@@ -1,0 +1,53 @@
+#!/bin/sh
+#
+# DSG-HRMS — commit-msg kancasi
+#
+# Amac: Commit mesajlarinin Conventional Commits bicimine uymasini saglamak.
+# Bkz. CONTRIBUTING.md §4
+#
+# Kurulum:  git config core.hooksPath .githooks
+
+MESAJ_DOSYASI="$1"
+ILK_SATIR=$(head -n1 "$MESAJ_DOSYASI")
+
+KIRMIZI='\033[0;31m'
+NORMAL='\033[0m'
+
+# Birlestirme ve geri alma commit'leri muaf
+case "$ILK_SATIR" in
+    "Merge "*|"Revert "*|"fixup!"*|"squash!"*) exit 0 ;;
+esac
+
+# <tur>(<kapsam>)!: <ozet>
+DESEN='^(feat|fix|docs|test|refactor|perf|build|ci|chore)(\([a-z0-9.-]+\))?!?: .+$'
+
+if ! printf '%s' "$ILK_SATIR" | grep -Eq "$DESEN"; then
+    printf "%b" "${KIRMIZI}"
+    echo "======================================================================"
+    echo " Commit mesaji bicimi hatali."
+    echo "======================================================================"
+    printf "%b" "${NORMAL}"
+    echo ""
+    echo " Girilen : $ILK_SATIR"
+    echo ""
+    echo " Beklenen: <tur>(<kapsam>): <ozet>"
+    echo ""
+    echo " Turler  : feat fix docs test refactor perf build ci chore"
+    echo " Ornek   : feat(kimlik): uyelik dogrulama kodu gonderimi"
+    echo ""
+    echo " Ayrinti : CONTRIBUTING.md §4"
+    echo ""
+    exit 1
+fi
+
+# Ozet satiri uzunlugu
+UZUNLUK=$(printf '%s' "$ILK_SATIR" | wc -m | tr -d ' ')
+if [ "$UZUNLUK" -gt 72 ]; then
+    printf "%b" "${KIRMIZI}"
+    echo " Ozet satiri $UZUNLUK karakter; en fazla 72 olmali."
+    printf "%b" "${NORMAL}"
+    echo " Ayrintiyi govde bolumune yazin."
+    exit 1
+fi
+
+exit 0

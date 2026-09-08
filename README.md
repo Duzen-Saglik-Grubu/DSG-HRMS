@@ -68,8 +68,17 @@ Ayrıntı ve gerekçeler: [ADR-0001](docs/adr/ADR-0001-teknoloji-yigini.md)
 ```bash
 git clone https://github.com/Duzen-Saglik-Grubu/DSG-HRMS.git
 cd DSG-HRMS
-# Kurulum adımları A1 aşamasında eklenecektir.
+
+# Git kancalarını etkinleştir (ZORUNLU)
+git config core.hooksPath .githooks
+
+# Kalan kurulum adımları A1 aşamasında eklenecektir.
 ```
+
+> **Git kancaları zorunludur.** `main` dalına doğrudan gönderimi engeller ve commit
+> mesajı biçimini denetler. GitHub Free planında özel depolarda sunucu tarafı dal
+> koruma kullanılamadığı için bu kancalar telafi edici kontroldür.
+> Ayrıntı: [dal-koruma-telafi-kontrolleri.md](docs/33061/MAN.5-konfigurasyon-yonetimi/dal-koruma-telafi-kontrolleri.md)
 
 ### Yapılandırma ve sırlar
 

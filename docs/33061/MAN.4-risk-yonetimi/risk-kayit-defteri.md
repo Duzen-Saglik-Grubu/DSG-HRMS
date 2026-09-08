@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.4-RKD
 **Süreç:** MAN.4 — Risk Yönetimi
-**Son güncelleme:** 2026-09-07
+**Son güncelleme:** 2026-09-08
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -186,6 +186,17 @@ raporunda ayrıca ele alınır.
 | **Önlem** | (1) **Yatay modüllere öncelik verilecek.** Onay akışı, bildirim, dosya, raporlama, denetim ve çalışma takvimi altyapısı bir kez yazılır; 20 iş modülü aynı altyapıyı kullanır. Bu, tek seferlik değil **20 kez geri dönen** bir yatırımdır (`KR-053`). (2) Modül bağımlılık haritası (`docs/mimari/modul-listesi-ve-bagimliliklar.md`) ile İK'nın ön koşulu tamamlanmamış modül seçmesi engellenir; yeniden çalışma önlenir. (3) Her modül kapanışında hız ölçülür ve kalan modüller için tahmin güncellenir (MAN.2). (4) Kapsam ve takvim beklentisi üst yönetimle dönemsel durum raporlarında paylaşılır. (5) İK onayı beklenirken enine kesen işler yapılarak boş zaman oluşması engellenir. |
 | **Durum** | Açık |
 
+### R-16 — Sunucu tarafı dal koruma özelliğinin kullanılamaması
+| | |
+|---|---|
+| **Kategori** | Konfigürasyon Yönetimi (MAN.5) |
+| **Açıklama** | Depo **özel** (private) ve organizasyon **GitHub Free** planında olduğu için `main` dalında sunucu tarafı koruma (branch protection ve repository ruleset) etkinleştirilememektedir. Sonuç: `main`'e doğrudan gönderim **teknik olarak engellenememekte**, kod incelemesi ve CI kalite kapıları birleştirme için **zorunlu kılınamamaktadır**. Depoyu herkese açık yapmak, içerik kuruma özel olduğu için seçenek değildir. |
+| **O / E / Puan** | 2 / 2 / **4** |
+| **Sahibi** | Bilgi İşlem |
+| **Önlem** | (1) **İstemci tarafı `pre-push` kancası** — `main`'e doğrudan gönderimi engeller (`--no-verify` ile atlanabilir). (2) **İstemci tarafı `commit-msg` kancası** — commit biçimini denetler. (3) **Sunucu tarafı tespit edici CI denetimi** — `main`'e PR olmadan gelen her commit'i yakalar, iş akışını başarısız kılar ve otomatik **düzeltici faaliyet issue'su** açar; bu kontrol atlatılamaz. (4) `CODEOWNERS` ve Tamamlanma Tanımı kontrol listesi. (5) **Kalıcı çözüm: GitHub Team planı** (kullanıcı başına aylık ~4 USD) — karar bekliyor. Ayrıntı: `docs/33061/MAN.5-konfigurasyon-yonetimi/dal-koruma-telafi-kontrolleri.md` |
+| **Seviye 2'ye etkisi** | PA 2.2 (c) ve (d) özniteliklerinde `F` (Tam) yerine `L` (Büyük Ölçüde) beklenir. Seviye 2 için PA 2.2'de **`L` yeterlidir** (33020 Madde 5.6); dolayısıyla hedef engellenmemektedir, ancak zayıflık kayıtlıdır. |
+| **Durum** | Açık — kalıcı çözüm kararı bekleniyor |
+
 ---
 
 ## 3. Risk özeti
@@ -194,13 +205,14 @@ raporunda ayrıca ele alınır.
 |---|---:|---|
 | 9 | 1 | R-01 |
 | 6 | 8 | R-03, R-04, R-05, R-06, R-08, R-12, R-13, R-15 |
-| 4 | 2 | R-09, R-14 |
+| 4 | 3 | R-09, R-14, R-16 |
 | 3 | 1 | R-02 |
 | Kapandı | 3 | R-07, R-10, R-11 |
 
 **Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-08, R-12, R-13, R-15
 
-**Son gözden geçirme:** 2026-09-07 — `R-15` (kapsam büyüklüğü) eklendi; `R-02`'nin
+**Son gözden geçirme:** 2026-09-08 — `R-16` (dal koruma kısıtı) eklendi; GitHub kurulumu sırasında tespit edildi.
+Önceki: 2026-09-07 — `R-15` (kapsam büyüklüğü) eklendi; `R-02`'nin
 olasılığı, LOGO sürüm yükseltmelerinin TRISOFT tarafından önceden bildirildiği ve geçmiş
 yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e düşürüldü**.
 Önceki: 2026-09-06 — R-14 (SMS kara listesi) eklendi.
