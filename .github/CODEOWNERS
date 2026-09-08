@@ -1,0 +1,9 @@
+# Tum degisiklikler icin varsayilan gozden gecirici.
+# Dokumanlar dahil her PR bu sahiplige tabidir (MAN.5, PA 2.2 d).
+*                       @dogusduzen
+
+# Kritik alanlar - ayrica dikkat gerektirir
+/docs/adr/              @dogusduzen
+/docs/karar-kayit-defteri.md  @dogusduzen
+/.github/               @dogusduzen
+/.gitignore             @dogusduzen

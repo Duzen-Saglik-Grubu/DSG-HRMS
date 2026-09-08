@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Dokuman Haritasi
+    url: https://github.com/Duzen-Saglik-Grubu/DSG-HRMS/blob/main/docs/00-DOKUMAN-HARITASI.md
+    about: Hangi bilginin nerede oldugunu gosteren harita.
+  - name: Katki Rehberi
+    url: https://github.com/Duzen-Saglik-Grubu/DSG-HRMS/blob/main/CONTRIBUTING.md
+    about: Dal, commit, PR ve Tamamlanma Tanimi kurallari.
+  - name: Modul Listesi ve Bagimliliklar
+    url: https://github.com/Duzen-Saglik-Grubu/DSG-HRMS/blob/main/docs/mimari/modul-listesi-ve-bagimliliklar.md
+    about: 35 modul, bagimlilik haritasi ve secim rehberi.

@@ -1,0 +1,85 @@
+name: "Görev"
+description: "Geliştirme, tasarım, test, doküman veya altyapı işi"
+title: "[GÖREV] "
+labels: ["tur:gelistirme"]
+body:
+  - type: dropdown
+    id: tur
+    attributes:
+      label: "İş türü"
+      options:
+        - "Geliştirme"
+        - "Tasarım"
+        - "Test"
+        - "Doküman"
+        - "Altyapı / Bakım"
+    validations:
+      required: true
+
+  - type: input
+    id: wbs
+    attributes:
+      label: "WBS kalemi"
+      description: "İş kırılım yapısındaki karşılığı."
+      placeholder: "2.12 — CI hattı ve kalite kapıları"
+    validations:
+      required: false
+
+  - type: textarea
+    id: aciklama
+    attributes:
+      label: "Ne yapılacak?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: neden
+    attributes:
+      label: "Neden?"
+      description: "Hangi gereksinimi, kararı veya riski karşılıyor? (REQ-…, KR-…, R-…)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: kabul
+    attributes:
+      label: "Tamamlanma kriterleri"
+      description: "Bu iş ne zaman bitmiş sayılır?"
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: input
+    id: onkosul
+    attributes:
+      label: "Ön koşullar"
+      description: "Bağımlı olduğu issue veya modüller."
+      placeholder: "#12, T4 Rol ve Yetki Yönetimi"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: surec
+    attributes:
+      label: "İlgili 33061 süreci"
+      description: "Bu işin kanıt ürettiği süreç. İzlenebilirlik matrisi için gereklidir."
+      options:
+        - "TEC.2 — Paydaş gereksinimleri"
+        - "TEC.3 — Sistem/yazılım gereksinimleri"
+        - "TEC.5 — Tasarım tanımlama"
+        - "TEC.7 — Gerçekleştirme"
+        - "TEC.8 — Entegrasyon"
+        - "TEC.9 — Doğrulama"
+        - "TEC.10 — Geçiş"
+        - "TEC.11 — Geçerleme"
+        - "TEC.13 — Bakım"
+        - "MAN.1 — Proje planlama"
+        - "MAN.2 — İzleme ve kontrol"
+        - "MAN.4 — Risk yönetimi"
+        - "MAN.5 — Konfigürasyon yönetimi"
+        - "MAN.6 — Bilgi yönetimi"
+        - "MAN.8 — Kalite güvence"
+    validations:
+      required: true

@@ -1,0 +1,114 @@
+# DSG-HRMS
+
+**Düzen Sağlık Grubu — İnsan Kaynakları Yönetim Sistemi**
+
+Kurum içi geliştirilen, web tabanlı insan kaynakları yönetim sistemi.
+Proje **TS ISO/IEC TS 33061 Seviye 2** çerçevesinde yürütülmektedir.
+
+---
+
+## Durum
+
+| | |
+|---|---|
+| **Aşama** | A0 — Hazırlık ve Planlama |
+| **Sürüm** | Henüz sürüm yok |
+| **Kapsam** | 35 modül (5 Temel · 10 Yatay · 20 İş) |
+
+---
+
+## Belgeler
+
+Başlangıç noktası: **[docs/00-DOKUMAN-HARITASI.md](docs/00-DOKUMAN-HARITASI.md)** —
+hangi bilginin nerede olduğunu gösteren harita.
+
+| Belge | İçerik |
+|---|---|
+| [Vizyon ve Kapsam](docs/mimari/vizyon-ve-kapsam.md) | Neden, ne, kim, kapsam içi/dışı |
+| [Modül Listesi ve Bağımlılıklar](docs/mimari/modul-listesi-ve-bagimliliklar.md) | 35 modül, bağımlılık haritası, seçim rehberi |
+| [Mimari Karar Kayıtları (ADR)](docs/adr/README.md) | 15 teknik karar, gerekçeleriyle |
+| [Karar Kayıt Defteri](docs/karar-kayit-defteri.md) | Tüm proje kararlarının resmî kaydı |
+| [Proje Planı](docs/33061/MAN.1-proje-planlama/proje-plani.md) | Hedefler, aşamalar, kaynaklar, izleme |
+| [İş Kırılım Yapısı](docs/33061/MAN.1-proje-planlama/is-kirilim-yapisi.md) | WBS ve kritik yol |
+| [Risk Kayıt Defteri](docs/33061/MAN.4-risk-yonetimi/risk-kayit-defteri.md) | Açık riskler ve önlemler |
+| [Olgunluk Kriterleri](docs/33061/00-OLGUNLUK-SEVIYESI-KRITERLERI.md) | Seviye 2 kriterleri ve öz değerlendirme |
+
+---
+
+## Teknoloji
+
+| Katman | Seçim |
+|---|---|
+| Backend | .NET 10 (LTS) · ASP.NET Core Web API · EF Core |
+| Frontend | React 19 · TypeScript · Vite · Material UI |
+| Veritabanı | PostgreSQL |
+| Kaynak sistem | LOGO Bordro (MSSQL) — **yalnızca okuma** |
+| Paketleme | Docker · Docker Compose |
+| CI/CD | GitHub Actions |
+
+Ayrıntı ve gerekçeler: [ADR-0001](docs/adr/ADR-0001-teknoloji-yigini.md)
+
+---
+
+## Geliştirme ortamı kurulumu
+
+> Bu bölüm, teknik iskelet (A1) tamamlandığında güncellenecektir.
+
+### Gereksinimler
+
+| Araç | Sürüm |
+|---|---|
+| .NET SDK | 10.0+ |
+| Node.js | 24 LTS |
+| Docker Desktop | Güncel |
+| Git | 2.40+ |
+
+### Kurulum
+
+```bash
+git clone https://github.com/Duzen-Saglik-Grubu/DSG-HRMS.git
+cd DSG-HRMS
+# Kurulum adımları A1 aşamasında eklenecektir.
+```
+
+### Yapılandırma ve sırlar
+
+Bağlantı dizeleri, API parolaları ve SMTP bilgileri **kaynak koda yazılmaz**
+([ADR-0008](docs/adr/ADR-0008-sir-ve-yapilandirma-yonetimi.md)).
+
+- **Geliştirme:** .NET User Secrets
+- **UAT / Üretim:** ortam değişkenleri
+
+Gerekli ayarların listesi ADR-0008 §4'tedir. Zorunlu bir ayar eksikse uygulama açılmaz.
+
+---
+
+## Katkı akışı
+
+Ayrıntı: [CONTRIBUTING.md](CONTRIBUTING.md)
+
+```
+issue → dal → geliştirme → PR → CI kapıları → inceleme → main
+```
+
+`main` dalına doğrudan yazılmaz. Her değişiklik — **dokümanlar dâhil** — Pull Request
+ile yapılır.
+
+---
+
+## Depoya girmeyen içerik
+
+| İçerik | Neden |
+|---|---|
+| `src_old/` | Açık metin kimlik bilgileri içeriyor ([KR-031](docs/karar-kayit-defteri.md)) |
+| `claude/` | Yazışma kayıtları paylaşılan parolalar içeriyor (KR-041) |
+| `docs/TSE_ISO_IEC_TS_33061/`, `docs/TS_ISO_IEC_33020/` | TSE telif hakkı (KR-030) |
+| `docs/NetGSM/` | Üçüncü taraf doküman |
+| `.env`, `*.pfx`, `*.key`, `secrets.json` | Sır |
+
+---
+
+## Lisans
+
+Bu depo **Düzen Sağlık Grubu'na** aittir ve kurum içi kullanım içindir.
+Kurum dışına dağıtılamaz.

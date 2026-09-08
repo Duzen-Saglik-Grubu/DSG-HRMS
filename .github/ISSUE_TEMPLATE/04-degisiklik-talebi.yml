@@ -1,0 +1,61 @@
+name: "Değişiklik Talebi"
+description: "Kabul edilmiş bir kapsam, gereksinim veya karar üzerinde değişiklik isteği"
+title: "[DEĞİŞİKLİK] "
+labels: ["tur:degisiklik-talebi", "surec:MAN.2"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Kilitlenmiş bir modül kapsamına sonradan gelen talepler **mevcut modüle
+        eklenmez**; bu issue ile kayıt altına alınır ve önceliklendirilir (`R-04`).
+
+  - type: textarea
+    id: talep
+    attributes:
+      label: "Ne değişsin?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: gerekce
+    attributes:
+      label: "Neden?"
+      description: "Talebin gerekçesi. Hangi ihtiyaç karşılanmıyor?"
+    validations:
+      required: true
+
+  - type: input
+    id: etkilenen
+    attributes:
+      label: "Etkilenen kayıt"
+      description: "Hangi gereksinim, karar veya modül etkileniyor?"
+      placeholder: "PG-IZIN-07 / KR-042 / İzin Yönetimi modülü"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: etki
+    attributes:
+      label: "Tahmini etki"
+      options:
+        - "Küçük — mevcut modül içinde çözülebilir"
+        - "Orta — ek geliştirme gerektirir, takvimi etkiler"
+        - "Büyük — kapsam değişikliği; üst yönetim onayı gerekir"
+    validations:
+      required: true
+
+  - type: input
+    id: talepeden
+    attributes:
+      label: "Talep eden"
+      placeholder: "İK Birimi — 2026-10-02 görüşmesi"
+    validations:
+      required: true
+
+  - type: textarea
+    id: karar
+    attributes:
+      label: "Karar (değerlendirme sonrası doldurulur)"
+      description: "Kabul / Ret / Ertelendi + gerekçe + karar defteri kimliği (KR-nnn)."
+    validations:
+      required: false

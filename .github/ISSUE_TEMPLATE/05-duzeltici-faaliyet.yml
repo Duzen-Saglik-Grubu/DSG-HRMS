@@ -1,0 +1,76 @@
+name: "Düzeltici Faaliyet"
+description: "Gözden geçirmede veya denetimde tespit edilen uygunsuzluk (MAN.8)"
+title: "[DÜZELTİCİ] "
+labels: ["tur:duzeltici-faaliyet", "surec:MAN.8"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tespit edilen uygunsuzluğun kayıt altına alınması bir zayıflık değil,
+        **kalite güvence sürecinin çalıştığının kanıtıdır** (MAN.8.BP5).
+        Uygunsuzluk gizlenmez, kaydedilir ve kapatılır.
+
+  - type: textarea
+    id: tespit
+    attributes:
+      label: "Tespit edilen uygunsuzluk"
+      description: "Ne, ne zaman, nerede tespit edildi?"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kaynak
+    attributes:
+      label: "Tespit kaynağı"
+      options:
+        - "Kod incelemesi"
+        - "Modül kapanış gözden geçirmesi"
+        - "Kalite güvence raporu"
+        - "Konfigürasyon denetimi"
+        - "Kabul testi (UAT)"
+        - "Öz değerlendirme (33061)"
+        - "Üretim olayı"
+        - "Diğer"
+    validations:
+      required: true
+
+  - type: textarea
+    id: etki
+    attributes:
+      label: "Etkisi"
+      description: "Bu uygunsuzluk neye yol açıyor veya açabilir?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: kokneden
+    attributes:
+      label: "Kök neden"
+      description: "Neden oluştu? Belirtiyi değil, nedeni yazın."
+    validations:
+      required: true
+
+  - type: textarea
+    id: duzeltme
+    attributes:
+      label: "Düzeltici faaliyet"
+      description: "Sorunu gidermek için ne yapılacak?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: onleyici
+    attributes:
+      label: "Önleyici faaliyet"
+      description: "Tekrarlanmaması için ne yapılacak? (kural, otomatik denetim, kontrol listesi maddesi)"
+    validations:
+      required: false
+
+  - type: input
+    id: ilgili
+    attributes:
+      label: "İlgili kayıt"
+      description: "Risk, karar veya süreç bağlantısı."
+      placeholder: "R-03 / KR-038 / TEC.9"
+    validations:
+      required: false

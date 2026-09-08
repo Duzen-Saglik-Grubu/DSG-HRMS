@@ -1,0 +1,112 @@
+name: "Gereksinim"
+description: "Bir modül veya yetenek için paydaş gereksinimi (TEC.2 / TEC.3)"
+title: "[GEREKSİNİM] "
+labels: ["tur:gereksinim", "surec:TEC.2"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gereksinimler İK birimiyle yapılan toplantılarda toplanır.
+        Bu issue, toplantıda alınan bir gereksinimin kaydıdır.
+        Toplantının tamamı ayrıca `docs/33061/TEC.2-.../kayitlar/` altına yazılır.
+
+  - type: input
+    id: kimlik
+    attributes:
+      label: "Gereksinim kimliği"
+      description: "PG-<MODÜL>-<no> biçiminde. Henüz atanmadıysa boş bırakın."
+      placeholder: "PG-IZIN-07"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: modul
+    attributes:
+      label: "Modül"
+      options:
+        - "Kimlik Yönetimi (Üyelik ve Giriş)"
+        - "Kullanıcı Yönetimi"
+        - "Rol ve Yetki Yönetimi"
+        - "Personel Yönetimi"
+        - "Organizasyon Yönetimi"
+        - "Çalışma Takvimi Yönetimi"
+        - "İzin Yönetimi"
+        - "İş Akışı Yönetimi (Workflow)"
+        - "Delegasyon Yönetimi"
+        - "Bildirim Merkezi"
+        - "Referans Veri Yönetimi"
+        - "Sistem Yönetimi"
+        - "Denetim ve Erişim Kayıtları"
+        - "Çalışan Belge Yönetimi"
+        - "Raporlama ve Dışa Aktarma"
+        - "Dashboard"
+        - "Eğitim Yönetimi"
+        - "Sertifika Yönetimi"
+        - "Yetkinlik Yönetimi"
+        - "Performans Yönetimi"
+        - "Terfi Yönetimi"
+        - "Pozisyon Değişikliği Yönetimi"
+        - "İşe Alım Yönetimi"
+        - "Aday Havuzu Yönetimi"
+        - "Mülakat Yönetimi"
+        - "Oryantasyon Yönetimi"
+        - "Deneme Süresi Yönetimi"
+        - "Disiplin Süreci Yönetimi"
+        - "Ödül ve Takdir Yönetimi"
+        - "Varlık Yönetimi (Zimmet)"
+        - "Kurum İçi Duyuru Yönetimi"
+        - "İşten Çıkış Süreci Yönetimi"
+        - "İşten Çıkış Görüşmesi Yönetimi"
+        - "Tebrik Servisi"
+        - "İSG ve İş Kazası Yönetimi"
+        - "Modül dışı / genel"
+    validations:
+      required: true
+
+  - type: textarea
+    id: ihtiyac
+    attributes:
+      label: "İhtiyaç"
+      description: "Kullanıcı gözünden ne isteniyor?"
+      placeholder: |
+        Bir personel olarak izin talebimi kendim girmek istiyorum ki
+        İK'ya e-posta göndermek zorunda kalmayayım.
+    validations:
+      required: true
+
+  - type: textarea
+    id: kurallar
+    attributes:
+      label: "İş kuralları"
+      description: "Geçerli kurallar, sınırlar, istisnalar. Madde madde yazın."
+    validations:
+      required: true
+
+  - type: textarea
+    id: kabul
+    attributes:
+      label: "Kabul kriterleri"
+      description: "Bu gereksinimin karşılandığı nasıl doğrulanacak? Ölçülebilir yazın."
+      placeholder: |
+        - Personel, kendi izin bakiyesini giriş yaptıktan sonra ana ekranda görebilir.
+        - Bakiyesinden fazla gün talep edilemez; sistem uyarı verir.
+        - Talep kaydedildiğinde yöneticisine bildirim gider.
+    validations:
+      required: true
+
+  - type: input
+    id: kaynak
+    attributes:
+      label: "Kaynak"
+      description: "Gereksinimi kim verdi ve hangi toplantıda?"
+      placeholder: "İK Birimi — 2026-09-15 İzin Yönetimi gereksinim toplantısı"
+    validations:
+      required: true
+
+  - type: textarea
+    id: notlar
+    attributes:
+      label: "Notlar ve açık sorular"
+      description: "Netleşmemiş noktalar, bağımlılıklar, ilgili kararlar (KR-nnn)."
+    validations:
+      required: false

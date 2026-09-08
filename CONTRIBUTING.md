@@ -1,0 +1,251 @@
+# Katkı Rehberi
+
+**Son güncelleme:** 2026-09-07
+**İlgili süreçler:** TEC.7 (Gerçekleştirme), TEC.9 (Doğrulama), MAN.5 (Konfigürasyon Yönetimi), MAN.8 (Kalite Güvence)
+
+Bu belge, depoda çalışma kurallarını tanımlar. Kurallar aynı zamanda
+**TS ISO/IEC TS 33061 Seviye 2 kanıtıdır**: PA 2.2 (c) ve (d) maddeleri, bilginin
+kontrol edilmesini ve onaylanmasını ister. Buradaki akış tam olarak bunu sağlar.
+
+---
+
+## 1. Temel kural
+
+> **`main` dalına doğrudan yazılmaz.** Kod, yapılandırma ve **dokümanlar dâhil**
+> her değişiklik bir dal üzerinde yapılır ve Pull Request ile birleştirilir.
+
+Gerekçe: Değişikliğin *neyi*, *neden* değiştirdiği ve *kim tarafından* onaylandığı
+kaydedilmiş olur. Dokümanların da bu akıştan geçmesi bilinçli bir karardır — 33061
+açısından bir doküman değişikliği de kontrol edilmesi gereken bir değişikliktir.
+
+---
+
+## 2. İş akışı
+
+```
+1. Issue açılır (veya mevcut issue seçilir)
+2. Issue'dan dal oluşturulur
+3. Geliştirme yapılır, commit'lenir
+4. Pull Request açılır (issue'ya bağlanır)
+5. CI kalite kapıları çalışır
+6. Kod incelemesi yapılır
+7. Squash merge ile main'e alınır
+8. Dal silinir
+9. Issue otomatik kapanır
+```
+
+**Her değişiklik bir issue'ya bağlıdır.** Issue'suz PR açılmaz; izlenebilirlik zinciri
+(gereksinim → issue → PR → test → kabul) bu bağ üzerinden kurulur.
+
+---
+
+## 3. Dal adlandırma
+
+```
+<tür>/<issue-no>-<kısa-açıklama>
+```
+
+| Tür | Kullanım | Örnek |
+|---|---|---|
+| `ozellik` | Yeni yetenek | `ozellik/42-uyelik-dogrulama-kodu` |
+| `hata` | Hata düzeltmesi | `hata/57-izin-gun-hesabi` |
+| `dokuman` | Yalnızca doküman | `dokuman/12-adr-0016-eklendi` |
+| `bakim` | Bağımlılık, altyapı, teknik borç | `bakim/63-paket-guncellemeleri` |
+| `duzeltici` | MAN.8 düzeltici faaliyet | `duzeltici/71-kapsam-esigi-dususu` |
+
+Türkçe karakter ve boşluk kullanılmaz.
+
+### 3.1 Dallanma stratejisi
+
+**Trunk-based (GitHub Flow).** Tek uzun ömürlü dal vardır: `main`.
+
+- Dallar **kısa ömürlüdür** — hedef: 1–3 gün, en fazla bir hafta.
+- Uzun süren dallar birleştirme çatışması ve gözden geçirilemez PR üretir.
+- Büyük bir modül tek PR'da gelmez; anlamlı parçalara bölünür.
+- `develop` veya `release` dalı **kullanılmaz** — tek geliştirme kanalı için gereksiz
+  karmaşıklık üretir.
+
+---
+
+## 4. Commit mesajları
+
+**Conventional Commits** biçimi kullanılır:
+
+```
+<tür>(<kapsam>): <özet>
+
+[gövde — neden değişti]
+
+Refs: #<issue-no>
+```
+
+| Tür | Anlamı |
+|---|---|
+| `feat` | Yeni yetenek |
+| `fix` | Hata düzeltmesi |
+| `docs` | Doküman |
+| `test` | Test ekleme/düzeltme |
+| `refactor` | Davranışı değiştirmeyen iyileştirme |
+| `perf` | Performans |
+| `build` | Derleme, paket, Docker |
+| `ci` | CI/CD yapılandırması |
+| `chore` | Diğer bakım işleri |
+
+**Kapsam**, modül kısaltmasıdır: `kimlik`, `izin`, `organizasyon`, `personel` …
+
+**Örnek:**
+```
+feat(kimlik): uyelik dogrulama kodu gonderimi
+
+Dogrulama kodu 6 hane, 5 dakika gecerli ve hash'lenmis saklaniyor.
+Kod hicbir log kaydina yazilmiyor (ADR-0009 §4).
+
+Refs: #42
+```
+
+**Kurallar:**
+- Özet satırı **en fazla 72 karakter**, küçük harfle başlar, sonunda nokta yok.
+- Gövdede **ne** değil **neden** anlatılır; *ne* zaten koddadır.
+- Kırıcı değişiklikte `!` kullanılır: `feat(api)!: ...`
+
+---
+
+## 5. Pull Request kuralları
+
+| Kural | Değer |
+|---|---|
+| Şablon | `.github/PULL_REQUEST_TEMPLATE.md` doldurulur |
+| Issue bağlantısı | **Zorunlu** — `Closes #42` |
+| Boyut | Hedef **< 400 satır** değişiklik; büyükse bölünür |
+| CI | Tüm kalite kapıları geçmeli |
+| İnceleme | En az **1 onay** |
+| Birleştirme | **Squash merge** — `main` geçmişi okunabilir kalır |
+| Dal | Birleştirme sonrası **silinir** |
+
+### 5.1 Taslak (draft) PR
+
+İş yarımken PR **taslak** olarak açılabilir. Bu, CI'ın erken çalışmasını ve geri
+bildirimin erken alınmasını sağlar. Taslak PR birleştirilemez.
+
+---
+
+## 6. Tamamlanma Tanımı (Definition of Done)
+
+Bir iş, aşağıdakilerin **tamamı** sağlanmadan "bitti" sayılmaz:
+
+- [ ] Kod yazıldı ve kodlama standartlarına uygun
+- [ ] **Birim testleri** yazıldı; kapsam eşikleri sağlanıyor (genel %75, Domain %90)
+- [ ] **Entegrasyon testleri** yazıldı (gerçek PostgreSQL — Testcontainers)
+- [ ] **Yetki sızıntısı testi** yazıldı (kapsam dışı kayıt `404` dönüyor) — *atlanamaz*
+- [ ] **Maskeleme testi** yazıldı (kişisel veri log'a düz metin düşmüyor) — *atlanamaz*
+- [ ] Mimari kuralları ihlal edilmedi (mimari testi geçiyor)
+- [ ] Denetim izi ve gerekiyorsa erişim kaydı üretiliyor (ADR-0009)
+- [ ] API değişikliği varsa OpenAPI güncel; frontend tipleri yeniden üretildi
+- [ ] Veritabanı değişikliği varsa migration yazıldı ve **geri alınabilir**
+- [ ] İlgili dokümanlar güncellendi (ADR, karar defteri, doküman haritası)
+- [ ] Yeni bir mimari karar alındıysa **ADR yazıldı**
+- [ ] Sır sızıntısı yok (`gitleaks` temiz)
+- [ ] CI'daki tüm kalite kapıları geçti
+- [ ] Kod incelemesi yapıldı ve onaylandı
+
+> Bu liste, ADR-0011 §2 ve §6'nın operasyonel karşılığıdır ve MAN.8 kapsamında
+> kalite kriteri sayılır.
+
+---
+
+## 7. Kod inceleme kontrol listesi
+
+İnceleyen kişi şunlara bakar:
+
+**Doğruluk**
+- [ ] İş kuralı gereksinimle örtüşüyor mu?
+- [ ] Sınır durumlar ele alınmış mı? (boş liste, ilk/son gün, çakışan tarih aralığı)
+- [ ] Hata durumları anlamlı mesajla dönüyor mu?
+
+**Güvenlik ve KVKK**
+- [ ] Yetki kontrolü **veri katmanında** mı yapılıyor? (ADR-0007 §3)
+- [ ] Kapsam dışı erişimde `404` mü dönüyor?
+- [ ] Kişisel veri log'a veya hata mesajına sızıyor mu?
+- [ ] Kullanıcı girdisi doğrulanıyor mu? (FluentValidation)
+- [ ] Sır, bağlantı dizesi veya anahtar koda yazılmış mı?
+
+**Veri**
+- [ ] Yabancı anahtar ve `CHECK` kısıtları tanımlı mı?
+- [ ] Tarih alanları `date` mi, zaman damgaları `timestamptz` (UTC) mi?
+- [ ] Soft delete filtresi uygulanıyor mu?
+- [ ] Migration geri alınabilir mi? Yıkıcı değişiklik çok adımlı mı?
+
+**Performans**
+- [ ] Listeleme sayfalanmış mı?
+- [ ] **N+1 sorgu** var mı?
+- [ ] Gerekli dizinler tanımlı mı?
+
+**Bakım kolaylığı**
+- [ ] Kod, çevresindeki kodla aynı üslupta mı?
+- [ ] Katman ve modül sınırları korunuyor mu?
+- [ ] Gereksiz soyutlama var mı? (KISS, YAGNI)
+- [ ] Tekrar eden mantık var mı? (DRY)
+
+---
+
+## 8. Doküman kuralları
+
+Ayrıntı: `docs/00-DOKUMAN-HARITASI.md` §4
+
+- Teknik terimler dışında **Türkçe** yazılır.
+- Kimliklendirme: `PG-`, `REQ-`, `ADR-`, `KR-`, `R-`, `TS-`
+- Tarih biçimi: `YYYY-AA-GG`
+- Her belgede "Son güncelleme" ve sonunda değişiklik geçmişi bulunur.
+- **Sır, bağlantı dizesi veya gerçek kişisel veri örneği yazılmaz.**
+- Yeni bir mimari karar `docs/sablonlar/ADR-sablonu.md` ile ADR olarak yazılır.
+
+---
+
+## 9. Sürümleme ve baseline
+
+**Semantic Versioning** (`MAJOR.MINOR.PATCH`).
+
+| Artış | Ne zaman |
+|---|---|
+| `PATCH` | Hata düzeltmesi |
+| `MINOR` | Yeni modül veya yetenek |
+| `MAJOR` | `v1.0.0` = üretime geçiş; sonrasında kırıcı değişiklik |
+
+Kabul edilen her modül bir **etiket (tag)** ve bir **baseline** üretir (MAN.5).
+Sürüm notları `CHANGELOG.md` dosyasında tutulur.
+
+---
+
+## 10. Etiketler ve issue türleri
+
+| Ön ek | Kullanım |
+|---|---|
+| `tur:` | gereksinim, tasarim, gelistirme, test, dokuman, hata, degisiklik-talebi, duzeltici-faaliyet |
+| `modul:` | kimlik, personel, organizasyon, izin, egitim … |
+| `surec:` | TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13, MAN.1, MAN.2, MAN.4, MAN.5, MAN.6, MAN.8 |
+| `oncelik:` | yuksek, orta, dusuk |
+| `durum:` | engellendi, bilgi-bekliyor |
+
+> **`surec:` etiketi**, bir issue'nun hangi 33061 sürecine kanıt ürettiğini gösterir.
+> İzlenebilirlik matrisinin üretilmesini kolaylaştırır; boş bırakılmaz.
+
+---
+
+## 11. Yapılmayacaklar
+
+- ❌ `main`'e doğrudan push
+- ❌ Issue'suz PR
+- ❌ CI kapılarını atlayarak birleştirme
+- ❌ Sır, parola veya bağlantı dizesini depoya yazma
+- ❌ `--force` ile `main` geçmişini değiştirme
+- ❌ Testsiz yeni yetenek
+- ❌ Gerçek kişisel veriyi test verisi olarak kullanma
+- ❌ Kişisel veri içeren dosyayı (Excel, döküm) depoya ekleme
+
+---
+
+## Değişiklik Geçmişi
+
+| Tarih | Sürüm | Değişiklik | Yapan |
+|---|---|---|---|
+| 2026-09-07 | 0.1 | İlk oluşturma | Bilgi İşlem |

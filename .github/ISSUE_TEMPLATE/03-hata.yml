@@ -1,0 +1,80 @@
+name: "Hata"
+description: "Beklenmeyen davranış veya arıza bildirimi"
+title: "[HATA] "
+labels: ["tur:hata", "surec:TEC.13"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ **Kişisel veri paylaşmayın.** Ekran görüntüsü eklerken TCKN, ad-soyad,
+        telefon ve e-posta gibi alanları maskeleyin. Hata kaydı için `traceId`
+        yeterlidir.
+
+  - type: textarea
+    id: ozet
+    attributes:
+      label: "Ne oldu?"
+      description: "Beklenen davranış ne, gerçekleşen ne?"
+      placeholder: |
+        Beklenen: İzin talebi kaydedildiğinde yöneticiye bildirim gitmeli.
+        Gerçekleşen: Talep kaydediliyor ancak bildirim gitmiyor.
+    validations:
+      required: true
+
+  - type: textarea
+    id: adimlar
+    attributes:
+      label: "Nasıl tekrarlanır?"
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: input
+    id: traceid
+    attributes:
+      label: "traceId"
+      description: "Hata ekranında görünen izleme kimliği. Log ile eşleştirme bununla yapılır."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: ortam
+    attributes:
+      label: "Ortam"
+      options:
+        - "Geliştirme"
+        - "UAT"
+        - "Üretim"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: siddet
+    attributes:
+      label: "Şiddet"
+      options:
+        - "Kritik — sistem kullanılamıyor veya veri kaybı riski var"
+        - "Yüksek — ana iş akışı çalışmıyor, geçici çözüm yok"
+        - "Orta — sorun var ama geçici çözümle devam edilebiliyor"
+        - "Düşük — görsel veya küçük tutarsızlık"
+    validations:
+      required: true
+
+  - type: input
+    id: surum
+    attributes:
+      label: "Sürüm"
+      placeholder: "v0.3.1"
+    validations:
+      required: false
+
+  - type: textarea
+    id: ek
+    attributes:
+      label: "Ek bilgi"
+      description: "Tarayıcı, ekran görüntüsü (maskeli), log kesiti."
+    validations:
+      required: false

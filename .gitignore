@@ -1,0 +1,59 @@
+# ---- Telif korumalı / repoya girmemesi gereken içerik ----
+# TSE standard dokümanı satın alınmıştır; TSE lisansı çoğaltma ve dağıtımı yasaklar.
+docs/TSE_ISO_IEC_TS_33061/
+docs/TS_ISO_IEC_33020/
+docs/NetGSM/
+*.pdf
+!docs/**/sablon/*.pdf
+
+# ---- Sırlar ----
+# UYARI: soru-cevap kayitlari mesajlasma icinde paylasilan parolalari icermektedir.
+# Depoya ALINMAZ; yerel karar arsividir. Resmi karar kaydi: docs/karar-kayit-defteri.md
+claude/
+
+*.env
+.env.*
+appsettings.*.Local.json
+appsettings.Local.json
+secrets.json
+*.pfx
+*.key
+*.pem
+
+# ---- .NET ----
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+.vs/
+TestResults/
+coverage/
+*.coverage
+*.trx
+
+# ---- Node / Frontend ----
+node_modules/
+dist/
+dist-ssr/
+.vite/
+coverage/
+*.local
+playwright-report/
+test-results/
+
+# ---- Araçlar / IDE ----
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# ---- Eski sistem kaynak arşivi ----
+# UYARI: src_old icinde acik metin kimlik bilgileri var (veritabani baglanti dizeleri,
+# SMTP parolasi, NetGSM API parolasi). Depoya ALINMAZ. Yerel referans arsividir.
+src_old/
+src_old/**/bin/
+src_old/**/obj/
+src_old/**/.vs/
+src_old/**/*.rar

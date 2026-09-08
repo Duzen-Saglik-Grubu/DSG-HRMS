@@ -1,0 +1,26 @@
+# Satir sonu normalizasyonu: depoda LF, calisma kopyasinda platform varsayilani.
+# Gelistirme Windows, uretim Linux oldugu icin gereklidir.
+* text=auto eol=lf
+
+# Ikili dosyalar
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary
+*.rar   binary
+*.xlsx  binary
+*.docx  binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+
+# Windows betikleri CRLF kalmali
+*.cmd   text eol=crlf
+*.bat   text eol=crlf
+*.ps1   text eol=crlf
+
+# Dil istatistiklerinde sayilmasin
+docs/**     linguist-documentation
