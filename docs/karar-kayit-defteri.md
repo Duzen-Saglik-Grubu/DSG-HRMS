@@ -1,7 +1,7 @@
 # Karar Kayıt Defteri
 
 **Belge kimliği:** KKD
-**Son güncelleme:** 2026-09-08
+**Son güncelleme:** 2026-09-09
 **Amaç:** Proje boyunca alınan kararların tek ve resmî kaydı. Bir kararın *ne olduğu*,
 *neden alındığı* ve *ne zaman alındığı* buradan izlenir.
 **İlgili süreçler:** MAN.2 (Proje Değerlendirme ve Kontrol), TEC.2, TEC.5
@@ -80,6 +80,8 @@
 | KR-052 | 2026-09-07 | Zincirli modüllerde planlama | Zincirli modül gruplarında (işe alım, çıkış, değerlendirme) planlama **daima zincirin ilk halkasından** başlayacak; zincirin ortasından modül seçilmeyecek | Zincirin ortasındaki modül, öncesindeki halkalar olmadan anlamlı çalışmaz; seçilirse önceki halkalar da kapsama girer ve modül kapsamı toplantıda öngörülenden büyür (`R-04`) | İK + Bilgi İşlem | Yürürlükte |
 | KR-053 | 2026-09-07 | Yatay modüllere öncelik | Yatay (enine kesen) modüllere **öncelik verilecek**; iş modüllerinden önce altyapı tamamlanacak | Onay akışı, bildirim, dosya, raporlama, denetim ve takvim altyapısı bir kez yazılır; 20 iş modülü aynı altyapıyı kullanır. Bu, tek seferlik değil **20 kez geri dönen** bir yatırımdır. "Önce altyapı" bir gecikme değil, hızlanma tercihidir | İK + Bilgi İşlem | Yürürlükte |
 | KR-054 | 2026-09-08 | Dal koruma telafi kontrolleri | GitHub Free planında özel depoda sunucu tarafı dal koruma kullanılamadığı için üç katmanlı telafi düzeni uygulanacak: (1) istemci tarafı `pre-push` ve `commit-msg` kancaları, (2) sunucu tarafı **tespit edici** CI denetimi — `main`'e PR olmadan gelen commit otomatik düzeltici faaliyet issue'su üretir, (3) `CODEOWNERS` ve Tamamlanma Tanımı. Kalıcı çözüm olarak **GitHub Team planı** önerilmektedir | Depo özel, organizasyon Free planında; depoyu herkese açık yapmak içerik nedeniyle seçenek değil. Zayıflığın kayıtlı ve telafi edilmiş olması, kayıtsız olmasından iyidir (`R-16`) | Bilgi İşlem | Yürürlükte |
+| KR-055 | 2026-09-09 | GitHub plan tercihi | Depo **özel kalacak** ve organizasyon **GitHub Free planında** devam edecek; **Team planına geçilmeyecek**. `KR-054` ile kurulan telafi edici kontroller **kalıcı çözümdür**. `R-16` riski, bu kontrollerle birlikte **kabul edilmiştir** | Şirket projesi olması nedeniyle deponun herkese açık yapılması söz konusu değildir. Sunucu tarafı dal koruma yerine, atlatılamaz bir tespit edici CI denetimi ve istemci tarafı kancalar yeterli görülmüştür. Seviye 2 için PA 2.2'de `L` derecesi yeterlidir (33020 Madde 5.6) | Bilgi İşlem | Yürürlükte |
+| KR-056 | 2026-09-09 | Bildirim istisnasının mimari yerleşimi | Bazı personele e-posta ve SMS gönderilmemesi ihtiyacı şu şekilde karşılanacak: **istisna tanımı `Kişi (Person)` seviyesinde tutulacak** ve **T5 Kullanıcı Yönetimi** modülünde yönetilecek; **uygulaması Y1 Bildirim Merkezi'nde tek merkezî noktada** (`INotificationService`) yapılacak. İstisna tanımı ve kaldırılması denetim izine yazılacak; gönderilmeyen iletiler de gönderim kaydına "istisna" sonucuyla düşecek | Kişinin hesabı olmasa da istisna tanımlanabilmeli; hesap kapanıp açılsa da korunmalı. Kontrolün tek noktada olması, 20 iş modülünün her birinde unutulma riskini ortadan kaldırır. Ayrıntı ve İK'ya sorulacak açık sorular: `docs/mimari/modul-listesi-ve-bagimliliklar.md` §7 | İK Birimi + Bilgi İşlem | Yürürlükte |
 
 ---
 
@@ -92,3 +94,4 @@
 | 2026-09-07 | 0.3 | KR-032 değiştirildi (geliştirme kapsamı ile göç kapsamı ayrıldı); KR-045…KR-049 eklendi | Bilgi İşlem |
 | 2026-09-07 | 0.4 | KR-050…KR-053 eklendi (Çalışma Takvimi ayrı modül, İSG modülü, zincir planlaması, yatay öncelik) | Bilgi İşlem |
 | 2026-09-08 | 0.5 | KR-054 eklendi (dal koruma telafi kontrolleri) | Bilgi İşlem |
+| 2026-09-09 | 0.6 | KR-055 (GitHub plan tercihi) ve KR-056 (bildirim istisnası yerleşimi) eklendi | Bilgi İşlem |
