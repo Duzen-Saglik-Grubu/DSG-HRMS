@@ -1,0 +1,108 @@
+name: Dal Koruma Denetimi
+
+# AMAC
+# GitHub Free planinda ozel depolar icin sunucu tarafi dal koruma ozelligi
+# bulunmadigindan, 'main' dalina dogrudan yapilan gonderimler ONLENEMEZ.
+# Bu is akisi, onleyici kontrol yerine TESPIT EDICI kontrol saglar:
+# main'e Pull Request disinda gelen her commit tespit edilir, kayit altina
+# alinir ve bir duzeltici faaliyet issue'su acilir.
+#
+# Bkz. docs/33061/MAN.5-konfigurasyon-yonetimi/dal-koruma-telafi-kontrolleri.md
+# Ilgili risk: R-16
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  denetim:
+    name: main dalina gelen commit'leri denetle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Commit'in bir Pull Request ile geldigini dogrula
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = context.sha;
+
+            const { data: prler } =
+              await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                commit_sha: sha,
+              });
+
+            const birlestirilmis = prler.filter(pr => pr.merged_at !== null);
+
+            if (birlestirilmis.length > 0) {
+              const pr = birlestirilmis[0];
+              core.info(`UYGUN: commit ${sha.substring(0,7)} #${pr.number} ile geldi.`);
+              return;
+            }
+
+            // Ilk commit (depo baslangici) muaf tutulur.
+            const { data: commit } = await github.rest.repos.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: sha,
+            });
+            if (commit.parents.length === 0) {
+              core.info('Ilk commit; denetim disi.');
+              return;
+            }
+
+            const yazar  = commit.commit.author.name;
+            const mesaj  = commit.commit.message.split('\n')[0];
+            const tarih  = commit.commit.author.date;
+            const kisaSha = sha.substring(0, 7);
+
+            const baslik = `[DÜZELTİCİ] main dalına PR olmadan commit geldi (${kisaSha})`;
+            const govde = [
+              '## Tespit edilen uygunsuzluk',
+              '',
+              `\`main\` dalına Pull Request kullanılmadan doğrudan bir commit gönderilmiştir.`,
+              'Bu, `CONTRIBUTING.md` §1 kuralına ve MAN.5 (Konfigürasyon Yönetimi) sürecine aykırıdır.',
+              '',
+              '| Alan | Değer |',
+              '|---|---|',
+              `| Commit | ${sha} |`,
+              `| Mesaj | ${mesaj} |`,
+              `| Yazar | ${yazar} |`,
+              `| Tarih | ${tarih} |`,
+              '',
+              '## Tespit kaynağı',
+              '',
+              'Otomatik denetim — `dal-koruma-denetimi.yml`',
+              '',
+              '## Etkisi',
+              '',
+              'Değişiklik kod incelemesinden ve CI kalite kapılarından geçmemiştir.',
+              'Konfigürasyon öğesi üzerindeki değişiklik onaysız uygulanmıştır.',
+              '',
+              '## Yapılması gerekenler',
+              '',
+              '- [ ] Commit içeriği gözden geçirildi',
+              '- [ ] Kalite kapıları geriye dönük çalıştırıldı',
+              '- [ ] Gerekliyse düzeltme PR ile yapıldı',
+              '- [ ] Kök neden yazıldı ve tekrarı önlendi',
+              '',
+              '> Sunucu tarafı dal koruma GitHub Free planında kullanılamadığı için bu',
+              '> kontrol **önleyici değil tespit edicidir**. Kalıcı çözüm için `R-16`.',
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: baslik,
+              body: govde,
+              labels: ['tur:duzeltici-faaliyet', 'surec:MAN.5', 'oncelik:yuksek'],
+            });
+
+            core.setFailed(
+              `main dalına PR olmadan commit geldi: ${kisaSha}. Düzeltici faaliyet issue'su açıldı.`
+            );

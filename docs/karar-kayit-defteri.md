@@ -1,7 +1,7 @@
 # Karar Kayıt Defteri
 
 **Belge kimliği:** KKD
-**Son güncelleme:** 2026-09-07
+**Son güncelleme:** 2026-09-08
 **Amaç:** Proje boyunca alınan kararların tek ve resmî kaydı. Bir kararın *ne olduğu*,
 *neden alındığı* ve *ne zaman alındığı* buradan izlenir.
 **İlgili süreçler:** MAN.2 (Proje Değerlendirme ve Kontrol), TEC.2, TEC.5
@@ -79,6 +79,7 @@
 | KR-051 | 2026-09-07 | İSG ve İş Kazası modülü | **İSG ve İş Kazası Yönetimi** modülü kapsama alındı (İ20) | 6331 sayılı İş Sağlığı ve Güvenliği Kanunu kapsamında iş kazası kayıtlarının tutulması yasal yükümlülüktür. Mevcut sistemde modül vardı ancak neredeyse kullanılmamıştı (2–3 kayıt); veri göçü yapılmayacak, modül yeni sistemde geliştirilecektir | İK + Bilgi İşlem | Yürürlükte |
 | KR-052 | 2026-09-07 | Zincirli modüllerde planlama | Zincirli modül gruplarında (işe alım, çıkış, değerlendirme) planlama **daima zincirin ilk halkasından** başlayacak; zincirin ortasından modül seçilmeyecek | Zincirin ortasındaki modül, öncesindeki halkalar olmadan anlamlı çalışmaz; seçilirse önceki halkalar da kapsama girer ve modül kapsamı toplantıda öngörülenden büyür (`R-04`) | İK + Bilgi İşlem | Yürürlükte |
 | KR-053 | 2026-09-07 | Yatay modüllere öncelik | Yatay (enine kesen) modüllere **öncelik verilecek**; iş modüllerinden önce altyapı tamamlanacak | Onay akışı, bildirim, dosya, raporlama, denetim ve takvim altyapısı bir kez yazılır; 20 iş modülü aynı altyapıyı kullanır. Bu, tek seferlik değil **20 kez geri dönen** bir yatırımdır. "Önce altyapı" bir gecikme değil, hızlanma tercihidir | İK + Bilgi İşlem | Yürürlükte |
+| KR-054 | 2026-09-08 | Dal koruma telafi kontrolleri | GitHub Free planında özel depoda sunucu tarafı dal koruma kullanılamadığı için üç katmanlı telafi düzeni uygulanacak: (1) istemci tarafı `pre-push` ve `commit-msg` kancaları, (2) sunucu tarafı **tespit edici** CI denetimi — `main`'e PR olmadan gelen commit otomatik düzeltici faaliyet issue'su üretir, (3) `CODEOWNERS` ve Tamamlanma Tanımı. Kalıcı çözüm olarak **GitHub Team planı** önerilmektedir | Depo özel, organizasyon Free planında; depoyu herkese açık yapmak içerik nedeniyle seçenek değil. Zayıflığın kayıtlı ve telafi edilmiş olması, kayıtsız olmasından iyidir (`R-16`) | Bilgi İşlem | Yürürlükte |
 
 ---
 
@@ -90,3 +91,4 @@
 | 2026-09-06 | 0.2 | KR-041…KR-044 eklendi (soru-cevap arşivi, SMS servisi, TCKN kuralı, IP kısıtlaması) | Bilgi İşlem |
 | 2026-09-07 | 0.3 | KR-032 değiştirildi (geliştirme kapsamı ile göç kapsamı ayrıldı); KR-045…KR-049 eklendi | Bilgi İşlem |
 | 2026-09-07 | 0.4 | KR-050…KR-053 eklendi (Çalışma Takvimi ayrı modül, İSG modülü, zincir planlaması, yatay öncelik) | Bilgi İşlem |
+| 2026-09-08 | 0.5 | KR-054 eklendi (dal koruma telafi kontrolleri) | Bilgi İşlem |

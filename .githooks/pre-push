@@ -1,0 +1,49 @@
+#!/bin/sh
+#
+# DSG-HRMS — pre-push kancasi
+#
+# Amac: 'main' dalina dogrudan gonderimi engellemek.
+#
+# Bu kanca, GitHub Free planinda ozel depolar icin sunucu tarafi dal koruma
+# ozelligi bulunmadigi icin TELAFI EDICI KONTROL olarak kullanilir.
+# Bkz. docs/33061/MAN.5-konfigurasyon-yonetimi/dal-koruma-telafi-kontrolleri.md
+#
+# Kurulum:  git config core.hooksPath .githooks
+#
+# ONEMLI: Bu kanca istemci tarafindadir; --no-verify ile atlanabilir.
+# Kalici cozum GitHub Team planina gecerek sunucu tarafi korumayi acmaktir.
+
+KORUMALI_DAL="main"
+KIRMIZI='\033[0;31m'
+SARI='\033[0;33m'
+NORMAL='\033[0m'
+
+while read -r yerel_ref yerel_sha uzak_ref uzak_sha; do
+    case "$uzak_ref" in
+        refs/heads/"$KORUMALI_DAL")
+            printf "%b" "${KIRMIZI}"
+            echo "======================================================================"
+            echo " ENGELLENDI: '$KORUMALI_DAL' dalina dogrudan gonderim yapilamaz."
+            echo "======================================================================"
+            printf "%b" "${NORMAL}"
+            echo ""
+            echo " Her degisiklik -- dokumanlar dahil -- bir dal uzerinde yapilir ve"
+            echo " Pull Request ile birlestirilir. (CONTRIBUTING.md, MAN.5)"
+            echo ""
+            echo " Yapmaniz gereken:"
+            echo ""
+            echo "   git switch -c ozellik/<issue-no>-<kisa-aciklama>"
+            echo "   git push -u origin ozellik/<issue-no>-<kisa-aciklama>"
+            echo "   gh pr create"
+            echo ""
+            printf "%b" "${SARI}"
+            echo " Istisnai bir durumda bu kontrolu --no-verify ile atlayabilirsiniz;"
+            echo " ancak bu durum CI tarafindan tespit edilir ve kayit altina alinir."
+            printf "%b" "${NORMAL}"
+            echo ""
+            exit 1
+            ;;
+    esac
+done
+
+exit 0

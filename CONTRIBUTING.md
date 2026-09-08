@@ -9,6 +9,30 @@ kontrol edilmesini ve onaylanmasını ister. Buradaki akış tam olarak bunu sa�
 
 ---
 
+## 0. İlk kurulum — git kancaları
+
+Depoyu klonladıktan sonra **bir kez** çalıştırın:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Bu, iki kancayı etkinleştirir:
+
+| Kanca | İşlevi |
+|---|---|
+| `pre-push` | `main` dalına doğrudan gönderimi engeller |
+| `commit-msg` | Commit mesajının Conventional Commits biçimine uymasını denetler |
+
+> **Neden gerekli?** GitHub Free planında **özel** depolarda sunucu tarafı dal
+> koruma kullanılamamaktadır (`R-16`). Bu kancalar telafi edici kontroldür.
+> Kancayı kurmadan çalışırsanız `main`'e yanlışlıkla gönderim yapabilirsiniz;
+> bu durum CI tarafından tespit edilir ve otomatik olarak bir düzeltici faaliyet
+> issue'su açılır. Ayrıntı:
+> [`dal-koruma-telafi-kontrolleri.md`](docs/33061/MAN.5-konfigurasyon-yonetimi/dal-koruma-telafi-kontrolleri.md)
+
+---
+
 ## 1. Temel kural
 
 > **`main` dalına doğrudan yazılmaz.** Kod, yapılandırma ve **dokümanlar dâhil**
