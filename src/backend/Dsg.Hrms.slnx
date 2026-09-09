@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/Dsg.Hrms.Api.IntegrationTests/Dsg.Hrms.Api.IntegrationTests.csproj" />
+    <Project Path="tests/Dsg.Hrms.Application.Tests/Dsg.Hrms.Application.Tests.csproj" />
+    <Project Path="tests/Dsg.Hrms.Architecture.Tests/Dsg.Hrms.Architecture.Tests.csproj" />
+    <Project Path="tests/Dsg.Hrms.Domain.Tests/Dsg.Hrms.Domain.Tests.csproj" />
+  </Folder>
+  <Project Path="Dsg.Hrms.Api/Dsg.Hrms.Api.csproj" />
+  <Project Path="Dsg.Hrms.Application/Dsg.Hrms.Application.csproj" />
+  <Project Path="Dsg.Hrms.Domain/Dsg.Hrms.Domain.csproj" />
+  <Project Path="Dsg.Hrms.Infrastructure/Dsg.Hrms.Infrastructure.csproj" />
+</Solution>

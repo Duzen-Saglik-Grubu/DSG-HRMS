@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    MIMARI TESTLERI
+    ADR-0002'deki katman ve modul bagimlilik kurallarini otomatik denetler.
+    Kural ihlali derlemeyi degil TESTI kirar; PR birlestirilemez.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Dsg.Hrms.Domain\Dsg.Hrms.Domain.csproj" />
+    <ProjectReference Include="..\..\Dsg.Hrms.Application\Dsg.Hrms.Application.csproj" />
+    <ProjectReference Include="..\..\Dsg.Hrms.Infrastructure\Dsg.Hrms.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Dsg.Hrms.Api\Dsg.Hrms.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NetArchTest.Rules" />
+  </ItemGroup>
+
+</Project>

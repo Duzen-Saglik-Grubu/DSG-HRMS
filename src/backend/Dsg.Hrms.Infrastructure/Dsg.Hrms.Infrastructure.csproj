@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    ALTYAPI KATMANI
+    Application katmanindaki arayuzlerin uygulamalari: EF Core, LOGO erisimi,
+    dosya saklama, SMS, e-posta.
+
+    KURAL (ADR-0002): Application ve Domain'e bagimlidir; Api'ye bagimli OLAMAZ.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dsg.Hrms.Application\Dsg.Hrms.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="EFCore.NamingConventions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+  </ItemGroup>
+
+</Project>

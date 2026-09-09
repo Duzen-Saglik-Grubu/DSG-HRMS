@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-001`, `KR-005`, `KR-006`, `KR-025`, `KR-026`
+**Karar defteri karşılığı:** `KR-001`, `KR-005`, `KR-006`, `KR-025`, `KR-026`, `KR-057`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 
 ---
@@ -40,7 +40,8 @@ Aşağıdaki yığın kullanılacaktır.
 | Dayanıklılık | **Microsoft.Extensions.Http.Resilience** | Yeniden deneme, zaman aşımı, devre kesici |
 | Excel | **ClosedXML** (MIT) | |
 | PDF | **PDFsharp / MigraDoc 6.x** (MIT) | QuestPDF **kullanılmayacak** |
-| Birim test | **xUnit** + **FluentAssertions** + **NSubstitute** | |
+| Birim test | **xUnit** + **Shouldly** + **NSubstitute** | FluentAssertions **kullanılmayacak** (`KR-057`) |
+| Mimari denetimi | **NetArchTest.Rules** | Katman ve modül kurallarını otomatik denetler (ADR-0002) |
 | Entegrasyon test | **Testcontainers** (gerçek PostgreSQL) | In-memory sağlayıcı kullanılmayacak |
 
 **Kullanılmayacaklar ve gerekçeleri:**
@@ -50,6 +51,8 @@ Aşağıdaki yığın kullanılacaktır.
 - **QuestPDF** — Community lisansı ciro eşiğine bağlı; koşullu lisans istenmiyor.
 - **EF Core In-Memory sağlayıcısı** — gerçek veritabanı davranışını taklit etmediği için
   yanlış güven verir.
+- **FluentAssertions (8.x ve üzeri)** — koşullu ticari lisansa geçti. Yerine **Shouldly**
+  (BSD-3-Clause) kullanılacaktır (`KR-057`). Bu, AutoMapper ve QuestPDF ile aynı ilkedir.
 
 ### Frontend
 
@@ -117,6 +120,9 @@ Bu ADR yalnızca ana sürümleri ve seçimleri belirler; sürüm envanteri
 | Angular | Bütünleşik çerçeve | Daha dik öğrenme eğrisi, daha ağır | React'te ekip yetkinliği ve topluluk büyüklüğü |
 | Redux Toolkit | Olgun | İK uygulaması için gereğinden ağır | TanStack Query yeterli (KISS, YAGNI) |
 | QuestPDF | En iyi tablo/düzen API'si | Koşullu ticari lisans | Kurum koşullu lisans istemiyor |
+| FluentAssertions 8.x | Çok yaygın, okunabilir iddialar | **Koşullu ticari lisans** | Aynı ilke; Shouldly aynı okunabilirliği ücretsiz sağlıyor |
+| FluentAssertions 7.x (son ücretsiz sürüm) | Ücretsiz (Apache-2.0) | Sürüm dondurulmuş; güvenlik ve uyumluluk güncellemesi almayacak | 10–15 yıllık ufukta terk edilmiş bağımlılık kabul edilemez |
+| AwesomeAssertions (FluentAssertions 7 çatallaması) | Ücretsiz, geçiş kolay | Genç proje, tek kaynaklı bakım | Shouldly daha köklü ve topluluğu geniş |
 
 ## Sonuçlar
 
@@ -150,3 +156,4 @@ Bu ADR yalnızca ana sürümleri ve seçimleri belirler; sürüm envanteri
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-09-09 | 0.2 | FluentAssertions lisans değişikliği nedeniyle Shouldly ile değiştirildi (`KR-057`) | Bilgi İşlem |

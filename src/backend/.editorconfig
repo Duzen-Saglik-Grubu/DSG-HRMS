@@ -1,0 +1,117 @@
+# DSG-HRMS - Backend kodlama standartlari
+# Bkz. CONTRIBUTING.md ve ADR-0002
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{json,yml,yaml,csproj,props,targets,xml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+
+#### Kod duzeni ####
+csharp_using_directive_placement = outside_namespace:error
+csharp_style_namespace_declarations = file_scoped:error
+csharp_prefer_braces = true:error
+csharp_style_prefer_top_level_statements = true:silent
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+#### Dil tercihleri ####
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_constructors = false:suggestion
+
+csharp_style_pattern_matching_over_is_with_cast_check = true:error
+csharp_style_pattern_matching_over_as_with_null_check = true:error
+csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_prefer_pattern_matching = true:suggestion
+
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+dotnet_style_null_propagation = true:error
+dotnet_style_coalesce_expression = true:error
+
+#### Degismezlik (immutability) ####
+# Alanlar mumkun oldugunca readonly olmali; is kurallari yan etkisiz kalir.
+dotnet_style_readonly_field = true:error
+csharp_prefer_static_local_function = true:suggestion
+csharp_style_prefer_readonly_struct = true:suggestion
+
+#### Isimlendirme ####
+dotnet_naming_rule.arayuzler_I_ile_baslar.severity = error
+dotnet_naming_rule.arayuzler_I_ile_baslar.symbols = arayuz
+dotnet_naming_rule.arayuzler_I_ile_baslar.style = I_onekli
+
+dotnet_naming_symbols.arayuz.applicable_kinds = interface
+dotnet_naming_symbols.arayuz.applicable_accessibilities = *
+dotnet_naming_style.I_onekli.required_prefix = I
+dotnet_naming_style.I_onekli.capitalization = pascal_case
+
+dotnet_naming_rule.tipler_pascal_case.severity = error
+dotnet_naming_rule.tipler_pascal_case.symbols = tip_ve_uye
+dotnet_naming_rule.tipler_pascal_case.style = pascal_case
+
+dotnet_naming_symbols.tip_ve_uye.applicable_kinds = class,struct,enum,property,method,event,delegate
+dotnet_naming_symbols.tip_ve_uye.applicable_accessibilities = *
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+dotnet_naming_rule.ozel_alanlar_alt_cizgi.severity = error
+dotnet_naming_rule.ozel_alanlar_alt_cizgi.symbols = ozel_alan
+dotnet_naming_rule.ozel_alanlar_alt_cizgi.style = alt_cizgi_camel
+
+dotnet_naming_symbols.ozel_alan.applicable_kinds = field
+dotnet_naming_symbols.ozel_alan.applicable_accessibilities = private
+dotnet_naming_style.alt_cizgi_camel.required_prefix = _
+dotnet_naming_style.alt_cizgi_camel.capitalization = camel_case
+
+#### Analiz kurallari ####
+# Guvenlik ve dogruluk acisindan kritik olanlar HATA seviyesindedir.
+
+# Asenkron kod: iptal jetonu ve ConfigureAwait
+dotnet_diagnostic.CA2016.severity = error   # CancellationToken iletilmeli
+dotnet_diagnostic.CA1849.severity = error   # Asenkron baglamda senkron cagri yapma
+
+# Guvenlik
+dotnet_diagnostic.CA2100.severity = error   # SQL enjeksiyonu riski
+dotnet_diagnostic.CA5350.severity = error   # Zayif kriptografi
+dotnet_diagnostic.CA5351.severity = error   # Kirik kriptografi
+dotnet_diagnostic.CA3075.severity = error   # Guvensiz XML isleme
+
+# Kultur duyarliligi: Turkce "i/I" sorunu nedeniyle onemli (ADR-0004 §10)
+dotnet_diagnostic.CA1304.severity = error   # CultureInfo belirt
+dotnet_diagnostic.CA1305.severity = error   # IFormatProvider belirt
+dotnet_diagnostic.CA1310.severity = error   # StringComparison belirt
+
+# Kaynak yonetimi
+dotnet_diagnostic.CA2000.severity = error   # Kapsam disina cikmadan Dispose et
+dotnet_diagnostic.CA1063.severity = error   # IDisposable dogru uygula
+
+# Tasarim
+dotnet_diagnostic.CA1062.severity = suggestion  # Genel metotlarda null kontrolu
+dotnet_diagnostic.CA1707.severity = error       # Isimlerde alt cizgi (testlerde muaf)
+
+# Kullanilmayan kod
+dotnet_diagnostic.IDE0005.severity = error  # Gereksiz using
+dotnet_diagnostic.CA1823.severity = error   # Kullanilmayan ozel alan
+
+[tests/**/*.cs]
+# Test adlarinda alt cizgi bilincli tercihtir; okunabilirligi artirir.
+dotnet_diagnostic.CA1707.severity = none
+# Testlerde ornek veri ve sabitler serbesttir.
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1861.severity = none

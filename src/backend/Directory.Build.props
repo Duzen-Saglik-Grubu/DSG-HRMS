@@ -1,0 +1,81 @@
+<Project>
+
+  <!--
+    DSG-HRMS - Tum backend projeleri icin ortak derleme ayarlari.
+    Bu dosya src/backend altindaki her projeye otomatik uygulanir.
+    Ilgili kararlar: ADR-0001 (teknoloji yigini), ADR-0002 (katmanli mimari)
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Kalite kapisi: uyarilar hata sayilir (ADR-0011 §6). -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+
+    <!--
+      IDE0005 (gereksiz using) yalnizca dokumantasyon dosyasi uretildiginde calisir.
+      Bu nedenle acilir; ancak CS1591 (eksik XML yorumu) ZORUNLU KILINMAZ.
+      Dokumantasyon, kod gozden gecirmede anlamli oldugu yerlerde istenir;
+      her uyeye mekanik yorum yazdirmak gurultu uretir.
+    -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+    <!--
+      Turkce kultur ve siralama gereklidir (ADR-0004 §10).
+      Invariant globalization ACIK olsaydi tr-TR kulturu ve ICU collation
+      calismazdi; "i/I" ve "ı/I" donusumleri yanlis sonuc verirdi.
+    -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+
+    <!-- Yeniden uretilebilir derleme -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+
+    <!-- Merkezi paket surum yonetimi (ADR-0001) -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+
+    <!-- Guvenlik: bilinen acikli paketle derleme kirilsin -->
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>low</NuGetAuditLevel>
+
+    <Company>Duzen Saglik Grubu</Company>
+    <Product>DSG-HRMS</Product>
+    <Authors>Duzen Saglik Grubu - Bilgi Islem</Authors>
+  </PropertyGroup>
+
+  <!-- Test projeleri icin ortak ayarlar -->
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('Tests'))">
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!--
+      CS1591: test projelerinde XML dokumantasyon uyarilari aranmaz.
+      CA1707: test adlarinda alt cizgi BILINCLI tercihtir. "Domain_diger_katmanlara_bagimli_olamaz"
+              bicimi, testin neyi dogruladigini cikti raporunda okunabilir kilar.
+              Bu istisna YALNIZCA test projeleri icin gecerlidir.
+    -->
+    <NoWarn>$(NoWarn);CS1591;CA1707</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('Tests'))">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+  <!-- Her test dosyasinda tekrar yazilmasin -->
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('Tests'))">
+    <Using Include="Xunit" />
+    <Using Include="Shouldly" />
+  </ItemGroup>
+
+</Project>

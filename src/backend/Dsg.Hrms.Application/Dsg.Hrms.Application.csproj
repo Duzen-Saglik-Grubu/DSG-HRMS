@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    UYGULAMA KATMANI
+    Kullanim senaryolari, DTO'lar, dogrulama ve dis dunya arayuzleri.
+
+    KURAL (ADR-0002): Yalnizca Domain'e bagimlidir. Infrastructure ve Api'ye
+    bagimli OLAMAZ. Dis dunyaya erisim yalnizca arayuzlerle tanimlanir.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dsg.Hrms.Domain\Dsg.Hrms.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Riok.Mapperly" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+</Project>

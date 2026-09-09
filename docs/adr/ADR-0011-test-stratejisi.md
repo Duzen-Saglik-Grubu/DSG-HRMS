@@ -25,7 +25,7 @@ mı" değil, **"tanımlı bir yaklaşımınız ve uygulanan bir eşiğiniz var m
 
 | Katman | Kapsam | Hedef | Araç |
 |---|---|---|---|
-| **Domain birim testi** | İş kuralları: izin hakedişi, kıdem, çalışma takvimi, döngü kontrolü, tarih aralığı çakışması | **≥ %90 satır kapsamı** | xUnit + FluentAssertions |
+| **Domain birim testi** | İş kuralları: izin hakedişi, kıdem, çalışma takvimi, döngü kontrolü, tarih aralığı çakışması | **≥ %90 satır kapsamı** | xUnit + Shouldly |
 | **Application birim testi** | Kullanım senaryoları, doğrulama, yetki kararları | ≥ %80 | xUnit + NSubstitute |
 | **API entegrasyon testi** | Uç noktalar, gerçek veritabanı, kimlik doğrulama, yetki | Her modülün ana akışları | `WebApplicationFactory` + **Testcontainers** |
 | **Frontend birim testi** | Bileşenler, kancalar (hooks), form doğrulama | ≥ %70 | Vitest + React Testing Library |
@@ -169,3 +169,4 @@ dönmek ise kalite kaybı demektir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-09-09 | 0.2 | İddia kütüphanesi FluentAssertions yerine Shouldly (`KR-057`) | Bilgi İşlem |
