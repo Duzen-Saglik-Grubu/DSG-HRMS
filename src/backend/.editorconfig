@@ -115,3 +115,13 @@ dotnet_diagnostic.CA1707.severity = none
 # Testlerde ornek veri ve sabitler serbesttir.
 dotnet_diagnostic.CA1062.severity = none
 dotnet_diagnostic.CA1861.severity = none
+
+# EF Core tarafindan URETILEN migration dosyalari.
+# Uretilen kod bizim bicim kurallarimiza tabi degildir; elle duzenlenmez.
+# Yalnizca bicim/stil kurallari kapatilir - guvenlik ve dogruluk kurallari gecerlidir.
+[**/Migrations/**.cs]
+generated_code = true
+dotnet_diagnostic.IDE0161.severity = none
+dotnet_diagnostic.IDE0005.severity = none
+dotnet_diagnostic.CA1861.severity = none
+dotnet_diagnostic.CA1062.severity = none
