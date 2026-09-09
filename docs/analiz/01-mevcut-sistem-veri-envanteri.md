@@ -111,24 +111,57 @@ tamamının personeli tek tabloda tutulmakta, firma ayrımı `FIRMNR` alanı ile
 Üyelik akışında kişi TCKN, doğum tarihi ve kurumsal e-posta ile eşleştirilecek; doğrulama
 kodu LOGO'da kayıtlı kurumsal e-posta veya cep telefonuna gönderilecektir.
 
-**Ölçüm kapsamı (`KR-034`):** aktif personel, `0001000` sicili hariç → **584 kişi**
-**Ölçüm tarihi:** 2026-09-05
+**Ölçüm kapsamı (`KR-034`):** aktif personel, `0001000` sicili hariç → **583 kişi**
+**Ölçüm tarihi:** 2026-09-09
 
 | Alan | Dolu | Eksik | Kaynak |
 |---|---:|---:|---|
-| **TCKN** | 584 | **0** ✅ | `LH_001_PERSON.TTFNO` |
-| **Doğum tarihi** | 584 | **0** ✅ | `LH_001_PERSON.BIRTHDATE` |
-| Kurumsal e-posta | 545 | **39** | `LH_001_CONTACT` (`TYP=6`) |
-| Telefon | ~570 | ~14 | `LH_001_CONTACT` (`TYP=3`) |
+| **TCKN** | 583 | **0** ✅ | `LH_001_PERSON.TTFNO` |
+| **Doğum tarihi** | 583 | **0** ✅ | `LH_001_PERSON.BIRTHDATE` |
+| Kurumsal e-posta | 545 | **38** | `LH_001_CONTACT` (`TYP=6`) |
+| Cep telefonu | 570 | **13** | `LH_001_CONTACT` (`TYP=3`) |
+
+**Ek kontroller:**
+
+| Kontrol | Sonuç |
+|---|---:|
+| Telefon biçimi geçersiz (normalize edilince 10 haneli ve `5` ile başlamıyor) | **1** |
+| **Ne e-posta ne telefon — hiçbir iletişim bilgisi yok** | **12** ⚠️ |
 
 > **İyi haber:** Aktif personelin tamamında TCKN ve doğum tarihi doludur. Üyelik akışının
 > kimlik eşleştirme adımı bu iki alan açısından sorunsuz çalışacaktır.
->
-> **Açık kalan:** 39 aktif personelde kurumsal e-posta adresi yoktur; bu kişiler e-posta
-> ile doğrulama yapamaz. Kurumsal adresi olmayanlar için SMS doğrulaması **zorunlu
-> kılınmayacak** (`KR-020`); kalıcı çözüm, İK'nın LOGO üzerinde adres tanımlamasıdır.
-> Hiçbir iletişim bilgisi bulunmayan personel için istisna (manuel açma) akışı Kullanıcı
-> Yönetimi modülünde tasarlanacaktır. → Risk `R-08`
+
+**⚠️ En kritik bulgu — 12 personel hiçbir kanaldan doğrulanamaz.**
+
+38 kişide e-posta, 13 kişide telefon eksiktir; ancak bu iki kümenin **kesişimi 12
+kişidir**. Yani:
+
+| Durum | Kişi | Sonuç |
+|---|---:|---|
+| Yalnız e-posta eksik (telefonu var) | 26 | SMS ile doğrulanabilir |
+| Yalnız telefon eksik (e-postası var) | 1 | E-posta ile doğrulanabilir |
+| **İkisi de eksik** | **12** | **Hiçbir kanaldan doğrulanamaz** |
+
+Bu 12 kişi, sistem devreye alındığında **kendi başına üye olamaz.** İki seçenek vardır:
+
+1. İK, devreye alma öncesinde bu kişilerin iletişim bilgilerini LOGO'da tamamlar
+   (**tercih edilen**), veya
+2. Bu kişiler için İK'nın gerekçe girerek elle hesap açtığı **istisna akışı** kullanılır
+   (Kullanıcı Yönetimi modülü).
+
+→ Risk `R-08`
+
+> Kurumsal adresi olmayanlar için SMS doğrulaması **zorunlu kılınmayacaktır** (`KR-020`);
+> kalıcı çözüm İK'nın LOGO üzerinde bilgileri tamamlamasıdır.
+
+### 1.5.1 Telefon alanının doğrulanması
+
+SMS gönderiminde kullanılacak alanın gerçekten **cep telefonu** olduğu teyit edilmiştir.
+`LH_001_CONTACT.TYP = 3` alanındaki numaraların ön ekleri tamamen Türkiye cep
+operatörü aralığındadır (`53x`, `54x`, `50x`, `55x`). Sabit hat ön eki görülmemiştir.
+
+Bazı kayıtlar başında `0` ile girilmiştir (`053…`, `054…`); bu, ADR-0012 §8'de
+tanımlanan **numara normalizasyonunun** neden gerekli olduğunu göstermektedir.
 
 ### 1.6 E-posta adresi kalitesi — güvenlik bulguları
 
@@ -331,16 +364,26 @@ ihtiyacı için mevcut veritabanının salt-okunur arşiv kopyasında saklanacak
 |---|---|---|---|---|
 | 1 | TCKN'si boş kartların tamamlanması | İK | TEC.10 | **Kapandı:** aktif personelde eksik TCKN yok (`KR-034`) |
 | 2 | Doğum tarihi boş kartların tamamlanması | İK | TEC.10 | **Kapandı:** aktif personelde eksik doğum tarihi yok |
-| 3 | Kurumsal e-postası olmayan 39 personelin LOGO'da tamamlanması | İK | TEC.10 | Açık |
-| 4 | Paylaşılan e-posta adreslerinin kişiye özel hâle getirilmesi (4 personel, 2 adres) | İK | TEC.10 | Açık |
-| 5 | Kurumsal olmayan adres kullanan 59 personele kurumsal adres tanımlanması | İK | TEC.10 | Açık |
-| 6 | RADYOLOJİ A.Ş. firmasının kapsamda olup olmadığının teyidi | İK | TEC.2 | Açık |
-| 7 | Performans, anket, İSG, işe alım modüllerinin kapsam kararı | İK | TEC.2 | **Kapandı:** modüller geliştirilecek, **verileri göç edilmeyecek** (`KR-045`, `KR-046`). Anket ve İSG modül listesinde yok — teyit edilecek |
-| 8 | Log/jeton tablolarının göç dışı bırakılmasının onayı | İK | TEC.10 | **Kapandı:** onaylandı, aktarılmayacak (`KR-033`) |
+| 3 | **Hiçbir iletişim bilgisi olmayan 12 personelin bilgilerinin tamamlanması** | İK | TEC.10 | **Açık — en yüksek öncelik** |
+| 4 | Kurumsal e-postası olmayan 38 personelin LOGO'da tamamlanması | İK | TEC.10 | Açık |
+| 5 | Cep telefonu olmayan 13 personelin LOGO'da tamamlanması | İK | TEC.10 | Açık |
+| 6 | Telefon biçimi geçersiz olan 1 personelin numarasının düzeltilmesi | İK | TEC.10 | Açık |
+| 7 | Paylaşılan e-posta adreslerinin kişiye özel hâle getirilmesi (4 personel, 2 adres) | İK | TEC.10 | Açık |
+| 8 | Kurumsal olmayan adres kullanan 58 personele kurumsal adres tanımlanması | İK | TEC.10 | Açık |
+| 9 | RADYOLOJİ A.Ş. firmasının kapsamda olup olmadığının teyidi | İK | TEC.2 | Açık |
+| 10 | Performans, anket, İSG, işe alım modüllerinin kapsam kararı | İK | TEC.2 | **Kapandı:** modüller geliştirilecek, **verileri göç edilmeyecek** (`KR-045`, `KR-046`). İSG kapsama alındı (`KR-051`); anket teyit edilecek |
+| 11 | Log/jeton tablolarının göç dışı bırakılmasının onayı | İK | TEC.10 | **Kapandı:** onaylandı, aktarılmayacak (`KR-033`) |
 
-> **3–5 numaralı işler için ayrıntılı personel listesi hazırlanmıştır.** Liste kişisel veri
+> **3–8 numaralı işler için ayrıntılı personel listesi hazırlanmıştır.** Liste kişisel veri
 > içerdiği için depoya **eklenmemiş**, İK toplantısında kullanılmak üzere ayrı bir Excel
 > dosyası olarak teslim edilmiştir. Bu belgede yalnızca özet sayılar yer alır.
+>
+> **Listeler birbiriyle kesişir.** 3 numaralı listedeki 12 kişi, 4 ve 5 numaralı
+> listelerde de görünür. Öncelik 3 numaralı listededir: o kişiler tamamlanmadan
+> sisteme hiçbir şekilde giremezler.
+>
+> Sayılar canlı LOGO verisinden alınmıştır ve günden güne birkaç kayıt oynayabilir
+> (bkz. §1.7). Ölçüm tarihi: **2026-09-09**.
 
 ---
 

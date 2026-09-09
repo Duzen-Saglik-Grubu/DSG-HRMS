@@ -2,9 +2,9 @@
 
 **Belge kimliği:** MAN.5-DK
 **Süreç:** MAN.5 — Konfigürasyon Yönetimi
-**Son güncelleme:** 2026-09-08
+**Son güncelleme:** 2026-09-09
 **İlgili risk:** `R-16`
-**İlgili kararlar:** `KR-054`
+**İlgili kararlar:** `KR-054`, `KR-055`
 
 ---
 
@@ -54,7 +54,8 @@ ilgili öznitelikte `F` (Tam) yerine `L` (Büyük Ölçüde) derecesine yol aça
 
 ## 3. Uygulanan telafi edici kontroller
 
-Kalıcı çözüm sağlanana kadar üç katmanlı bir düzen uygulanmaktadır.
+Üç katmanlı bir düzen uygulanmaktadır. `KR-055` ile bu düzen **kalıcı çözüm** olarak
+kabul edilmiştir (bkz. §4.1).
 
 ### 3.1 Önleyici (istemci tarafı) — `pre-push` kancası
 
@@ -106,21 +107,46 @@ denetler:
 
 ---
 
-## 4. Kalıcı çözüm önerisi
+## 4. Kalıcı çözüm — değerlendirme ve karar
 
 | Seçenek | Maliyet | Sonuç | Değerlendirme |
 |---|---|---|---|
-| **A — GitHub Team planı** | Kullanıcı başına aylık ~4 USD (1–2 kullanıcı) | Dal koruma + kural kümesi + zorunlu durum kontrolleri açılır | ✅ **Önerilen** |
+| A — GitHub Team planı | Kullanıcı başına aylık ~4 USD (1–2 kullanıcı) | Dal koruma + kural kümesi + zorunlu durum kontrolleri açılır | Değerlendirildi, **tercih edilmedi** |
 | B — Depoyu herkese açık yapmak | Ücretsiz | Kurum içi belgeler dışarı açılır | ❌ Kabul edilemez |
 | C — Kendi barındırılan Git (GitLab/Gitea) | Sunucu + bakım | Tam kontrol | Mevcut kuruluma göre orantısız |
-| D — Mevcut telafi kontrolleriyle devam | Ücretsiz | Tespit edici kontrol; önleyici kontrol zayıf | Kısa vadede kabul edilebilir |
+| **D — Mevcut telafi kontrolleriyle devam** | Ücretsiz | Tespit edici kontrol; önleyici kontrol zayıf | ✅ **Seçilen** (`KR-055`) |
 
-**Öneri:** **Seçenek A.** Aylık ~4–8 USD, belgelendirme hedefinin ve
-konfigürasyon bütünlüğünün yanında ihmal edilebilir bir maliyettir. Team planına
-geçildiğinde §3.1–3.2 kancaları kaldırılmaz; sunucu tarafı korumanın
-**tamamlayıcısı** olarak kalırlar.
+### 4.1 Alınan karar (2026-09-09)
 
-Team planına geçildiğinde uygulanacak kurallar:
+> **Seçenek D — mevcut telafi kontrolleriyle devam edilecektir.**
+>
+> Kurum, şirket projesi olması nedeniyle deponun **özel kalmasına** ve
+> `Duzen-Saglik-Grubu` organizasyonunun **Free planında devam etmesine** karar
+> vermiştir. **GitHub Team planına geçilmeyecektir** (`KR-055`).
+>
+> Risk `R-16`, uygulanan telafi edici kontrollerle birlikte **kabul edilmiştir**
+> (risk kabulü). Denetimde bu belge ve CI denetim kayıtları gösterilecektir.
+
+Bu karar sonucunda:
+
+- §3'teki üç katmanlı düzen **kalıcı çözümdür**, geçici değildir.
+- Kontrollerin fiilen çalıştığının kanıtı düzenli olarak toplanacaktır:
+  - Her `main` gönderiminde çalışan **CI denetim kaydı** (GitHub Actions geçmişi),
+  - Denetimin ürettiği **düzeltici faaliyet issue'ları** (varsa),
+  - PR geçmişi — her değişikliğin inceleme ve onaydan geçtiği.
+- Konfigürasyon denetimlerinde (MAN.5.BP5) bu kayıtlar örneklenerek kontrol
+  edilecektir.
+
+> **Denetçiye anlatılacak özet:** *"Sunucu tarafı dal koruma, plan kısıtı nedeniyle
+> kullanılamamaktadır. Bunun yerine istemci tarafı önleyici kancalar ve sunucu
+> tarafı, atlatılamaz bir tespit edici denetim uygulanmaktadır. Denetim, kural dışı
+> her commit'i yakalar ve otomatik düzeltici faaliyet kaydı üretir. Kısıt, riski ve
+> telafisi ile birlikte kayıt altındadır."*
+
+### 4.2 İleride Team planına geçilirse
+
+Karar değişirse §3.1–3.2 kancaları kaldırılmaz; sunucu tarafı korumanın
+**tamamlayıcısı** olarak kalır. Uygulanacak kurallar:
 
 | Kural | Değer |
 |---|---|
@@ -137,10 +163,10 @@ Team planına geçildiğinde uygulanacak kurallar:
 
 ## 5. Öz değerlendirmeye etkisi
 
-Bu kısıt giderilene kadar, ilgili özniteliklerde **`F` (Tam) derecesi
+Kısıt kalıcı olarak kabul edildiği için, ilgili özniteliklerde **`F` (Tam) derecesi
 hedeflenmemektedir**:
 
-| Öznitelik | Telafi kontrolleriyle | Team planıyla |
+| Öznitelik | Telafi kontrolleriyle (mevcut) | Team planıyla (tercih edilmedi) |
 |---|---|---|
 | PA 2.2 (c) Bilginin kontrolü | `L` — sistematik yaklaşım var, zayıflık mevcut | `F` erişilebilir |
 | PA 2.2 (d) Gözden geçirme ve onay | `L` | `F` erişilebilir |
@@ -159,9 +185,9 @@ denetimde sorulduğunda bu belge gösterilecektir.
 
 | # | İş | Sorumlu | Durum |
 |---|---|---|---|
-| 1 | GitHub Team planı kararının alınması | Üst Yönetim / Bilgi İşlem | ⏳ Açık |
-| 2 | Geçiş sonrası §4 tablosundaki kuralların uygulanması | Bilgi İşlem | ⏳ Bekliyor |
-| 3 | Bu belgenin ve `R-16`'nın güncellenmesi | Bilgi İşlem | ⏳ Bekliyor |
+| 1 | GitHub Team planı kararının alınması | Üst Yönetim / Bilgi İşlem | ✅ **Kapandı** — Free planda kalınacak (`KR-055`) |
+| 2 | `R-16` riskinin kabul edilmesi ve kayda geçirilmesi | Bilgi İşlem | ✅ Kapandı |
+| 3 | Telafi kontrollerinin çalıştığına dair kanıtların dönemsel örneklenmesi (MAN.5.BP5) | Bilgi İşlem | 🔄 Sürekli |
 | 4 | `core.hooksPath` kurulumunun her çalışma kopyasında yapılması | Bilgi İşlem | ✅ Kurulum kılavuzunda |
 
 ---
@@ -171,3 +197,4 @@ denetimde sorulduğunda bu belge gösterilecektir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-08 | 0.1 | Kısıtın tespiti ve telafi edici kontrollerin tanımlanması | Bilgi İşlem |
+| 2026-09-09 | 0.2 | Kalıcı çözüm kararı işlendi: Free planda kalınacak, telafi kontrolleri kalıcıdır (`KR-055`); `R-16` kabul edildi | Bilgi İşlem |

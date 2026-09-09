@@ -110,10 +110,10 @@ raporunda ayrıca ele alınır.
 | | |
 |---|---|
 | **Kategori** | Veri Kalitesi / Devreye Alma |
-| **Açıklama** | 584 aktif personelin **39'unda kurumsal e-posta** kayıtlı değildir. Bu kişiler e-posta ile doğrulama kodu alamaz. Kurumsal adresi olmayanlar için SMS doğrulaması zorunlu kılınmadığından (`KR-020`), kalıcı çözüm veri düzeltmesidir. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.5) |
+| **Açıklama** | 583 aktif personelin **38'inde kurumsal e-posta**, **13'ünde cep telefonu** kayıtlı değildir; **12'sinde ise ikisi de yoktur**. Bu 12 kişi **hiçbir kanaldan** doğrulama kodu alamaz ve kendi başına üye olamaz. Ayrıca 1 kişinin telefon numarası geçerli cep biçiminde değildir. Kurumsal adresi olmayanlar için SMS doğrulaması zorunlu kılınmadığından (`KR-020`), kalıcı çözüm veri düzeltmesidir. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.5) |
 | **O / E / Puan** | 3 / 2 / **6** |
 | **Sahibi** | İK Birimi |
-| **Önlem** | (1) İK, devreye alma öncesinde eksik iletişim bilgilerini LOGO'da tamamlayacak. (2) Sistem, eksik iletişim bilgisi olan aktif personeli listeleyen bir yönetim raporu sunacak. (3) Hiçbir iletişim bilgisi olmayan personel için İK'nın gerekçe girerek hesap açabildiği, tam loglanan **istisna akışı** tasarlanacak (Kullanıcı Yönetimi modülü). |
+| **Önlem** | (0) **Öncelik: iletişim bilgisi hiç olmayan 12 kişi.** Bu kişiler tamamlanmadan sisteme giremezler. (1) İK, devreye alma öncesinde eksik iletişim bilgilerini LOGO'da tamamlayacak. (2) Sistem, eksik iletişim bilgisi olan aktif personeli listeleyen bir yönetim raporu sunacak. (3) Hiçbir iletişim bilgisi olmayan personel için İK'nın gerekçe girerek hesap açabildiği, tam loglanan **istisna akışı** tasarlanacak (Kullanıcı Yönetimi modülü). |
 | **Durum** | Açık |
 
 ### R-09 — Mevcut sistemin PostgreSQL 14 sürümünün destek dışına çıkması
@@ -195,7 +195,8 @@ raporunda ayrıca ele alınır.
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | (1) **İstemci tarafı `pre-push` kancası** — `main`'e doğrudan gönderimi engeller (`--no-verify` ile atlanabilir). (2) **İstemci tarafı `commit-msg` kancası** — commit biçimini denetler. (3) **Sunucu tarafı tespit edici CI denetimi** — `main`'e PR olmadan gelen her commit'i yakalar, iş akışını başarısız kılar ve otomatik **düzeltici faaliyet issue'su** açar; bu kontrol atlatılamaz. (4) `CODEOWNERS` ve Tamamlanma Tanımı kontrol listesi. (5) **Kalıcı çözüm: GitHub Team planı** (kullanıcı başına aylık ~4 USD) — karar bekliyor. Ayrıntı: `docs/33061/MAN.5-konfigurasyon-yonetimi/dal-koruma-telafi-kontrolleri.md` |
 | **Seviye 2'ye etkisi** | PA 2.2 (c) ve (d) özniteliklerinde `F` (Tam) yerine `L` (Büyük Ölçüde) beklenir. Seviye 2 için PA 2.2'de **`L` yeterlidir** (33020 Madde 5.6); dolayısıyla hedef engellenmemektedir, ancak zayıflık kayıtlıdır. |
-| **Durum** | Açık — kalıcı çözüm kararı bekleniyor |
+| **Karar (2026-09-09)** | Kurum, deponun **özel kalmasına** ve organizasyonun **Free planında devam etmesine** karar vermiştir; GitHub Team planına geçilmeyecektir (`KR-055`). Risk, uygulanan telafi edici kontrollerle **kabul edilmiştir** (risk kabulü). Denetimde `dal-koruma-telafi-kontrolleri.md` belgesi ve CI denetim kayıtları gösterilecektir. |
+| **Durum** | **Kabul edildi** — telafi edici kontrollerle izleniyor |
 
 ---
 
