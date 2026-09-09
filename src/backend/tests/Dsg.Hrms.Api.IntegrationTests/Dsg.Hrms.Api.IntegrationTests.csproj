@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    API ENTEGRASYON TESTLERI
+    GERCEK PostgreSQL uzerinde calisir (Testcontainers).
+    EF Core In-Memory saglayicisi KULLANILMAZ - ADR-0011 §3.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Dsg.Hrms.Api\Dsg.Hrms.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
+  </ItemGroup>
+
+</Project>

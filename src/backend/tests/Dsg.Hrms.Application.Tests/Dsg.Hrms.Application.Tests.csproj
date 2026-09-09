@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Uygulama katmani birim testleri. Hedef kapsam: %80 (ADR-0011 §1) -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Dsg.Hrms.Application\Dsg.Hrms.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NSubstitute" />
+  </ItemGroup>
+
+</Project>

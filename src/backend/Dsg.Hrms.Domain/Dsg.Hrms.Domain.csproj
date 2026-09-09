@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    DOMAIN KATMANI
+    Varliklar, deger nesneleri, is kurallari ve arayuz tanimlari.
+
+    KURAL (ADR-0002): Bu proje HICBIR projeye ve HICBIR dis kutuphaneye
+    bagimli degildir. Ne EF Core, ne ASP.NET, ne baska bir paket.
+    Bu kural Dsg.Hrms.Architecture.Tests tarafindan denetlenir.
+  -->
+
+</Project>

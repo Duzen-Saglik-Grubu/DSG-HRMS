@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Domain katmani birim testleri. Hedef kapsam: %90 (ADR-0011 §1) -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Dsg.Hrms.Domain\Dsg.Hrms.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
