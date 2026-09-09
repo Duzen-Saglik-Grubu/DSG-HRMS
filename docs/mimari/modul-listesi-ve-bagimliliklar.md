@@ -324,29 +324,92 @@ Bu nedenle iletiler **iki sınıfa ayrılmalıdır**:
 | **İşlemsel / güvenlik** | Üyelik doğrulama kodu, parola sıfırlama kodu, hesap kilitlenme uyarısı | ❌ **Hayır — muaf olmalı** |
 | **Bilgilendirme** | İzin onayı, eğitim duyurusu, kurum içi duyuru, tebrik mesajı | ✅ Evet |
 
-**Önerimiz:** İşlemsel/güvenlik iletileri istisnadan muaf tutulsun. Aksi hâlde
-istisna, kişiyi sistemden tamamen dışlayan bir yan etki üretir.
+**Karar (2026-09-09):** İşlemsel/güvenlik iletileri istisnadan **muaftır** (§7.4, B1).
+Aksi hâlde istisna, kişiyi sistemden tamamen dışlayan bir yan etki üretirdi.
 
-Bu ayrım İK ile netleştirilecektir; kararı `PG-KULLANICI` gereksinimi olarak
-kayıt altına alınacaktır.
+### 7.4 İK'nın verdiği cevaplar (2026-09-09)
 
-### 7.4 İK'ya sorulacak sorular
-
-| # | Soru | Neden önemli |
+| # | Soru | **Cevap** |
 |---|---|---|
-| B1 | İşlemsel/güvenlik iletileri (doğrulama, parola sıfırlama) muaf olacak mı? | Muaf değilse kişi sisteme hiç giremez (§7.3) |
-| B2 | **Uygulama içi** bildirim de kapatılacak mı, yoksa yalnızca dış kanallar (e-posta/SMS) mı? | Kişi sisteme giriyorsa uygulama içi bildirim onu rahatsız etmez |
-| B3 | İstisna **kanal bazlı** olabilecek mi? (örn. SMS kapalı, e-posta açık) | Tasarımı belirgin biçimde etkiler |
-| B4 | İstisna **kalıcı** mı, yoksa **tarih aralıklı** mı olacak? (örn. uzun süreli izinde) | Tarih aralıklıysa `valid_from`/`valid_to` gerekir (ADR-0004 §7) |
-| B5 | Kim tanımlayabilecek? Hangi rol/yetki? | Yeni izin tanımı gerekir: `identity.notification-exemption.manage` |
-| B6 | **Gerekçe zorunlu olacak mı?** | Denetim ve KVKK açısından gerekçesiz istisna savunulamaz |
-| B7 | İstisnaya rağmen gönderilmesi gereken **yasal/zorunlu** bildirim var mı? | Örneğin İSG kaynaklı bir bildirim |
+| B1 | İşlemsel/güvenlik iletileri muaf olacak mı? | ✅ **Evet, muaf.** Doğrulama kodu ve parola sıfırlama istisnadan etkilenmez |
+| B2 | Uygulama içi bildirim de kapatılacak mı? | **Kanal bazlı çözülecek** (bkz. B3) |
+| B3 | İstisna kanal bazlı olabilecek mi? | ✅ **Evet.** Her kanal ayrı ayrı açılıp kapatılabilecek — örn. *uygulama içi açık, SMS kapalı, e-posta açık*. Gerekçe: ileride farklı bir ihtiyaç doğarsa yazılım değişikliği gerekmesin |
+| B4 | Kalıcı mı, tarih aralıklı mı? | ✅ **Tarih aralıklı.** Ayrıca **bitiş tarihi yaklaştığında uyarı** verilecek |
+| B5 | Kim tanımlayabilecek? | **Sistem Yöneticisi** ve **İnsan Kaynakları** rolüne sahip kullanıcılar |
+| B6 | Gerekçe zorunlu olacak mı? | ✅ **Evet, zorunlu** |
+| B7 | İstisnaya rağmen gönderilmesi gereken yasal bildirim var mı? | ❌ **Yok** |
 
-> **Önerimiz B6 için "evet".** İstisna, kişinin kurumsal iletişimden çıkarılması
-> anlamına gelir; gerekçesi ve kimin tanımladığı **denetim kaydına** yazılmalıdır
-> (ADR-0009 §2).
+> **Kanal bazlı tercih isabetlidir.** Tek bir "bildirim kapalı" bayrağı yerine kanal
+> bazlı yapı, hem bugünkü ihtiyacı karşılar hem de ileride "yalnızca SMS kapatılsın"
+> gibi bir talep geldiğinde kod değişikliği gerektirmez. Maliyeti neredeyse aynıdır.
 
-### 7.5 Tasarım notları
+### 7.5 Kesinleşen kurallar
+
+Yukarıdaki cevaplar doğrultusunda gereksinim şu şekilde kesinleşmiştir:
+
+**Kapsam ve granülerlik**
+
+- İstisna **kişi + kanal** ikilisi bazında tanımlanır.
+- Kanallar: `UygulamaIci`, `EPosta`, `Sms`.
+- Kayıt yoksa varsayılan davranış: **tüm kanallar açık**.
+
+**İleti sınıflandırması**
+
+Her bildirim türü iki sınıftan birine ait olur:
+
+| Sınıf | İstisnadan etkilenir mi? | Örnek |
+|---|---|---|
+| `Islemsel` (işlemsel / güvenlik) | ❌ **Hayır** | Doğrulama kodu, parola sıfırlama, hesap kilidi uyarısı |
+| `Bilgilendirme` | ✅ Evet | İzin onayı, eğitim duyurusu, kurum içi duyuru, tebrik |
+
+> Sınıf, bildirim türünün **tanımında** taşınır; gönderim anında kararlaştırılmaz.
+> Böylece yeni bir bildirim türü eklendiğinde sınıfını belirtmek zorunlu olur ve
+> yanlışlıkla "işlemsel" sayılması engellenir.
+
+**Tarih aralığı**
+
+- `valid_from` (zorunlu) ve `valid_to` (opsiyonel — boşsa süresiz).
+- ADR-0004 §7 kuralları geçerlidir: aynı kişi + kanal için **çakışan aralık olamaz**
+  (PostgreSQL `EXCLUDE` kısıtı ile veritabanı seviyesinde engellenir).
+- Süre dolduğunda bildirimler **otomatik olarak yeniden başlar**; elle işlem gerekmez.
+
+**Bitiş uyarısı**
+
+- Bitiş tarihi yaklaşan istisnalar için uyarı üretilir.
+- Uyarı **İK ve Sistem Yöneticisi rollerine** gider (istisnanın kendisine değil).
+- Uyarı süresi (örn. 7 gün önce) **yapılandırılabilir parametredir** (Y3 Referans Veri).
+- Uyarı kanalı: uygulama içi bildirim + yönetim ekranında liste.
+
+**Yetki**
+
+- Yeni izin: `identity.notification-exemption.manage`
+- Bu izin başlangıçta **Sistem Yöneticisi** ve **İnsan Kaynakları** rollerine atanır.
+- Rol–izin ilişkisi yönetilebilir olduğundan (ADR-0007 §1), ileride değiştirilebilir.
+
+**Gerekçe ve denetim**
+
+- Gerekçe alanı **zorunludur**; boş bırakılamaz.
+- Tanımlama, güncelleme ve kaldırma işlemleri **denetim izine** yazılır (ADR-0009 §2).
+- İstisna nedeniyle gönderilmeyen iletiler, gönderim kaydına
+  `Gönderilmedi — istisna (<kanal>)` sonucuyla düşer (ADR-0012 §6).
+
+**Veri modeli taslağı**
+
+```
+notification_exemption
+──────────────────────────────
+id
+person_id          → Kişi (hesaba değil)
+channel            → UygulamaIci | EPosta | Sms
+valid_from         (date, zorunlu)
+valid_to           (date, null = süresiz)
+reason             (text, ZORUNLU)
+created_at, created_by, updated_at, updated_by
+```
+
+Kısıt: aynı `person_id` + `channel` için `daterange` çakışması yasak (`EXCLUDE`).
+
+### 7.6 Tasarım notları
 
 - İstisna tanımı ve kaldırılması **denetim izine** yazılır (kim, ne zaman, gerekçe).
 - Gönderim kaydında (ADR-0012 §6), istisna nedeniyle **gönderilmeyen** iletiler de
@@ -368,7 +431,7 @@ kayıt altına alınacaktır.
 | A5 | Y7 Çalışan Belge Yönetimi'nde mevcut sistemden dosya göçü olacak mı? | Modül geliştirilirken netleşecek |
 | A6 | Mevcut sistemdeki `imza`, `varsayilan_personel_kartlari`, `ayarlar`, `sirket_faaliyetleri` tablolarının karşılığı | İlgili modül geliştirilirken değerlendirilecek |
 | A7 | Cumartesi iş başı beyanının sistemde nasıl kayda geçeceği (§6.4) | İzin Yönetimi toplantısında netleşecek |
-| A8 | Bildirim istisnasının kuralları — §7.4'teki B1–B7 soruları | Kullanıcı Yönetimi toplantısında netleşecek |
+| A8 | Bildirim istisnasının kuralları (B1–B7) | ✅ **Kapandı** — İK cevapladı, kurallar §7.5'te kesinleşti (2026-09-09) |
 
 ---
 
@@ -400,3 +463,4 @@ Kapsam büyüklüğünün getirdiği süre riski `R-15` olarak kayıt altına al
 | 2026-09-07 | 0.1 | İlk oluşturma — 33 modül, bağımlılık haritası, seçim rehberi | Bilgi İşlem |
 | 2026-09-07 | 0.2 | **Y10 Çalışma Takvimi** ve **İ20 İSG ve İş Kazası** modülleri eklendi (35 modül); izin gün sayımı ön bilgisi ve tasarım etkisi kaydedildi; zincir ve yatay öncelik kararları işlendi | Bilgi İşlem |
 | 2026-09-09 | 0.3 | §7 Bildirim istisnası eklendi (mimari yerleşim, doğrulama kodu etkileşimi, İK soruları) | Bilgi İşlem |
+| 2026-09-09 | 0.4 | §7.4 İK cevapları ve §7.5 kesinleşen kurallar eklendi; A8 kapandı | Bilgi İşlem |
