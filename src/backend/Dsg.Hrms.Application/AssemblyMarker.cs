@@ -5,4 +5,4 @@ namespace Dsg.Hrms.Application;
 /// Mimari testleri ve bagimlilik kaydi bu tipi kullanir.
 /// Ic mantik icermez ve icermemelidir.
 /// </summary>
-public sealed class AssemblyIsareti;
+public sealed class AssemblyMarker;

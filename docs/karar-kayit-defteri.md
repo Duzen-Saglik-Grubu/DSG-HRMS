@@ -1,7 +1,7 @@
 # Karar Kayıt Defteri
 
 **Belge kimliği:** KKD
-**Son güncelleme:** 2026-09-09
+**Son güncelleme:** 2026-09-10
 **Amaç:** Proje boyunca alınan kararların tek ve resmî kaydı. Bir kararın *ne olduğu*,
 *neden alındığı* ve *ne zaman alındığı* buradan izlenir.
 **İlgili süreçler:** MAN.2 (Proje Değerlendirme ve Kontrol), TEC.2, TEC.5
@@ -83,6 +83,7 @@
 | KR-055 | 2026-09-09 | GitHub plan tercihi | Depo **özel kalacak** ve organizasyon **GitHub Free planında** devam edecek; **Team planına geçilmeyecek**. `KR-054` ile kurulan telafi edici kontroller **kalıcı çözümdür**. `R-16` riski, bu kontrollerle birlikte **kabul edilmiştir** | Şirket projesi olması nedeniyle deponun herkese açık yapılması söz konusu değildir. Sunucu tarafı dal koruma yerine, atlatılamaz bir tespit edici CI denetimi ve istemci tarafı kancalar yeterli görülmüştür. Seviye 2 için PA 2.2'de `L` derecesi yeterlidir (33020 Madde 5.6) | Bilgi İşlem | Yürürlükte |
 | KR-056 | 2026-09-09 | Bildirim istisnasının mimari yerleşimi | Bazı personele bildirim gönderilmemesi ihtiyacı şu şekilde karşılanacak: **istisna tanımı `Kişi (Person)` seviyesinde**, **T5 Kullanıcı Yönetimi**'nde yönetilecek; **uygulaması Y1 Bildirim Merkezi'nde tek merkezî noktada** yapılacak. İstisna **kişi + kanal** bazındadır (`UygulamaIci`, `EPosta`, `Sms`) ve **tarih aralıklıdır**; bitiş yaklaşınca uyarı üretilir. **İşlemsel/güvenlik iletileri (doğrulama kodu, parola sıfırlama) istisnadan muaftır.** **Gerekçe zorunludur.** Tanımlama yetkisi Sistem Yöneticisi ve İnsan Kaynakları rollerindedir. İstisnaya rağmen gönderilmesi gereken yasal bildirim yoktur | Kişinin hesabı olmasa da istisna tanımlanabilmeli; hesap kapanıp açılsa da korunmalı. Kontrolün tek noktada olması, 20 iş modülünün her birinde unutulma riskini ortadan kaldırır. Kanal bazlı yapı, ileride farklı bir ihtiyaç doğduğunda yazılım değişikliği gerektirmez. İşlemsel iletiler muaf tutulmasaydı istisna kapsamındaki kişi doğrulama kodu alamayacağı için sisteme hiç giremezdi. Ayrıntı ve İK'ya sorulacak açık sorular: `docs/mimari/modul-listesi-ve-bagimliliklar.md` §7 | İK Birimi + Bilgi İşlem | Yürürlükte |
 | KR-057 | 2026-09-09 | İddia (assertion) kütüphanesi | Testlerde **Shouldly** (BSD-3-Clause) kullanılacak; **FluentAssertions kullanılmayacak** | FluentAssertions 8.x koşullu ticari lisansa geçti. Son ücretsiz sürüm olan 7.x dondurulmuş durumda ve güvenlik güncellemesi almayacak; 10–15 yıllık ufukta terk edilmiş bağımlılık kabul edilemez. Bu, `KR-005` (AutoMapper), `KR-006` (MediatR) ve `KR-025` (QuestPDF) ile aynı ilkedir | Bilgi İşlem | Yürürlükte |
+| KR-058 | 2026-09-10 | Kodlama dili | **Kod tanımlayıcıları İngilizce** olacak: sınıf, arayüz, metot, özellik, değişken, ad alanı, klasör, veritabanı kolonu ve yapılandırma anahtarı adları. **Yorum satırları ve XML belgeleri Türkçe** kalacak. Belgeler de Türkçe (teknik terimler hariç) | Kod tanımlayıcılarının dili hakkında daha önce alınmış bir karar yoktu; Türkçe adlandırma yanlışlıkla uygulanmıştı. ADR'lerde tanımlanan arayüzler (`ICurrentUser`, `IFileStorage`, `ILogoPersonnelSource`, `ISmsSender`, `IReportGenerator`, `IUnitOfWork`) ve ADR-0004'teki kolon adları (`created_at`, `deleted_by`, `public_id`) zaten İngilizceydi; Türkçe adlandırma bu belgelerle çelişiyordu. Ayrıca .NET ekosisteminin tamamı (çerçeve tipleri, ezilen metot imzaları, paket API'leri) İngilizcedir; karışık dil, ezme (override) kurallarında da çelişki üretir (`CA1725`) | Bilgi İşlem | Yürürlükte |
 
 ---
 
@@ -98,3 +99,4 @@
 | 2026-09-09 | 0.6 | KR-055 (GitHub plan tercihi) ve KR-056 (bildirim istisnası yerleşimi) eklendi | Bilgi İşlem |
 | 2026-09-09 | 0.7 | KR-056 İK cevaplarıyla kesinleştirildi (kanal bazlı, tarih aralıklı, işlemsel muaf, gerekçe zorunlu) | Bilgi İşlem |
 | 2026-09-09 | 0.8 | KR-057 eklendi (iddia kütüphanesi Shouldly) | Bilgi İşlem |
+| 2026-09-10 | 0.9 | KR-058 eklendi (kodlama dili: tanımlayıcılar İngilizce, yorumlar Türkçe) | Bilgi İşlem |

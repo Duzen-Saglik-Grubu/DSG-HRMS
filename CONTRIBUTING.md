@@ -91,6 +91,44 @@ Türkçe karakter ve boşluk kullanılmaz.
 
 ---
 
+## 3.2 Kodlama dili (`KR-058`)
+
+| Ne | Dil |
+|---|---|
+| Sınıf, arayüz, metot, özellik, değişken adları | **İngilizce** |
+| Ad alanı (namespace) ve klasör adları | **İngilizce** |
+| Veritabanı tablo ve kolon adları | **İngilizce** (`snake_case`) |
+| Yapılandırma anahtarları | **İngilizce** (`Database:Hrms`) |
+| Test metodu adları | **İngilizce** |
+| **Kod içi yorumlar** | **Türkçe** |
+| **XML belgeleri** (`<summary>`, `<remarks>`) | **Türkçe** |
+| Hata mesajları (kullanıcıya görünen) | **Türkçe** |
+| Dokümanlar | **Türkçe** (teknik terimler hariç) |
+
+**Gerekçe:** .NET ekosisteminin tamamı İngilizcedir — çerçeve tipleri, ezilen metot
+imzaları, paket API'leri. Karışık dil, ezme (override) kurallarında doğrudan çelişki
+üretir: `CA1725`, ezilen metotlarda parametre adlarının taban imzayla aynı olmasını
+zorunlu kılar. Ayrıca ADR'lerde tanımlanan arayüzler (`ICurrentUser`, `IFileStorage`,
+`ILogoPersonnelSource`) ve ADR-0004'teki kolon adları (`created_at`, `deleted_by`)
+zaten İngilizcedir.
+
+**Yorumların Türkçe olması bilinçlidir.** Yorum, kodun *neden* öyle yazıldığını
+anlatır; bu açıklamanın ekibin ana dilinde olması anlaşılırlığı artırır.
+
+```csharp
+/// <summary>
+/// Denetim alanlarini otomatik doldurur (ADR-0004 §4).
+/// </summary>
+public sealed class AuditFieldsInterceptor : SaveChangesInterceptor
+{
+    // Olusturma bilgisi degistirilemez: denetim izinin guvenilirligi
+    // bunun degismezligine dayanir.
+    entry.Property(nameof(IAuditable.CreatedAt)).IsModified = false;
+}
+```
+
+---
+
 ## 4. Commit mesajları
 
 **Conventional Commits** biçimi kullanılır:

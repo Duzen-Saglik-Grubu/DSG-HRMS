@@ -9,38 +9,38 @@ namespace Dsg.Hrms.Architecture.Tests;
 /// Bu testler, mimari kurallarin zamanla asinmasini onler: kural ihlali
 /// derlemeyi degil TESTI kirar ve Pull Request birlestirilemez.
 /// </summary>
-public sealed class KatmanBagimlilikTestleri
+public sealed class LayerDependencyTests
 {
-    private const string Application = "Dsg.Hrms.Application";
-    private const string Infrastructure = "Dsg.Hrms.Infrastructure";
-    private const string Api = "Dsg.Hrms.Api";
+    private const string ApplicationLayer = "Dsg.Hrms.Application";
+    private const string InfrastructureLayer = "Dsg.Hrms.Infrastructure";
+    private const string ApiLayer = "Dsg.Hrms.Api";
 
-    private static Assembly DomainAssembly => typeof(global::Dsg.Hrms.Domain.AssemblyIsareti).Assembly;
-    private static Assembly ApplicationAssembly => typeof(global::Dsg.Hrms.Application.AssemblyIsareti).Assembly;
-    private static Assembly InfrastructureAssembly => typeof(global::Dsg.Hrms.Infrastructure.AssemblyIsareti).Assembly;
+    private static Assembly DomainAssembly => typeof(Dsg.Hrms.Domain.AssemblyMarker).Assembly;
+    private static Assembly ApplicationAssembly => typeof(Dsg.Hrms.Application.AssemblyMarker).Assembly;
+    private static Assembly InfrastructureAssembly => typeof(Dsg.Hrms.Infrastructure.AssemblyMarker).Assembly;
 
     // ------------------------------------------------------------------
     // Kural 1: Domain hicbir seye bagimli degildir.
     // ------------------------------------------------------------------
 
     [Fact]
-    public void Domain_diger_katmanlara_bagimli_olamaz()
+    public void Domain_should_not_depend_on_other_layers()
     {
-        var sonuc = Types.InAssembly(DomainAssembly)
+        var result = Types.InAssembly(DomainAssembly)
             .ShouldNot()
-            .HaveDependencyOnAny(Application, Infrastructure, Api)
+            .HaveDependencyOnAny(ApplicationLayer, InfrastructureLayer, ApiLayer)
             .GetResult();
 
-        IhlalMesaji(sonuc, "Domain katmani yalnizca kendi icinde calisir (ADR-0002, Kural 1).")
+        ViolationMessage(result, "Domain katmani yalnizca kendi icinde calisir (ADR-0002, Kural 1).")
             .ShouldBeNull();
     }
 
     [Fact]
-    public void Domain_altyapi_kutuphanelerine_bagimli_olamaz()
+    public void Domain_should_not_depend_on_infrastructure_libraries()
     {
         // Domain saf is mantigidir: veri erisimi, HTTP ve seri hale getirme
         // ayrintilarini bilmez. Bu, is kurallarinin izole test edilebilmesini saglar.
-        var sonuc = Types.InAssembly(DomainAssembly)
+        var result = Types.InAssembly(DomainAssembly)
             .ShouldNot()
             .HaveDependencyOnAny(
                 "Microsoft.EntityFrameworkCore",
@@ -50,7 +50,7 @@ public sealed class KatmanBagimlilikTestleri
                 "System.Text.Json")
             .GetResult();
 
-        IhlalMesaji(sonuc, "Domain katmani altyapi kutuphanelerine bagimli olamaz (ADR-0002, Kural 1).")
+        ViolationMessage(result, "Domain katmani altyapi kutuphanelerine bagimli olamaz (ADR-0002, Kural 1).")
             .ShouldBeNull();
     }
 
@@ -59,28 +59,28 @@ public sealed class KatmanBagimlilikTestleri
     // ------------------------------------------------------------------
 
     [Fact]
-    public void Application_Infrastructure_veya_Api_ye_bagimli_olamaz()
+    public void Application_should_not_depend_on_infrastructure_or_api()
     {
-        var sonuc = Types.InAssembly(ApplicationAssembly)
+        var result = Types.InAssembly(ApplicationAssembly)
             .ShouldNot()
-            .HaveDependencyOnAny(Infrastructure, Api)
+            .HaveDependencyOnAny(InfrastructureLayer, ApiLayer)
             .GetResult();
 
-        IhlalMesaji(sonuc,
+        ViolationMessage(result,
                 "Application katmani dis dunyaya yalnizca arayuzlerle erisir; " +
                 "uygulamalari Infrastructure'da bulunur (ADR-0002, Kural 2).")
             .ShouldBeNull();
     }
 
     [Fact]
-    public void Application_veri_erisim_kutuphanelerine_bagimli_olamaz()
+    public void Application_should_not_depend_on_data_access_libraries()
     {
-        var sonuc = Types.InAssembly(ApplicationAssembly)
+        var result = Types.InAssembly(ApplicationAssembly)
             .ShouldNot()
             .HaveDependencyOnAny("Microsoft.EntityFrameworkCore", "Npgsql", "Microsoft.AspNetCore")
             .GetResult();
 
-        IhlalMesaji(sonuc,
+        ViolationMessage(result,
                 "Application katmani EF Core ve ASP.NET ayrintilarini bilmez; " +
                 "aksi hâlde kullanim senaryolari altyapidan bagimsiz test edilemez.")
             .ShouldBeNull();
@@ -91,14 +91,14 @@ public sealed class KatmanBagimlilikTestleri
     // ------------------------------------------------------------------
 
     [Fact]
-    public void Infrastructure_Api_ye_bagimli_olamaz()
+    public void Infrastructure_should_not_depend_on_api()
     {
-        var sonuc = Types.InAssembly(InfrastructureAssembly)
+        var result = Types.InAssembly(InfrastructureAssembly)
             .ShouldNot()
-            .HaveDependencyOn(Api)
+            .HaveDependencyOn(ApiLayer)
             .GetResult();
 
-        IhlalMesaji(sonuc, "Bagimlilik yonu Api -> Infrastructure seklindedir, tersi degil (ADR-0002, Kural 3).")
+        ViolationMessage(result, "Bagimlilik yonu Api -> Infrastructure seklindedir, tersi degil (ADR-0002, Kural 3).")
             .ShouldBeNull();
     }
 
@@ -107,44 +107,44 @@ public sealed class KatmanBagimlilikTestleri
     // ------------------------------------------------------------------
 
     [Fact]
-    public void Moduller_birbirinin_ic_siniflarina_erisemez()
+    public void Modules_should_not_depend_on_each_others_internals()
     {
         // Bir modul, baska bir modulun yalnizca acikca yayimladigi arayuzleri
         // kullanabilir (Modules/<Modul>/Abstractions). Diger her sey icseldir.
         //
         // Modul bulunmadigi surece bu test bos gecer; ilk modul eklendiginde
         // kendiliginden anlamli hâle gelir.
-        var ihlaller = new List<string>();
+        var violations = new List<string>();
 
         foreach (var assembly in new[] { DomainAssembly, ApplicationAssembly, InfrastructureAssembly })
         {
-            var modulAdlari = ModulAdlariniBul(assembly);
+            var moduleNames = FindModuleNames(assembly);
 
-            foreach (var modul in modulAdlari)
+            foreach (var module in moduleNames)
             {
-                var digerModuller = modulAdlari
-                    .Where(m => m != modul)
+                var otherModules = moduleNames
+                    .Where(m => m != module)
                     .Select(m => $"{assembly.GetName().Name}.Modules.{m}")
                     .ToArray();
 
-                if (digerModuller.Length == 0)
+                if (otherModules.Length == 0)
                 {
                     continue;
                 }
 
-                var sonuc = Types.InAssembly(assembly)
-                    .That().ResideInNamespace($"{assembly.GetName().Name}.Modules.{modul}")
-                    .ShouldNot().HaveDependencyOnAny(digerModuller)
+                var result = Types.InAssembly(assembly)
+                    .That().ResideInNamespace($"{assembly.GetName().Name}.Modules.{module}")
+                    .ShouldNot().HaveDependencyOnAny(otherModules)
                     .GetResult();
 
-                if (!sonuc.IsSuccessful)
+                if (!result.IsSuccessful)
                 {
-                    ihlaller.AddRange(sonuc.FailingTypeNames.Select(t => $"{modul}: {t}"));
+                    violations.AddRange(result.FailingTypeNames.Select(t => $"{module}: {t}"));
                 }
             }
         }
 
-        ihlaller.ShouldBeEmpty(
+        violations.ShouldBeEmpty(
             "Moduller arasi dogrudan erisim yasaktir; yalnizca yayimlanan arayuzler " +
             "uzerinden konusulur (ADR-0002, Kural 5).");
     }
@@ -153,14 +153,14 @@ public sealed class KatmanBagimlilikTestleri
     // Yardimcilar
     // ------------------------------------------------------------------
 
-    private static string[] ModulAdlariniBul(Assembly assembly)
+    private static string[] FindModuleNames(Assembly assembly)
     {
-        var onEk = $"{assembly.GetName().Name}.Modules.";
+        var prefix = $"{assembly.GetName().Name}.Modules.";
 
         return assembly.GetTypes()
             .Select(t => t.Namespace)
-            .Where(ns => ns is not null && ns.StartsWith(onEk, StringComparison.Ordinal))
-            .Select(ns => ns![onEk.Length..].Split('.')[0])
+            .Where(ns => ns is not null && ns.StartsWith(prefix, StringComparison.Ordinal))
+            .Select(ns => ns![prefix.Length..].Split('.')[0])
             .Distinct(StringComparer.Ordinal)
             .ToArray();
     }
@@ -170,14 +170,14 @@ public sealed class KatmanBagimlilikTestleri
     /// Amaç, testin "false bekleniyordu true geldi" yerine ihlal eden tip adlarini
     /// ve kuralin gerekcesini gostermesidir.
     /// </summary>
-    private static string? IhlalMesaji(TestResult sonuc, string kural)
+    private static string? ViolationMessage(TestResult result, string rule)
     {
-        if (sonuc.IsSuccessful)
+        if (result.IsSuccessful)
         {
             return null;
         }
 
-        var tipler = string.Join(Environment.NewLine, sonuc.FailingTypeNames.Select(t => $"  - {t}"));
-        return $"{kural}{Environment.NewLine}Kurali ihlal eden tipler:{Environment.NewLine}{tipler}";
+        var types = string.Join(Environment.NewLine, result.FailingTypeNames.Select(t => $"  - {t}"));
+        return $"{rule}{Environment.NewLine}Kurali ihlal eden tipler:{Environment.NewLine}{types}";
     }
 }
