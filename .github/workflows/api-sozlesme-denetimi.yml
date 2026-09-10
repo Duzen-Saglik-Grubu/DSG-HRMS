@@ -1,0 +1,66 @@
+# API sozlesme denetimi (TEC.5 · MAN.5)
+#
+# OpenAPI belgesi tek dogruluk kaynagidir (ADR-0010 §1) ve depoda konfigurasyon
+# ogesi olarak tutulur. Bu denetim, belgenin koddan uretilen hâliyle depodaki
+# hâlinin AYNI oldugunu dogrular.
+#
+# Amac: sozlesme degisikliginin PR farkinda GORUNMESI. Aksi hâlde kirici bir
+# API degisikligi (kaldirilan alan, degisen tip) gozden kacar ve frontend
+# calisma zamaninda kirilirdi.
+
+name: API sozlesme denetimi
+
+on:
+  pull_request:
+    paths:
+      - 'src/backend/**'
+      - 'docs/api/**'
+      - '.github/workflows/api-sozlesme-denetimi.yml'
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  sozlesme:
+    name: OpenAPI belgesi guncel mi
+    runs-on: ubuntu-latest
+
+    env:
+      # Belge uretimi uygulamayi acar; acilis zorunlu yapilandirmayi denetler
+      # (ADR-0008 §4). Bu tasarim zamani degeri gercek bir veritabanina
+      # baglanmaz, yalnizca dogrulamayi gecer.
+      Database__Hrms: 'Host=openapi-uretimi;Database=dsg_hrms;Username=openapi;Password=openapi'
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: .NET kur
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: OpenAPI belgesini uret
+        run: dotnet build src/backend/Dsg.Hrms.Api -p:OpenApiGenerateDocumentsOnBuild=true
+
+      - name: Depodaki belgeyle karsilastir
+        run: |
+          if ! git diff --exit-code -- docs/api/; then
+            echo ''
+            echo '::error::OpenAPI belgesi guncel degil.'
+            echo 'API sozlesmesi degismis ancak docs/api/openapi-v1.json guncellenmemis.'
+            echo 'Asagidaki komutu calistirip sonucu commitleyin:'
+            echo '  dotnet build src/backend/Dsg.Hrms.Api -p:OpenApiGenerateDocumentsOnBuild=true'
+            exit 1
+          fi
+          echo 'OpenAPI belgesi guncel.'
+
+      - name: Belgeyi yapit olarak sakla
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-v1
+          path: docs/api/openapi-v1.json
+          if-no-files-found: error
