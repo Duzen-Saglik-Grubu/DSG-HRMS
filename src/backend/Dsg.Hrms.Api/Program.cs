@@ -1,5 +1,5 @@
-using Dsg.Hrms.Api.Kimlik;
-using Dsg.Hrms.Application.Ortak.Soyutlamalar;
+using Dsg.Hrms.Api.Identity;
+using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Infrastructure;
 
 // DSG-HRMS API - uygulama giris noktasi (kompozisyon koku).
@@ -13,11 +13,11 @@ using Dsg.Hrms.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IMevcutKullanici, HttpBaglamMevcutKullanici>();
+builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
 
 // Yapilandirma dogrulamasi ve veritabani kaydi.
 // Zorunlu bir ayar eksikse uygulama BURADA degil, acilirken durur (ADR-0008 §4).
-builder.Services.AltyapiEkle(builder.Configuration, builder.Environment);
+builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 
 builder.Services.AddHealthChecks();
 
