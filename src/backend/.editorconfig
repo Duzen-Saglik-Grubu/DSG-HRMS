@@ -70,6 +70,31 @@ dotnet_naming_symbols.tip_ve_uye.applicable_kinds = class,struct,enum,property,m
 dotnet_naming_symbols.tip_ve_uye.applicable_accessibilities = *
 dotnet_naming_style.pascal_case.capitalization = pascal_case
 
+# private/internal static readonly alanlar PascalCase yazilir.
+#
+# Alt cizgi oneki ORNEK durumunu (instance state) isaretler; okuyan kisi "_"
+# gorunce nesneye ait bir degisken bekler. static readonly bir alan ise sabit
+# gibi davranir ve .NET genelinde PascalCase yazilir.
+#
+# SIRA ONEMLIDIR: adlandirma kurallarinda ILK eslesen kural uygulanir; bu yuzden
+# alt cizgi kuralindan once tanimlanmistir.
+dotnet_naming_rule.statik_salt_okunur_pascal.severity = error
+dotnet_naming_rule.statik_salt_okunur_pascal.symbols = statik_salt_okunur_alan
+dotnet_naming_rule.statik_salt_okunur_pascal.style = pascal_case
+
+dotnet_naming_symbols.statik_salt_okunur_alan.applicable_kinds = field
+dotnet_naming_symbols.statik_salt_okunur_alan.applicable_accessibilities = private,internal
+dotnet_naming_symbols.statik_salt_okunur_alan.required_modifiers = static,readonly
+
+# Sabitler (const) PascalCase yazilir. Ayni gerekce: sabit, ornek durumu degildir.
+dotnet_naming_rule.sabitler_pascal.severity = error
+dotnet_naming_rule.sabitler_pascal.symbols = sabit_alan
+dotnet_naming_rule.sabitler_pascal.style = pascal_case
+
+dotnet_naming_symbols.sabit_alan.applicable_kinds = field
+dotnet_naming_symbols.sabit_alan.applicable_accessibilities = *
+dotnet_naming_symbols.sabit_alan.required_modifiers = const
+
 dotnet_naming_rule.ozel_alanlar_alt_cizgi.severity = error
 dotnet_naming_rule.ozel_alanlar_alt_cizgi.symbols = ozel_alan
 dotnet_naming_rule.ozel_alanlar_alt_cizgi.style = alt_cizgi_camel

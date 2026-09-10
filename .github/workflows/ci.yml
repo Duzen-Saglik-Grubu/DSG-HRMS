@@ -1,0 +1,175 @@
+# Surekli tumlestirme - kalite kapilari (ADR-0011 §6)
+#
+# Kapilar UYARI DEGIL, ENGELDIR. Gecici olarak devre disi birakilmasi gerekirse
+# gerekcesi PR'da yazilir ve "tur:duzeltici-faaliyet" etiketli bir issue acilir.
+#
+# Kapilarin bir kismi zaten derleme zamaninda calisir (uyarilar hata, .NET analiz
+# kurallari, NuGet guvenlik denetimi); burada tekrarlanmaz, derleme adiminda
+# kendiliginden uygulanir.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+  # Entegrasyon testleri Testcontainers ile gercek PostgreSQL kaldirir (ADR-0011 §3).
+  TESTCONTAINERS_RYUK_DISABLED: 'false'
+
+jobs:
+  # ------------------------------------------------------------------
+  # Kapi 1-5: Derleme, bicim, testler, kapsam, mimari
+  # ------------------------------------------------------------------
+  derleme-ve-test:
+    name: Derleme, test ve kapsam
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: .NET kur
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Araclari geri yukle
+        run: dotnet tool restore
+
+      - name: Paketleri geri yukle
+        run: dotnet restore src/backend/Dsg.Hrms.slnx
+
+      # KAPI 1 - Derleme: uyari yok.
+      # TreatWarningsAsErrors ve .NET analiz kurallari Directory.Build.props'ta
+      # acik; bu adim ayni zamanda STATIK ANALIZ kapisidir (KAPI 4).
+      - name: Derle
+        run: dotnet build src/backend/Dsg.Hrms.slnx --no-restore -warnaserror
+
+      # KAPI 2 - Bicim: dotnet format temiz olmali.
+      - name: Bicim denetimi
+        run: dotnet format src/backend/Dsg.Hrms.slnx --verify-no-changes --no-restore
+
+      # KAPI 3 - Testler: tamami gecmeli (mimari testleri dâhil - KAPI 5).
+      - name: Testler ve kapsam olcumu
+        run: |
+          dotnet test src/backend/Dsg.Hrms.slnx \
+            --no-build \
+            --settings src/backend/coverlet.runsettings \
+            --results-directory artifacts/coverage \
+            --logger 'trx;LogFileName=test-sonuclari.trx'
+
+      # KAPI 4 - Kapsam esigi: genel %75, Domain %90 (ADR-0011 §1).
+      - name: Kapsam raporu
+        run: |
+          dotnet reportgenerator \
+            "-reports:artifacts/coverage/**/coverage.cobertura.xml" \
+            "-targetdir:artifacts/coverage-report" \
+            "-reporttypes:TextSummary;Cobertura;MarkdownSummaryGithub"
+
+      - name: Kapsam esigini denetle
+        run: ./.github/scripts/kapsam-denetimi.sh artifacts/coverage-report/Cobertura.xml
+
+      - name: Kapsam ozetini is akisina yaz
+        if: always()
+        run: cat artifacts/coverage-report/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Sonuclari sakla
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-ve-kapsam
+          path: |
+            artifacts/coverage-report/
+            artifacts/coverage/**/*.trx
+          if-no-files-found: warn
+
+  # ------------------------------------------------------------------
+  # Kapi 6: Migration kontrolu
+  # ------------------------------------------------------------------
+  migration-denetimi:
+    name: Bekleyen model degisikligi yok
+    runs-on: ubuntu-latest
+
+    env:
+      # Tasarim zamani degeri; gercek bir veritabanina baglanmaz.
+      Database__Hrms: 'Host=migration-denetimi;Database=dsg_hrms;Username=denetim;Password=denetim'
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: .NET kur
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: EF araclarini kur
+        run: dotnet tool install --global dotnet-ef --version 10.0.12
+
+      # Model degistirilip migration uretilmezse, uygulama uretimde veritabani
+      # semasiyla uyusmayan bir modelle acilirdi. Hata calisma zamaninda,
+      # kullanicinin ilk isleminde ortaya cikardi.
+      - name: Bekleyen model degisikligi denetimi
+        run: |
+          dotnet ef migrations has-pending-model-changes \
+            --project src/backend/Dsg.Hrms.Infrastructure \
+            --startup-project src/backend/Dsg.Hrms.Api
+
+  # ------------------------------------------------------------------
+  # Kapi 7: Bagimlilik guvenligi
+  # ------------------------------------------------------------------
+  bagimlilik-guvenligi:
+    name: Guvenlik acigi olan paket yok
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: .NET kur
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Paketleri geri yukle
+        run: dotnet restore src/backend/Dsg.Hrms.slnx
+
+      # NuGetAudit derleme sirasinda da calisir; bu adim GECISLI bagimliliklari
+      # da acikca raporlar ve ciktiyi okunabilir birakir.
+      - name: Acikli paket taramasi
+        run: |
+          cikti=$(dotnet list src/backend/Dsg.Hrms.slnx package --vulnerable --include-transitive)
+          echo "$cikti"
+
+          if echo "$cikti" | grep -q 'has the following vulnerable packages'; then
+            echo '::error::Guvenlik acigi bulunan paket var. Paketi guncelleyin veya degistirin.'
+            exit 1
+          fi
+
+          echo 'Guvenlik acigi bulunan paket yok.'
+
+  # ------------------------------------------------------------------
+  # Kapi 8: Sir taramasi
+  # ------------------------------------------------------------------
+  sir-taramasi:
+    name: Sir taramasi (gitleaks)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+        with:
+          # Sir, gecmis bir commit'te kalmis olabilir; tarama tum gecmisi kapsar.
+          fetch-depth: 0
+
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
