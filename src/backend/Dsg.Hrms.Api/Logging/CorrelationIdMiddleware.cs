@@ -53,6 +53,22 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next)
         }
     }
 
+    /// <summary>
+    /// Istek icin belirlenmis izleme kimligini dondurur.
+    /// </summary>
+    /// <remarks>
+    /// Ara katman calismadiysa (ornegin boru hatti kurulmadan onceki bir hata)
+    /// cercevenin kendi istek kimligine duser; deger her zaman doludur.
+    /// </remarks>
+    public static string GetCorrelationId(HttpContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        return context.Items.TryGetValue(ItemKey, out var value) && value is string id
+            ? id
+            : Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier;
+    }
+
     private static string ResolveCorrelationId(HttpContext context)
     {
         // Cagiran taraf kendi kimligini gonderebilir; bu, istegin birden fazla

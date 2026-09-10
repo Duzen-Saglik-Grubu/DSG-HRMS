@@ -1,3 +1,4 @@
+using Dsg.Hrms.Api.ErrorHandling;
 using Dsg.Hrms.Api.Identity;
 using Dsg.Hrms.Api.Logging;
 using Dsg.Hrms.Application.Common.Abstractions;
@@ -27,6 +28,7 @@ try
         SerilogConfiguration.Configure(loggerConfiguration, builder.Configuration, builder.Environment));
 
     builder.Services.AddHttpContextAccessor();
+    builder.Services.AddHrmsProblemDetails();
     builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
 
     // Yapilandirma dogrulamasi ve veritabani kaydi.
@@ -51,6 +53,10 @@ try
             diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
             diagnosticContext.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress?.ToString());
         });
+
+    // Hata yonetimi istek gunlugunden SONRA gelir; gerekcesi
+    // ErrorHandlingRegistration icinde yazilidir.
+    app.UseHrmsErrorHandling();
 
     // Canlilik kontrolu: uygulama ayakta mi?
     app.MapHealthChecks("/health/live");
