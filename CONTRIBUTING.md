@@ -205,6 +205,46 @@ Ayrıntı: ADR-0009 §3.
 
 ---
 
+## 3.5 Hata fırlatma — hangi istisna, hangi durum kodu?
+
+Hata yanıtı **tek yerden** üretilir (`ProblemDetailsExceptionHandler`). Servis kodu
+yalnızca doğru istisnayı fırlatır; HTTP ayrıntısıyla ilgilenmez.
+
+| İstisna | Kod | Ne zaman |
+|---|---|---|
+| `ValidationException` (FluentValidation) | `400` | Veri **biçimsel** olarak geçersiz |
+| `ForbiddenException` | `403` | Kullanıcı bu eylemi **hiçbir** kayıtta yapamaz (rol) |
+| `NotFoundException` | `404` | Kayıt yok **veya kapsam dışı** |
+| `ConflictException` | `409` | Kaydın o anki durumu isteği reddediyor |
+| `BusinessRuleException` | `422` | Biçim doğru, **iş kuralı** ihlal edilmiş |
+
+**`403` / `404` ayrımı kritiktir.** Kapsam dışı bir kayıt için `403` dönmek, kaydın
+**var olduğunu** sızdırır — kullanıcı kimlik deneyerek hangi kayıtların mevcut
+olduğunu çıkarabilir. Bu yüzden kapsam dışı erişim `NotFoundException` fırlatır ve
+mesajda kayıt kimliği **yer almaz** (ADR-0007 §4).
+
+**`400` / `422` ayrımı** frontend için anlamlıdır: ilkinde kullanıcı alanı düzeltir,
+ikincisinde kendisine açıklama gösterilir.
+
+**Kullanıcıya gösterilecek mesaj yalnızca bu istisnalarda taşınır.** Diğer tüm
+istisnalar "beklenmeyen" sayılır: kullanıcı genel bir mesaj ve `traceId` görür,
+ayrıntının tamamı sunucu günlüğüne yazılır (`KR-062`).
+
+```csharp
+// DOĞRU
+if (balance < requestedDays)
+{
+    throw new BusinessRuleException("Yıllık izin bakiyeniz yetersiz.");
+}
+
+// YANLIŞ — teknik ayrıntı kullanıcıya gider
+throw new InvalidOperationException($"leave_balance={balance} < {requestedDays}");
+```
+
+Ayrıntı: ADR-0010 §5–§7.
+
+---
+
 ## 4. Commit mesajları
 
 **Conventional Commits** biçimi kullanılır:
@@ -302,7 +342,8 @@ Bir iş, aşağıdakilerin **tamamı** sağlanmadan "bitti" sayılmaz:
 
 **Güvenlik ve KVKK**
 - [ ] Yetki kontrolü **veri katmanında** mı yapılıyor? (ADR-0007 §3)
-- [ ] Kapsam dışı erişimde `404` mü dönüyor?
+- [ ] Kapsam dışı erişimde `404` mü dönüyor? (§3.5)
+- [ ] Hata mesajı kullanıcıya yönelik mi, teknik ayrıntı taşıyor mu?
 - [ ] Kişisel veri log'a veya hata mesajına sızıyor mu?
 - [ ] Hassas alanlar `[PersonalData]` / `[Secret]` ile işaretlenmiş mi? (§3.3)
 - [ ] Kişisel veri günlüğe **nesne olarak** mı veriliyor? (`{@Nesne}`, ham metin değil)
@@ -393,3 +434,4 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 | 2026-09-07 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-10 | 0.2 | §3.2 kodlama dili (KR-058) ve §3.3 günlük kaydı / kişisel veri kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |
 | 2026-09-10 | 0.3 | §3.4 erişim kaydı kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |
+| 2026-09-10 | 0.4 | §3.5 hata fırlatma kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |

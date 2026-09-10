@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Globalization;
 using System.Security.Claims;
 using Dsg.Hrms.Api.Logging;
@@ -46,16 +45,9 @@ public sealed class HttpContextCurrentUser(IHttpContextAccessor httpContextAcces
         {
             var context = httpContextAccessor.HttpContext;
 
-            if (context is null)
-            {
-                return null;
-            }
-
-            // Ara katmanin urettigi (veya cagirandan alip dogruladigi) kimlik onceliklidir;
+            // Ara katmanin urettigi (veya cagirandan alip dogruladigi) kimlik kullanilir;
             // uygulama gunlugundeki CorrelationId ile ayni deger olmalidir.
-            return context.Items.TryGetValue(CorrelationIdMiddleware.ItemKey, out var value) && value is string id
-                ? id
-                : Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier;
+            return context is null ? null : CorrelationIdMiddleware.GetCorrelationId(context);
         }
     }
 }
