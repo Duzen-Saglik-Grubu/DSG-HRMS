@@ -1,0 +1,70 @@
+# PR izlenebilirlik denetimi (MAN.5 · MAN.8)
+#
+# Izlenebilirlik zinciri: gereksinim -> issue -> PR -> test -> kabul.
+# Zincirde kopuk halka varsa "bu gereksinim hangi degisiklikle karsilandi"
+# sorusu belgelerden cevaplanamaz.
+#
+# Bu denetim, #17 duzeltici faaliyetinin sonucudur: kural yazili olmadigi ve
+# otomatik denetlenmedigi icin milestone ve issue baglantisi unutulabiliyordu.
+
+name: PR izlenebilirlik denetimi
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize, milestoned, demilestoned]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  izlenebilirlik:
+    name: Milestone ve issue baglantisi
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Denetle
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = pr.body || '';
+            const eksikler = [];
+
+            // --- 1. Milestone ---
+            if (!pr.milestone) {
+              eksikler.push(
+                'Milestone atanmamis. PR bir asamaya (A0/A1/A2/A3/AS) bagli olmalidir; ' +
+                'asama planlamasi ve ilerleme olcumu buna dayanir.');
+            }
+
+            // --- 2. Issue baglantisi ---
+            // "Closes #42" issue'yu kapatir ve resmi baglantiyi uretir.
+            // "Refs #42" yalnizca metinsel bagdir; gereksinim issue'lari icin
+            // kullanilir (modul kabul edilene kadar acik kalirlar).
+            const kapatma = /\b(clos(e[sd]?)|fix(e[sd]?)?|resolv(e[sd]?))\s+#\d+/i.test(body);
+            const referans = /\brefs?\s+#\d+/i.test(body);
+
+            if (!kapatma && !referans) {
+              eksikler.push(
+                'Issue baglantisi yok. Govdede "Closes #42" (gorev/hata) veya ' +
+                '"Refs #42" (gereksinim) bulunmalidir.');
+            }
+
+            // --- 3. Sablonun doldurulmus olmasi ---
+            if (/^Closes #\s*$/m.test(body)) {
+              eksikler.push(
+                'PR sablonundaki "Closes #" satiri doldurulmamis.');
+            }
+
+            if (eksikler.length > 0) {
+              core.setFailed(
+                'PR izlenebilirlik denetimi basarisiz:\n' +
+                eksikler.map(e => `  - ${e}`).join('\n') +
+                '\n\nAyrinti: CONTRIBUTING.md §5');
+              return;
+            }
+
+            core.info('Izlenebilirlik denetimi gecti.');
+            core.info(`Milestone: ${pr.milestone.title}`);
+            core.info(`Issue baglantisi: ${kapatma ? 'Closes/Fixes' : 'Refs'}`);
