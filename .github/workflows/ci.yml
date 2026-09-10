@@ -113,6 +113,10 @@ jobs:
       - name: EF araclarini kur
         run: dotnet tool install --global dotnet-ef --version 10.0.12
 
+      # "dotnet ef" proje ustveri okur; geri yukleme yapilmadan calismaz.
+      - name: Paketleri geri yukle
+        run: dotnet restore src/backend/Dsg.Hrms.slnx
+
       # Model degistirilip migration uretilmezse, uygulama uretimde veritabani
       # semasiyla uyusmayan bir modelle acilirdi. Hata calisma zamaninda,
       # kullanicinin ilk isleminde ortaya cikardi.
@@ -169,7 +173,22 @@ jobs:
           # Sir, gecmis bir commit'te kalmis olabilir; tarama tum gecmisi kapsar.
           fetch-depth: 0
 
-      - name: gitleaks
-        uses: gitleaks/gitleaks-action@v2
+      # gitleaks ARACI MIT lisanslidir ve serbestce kullanilir; ancak resmi GitHub
+      # ACTION sarmalayicisi organizasyon depolarinda UCRETLI LISANS ister.
+      # Kosullu ticari lisansli bilesen kullanmama ilkesi geregi (KR-025) araci
+      # dogrudan, surumu sabitlenmis olarak calistiriyoruz.
+      - name: gitleaks kur
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_SURUM: 8.30.1
+        run: |
+          curl -sSfL \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_SURUM}/gitleaks_${GITLEAKS_SURUM}_linux_x64.tar.gz" \
+            -o gitleaks.tar.gz
+          tar -xzf gitleaks.tar.gz gitleaks
+          sudo mv gitleaks /usr/local/bin/
+          gitleaks version
+
+      # --redact: bulunan sir, is akisi gunlugune YAZILMAZ. Aksi hâlde tarama
+      # sonucunun kendisi ikinci bir sizinti kaynagi olurdu.
+      - name: Sir taramasi
+        run: gitleaks git --no-banner --redact --verbose .
