@@ -293,14 +293,30 @@ Refs: #42
 | Kural | Değer |
 |---|---|
 | Şablon | `.github/PULL_REQUEST_TEMPLATE.md` doldurulur |
-| Issue bağlantısı | **Zorunlu** — `Closes #42` |
+| Issue bağlantısı | **Zorunlu** — `Closes #42` (görev/hata) veya `Refs #42` (gereksinim) |
+| Milestone | **Zorunlu** — PR ve issue aynı aşamaya (A0/A1/A2/A3/AS) bağlanır |
 | Boyut | Hedef **< 400 satır** değişiklik; büyükse bölünür |
 | CI | Tüm kalite kapıları geçmeli |
 | İnceleme | En az **1 onay** |
 | Birleştirme | **Squash merge** — `main` geçmişi okunabilir kalır |
 | Dal | Birleştirme sonrası **silinir** |
 
-### 5.1 Taslak (draft) PR
+### 5.1 `Closes` ve `Refs` ayrımı
+
+| Anahtar kelime | Etkisi | Ne zaman |
+|---|---|---|
+| `Closes #42` | Issue **kapanır**, resmî bağlantı (*Linked pull requests*) oluşur | Görev ve hata issue'ları |
+| `Refs #42` | Yalnızca metinsel bağ; issue **açık kalır** | Gereksinim issue'ları — modül kabul edilene kadar açık kalmalıdır |
+
+> **Dikkat:** `Refs` kullanıldığında issue kapanmaz **ve** pano otomasyonu onu
+> "Done"a taşımaz. Görev issue'sunda yanlışlıkla `Refs` yazılırsa issue "Review"da
+> asılı kalır. Bu durum bir kez yaşandı (#17); artık CI denetimi ve bu tablo var.
+
+Her iki alan da **CI tarafından denetlenir**
+([`pr-izlenebilirlik-denetimi.yml`](.github/workflows/pr-izlenebilirlik-denetimi.yml)):
+milestone veya issue bağlantısı eksikse kontrol başarısız olur.
+
+### 5.2 Taslak (draft) PR
 
 İş yarımken PR **taslak** olarak açılabilir. Bu, CI'ın erken çalışmasını ve geri
 bildirimin erken alınmasını sağlar. Taslak PR birleştirilemez.
@@ -435,3 +451,4 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 | 2026-09-10 | 0.2 | §3.2 kodlama dili (KR-058) ve §3.3 günlük kaydı / kişisel veri kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |
 | 2026-09-10 | 0.3 | §3.4 erişim kaydı kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |
 | 2026-09-10 | 0.4 | §3.5 hata fırlatma kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |
+| 2026-09-10 | 0.5 | §5 milestone zorunluluğu ve §5.1 `Closes`/`Refs` ayrımı eklendi (düzeltici faaliyet #17) | Bilgi İşlem |

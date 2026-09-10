@@ -2,7 +2,12 @@
 
 ## Bağlantılı issue
 
-<!-- Zorunlu. Örnek: Closes #42 -->
+<!--
+  Zorunlu.
+  Closes #42  -> gorev/hata issue'u: issue kapanir, resmi baglanti olusur
+  Refs #42    -> gereksinim issue'u: issue acik kalir
+  Ayrinti: CONTRIBUTING.md §5.1
+-->
 Closes #
 
 ## Ne değişti?
