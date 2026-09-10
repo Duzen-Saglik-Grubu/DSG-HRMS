@@ -66,3 +66,9 @@ src_old/**/*.rar
 # ---- CI yapitlari ----
 artifacts/
 coverage/
+
+# ---- Frontend ----
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
