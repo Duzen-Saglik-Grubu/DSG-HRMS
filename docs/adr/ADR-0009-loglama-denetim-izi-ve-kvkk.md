@@ -85,8 +85,8 @@ Aşağıdaki alanlar **hiçbir log veya denetim kaydında düz metin olarak yer 
 | Alan | Davranış |
 |---|---|
 | TCKN | Maskelenir: `123*****901` |
-| IBAN / banka bilgisi | Maskelenir |
-| Telefon | Kısmi maskelenir: `5XX***XX67` |
+| IBAN / banka bilgisi | Maskelenir: `TR***1326` |
+| Telefon | Kısmi maskelenir: `532*****67` (operatör ön eki görünür kalır) |
 | E-posta | Kısmi maskelenir: `ab***@duzen.com.tr` |
 | Parola, doğrulama kodu, jeton | **Hiç yazılmaz** — maskelenmez, tamamen dışlanır |
 | Özel nitelikli veri içeriği | Denetim izinde değer değil, **"değişti" bilgisi** tutulur |
@@ -186,3 +186,4 @@ veri sızıntısı incelemesi mümkün olur.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-09-10 | 0.2 | §4 maskeleme biçimleri kesinleştirildi (telefon, IBAN); gerçekleştirme `KR-059` ile iki katmanlı yapıldı | Bilgi İşlem |

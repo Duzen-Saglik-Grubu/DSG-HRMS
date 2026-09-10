@@ -4,6 +4,7 @@
     <Project Path="tests/Dsg.Hrms.Application.Tests/Dsg.Hrms.Application.Tests.csproj" />
     <Project Path="tests/Dsg.Hrms.Architecture.Tests/Dsg.Hrms.Architecture.Tests.csproj" />
     <Project Path="tests/Dsg.Hrms.Domain.Tests/Dsg.Hrms.Domain.Tests.csproj" />
+    <Project Path="tests/Dsg.Hrms.Infrastructure.Tests/Dsg.Hrms.Infrastructure.Tests.csproj" />
   </Folder>
   <Project Path="Dsg.Hrms.Api/Dsg.Hrms.Api.csproj" />
   <Project Path="Dsg.Hrms.Application/Dsg.Hrms.Application.csproj" />
