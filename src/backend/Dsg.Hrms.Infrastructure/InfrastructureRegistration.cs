@@ -33,6 +33,7 @@ public static class InfrastructureRegistration
 
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
         services.AddScoped<AuditFieldsInterceptor>();
+        services.AddScoped<AuditTrailInterceptor>();
 
         AddDatabase(services, configuration, environment);
 
@@ -64,7 +65,11 @@ public static class InfrastructureRegistration
             // Ad eslemesi elle yazilmaz; C# tarafinda PascalCase kullanilir.
             builder.UseSnakeCaseNamingConvention();
 
-            builder.AddInterceptors(provider.GetRequiredService<AuditFieldsInterceptor>());
+            // SIRA ONEMLIDIR: denetim alanlari once doldurulur ve yumusak silme
+            // donusumu once yapilir; denetim izi bu son durumu kaydeder.
+            builder.AddInterceptors(
+                provider.GetRequiredService<AuditFieldsInterceptor>(),
+                provider.GetRequiredService<AuditTrailInterceptor>());
 
             if (options.DetailedLoggingEnabled)
             {

@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -29,6 +30,16 @@ public class HrmsDbContext : DbContext
         : base(options)
     {
     }
+
+    /// <summary>
+    /// Denetim izi kayitlari (ADR-0009 §2).
+    /// </summary>
+    /// <remarks>
+    /// Bu kume yalnizca <b>okuma ve ekleme</b> icindir. Guncelleme ve silme,
+    /// <c>AuditTrailInterceptor</c> tarafindan ve ayrica veritabani tetikleyicisiyle
+    /// engellenir.
+    /// </remarks>
+    public DbSet<ChangeLogEntry> ChangeLog => Set<ChangeLogEntry>();
 
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)

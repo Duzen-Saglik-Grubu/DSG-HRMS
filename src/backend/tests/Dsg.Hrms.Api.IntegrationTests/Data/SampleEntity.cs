@@ -1,3 +1,4 @@
+using Dsg.Hrms.Application.Common.Security;
 using Dsg.Hrms.Domain.Common;
 using Dsg.Hrms.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,14 @@ public sealed class SampleRecord : Entity, IAuditable, ISoftDeletable
     public DateOnly ValidOn { get; set; }
 
     public decimal Amount { get; set; }
+
+    /// <summary>Maskeleme kuralinin denetim izinde de gectigini dogrulamak icin.</summary>
+    [PersonalData(PersonalDataKind.NationalId)]
+    public string? NationalId { get; set; }
+
+    /// <summary>Sir alanlarin denetim izine hic yazilmadigini dogrulamak icin.</summary>
+    [Secret]
+    public string? PasswordHash { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
 

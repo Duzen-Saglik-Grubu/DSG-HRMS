@@ -23,6 +23,9 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next)
     /// <summary>Istek ve yanitta kullanilan baslik adi.</summary>
     public const string HeaderName = "X-Correlation-Id";
 
+    /// <summary>Istek boyunca izleme kimligini tasiyan anahtar.</summary>
+    public const string ItemKey = "Dsg.Hrms.CorrelationId";
+
     private const string LogPropertyName = "CorrelationId";
     private const int MaximumLength = 64;
 
@@ -32,6 +35,10 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next)
         ArgumentNullException.ThrowIfNull(context);
 
         var correlationId = ResolveCorrelationId(context);
+
+        // Istek boyunca erisilebilir olmalidir: denetim izi de ayni kimligi kullanir,
+        // boylece bir denetim kaydindan teknik gunluk satirlarina ulasilabilir.
+        context.Items[ItemKey] = correlationId;
 
         // Yanit basligi, govde yazilmaya BASLAMADAN once eklenmelidir.
         context.Response.OnStarting(() =>
