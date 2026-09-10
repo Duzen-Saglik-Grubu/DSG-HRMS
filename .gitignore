@@ -20,6 +20,11 @@ secrets.json
 *.key
 *.pem
 
+# ---- Uygulama gunlukleri ----
+# Gunluk dosyalari kisisel veri iceren maskeli kayitlar tasir; depoya GIRMEZ.
+logs/
+*.log
+
 # ---- .NET ----
 bin/
 obj/

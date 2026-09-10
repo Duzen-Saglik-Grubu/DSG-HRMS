@@ -1,6 +1,6 @@
 # Katkı Rehberi
 
-**Son güncelleme:** 2026-09-07
+**Son güncelleme:** 2026-09-10
 **İlgili süreçler:** TEC.7 (Gerçekleştirme), TEC.9 (Doğrulama), MAN.5 (Konfigürasyon Yönetimi), MAN.8 (Kalite Güvence)
 
 Bu belge, depoda çalışma kurallarını tanımlar. Kurallar aynı zamanda
@@ -129,6 +129,48 @@ public sealed class AuditFieldsInterceptor : SaveChangesInterceptor
 
 ---
 
+## 3.3 Günlük (log) kaydı ve kişisel veri
+
+Kişisel verinin günlüğe düz metin olarak düşmesi **geri alınamaz** bir KVKK
+ihlalidir: dosya diske yazıldıktan sonra yedeklere, kapsayıcı günlüklerine ve
+izleme sistemine yayılır.
+
+**Kural:** Kişisel veri günlüğe **daima nesne olarak** verilir.
+
+```csharp
+// DOĞRU — maskeleme ilkesi devreye girer
+logger.LogInformation("Personel bulundu {@Person}", person);
+
+// YANLIŞ — ham metin maskelenemez, düz metin diske düşer
+logger.LogInformation("TCKN: {NationalId}", person.NationalId);
+
+// Zorunlu hâllerde açıkça maskelenir
+logger.LogInformation("TCKN: {NationalId}", Mask.NationalId(nationalId));
+```
+
+**Neden bu kural var:** `MaskingDestructuringPolicy` yalnızca nesne ayrıştırma
+(`{@Nesne}`) yolunu kapsar. Doğrudan yazılan bir metin, Serilog için sıradan bir
+değerdir ve otomatik olarak korunamaz. Bu, altyapının bilinen ve kabul edilen
+sınırıdır; kod incelemesinde denetlenir (§7).
+
+| Veri | Davranış | Örnek çıktı |
+|---|---|---|
+| T.C. Kimlik No | Kısmen maskelenir | `123*****901` |
+| Telefon | Kısmen maskelenir | `532*****67` |
+| E-posta | Yerel bölüm maskelenir, alan adı kalır | `ah***@duzen.com.tr` |
+| IBAN | Kısmen maskelenir | `TR***1326` |
+| Parola, doğrulama kodu, jeton | **Hiç yazılmaz** | `***` |
+| SMS / e-posta gövdesi | **Hiç yazılmaz** | `***` |
+
+Yeni bir DTO veya varlık yazarken hassas alanlar `[PersonalData(...)]` veya
+`[Secret]` ile işaretlenir. İşaretleme unutulursa ad benzerliği ikinci savunma
+hattı olarak devreye girer (`MaskRules`) — ancak buna **güvenilmez**, öznitelik
+asıl kuraldır.
+
+Ayrıntı: ADR-0009 §4.
+
+---
+
 ## 4. Commit mesajları
 
 **Conventional Commits** biçimi kullanılır:
@@ -228,6 +270,8 @@ Bir iş, aşağıdakilerin **tamamı** sağlanmadan "bitti" sayılmaz:
 - [ ] Yetki kontrolü **veri katmanında** mı yapılıyor? (ADR-0007 §3)
 - [ ] Kapsam dışı erişimde `404` mü dönüyor?
 - [ ] Kişisel veri log'a veya hata mesajına sızıyor mu?
+- [ ] Hassas alanlar `[PersonalData]` / `[Secret]` ile işaretlenmiş mi? (§3.3)
+- [ ] Kişisel veri günlüğe **nesne olarak** mı veriliyor? (`{@Nesne}`, ham metin değil)
 - [ ] Kullanıcı girdisi doğrulanıyor mu? (FluentValidation)
 - [ ] Sır, bağlantı dizesi veya anahtar koda yazılmış mı?
 
@@ -311,3 +355,4 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-07 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-09-10 | 0.2 | §3.2 kodlama dili (KR-058) ve §3.3 günlük kaydı / kişisel veri kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |

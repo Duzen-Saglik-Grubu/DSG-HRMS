@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Altyapi katmani birim testleri. Hedef kapsam: %80 (ADR-0011 §1) -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Dsg.Hrms.Infrastructure\Dsg.Hrms.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" />
+  </ItemGroup>
+
+</Project>

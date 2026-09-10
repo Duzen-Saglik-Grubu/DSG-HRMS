@@ -1,7 +1,7 @@
 # Paket Envanteri
 
 **Belge kimliği:** MIM-003
-**Son güncelleme:** 2026-09-09
+**Son güncelleme:** 2026-09-10
 **İlgili süreç:** TEC.5 (Tasarım), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-001`, `KR-005`, `KR-006`, `KR-025`, `KR-026`, `KR-057`
 
@@ -80,6 +80,7 @@ Proje dosyalarında sürüm yazılmaz.
 
 | Paket | Sürüm | Lisans | Amaç |
 |---|---|---|---|
+| Serilog | 4.4.0 | Apache-2.0 | Günlük çekirdeği (Infrastructure katmanı) |
 | Serilog.AspNetCore | 10.0.0 | Apache-2.0 | Yapılandırılmış loglama |
 | Serilog.Sinks.Console | 6.1.1 | Apache-2.0 | Konsol çıktısı |
 | Serilog.Sinks.File | 7.0.0 | Apache-2.0 | Dosya çıktısı |
@@ -174,3 +175,4 @@ Reddedilen bir paket varsa §2 tablosuna gerekçesiyle yazılır.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-09 | 0.1 | İlk oluşturma — backend paketleri ve lisansları | Bilgi İşlem |
+| 2026-09-10 | 0.2 | Serilog çekirdek paketi eklendi (Infrastructure katmanı günlük yapılandırması) | Bilgi İşlem |

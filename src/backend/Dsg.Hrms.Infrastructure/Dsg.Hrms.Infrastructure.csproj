@@ -21,6 +21,13 @@
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
+    <!--
+      Gunluk yapilandirmasi ve maskeleme ilkesi bu katmandadir (ADR-0009 §1, §4).
+      Api yalnizca "gunlugu baslat" der; nasil yazildigini bilmez.
+    -->
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
   </ItemGroup>
 
 </Project>
