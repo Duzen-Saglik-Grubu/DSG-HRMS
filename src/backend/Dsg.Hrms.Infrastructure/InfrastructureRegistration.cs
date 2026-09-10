@@ -1,5 +1,6 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
+using Dsg.Hrms.Infrastructure.Audit;
 using Dsg.Hrms.Infrastructure.Configuration;
 using Dsg.Hrms.Infrastructure.Data;
 using Dsg.Hrms.Infrastructure.Data.Interceptors;
@@ -34,6 +35,7 @@ public static class InfrastructureRegistration
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
         services.AddScoped<AuditFieldsInterceptor>();
         services.AddScoped<AuditTrailInterceptor>();
+        services.AddScoped<IAccessLogger, AccessLogger>();
 
         AddDatabase(services, configuration, environment);
 
@@ -52,7 +54,7 @@ public static class InfrastructureRegistration
 
         OptionsRegistration.EnsureProductionSafety(environment, options.DetailedLoggingEnabled);
 
-        services.AddDbContext<HrmsDbContext>((provider, builder) =>
+        void Configure(IServiceProvider provider, DbContextOptionsBuilder builder)
         {
             builder.UseNpgsql(options.Hrms, npgsql =>
             {
@@ -77,6 +79,13 @@ public static class InfrastructureRegistration
                 builder.EnableDetailedErrors();
                 builder.EnableSensitiveDataLogging();
             }
-        });
+        }
+
+        services.AddDbContext<HrmsDbContext>(Configure);
+
+        // Erisim kaydi, cagiranin baglamindan AYRI bir baglamla yazilir (ADR-0009 §3).
+        // Kapsam (scoped) omurlu fabrika secilmistir: ara katmanlar kapsam omurlu
+        // servislerdir ve tekil (singleton) bir fabrika onlari cozemezdi.
+        services.AddDbContextFactory<HrmsDbContext>(Configure, ServiceLifetime.Scoped);
     }
 }
