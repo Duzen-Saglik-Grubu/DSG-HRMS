@@ -1,0 +1,12 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "DSG-HRMS API",
+    "description": "Duzen Saglik Grubu Insan Kaynaklari Yonetim Sistemi API sozlesmesi. Bu belge otomatik uretilir; elle duzenlenmez.",
+    "contact": {
+      "name": "Duzen Saglik Grubu - Bilgi Islem"
+    },
+    "version": "v1"
+  },
+  "paths": { }
+}

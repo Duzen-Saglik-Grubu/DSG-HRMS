@@ -1,6 +1,7 @@
 using Dsg.Hrms.Api.ErrorHandling;
 using Dsg.Hrms.Api.Identity;
 using Dsg.Hrms.Api.Logging;
+using Dsg.Hrms.Api.OpenApi;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Infrastructure;
 using Dsg.Hrms.Infrastructure.Logging;
@@ -29,6 +30,7 @@ try
 
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddHrmsProblemDetails();
+    builder.Services.AddHrmsOpenApi();
     builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
 
     // Yapilandirma dogrulamasi ve veritabani kaydi.
@@ -57,6 +59,9 @@ try
     // Hata yonetimi istek gunlugunden SONRA gelir; gerekcesi
     // ErrorHandlingRegistration icinde yazilidir.
     app.UseHrmsErrorHandling();
+
+    // API sozlesmesi: frontend tipleri bu belgeden uretilir (ADR-0010 §1).
+    app.UseHrmsOpenApi();
 
     // Canlilik kontrolu: uygulama ayakta mi?
     app.MapHealthChecks("/health/live");

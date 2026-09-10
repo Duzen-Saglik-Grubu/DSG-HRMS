@@ -13,6 +13,37 @@
     <UserSecretsId>dsg-hrms-api</UserSecretsId>
   </PropertyGroup>
 
+  <!--
+    OpenAPI belgesi DERLEME ZAMANINDA uretilir ve depoya yazilir (ADR-0010 §1).
+    Calisan bir sunucuya ihtiyac duyulmaz; CI, uretilen belgeyi depodakiyle
+    karsilastirarak sozlesme degisikliginin PR farkinda gorunmesini saglar.
+  -->
+  <PropertyGroup>
+    <OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
+    <!--
+      Normal derlemede KAPALI. Belge uretimi uygulamanin acilmasini gerektirir;
+      acilis ise zorunlu yapilandirmanin varligini denetler (ADR-0008 §4). Her
+      derlemede baglanti dizesi istemek, gelistirme akisini gereksiz yavaslatirdi.
+
+      Uretim komutu (CI ve elle ayni):
+        dotnet build src/backend/Dsg.Hrms.Api -p:OpenApiGenerateDocumentsOnBuild=true
+    -->
+    <OpenApiGenerateDocumentsOnBuild>false</OpenApiGenerateDocumentsOnBuild>
+    <OpenApiDocumentsDirectory>$(MSBuildThisFileDirectory)../../../docs/api</OpenApiDocumentsDirectory>
+  </PropertyGroup>
+
+  <!--
+    Uretilen dosyanin adi varsayilan olarak derleme adidir (Dsg.Hrms.Api.json).
+    Sozlesmenin surumu adinda gorunsun diye yeniden adlandirilir; frontend tip
+    ureteci de bu adi bekler.
+  -->
+  <Target Name="OpenApiBelgesiniYenidenAdlandir"
+          AfterTargets="GenerateOpenApiDocuments"
+          Condition="'$(OpenApiGenerateDocumentsOnBuild)' == 'true'">
+    <Move SourceFiles="$(OpenApiDocumentsDirectory)/$(AssemblyName).json"
+          DestinationFiles="$(OpenApiDocumentsDirectory)/openapi-v1.json" />
+  </Target>
+
   <ItemGroup>
     <ProjectReference Include="..\Dsg.Hrms.Application\Dsg.Hrms.Application.csproj" />
     <ProjectReference Include="..\Dsg.Hrms.Infrastructure\Dsg.Hrms.Infrastructure.csproj" />
@@ -20,6 +51,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.OpenApi" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Sinks.Console" />

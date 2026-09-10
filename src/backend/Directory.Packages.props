@@ -48,6 +48,14 @@
 
   <ItemGroup Label="API">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+    <!-- Derleme zamaninda OpenAPI belgesi uretimi - ADR-0010 §1 -->
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.12" />
+    <!--
+      Belge ureten arac (ApiDescription.Server) Microsoft.OpenApi 2.12 ile derlenmis;
+      AspNetCore.OpenApi ise 2.7.5 getiriyor. Surum sabitlenmezse arac, uygulamanin
+      eski surumunu yukleyip "manifest definition does not match" hatasi veriyor.
+    -->
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.12.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />

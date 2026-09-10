@@ -93,6 +93,8 @@ Proje dosyalarında sürüm yazılmaz.
 | Paket | Sürüm | Lisans | Amaç |
 |---|---|---|---|
 | Microsoft.AspNetCore.OpenApi | 10.0.11 | MIT | OpenAPI belgesi (ADR-0010) |
+| Microsoft.Extensions.ApiDescription.Server | 10.0.12 | MIT | **Derleme zamanı** OpenAPI belgesi üretimi |
+| Microsoft.OpenApi | 2.12.0 | MIT | OpenAPI nesne modeli — sürüm **araç uyumu için sabitlendi** |
 | Swashbuckle.AspNetCore | 10.2.3 | MIT | Swagger arayüzü |
 | Microsoft.AspNetCore.Authentication.JwtBearer | 10.0.11 | MIT | JWT doğrulama (ADR-0006) |
 | AspNetCore.HealthChecks.NpgSql | 9.0.0 | Apache-2.0 | Veritabanı hazır olma kontrolü |
@@ -176,3 +178,4 @@ Reddedilen bir paket varsa §2 tablosuna gerekçesiyle yazılır.
 |---|---|---|---|
 | 2026-09-09 | 0.1 | İlk oluşturma — backend paketleri ve lisansları | Bilgi İşlem |
 | 2026-09-10 | 0.2 | Serilog çekirdek paketi eklendi (Infrastructure katmanı günlük yapılandırması) | Bilgi İşlem |
+| 2026-09-10 | 0.3 | OpenAPI belge üretimi paketleri eklendi (ApiDescription.Server, Microsoft.OpenApi) | Bilgi İşlem |
