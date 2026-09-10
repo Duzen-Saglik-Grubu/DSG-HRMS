@@ -1,0 +1,31 @@
+# Sir taramasi yapilandirmasi (ADR-0008 §3)
+#
+# KURAL: Istisna DAR kapsamlidir ve GEREKCESIYLE yazilir. "Tarama kirilmasin diye"
+# eklenen genis istisna kabul edilmez; boyle bir istisna, gercek bir sizintiyi
+# gorunmez kilar.
+#
+# Istisna eklerken sorulacak soru: "Bu deger gercekten uretimde hicbir yerde
+# gecerli degil mi?" Cevap kesin evet degilse istisna yazilmaz, deger degistirilir.
+
+title = "DSG-HRMS sir taramasi"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Testlerde kullanilan SAHTE kimlik bilgileri"
+
+# Saglik kontrolu testi, baglanti hatasinin yanita sizmadigini dogrulamak icin
+# bilerek "gizli gorunumlu" bir baglanti dizesi kurar ve bu degerlerin yanitta
+# BULUNMADIGINI iddia eder. Deger yalnizca test dosyasinda yasar; hicbir sistemde
+# gecerli degildir. Bkz. HealthCheckTests.Health_response_never_leaks_connection_details
+regexes = [
+  '''CokGizliParola123''',
+]
+
+paths = [
+  # Belge uretimi ve migration denetiminde kullanilan tasarim zamani baglanti
+  # dizeleri: gercek bir veritabanina baglanmazlar (ADR-0008).
+  '''\.github/workflows/api-sozlesme-denetimi\.yml''',
+  '''\.github/workflows/ci\.yml''',
+]

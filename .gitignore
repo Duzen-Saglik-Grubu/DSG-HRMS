@@ -62,3 +62,7 @@ src_old/**/bin/
 src_old/**/obj/
 src_old/**/.vs/
 src_old/**/*.rar
+
+# ---- CI yapitlari ----
+artifacts/
+coverage/

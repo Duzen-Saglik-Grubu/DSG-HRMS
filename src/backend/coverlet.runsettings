@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Kod kapsami olcum ayarlari (ADR-0011 §1, §6).
+
+  KURAL: Kapsam disi birakilan her sey burada, GEREKCESIYLE yazilir.
+  "Kapsami yukseltmek icin" yapilan disarida birakma kabul edilmez; yalnizca
+  gercekten test edilemeyen veya bize ait olmayan kod haric tutulur.
+-->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+
+          <!--
+            Uretilmis kod: kaynak ureteclerinin (OpenAPI, LoggerMessage) urettigi
+            siniflar. Bizim yazmadigimiz kodun kapsami bizim kalite olcumumuz degildir.
+          -->
+          <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+
+          <!--
+            Tasarim zamani fabrikasi yalnizca "dotnet ef" araclari tarafindan
+            kullanilir; calisma zamaninda hic cagrilmaz.
+          -->
+          <Exclude>[Dsg.Hrms.Infrastructure]Dsg.Hrms.Infrastructure.Data.HrmsDbContextDesignTimeFactory</Exclude>
+
+          <ExcludeByFile>**/Migrations/*.Designer.cs,**/Migrations/HrmsDbContextModelSnapshot.cs</ExcludeByFile>
+
+          <SkipAutoProps>true</SkipAutoProps>
+          <IncludeTestAssembly>false</IncludeTestAssembly>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
