@@ -87,6 +87,8 @@ Proje dosyalarında sürüm yazılmaz.
 | OpenTelemetry.Extensions.Hosting | 1.18.0 | Apache-2.0 | İzleme ve ölçüm |
 | OpenTelemetry.Instrumentation.AspNetCore | 1.12.0 | Apache-2.0 | HTTP sunucu izleme |
 | OpenTelemetry.Instrumentation.Http | 1.12.0 | Apache-2.0 | HTTP istemci izleme |
+| OpenTelemetry.Instrumentation.Runtime | 1.18.0 | Apache-2.0 | Çalışma zamanı ölçümleri (GC, iş parçacığı) |
+| OpenTelemetry.Exporter.OpenTelemetryProtocol | 1.18.0 | Apache-2.0 | OTLP dışa aktarımı |
 
 ### 3.5 API
 
@@ -179,3 +181,4 @@ Reddedilen bir paket varsa §2 tablosuna gerekçesiyle yazılır.
 | 2026-09-09 | 0.1 | İlk oluşturma — backend paketleri ve lisansları | Bilgi İşlem |
 | 2026-09-10 | 0.2 | Serilog çekirdek paketi eklendi (Infrastructure katmanı günlük yapılandırması) | Bilgi İşlem |
 | 2026-09-10 | 0.3 | OpenAPI belge üretimi paketleri eklendi (ApiDescription.Server, Microsoft.OpenApi) | Bilgi İşlem |
+| 2026-09-10 | 0.4 | OpenTelemetry çalışma zamanı ölçümü ve OTLP dışa aktarım paketleri eklendi | Bilgi İşlem |

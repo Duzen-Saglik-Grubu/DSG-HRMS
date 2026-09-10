@@ -1,6 +1,8 @@
 using Dsg.Hrms.Api.ErrorHandling;
+using Dsg.Hrms.Api.Health;
 using Dsg.Hrms.Api.Identity;
 using Dsg.Hrms.Api.Logging;
+using Dsg.Hrms.Api.Observability;
 using Dsg.Hrms.Api.OpenApi;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Infrastructure;
@@ -37,7 +39,8 @@ try
     // Zorunlu bir ayar eksikse uygulama BURADA degil, acilirken durur (ADR-0008 §4).
     builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 
-    builder.Services.AddHealthChecks();
+    builder.Services.AddHrmsHealthChecks(builder.Configuration);
+    builder.Services.AddHrmsObservability(builder.Configuration);
 
     var app = builder.Build();
 
@@ -63,12 +66,9 @@ try
     // API sozlesmesi: frontend tipleri bu belgeden uretilir (ADR-0010 §1).
     app.UseHrmsOpenApi();
 
-    // Canlilik kontrolu: uygulama ayakta mi?
-    app.MapHealthChecks("/health/live");
-
-    // Hazir olma kontrolu: bagimliliklar (veritabani, LOGO, NAS) erisilebilir mi?
-    // Bagimlilik kontrolleri ilgili altyapi bilesenleriyle birlikte eklenecektir.
-    app.MapHealthChecks("/health/ready");
+    // Canlilik ve hazir olma uc noktalari (ADR-0011).
+    // LOGO ve NAS kontrolleri, ilgili altyapi bilesenleriyle birlikte eklenecektir.
+    app.MapHrmsHealthChecks();
 
     await app.RunAsync();
 }
