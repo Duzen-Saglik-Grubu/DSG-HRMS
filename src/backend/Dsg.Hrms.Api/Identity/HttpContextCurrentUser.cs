@@ -1,20 +1,22 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Security.Claims;
+using Dsg.Hrms.Api.Logging;
 using Dsg.Hrms.Application.Common.Abstractions;
 
 namespace Dsg.Hrms.Api.Identity;
 
 /// <summary>
-/// Oturum acmis kullaniciyi HTTP baglamindan okur.
+/// Oturum acmis kullaniciyi ve istek baglamini HTTP baglamindan okur.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Kimlik dogrulama altyapisi henuz kurulmadigi icin su an daima <c>null</c> doner;
-/// bu, islemlerin "sistem" adina yapildigi anlamina gelir. Kimlik Yonetimi modulu
-/// (T3) tamamlandiginda talep (claim) okuma devreye girecektir.
+/// Kimlik dogrulama altyapisi henuz kurulmadigi icin <see cref="UserId"/> su an daima
+/// <c>null</c> doner; bu, islemlerin "sistem" adina yapildigi anlamina gelir. Kimlik
+/// Yonetimi modulu (T3) tamamlandiginda talep (claim) okuma devreye girecektir.
 /// </para>
 /// <para>
-/// Arka plan islerinde HTTP baglami bulunmaz; bu durumda da <c>null</c> doner.
+/// Arka plan islerinde HTTP baglami bulunmaz; tum ozellikler <c>null</c> doner.
 /// </para>
 /// </remarks>
 public sealed class HttpContextCurrentUser(IHttpContextAccessor httpContextAccessor) : ICurrentUser
@@ -30,6 +32,30 @@ public sealed class HttpContextCurrentUser(IHttpContextAccessor httpContextAcces
             var value = httpContextAccessor.HttpContext?.User?.FindFirstValue(UserIdClaimType);
 
             return long.TryParse(value, CultureInfo.InvariantCulture, out var id) ? id : null;
+        }
+    }
+
+    /// <inheritdoc />
+    public string? IpAddress =>
+        httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
+
+    /// <inheritdoc />
+    public string? TraceId
+    {
+        get
+        {
+            var context = httpContextAccessor.HttpContext;
+
+            if (context is null)
+            {
+                return null;
+            }
+
+            // Ara katmanin urettigi (veya cagirandan alip dogruladigi) kimlik onceliklidir;
+            // uygulama gunlugundeki CorrelationId ile ayni deger olmalidir.
+            return context.Items.TryGetValue(CorrelationIdMiddleware.ItemKey, out var value) && value is string id
+                ? id
+                : Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier;
         }
     }
 }
