@@ -41,6 +41,15 @@ public class HrmsDbContext : DbContext
     /// </remarks>
     public DbSet<ChangeLogEntry> ChangeLog => Set<ChangeLogEntry>();
 
+    /// <summary>
+    /// Kisisel veriye erisim kayitlari (ADR-0009 §3).
+    /// </summary>
+    /// <remarks>
+    /// Degisiklik kaydinda oldugu gibi yalnizca <b>okuma ve ekleme</b> icindir;
+    /// guncelleme ve silme veritabani tetikleyicisiyle engellenir (KR-060).
+    /// </remarks>
+    public DbSet<AccessLogEntry> AccessLog => Set<AccessLogEntry>();
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

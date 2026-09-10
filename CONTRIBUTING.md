@@ -171,6 +171,40 @@ Ayrıntı: ADR-0009 §4.
 
 ---
 
+## 3.4 Erişim kaydı — ne zaman çağrılır?
+
+Değişiklik kaydı otomatiktir; **erişim kaydı değildir.** Bir sorgunun kişisel veri
+döndürüp döndürmediğini yalnızca kullanım senaryosu bilir, bu yüzden çağrı açıkça
+yapılır (`IAccessLogger`).
+
+**Kişisel veri dışarı çıkıyorsa kaydedilir:**
+
+| Durum | Çağrı |
+|---|---|
+| Tek kişinin özlük kartı açıldı | `AccessRecord.View("Person", id)` |
+| Sağlık raporu, engellilik bilgisi görüntülendi | `AccessRecord.SpecialCategoryView(...)` |
+| Personel listesi getirildi | `AccessRecord.List("Person", count, filters)` |
+| Excel / PDF indirildi | `AccessRecord.Export("Person", count, filters)` |
+| Toplu rapor üretildi | `AccessRecord.Report(reportName, count, filters)` |
+| Özlük dosyası eki indirildi | `AccessRecord.FileDownload(...)` |
+
+**Kaydedilmez:** referans veri (il, ilçe, unvan listesi), kendi profilini görüntüleme,
+kişisel veri içermeyen sayaç ve grafikler. Her şeyi kaydetmek, kaydın kendisini
+kullanılamaz hâle getirir.
+
+**Dışa aktarmada kayıt sayısı zorunludur.** Bir sızıntı incelemesinin ilk sorusu
+"kaç kişinin verisi dışarı çıktı" sorusudur.
+
+**Filtre değerleri maskelenir**, ancak bu otomatik maskelemeye güvenilerek serbest
+metin gönderilmez: filtreler `ad → değer` sözlüğü olarak verilir, karar **ada** göre
+alınır (`MaskRules`).
+
+**Fail-closed:** Kayıt yazılamazsa çağrı hata fırlatır ve **veri sunulmaz** (`KR-061`).
+
+Ayrıntı: ADR-0009 §3.
+
+---
+
 ## 4. Commit mesajları
 
 **Conventional Commits** biçimi kullanılır:
@@ -272,6 +306,8 @@ Bir iş, aşağıdakilerin **tamamı** sağlanmadan "bitti" sayılmaz:
 - [ ] Kişisel veri log'a veya hata mesajına sızıyor mu?
 - [ ] Hassas alanlar `[PersonalData]` / `[Secret]` ile işaretlenmiş mi? (§3.3)
 - [ ] Kişisel veri günlüğe **nesne olarak** mı veriliyor? (`{@Nesne}`, ham metin değil)
+- [ ] Kişisel veri dışarı çıkıyorsa **erişim kaydı** yazılıyor mu? (§3.4)
+- [ ] Dışa aktarmada **kayıt sayısı** kaydediliyor mu?
 - [ ] Kullanıcı girdisi doğrulanıyor mu? (FluentValidation)
 - [ ] Sır, bağlantı dizesi veya anahtar koda yazılmış mı?
 
@@ -356,3 +392,4 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 |---|---|---|---|
 | 2026-09-07 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-10 | 0.2 | §3.2 kodlama dili (KR-058) ve §3.3 günlük kaydı / kişisel veri kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |
+| 2026-09-10 | 0.3 | §3.4 erişim kaydı kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |
