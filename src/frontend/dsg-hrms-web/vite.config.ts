@@ -18,8 +18,15 @@ export default defineConfig({
     port: 5173,
     // API cagrilari gelistirmede backend'e yonlendirilir; boylece tarayici
     // acisindan ayni kokenden gelirler ve CORS yapilandirmasina gerek kalmaz.
+    //
+    // "/health" AYRICA yazilmalidir: saglik uclari surumlu API yolunun disindadir
+    // (sozlesmenin parcasi degillerdir), bu yuzden "/api" kurali onlari kapsamaz.
     proxy: {
       '/api': {
+        target: 'http://localhost:5199',
+        changeOrigin: true,
+      },
+      '/health': {
         target: 'http://localhost:5199',
         changeOrigin: true,
       },
