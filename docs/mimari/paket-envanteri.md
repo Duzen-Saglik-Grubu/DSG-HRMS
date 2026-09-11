@@ -155,7 +155,7 @@ Sürümler `src/frontend/dsg-hrms-web/package.json` dosyasında; `package-lock.j
 | react-hook-form | 7.87 | MIT | Form yönetimi |
 | @mui/x-date-pickers | 9.13 | MIT | Tarih seçimi (**community** sürüm) |
 | date-fns | 4.4 | MIT | Tarih işlemleri ve Türkçe yerelleştirme |
-| zod · /resolvers | 4.6 / 5.9 | MIT | Şema doğrulama |
+| zod · @hookform/resolvers | 4.6 / 5.9 | MIT | Şema doğrulama |
 
 ### 4.2 Geliştirme ve test
 
