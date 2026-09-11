@@ -13,6 +13,9 @@ claude/
 
 *.env
 .env.*
+# Ornek dosyalar DEPOYA GIRER: gercek deger icermezler ve kurulum icin
+# gereklidir (ADR-0008 §3).
+!*.ornek
 appsettings.*.Local.json
 appsettings.Local.json
 secrets.json
