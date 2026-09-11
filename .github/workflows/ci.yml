@@ -220,7 +220,51 @@ jobs:
           echo 'Guvenlik acigi bulunan paket yok.'
 
   # ------------------------------------------------------------------
-  # Kapi 8: Sir taramasi
+  # Kapi 8: Konteyner taramasi
+  # ------------------------------------------------------------------
+  konteyner-taramasi:
+    name: Konteyner taramasi (trivy)
+    runs-on: ubuntu-latest
+
+    strategy:
+      # Bir imajdaki acik digerinin taranmasini engellemesin; iki sonucu da
+      # ayni kosumda gormek istiyoruz.
+      fail-fast: false
+      matrix:
+        include:
+          - ad: api
+            baglam: src/backend
+            dockerfile: src/backend/Dsg.Hrms.Api/Dockerfile
+          - ad: web
+            baglam: src/frontend/dsg-hrms-web
+            dockerfile: src/frontend/dsg-hrms-web/Dockerfile
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Imaji derle
+        run: >
+          docker build
+          -f ${{ matrix.dockerfile }}
+          -t dsg-hrms-${{ matrix.ad }}:tarama
+          ${{ matrix.baglam }}
+
+      # Uretime giden imajdaki isletim sistemi paketleri de bizim
+      # sorumlulugumuzdadir; uygulama kodu temiz olsa bile taban imajdaki bir
+      # acik sistemi savunmasiz birakir.
+      - name: trivy taramasi
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: dsg-hrms-${{ matrix.ad }}:tarama
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+          vuln-type: os,library
+
+  # ------------------------------------------------------------------
+  # Kapi 9: Sir taramasi
   # ------------------------------------------------------------------
   sir-taramasi:
     name: Sir taramasi (gitleaks)

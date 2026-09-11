@@ -11,7 +11,7 @@ Proje **TS ISO/IEC TS 33061 Seviye 2** çerçevesinde yürütülmektedir.
 
 | | |
 |---|---|
-| **Aşama** | A0 — Hazırlık ve Planlama |
+| **Aşama** | A1 — Teknik İskelet |
 | **Sürüm** | Henüz sürüm yok |
 | **Kapsam** | 35 modül (5 Temel · 10 Yatay · 20 İş) |
 
@@ -52,18 +52,16 @@ Ayrıntı ve gerekçeler: [ADR-0001](docs/adr/ADR-0001-teknoloji-yigini.md)
 
 ## Geliştirme ortamı kurulumu
 
-> Bu bölüm, teknik iskelet (A1) tamamlandığında güncellenecektir.
-
 ### Gereksinimler
 
 | Araç | Sürüm |
 |---|---|
-| .NET SDK | 10.0+ |
-| Node.js | 24 LTS |
+| .NET SDK | 10.0.400+ (`global.json` ile sabit) |
+| Node.js | 22+ |
 | Docker Desktop | Güncel |
 | Git | 2.40+ |
 
-### Kurulum
+### İlk kurulum
 
 ```bash
 git clone https://github.com/Duzen-Saglik-Grubu/DSG-HRMS.git
@@ -71,9 +69,61 @@ cd DSG-HRMS
 
 # Git kancalarını etkinleştir (ZORUNLU)
 git config core.hooksPath .githooks
-
-# Kalan kurulum adımları A1 aşamasında eklenecektir.
 ```
+
+### Seçenek 1 — Tümü konteynerde (en hızlı)
+
+Üretime en yakın çalışma biçimi; makineye PostgreSQL kurmayı gerektirmez.
+
+```bash
+cd docker
+cp .env.ornek .env          # bir kez — .env depoya GİRMEZ, parolayı değiştirin
+docker compose up -d --build
+
+# Veritabanı şemasını oluştur
+cd ../src/backend
+Database__Hrms="Host=localhost;Port=5433;Database=dsg_hrms;Username=postgres;Password=<parolanız>" \
+  dotnet ef database update --project Dsg.Hrms.Infrastructure --startup-project Dsg.Hrms.Api
+```
+
+| Adres | Servis |
+|---|---|
+| http://localhost:8080 | Web arayüzü |
+| http://localhost:5199 | API |
+| `localhost:5433` | PostgreSQL — veritabanı istemcinizle bağlanabilirsiniz |
+
+Durdurmak için: `docker compose down` · veriyi de silmek için: `docker compose down -v`
+
+### Seçenek 2 — Uygulamalar yerelde, veritabanı konteynerde
+
+Kod değişikliğini anında görmek (hot reload) için tercih edilir.
+
+```bash
+cd docker && docker compose up -d postgres
+
+cd ../src/backend
+dotnet user-secrets set "Database:Hrms" \
+  "Host=localhost;Port=5433;Database=dsg_hrms;Username=postgres;Password=<parolanız>" \
+  --project Dsg.Hrms.Api
+dotnet run --project Dsg.Hrms.Api            # http://localhost:5199
+
+cd ../frontend/dsg-hrms-web
+npm ci && npm run dev                         # http://localhost:5173
+```
+
+### UAT yığını
+
+Kabul testi ortamı **ayrı veritabanı, ayrı hacim ve ayrı portlarla** çalışır
+([`KR-024`](docs/karar-kayit-defteri.md)); geliştirme verisiyle karışmaz.
+
+```bash
+cd docker
+cp .env.uat.ornek .env.uat
+docker compose -f compose.uat.yml --env-file .env.uat up -d
+```
+
+UAT'ye **yalnızca etiketlenmiş imajlar** gider; "en son kod" değil. Kabul formu o
+sürüm numarasına yazılır.
 
 > **Git kancaları zorunludur.** `main` dalına doğrudan gönderimi engeller ve commit
 > mesajı biçimini denetler. GitHub Free planında özel depolarda sunucu tarafı dal

@@ -1,0 +1,85 @@
+# DSG-HRMS - UAT (kullanici kabul testi) yigini
+#
+# Calistirma:
+#   cd docker
+#   docker compose -f compose.uat.yml --env-file .env.uat up -d
+#
+# Adresler:
+#   Web        http://localhost:8081
+#   API        http://localhost:5299
+#   PostgreSQL localhost:5434
+#
+# AYRI YIGIN OLMASININ NEDENI (KR-024, ADR-0011 §7):
+# IK birimi kabul testini kendi ortaminda yapar. Gelistirme yiginiyla ayni
+# veritabanini paylassaydi, gelistirici bir degisiklik yaptiginda kabul testi
+# ortasindaki veri degisir ve test sonucu guvenilmez olurdu.
+#
+# UAT'ye YALNIZCA ETIKETLENMIS SURUMLER gider; "en son kod" degil. Kabul formu
+# o surum numarasina yazilir (TEC.11).
+
+name: dsg-hrms-uat
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: dsg-hrms-uat-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dsg_hrms_uat}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD tanimli olmalidir}
+      LANG: tr_TR.utf8
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8'
+    ports:
+      - '${POSTGRES_PORT:-5434}:5432'
+    volumes:
+      # AYRI hacim: UAT verisi gelistirme verisinden tamamen bagimsizdir.
+      - uat-postgres-verisi:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-dsg_hrms_uat}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  api:
+    # UAT'de imaj YERINDE DERLENMEZ; etiketlenmis bir imaj kullanilir.
+    # Boylece kabul testi, uzerinde anlasilan surumle yapilir.
+    image: ${API_IMAGE:-dsg-hrms-api:uat}
+    container_name: dsg-hrms-uat-api
+    environment:
+      # Uretim ayarlariyla ayni davranis: ayrintili gunluk KAPALI, hata
+      # ayrintisi sizmaz. UAT'nin gelistirme gibi davranmasi, uretimde ortaya
+      # cikacak sorunlari gizlerdi.
+      ASPNETCORE_ENVIRONMENT: Production
+      Database__Hrms: 'Host=postgres;Port=5432;Database=${POSTGRES_DB:-dsg_hrms_uat};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}'
+      ApplicationLogging__FilePath: '/uygulama/logs/dsg-hrms-.json'
+      ApplicationLogging__MinimumLevel: Information
+    ports:
+      - '${API_PORT:-5299}:8080'
+    volumes:
+      - uat-api-gunlukleri:/uygulama/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'curl --fail --silent http://127.0.0.1:8080/health/live || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  web:
+    image: ${WEB_IMAGE:-dsg-hrms-web:uat}
+    container_name: dsg-hrms-uat-web
+    ports:
+      - '${WEB_PORT:-8081}:8080'
+    depends_on:
+      api:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  uat-postgres-verisi:
+  uat-api-gunlukleri:
