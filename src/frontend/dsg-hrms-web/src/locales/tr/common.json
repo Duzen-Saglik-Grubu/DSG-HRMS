@@ -1,0 +1,36 @@
+{
+  "uygulama": {
+    "ad": "DSG-HRMS",
+    "kurum": "Düzen Sağlık Grubu",
+    "aciklama": "İnsan Kaynakları Yönetim Sistemi"
+  },
+  "gezinme": {
+    "anaSayfa": "Ana Sayfa",
+    "menuAc": "Menüyü aç"
+  },
+  "durum": {
+    "yukleniyor": "Yükleniyor…",
+    "hata": "Bir sorun oluştu",
+    "bosListe": "Henüz kayıt yok"
+  },
+  "hata": {
+    "baslik": "İşlem tamamlanamadı",
+    "genel": "Beklenmeyen bir sorun oluştu. Lütfen tekrar deneyin.",
+    "ag": "Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.",
+    "yetki": "Bu işlem için yetkiniz bulunmuyor.",
+    "bulunamadi": "Aradığınız kayıt bulunamadı.",
+    "cakisma": "Bu kayıt siz görüntülerken başkası tarafından güncellendi. Sayfayı yenileyip tekrar deneyin.",
+    "takipNumarasi": "Takip numarası",
+    "takipAciklama": "Destek talebinde bu numarayı iletin.",
+    "tekrarDene": "Tekrar dene",
+    "sayfaBulunamadi": "Sayfa bulunamadı",
+    "sayfaBulunamadiAciklama": "Aradığınız sayfa taşınmış veya hiç var olmamış olabilir.",
+    "anaSayfayaDon": "Ana sayfaya dön"
+  },
+  "saglik": {
+    "baslik": "Sistem durumu",
+    "kontrolEdiliyor": "Kontrol ediliyor…",
+    "calisiyor": "Sistem çalışıyor",
+    "sorunVar": "Sisteme ulaşılamıyor"
+  }
+}

@@ -1,7 +1,7 @@
 # Paket Envanteri
 
 **Belge kimliği:** MIM-003
-**Son güncelleme:** 2026-09-10
+**Son güncelleme:** 2026-09-11
 **İlgili süreç:** TEC.5 (Tasarım), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-001`, `KR-005`, `KR-006`, `KR-025`, `KR-026`, `KR-057`
 
@@ -136,7 +136,55 @@ Proje dosyalarında sürüm yazılmaz.
 
 ## 4. Frontend paketleri
 
-> A1 aşamasının frontend adımı (WBS 2.3) tamamlandığında doldurulacaktır.
+Sürümler `src/frontend/dsg-hrms-web/package.json` dosyasında; `package-lock.json`
+**depoda tutulur** ve CI `npm ci` ile birebir aynı sürümleri kurar.
+
+### 4.1 Çalışma zamanı
+
+| Paket | Sürüm | Lisans | Amaç |
+|---|---|---|---|
+| react / react-dom | 19.2 | MIT | Arayüz kütüphanesi |
+| /material · /icons-material | 9.4 | MIT | Bileşen kütüphanesi ve tema |
+| /react · /styled | 11.14 | MIT | MUI stil motoru |
+| react-router | 8.3 | MIT | Yönlendirme, kod bölme |
+| /react-query | 5.102 | MIT | Sunucu durumu (ADR-0015 §2) |
+| axios | 1.20 | MIT | HTTP istemcisi ve ara katmanlar |
+| i18next · react-i18next | 26.4 / 17.0 | MIT | Çoklu dil (ADR-0015 §9) |
+| react-hook-form | 7.87 | MIT | Form yönetimi |
+| zod · /resolvers | 4.6 / 5.9 | MIT | Şema doğrulama |
+
+### 4.2 Geliştirme ve test
+
+| Paket | Sürüm | Lisans | Amaç |
+|---|---|---|---|
+| vite · /plugin-react | 8.3 / 6.1 | MIT | Derleme ve geliştirme sunucusu |
+| typescript | **5.9** | Apache-2.0 | Tip sistemi — sürüm gerekçesi §4.3 |
+| eslint · typescript-eslint | **9.39** / 8.70 | MIT | Statik analiz — sürüm gerekçesi §4.3 |
+| eslint-plugin-react-hooks · react-refresh | 7.1 / 0.5 | MIT | React kuralları |
+| eslint-config-prettier | 10.1 | MIT | Biçim kurallarını ESLint'ten ayırır |
+| prettier | 3.9 | MIT | Biçimlendirme |
+| vitest · /coverage-v8 | 5.0 | MIT | Test ve kapsam |
+| jsdom | 30.0 | MIT | Tarayıcı ortamı benzetimi |
+| -library/react · jest-dom · user-event | 16.3 / 7.0 / 14.6 | MIT | Bileşen testleri |
+| openapi-typescript | 7.13 | MIT | **OpenAPI'den tip üretimi** (ADR-0010 §1) |
+| globals · /* | — | MIT | Tip tanımları |
+
+### 4.3 Sürüm sabitleme gerekçeleri
+
+Vite şablonu **TypeScript 6.0** ve **ESLint 10** ile geldi; ikisi de araç
+ekosistemi tarafından henüz desteklenmiyor:
+
+| Paket | Şablon | Seçilen | Neden |
+|---|---|---|---|
+| TypeScript | 6.0 | **5.9** | `openapi-typescript` yalnızca TS 5.x destekliyor |
+| ESLint | 10.x | **9.39** | `eslint-plugin-*` paketleri henüz ESLint 10 desteklemiyor |
+
+Bu, `KR-001`'deki **LTS ve olgunluk** ilkesinin uygulanmasıdır: en yeni sürüm değil,
+ekosistemin desteklediği sürüm seçilir. Sürümler ekosistem yetiştiğinde yükseltilecektir.
+
+> **Not:** Vite şablonunun varsayılan linter'ı artık `oxlint`. ADR-0015 ESLint +
+> Prettier öngördüğü ve eklenti ekosistemi (özellik izolasyonu kuralı) ESLint'te
+> olduğu için `oxlint` kaldırıldı.
 
 ---
 
@@ -182,3 +230,4 @@ Reddedilen bir paket varsa §2 tablosuna gerekçesiyle yazılır.
 | 2026-09-10 | 0.2 | Serilog çekirdek paketi eklendi (Infrastructure katmanı günlük yapılandırması) | Bilgi İşlem |
 | 2026-09-10 | 0.3 | OpenAPI belge üretimi paketleri eklendi (ApiDescription.Server, Microsoft.OpenApi) | Bilgi İşlem |
 | 2026-09-10 | 0.4 | OpenTelemetry çalışma zamanı ölçümü ve OTLP dışa aktarım paketleri eklendi | Bilgi İşlem |
+| 2026-09-11 | 0.5 | Frontend paketleri eklendi (§4); TypeScript ve ESLint sürüm sabitleme gerekçeleri yazıldı | Bilgi İşlem |

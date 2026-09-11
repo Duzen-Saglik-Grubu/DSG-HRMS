@@ -91,6 +91,66 @@ jobs:
           if-no-files-found: warn
 
   # ------------------------------------------------------------------
+  # Frontend kapilari: bicim, lint, tip denetimi, test, kapsam, derleme
+  # ------------------------------------------------------------------
+  frontend:
+    name: Frontend - lint, test ve derleme
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: src/frontend/dsg-hrms-web
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Node kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/frontend/dsg-hrms-web/package-lock.json
+
+      # "npm ci" package-lock.json'a BIREBIR uyar; surumler koşumdan koşuma
+      # degismez (MAN.5 - konfigurasyon yonetimi).
+      - name: Paketleri kur
+        run: npm ci
+
+      - name: Bicim denetimi
+        run: npm run format:check
+
+      # --max-warnings 0: uyari birikmesine izin verilmez. Birikmis uyari,
+      # zamanla "zaten hep kirmizi" durumuna donusur ve hicbir sey ifade etmez.
+      - name: Lint
+        run: npm run lint
+
+      - name: Tip denetimi
+        run: npm run typecheck
+
+      - name: Testler ve kapsam
+        run: npm run test:coverage
+
+      - name: Derleme
+        run: npm run build
+
+      # API tipleri OpenAPI belgesinden URETILIR; elle yazilmaz (ADR-0010 §1).
+      # Belge degisip tipler yenilenmezse, frontend gercekte var olmayan bir
+      # sozlesmeye gore derlenir ve uyusmazlik calisma zamaninda ortaya cikar.
+      - name: Uretilen API tipleri guncel mi
+        run: |
+          npm run api:types
+
+          if ! git diff --exit-code -- src/shared/api/generated/; then
+            echo '::error::Uretilen API tipleri guncel degil.'
+            echo 'Su komutu calistirip sonucu commitleyin:'
+            echo '  npm run api:types'
+            exit 1
+          fi
+
+          echo 'API tipleri guncel.'
+
+  # ------------------------------------------------------------------
   # Kapi 6: Migration kontrolu
   # ------------------------------------------------------------------
   migration-denetimi:

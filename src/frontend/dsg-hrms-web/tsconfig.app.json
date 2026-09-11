@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "es2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "types": ["vite/client"],
+    "allowArbitraryExtensions": true,
+    "skipLibCheck": true,
+
+    /* Paket toplayici (bundler) modu */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /*
+      Tip guvenligi en yuksek seviyede.
+
+      "strict" tek basina yeterli degildir: asagidaki uc ayar, gunluk hayatta en
+      sik karsilasilan tip bosluklarini kapatir. Ozellikle
+      noUncheckedIndexedAccess, dizi ve sozluk erisimlerinde "undefined
+      olabilir" gercegini gorunur kilar - aksi hâlde bos listeyle calisan bir
+      ekran calisma zamaninda kirilir.
+    */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+
+    /* Kullanilmayan kod derlemeyi kirar */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Mutlak ice aktarma: "../../../shared" yerine "@/shared" */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}

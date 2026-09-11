@@ -1,0 +1,11 @@
+/**
+ * TanStack Query anahtarlari (ADR-0015 §2).
+ *
+ * Anahtarlar merkezi olarak tanimlanir; bilesen icinde dize elle YAZILMAZ.
+ * Elle yazilan bir anahtar, degisiklik sonrasi gecersiz kilma (invalidate)
+ * cagrisiyla uyusmazsa ekran eski veriyi gostermeye devam eder - ve bu hata
+ * sessizdir.
+ */
+export const queryKeys = {
+  saglik: ['saglik'] as const,
+} as const;
