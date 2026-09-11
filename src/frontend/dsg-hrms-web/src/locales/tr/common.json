@@ -32,5 +32,18 @@
     "kontrolEdiliyor": "Kontrol ediliyor…",
     "calisiyor": "Sistem çalışıyor",
     "sorunVar": "Sisteme ulaşılamıyor"
+  },
+  "onay": {
+    "onayla": "Onayla",
+    "vazgec": "Vazgeç",
+    "geriAlinamaz": "Bu işlem geri alınamaz."
+  },
+  "tablo": {
+    "sayfaBasinaKayit": "Sayfa başına kayıt:",
+    "kayitAraligi": "{{count}} kayıttan {{from}}–{{to}} arası"
+  },
+  "tarih": {
+    "baslangic": "Başlangıç tarihi",
+    "bitis": "Bitiş tarihi"
   }
 }
