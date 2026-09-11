@@ -1,8 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Süreç:** MAN.4 — Risk Yönetimi
-**Son güncelleme:** 2026-09-08
+**Son güncelleme:** 2026-09-11
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -140,10 +139,10 @@ raporunda ayrıca ele alınır.
 | | |
 |---|---|
 | **Kategori** | Güvenlik / Veri Kalitesi |
-| **Açıklama** | LOGO'da **iki e-posta adresi, farklı TCKN'li dört aktif personele** tanımlıdır. Üyelik doğrulama kodu bu adrese gideceği için, posta kutusuna erişimi olan kişi **başkasının adına hesap açabilir** ve o kişinin özlük verilerine erişebilir. Kontrol tüm aktif personel üzerinde çalıştırılmıştır, belirli bir görev grubuyla sınırlı değildir. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.6) |
-| **O / E / Puan** | 2 / 3 / **6** |
+| **Açıklama** | **2026-09-11 ölçümü: 13 e-posta adresi, 37 aktif personele tanımlıdır; bir adres 10 kişiye aittir.** (İlk ölçümde 2 adres / 4 kişi görünmüştü; kapsamlı ölçüm sorunun çok daha büyük olduğunu gösterdi.) Üyelik doğrulama kodu bu adrese gideceği için, posta kutusuna erişimi olan kişi **başkasının adına hesap açabilir** ve o kişinin özlük verilerine erişebilir. Kontrol tüm aktif personel üzerinde çalıştırılmıştır, belirli bir görev grubuyla sınırlı değildir. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.6) |
+| **O / E / Puan** | 3 / 3 / **9** |
 | **Sahibi** | İK Birimi + Bilgi İşlem |
-| **Önlem** | (1) İK, ilgili personellere kendilerine ait ayrı e-posta adresi tanımlayacak. (2) Sistem, üyelik akışında **e-posta adresinin birden fazla kişiye tanımlı olması durumunda o adrese doğrulama kodu göndermeyecek**, kaydı istisna akışına yönlendirecek. (3) Senkronizasyon, paylaşılan e-posta adreslerini tespit edip uyarı raporunda listeleyecek. |
+| **Önlem** | (1) İK, ilgili personellere kendilerine ait ayrı e-posta adresi tanımlayacak. **Bu, Kimlik Yönetimi modülünün devreye alınması için ön koşuldur.** (2) Sistem, üyelik akışında **e-posta adresinin birden fazla kişiye tanımlı olması durumunda o adrese doğrulama kodu göndermeyecek**, kaydı istisna akışına yönlendirecek. (3) Senkronizasyon, paylaşılan e-posta adreslerini tespit edip uyarı raporunda listeleyecek. |
 | **Durum** | Açık |
 
 ### R-13 — Kurumsal olmayan e-posta adresine doğrulama kodu gönderilmesi
@@ -226,3 +225,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-03 | 0.1 | İlk oluşturma; R-01…R-11 kayıtları | Bilgi İşlem |
+| 2026-09-11 | 0.4 | R-12 yeniden ölçüldü: 4 kişi → 37 kişi; puan 6 → 9 (A1 kapanış değerlendirmesi) | Bilgi İşlem |

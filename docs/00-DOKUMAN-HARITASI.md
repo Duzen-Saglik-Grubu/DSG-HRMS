@@ -160,6 +160,7 @@ Aşağıdaki tablolarda "33061 Süreç Çıktısı" sütunu, standardın Madde 5
 | İş kırılım yapısı (WBS) | `is-kirilim-yapisi.md` + GitHub Projects panosu |
 | Zaman planı | GitHub Projects + Milestone kayıtları |
 | Roller ve sorumluluklar | `roller-ve-sorumluluklar.md` (RACI) |
+| Aşama kapanış değerlendirmesi | `A1-asama-kapanis-degerlendirmesi.md` (her aşama için bir belge) |
 | Altyapı ve kaynak ihtiyaçları | `proje-plani.md` (Kaynaklar bölümü) |
 | Planlama kaydı | `kayitlar/` — plan revizyonları |
 
