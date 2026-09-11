@@ -1,0 +1,19 @@
+# Imaja GIRMEMESI gerekenler.
+#
+# Iki gerekce: imaj boyutu ve GUVENLIK. Ozellikle kullanici sirlari ve gunluk
+# dosyalari imaja kopyalanirsa, imaji alan herkes onlara erisir.
+
+**/bin/
+**/obj/
+**/logs/
+**/*.user
+**/.vs/
+**/TestResults/
+**/coverage/
+artifacts/
+
+# Sirlar ve yerel ayarlar
+**/appsettings.Development.json
+**/*.pfx
+**/*.key
+**/*.pem

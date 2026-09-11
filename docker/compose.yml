@@ -1,0 +1,88 @@
+# DSG-HRMS - GELISTIRME yigini
+#
+# Calistirma:
+#   cd docker
+#   cp .env.ornek .env        (bir kez; .env DEPOYA GIRMEZ)
+#   docker compose up -d --build
+#
+# Adresler:
+#   Web        http://localhost:8080
+#   API        http://localhost:5199
+#   PostgreSQL localhost:5433
+#
+# UAT yigini icin: compose.uat.yml (ayri veritabani, ayri portlar - KR-024).
+
+name: dsg-hrms-dev
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: dsg-hrms-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dsg_hrms}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD tanimli olmalidir}
+      # Turkce siralama ve karsilastirma icin veritabani dil ayari.
+      LANG: tr_TR.utf8
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8'
+    ports:
+      # Makinede kurulu bir PostgreSQL 5432'yi kullaniyor olabilir; catismamak
+      # icin disariya 5433 acilir.
+      - '${POSTGRES_PORT:-5433}:5432'
+    volumes:
+      - postgres-verisi:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-dsg_hrms}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ../src/backend
+      dockerfile: Dsg.Hrms.Api/Dockerfile
+    image: dsg-hrms-api:dev
+    container_name: dsg-hrms-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      # Baglanti dizesi ORTAM DEGISKENINDEN gelir; imajda veya depoda yer almaz
+      # (ADR-0008, KR-038).
+      Database__Hrms: 'Host=postgres;Port=5432;Database=${POSTGRES_DB:-dsg_hrms};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}'
+      ApplicationLogging__FilePath: '/uygulama/logs/dsg-hrms-.json'
+      Observability__OtlpEndpoint: ${OTLP_ENDPOINT:-}
+    ports:
+      - '${API_PORT:-5199}:8080'
+    volumes:
+      # Gunlukler konteyner disinda kalir; konteyner yeniden olusturuldugunda
+      # kaybolmaz.
+      - api-gunlukleri:/uygulama/logs
+    depends_on:
+      postgres:
+        # API, veritabani HAZIR OLMADAN baslamaz. Aksi hâlde ilk acilista
+        # baglanti hatasi alip yeniden baslatma dongusune girerdi.
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'curl --fail --silent http://127.0.0.1:8080/health/live || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ../src/frontend/dsg-hrms-web
+    image: dsg-hrms-web:dev
+    container_name: dsg-hrms-web
+    ports:
+      - '${WEB_PORT:-8080}:8080'
+    depends_on:
+      api:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  postgres-verisi:
+  api-gunlukleri:

@@ -220,7 +220,63 @@ jobs:
           echo 'Guvenlik acigi bulunan paket yok.'
 
   # ------------------------------------------------------------------
-  # Kapi 8: Sir taramasi
+  # Kapi 8: Konteyner taramasi
+  # ------------------------------------------------------------------
+  konteyner-taramasi:
+    name: Konteyner taramasi (trivy)
+    runs-on: ubuntu-latest
+
+    strategy:
+      # Bir imajdaki acik digerinin taranmasini engellemesin; iki sonucu da
+      # ayni kosumda gormek istiyoruz.
+      fail-fast: false
+      matrix:
+        include:
+          - ad: api
+            baglam: src/backend
+            dockerfile: src/backend/Dsg.Hrms.Api/Dockerfile
+          - ad: web
+            baglam: src/frontend/dsg-hrms-web
+            dockerfile: src/frontend/dsg-hrms-web/Dockerfile
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Imaji derle
+        run: >
+          docker build
+          -f ${{ matrix.dockerfile }}
+          -t dsg-hrms-${{ matrix.ad }}:tarama
+          ${{ matrix.baglam }}
+
+      # Uretime giden imajdaki isletim sistemi paketleri de bizim
+      # sorumlulugumuzdadir; uygulama kodu temiz olsa bile taban imajdaki bir
+      # acik sistemi savunmasiz birakir.
+      #
+      # Arac, resmi Action sarmalayicisi yerine DOGRUDAN calistirilir: surum
+      # dogrudan sabitlenir ve ek bir bagimliligin surum degisikliklerinden
+      # etkilenmeyiz (ayni yaklasim sir taramasinda da kullanildi).
+      #
+      # --ignore-unfixed: yamasi HENUZ YAYIMLANMAMIS aciklar kapiyi kirmaz;
+      # yapabilecegimiz bir sey olmadigi icin kalici kirmizi uretirlerdi.
+      - name: trivy taramasi
+        env:
+          TRIVY_SURUM: 0.74.0
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$HOME/.cache/trivy:/root/.cache/trivy" \
+            "aquasec/trivy:${TRIVY_SURUM}" image \
+            --scanners vuln \
+            --severity CRITICAL,HIGH \
+            --ignore-unfixed \
+            --exit-code 1 \
+            --format table \
+            "dsg-hrms-${{ matrix.ad }}:tarama"
+
+  # ------------------------------------------------------------------
+  # Kapi 9: Sir taramasi
   # ------------------------------------------------------------------
   sir-taramasi:
     name: Sir taramasi (gitleaks)

@@ -188,6 +188,25 @@ ekosistemin desteklediği sürüm seçilir. Sürümler ekosistem yetiştiğinde 
 
 ---
 
+## 4.4 Konteyner taban imajları
+
+Taban imajlar da **konfigürasyon öğesidir**: sürümleri burada kayıtlıdır ve CI
+her PR'da `trivy` ile taranır (ADR-0011 §6).
+
+| İmaj | Sürüm | Lisans | Amaç |
+|---|---|---|---|
+| `mcr.microsoft.com/dotnet/sdk` | 10.0-noble | MIT | API derleme aşaması |
+| `mcr.microsoft.com/dotnet/aspnet` | 10.0-noble | MIT | API çalışma zamanı |
+| `node` | 22-alpine | MIT | Frontend derleme aşaması |
+| `nginx` | 1.29-alpine | BSD-2-Clause | Statik dosya sunumu |
+| `postgres` | 17-alpine | PostgreSQL License | Geliştirme ve UAT veritabanı |
+
+> **Taban imajdaki paketler imaj derlenirken güncellenir** (`KR-065`). Resmî etiketler
+> yayımlandıkları andaki paket sürümleriyle dondurulur; ilk taramada web imajında
+> **36 yüksek önemli açık** bulundu ve hepsinin yaması mevcuttu.
+
+---
+
 ## 5. Güvenlik açığı denetimi
 
 `Directory.Build.props` içinde NuGet denetimi **açık** ve **hata seviyesindedir**:
@@ -231,3 +250,4 @@ Reddedilen bir paket varsa §2 tablosuna gerekçesiyle yazılır.
 | 2026-09-10 | 0.3 | OpenAPI belge üretimi paketleri eklendi (ApiDescription.Server, Microsoft.OpenApi) | Bilgi İşlem |
 | 2026-09-10 | 0.4 | OpenTelemetry çalışma zamanı ölçümü ve OTLP dışa aktarım paketleri eklendi | Bilgi İşlem |
 | 2026-09-11 | 0.5 | Frontend paketleri eklendi (§4); TypeScript ve ESLint sürüm sabitleme gerekçeleri yazıldı | Bilgi İşlem |
+| 2026-09-11 | 0.6 | §4.4 konteyner taban imajları eklendi | Bilgi İşlem |
