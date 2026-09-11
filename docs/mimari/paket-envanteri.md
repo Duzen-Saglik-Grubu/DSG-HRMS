@@ -41,6 +41,8 @@ Bu tablo, **neden kullanılmadıklarını** kayıt altına alır. Amacı, ilerid
 | **FluentAssertions** | Shouldly | **8.x sürümü koşullu ticari lisansa geçti** | `KR-057` |
 | **EPPlus** | ClosedXML | 5.x'ten itibaren ticari lisans | `KR-026` |
 | **EF Core In-Memory** | Testcontainers | Gerçek veritabanı davranışını taklit etmiyor | ADR-0011 §3 |
+| **MUI X `DateRangePicker`** | İki adet `DatePicker` | Yalnızca ücretli (Pro) pakette; iki ücretsiz `DatePicker` ile aynı işlev elde edildi | `KR-025` |
+| **MUI X `DataGrid`** | MUI `Table` üzerine kendi `DataTable` | Sunucu tarafı özelliklerin bir kısmı Pro pakette; lisans belirsizliği yerine tam denetim tercih edildi | `KR-025` |
 
 ---
 
@@ -151,7 +153,9 @@ Sürümler `src/frontend/dsg-hrms-web/package.json` dosyasında; `package-lock.j
 | axios | 1.20 | MIT | HTTP istemcisi ve ara katmanlar |
 | i18next · react-i18next | 26.4 / 17.0 | MIT | Çoklu dil (ADR-0015 §9) |
 | react-hook-form | 7.87 | MIT | Form yönetimi |
-| zod · /resolvers | 4.6 / 5.9 | MIT | Şema doğrulama |
+| @mui/x-date-pickers | 9.13 | MIT | Tarih seçimi (**community** sürüm) |
+| date-fns | 4.4 | MIT | Tarih işlemleri ve Türkçe yerelleştirme |
+| zod · @hookform/resolvers | 4.6 / 5.9 | MIT | Şema doğrulama |
 
 ### 4.2 Geliştirme ve test
 
@@ -251,3 +255,4 @@ Reddedilen bir paket varsa §2 tablosuna gerekçesiyle yazılır.
 | 2026-09-10 | 0.4 | OpenTelemetry çalışma zamanı ölçümü ve OTLP dışa aktarım paketleri eklendi | Bilgi İşlem |
 | 2026-09-11 | 0.5 | Frontend paketleri eklendi (§4); TypeScript ve ESLint sürüm sabitleme gerekçeleri yazıldı | Bilgi İşlem |
 | 2026-09-11 | 0.6 | §4.4 konteyner taban imajları eklendi | Bilgi İşlem |
+| 2026-09-11 | 0.7 | Tarih seçimi paketleri eklendi; MUI X Pro bileşenleri reddedilenler tablosuna işlendi | Bilgi İşlem |
