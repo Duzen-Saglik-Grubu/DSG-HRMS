@@ -36,8 +36,14 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
 
-    /* Mutlak ice aktarma: "../../../shared" yerine "@/shared" */
-    "baseUrl": ".",
+    /*
+      Mutlak ice aktarma: "../../../shared" yerine "@/shared".
+
+      "baseUrl" BILINCLI olarak YOK. TypeScript 5.5'ten beri kullanimdan
+      kaldirilmis, 6.0'da tamamen kaldirilmistir; tanimli birakilmasi yeni surum
+      araclarda hata uretir. "paths" girdileri bu dosyanin bulundugu dizine gore
+      cozulur, dolayisiyla "baseUrl" zaten gereksizdir.
+    */
     "paths": {
       "@/*": ["./src/*"]
     }
