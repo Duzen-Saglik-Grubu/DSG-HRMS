@@ -186,6 +186,9 @@ ekosistemi tarafından henüz desteklenmiyor:
 Bu, `KR-001`'deki **LTS ve olgunluk** ilkesinin uygulanmasıdır: en yeni sürüm değil,
 ekosistemin desteklediği sürüm seçilir. Sürümler ekosistem yetiştiğinde yükseltilecektir.
 
+> **TypeScript 6 hazırlığı:** `baseUrl` ayarı 6.0'da kaldırıldığı için önceden
+> çıkarılmıştır (#35). Yükseltme sırasında bu ayar bir engel oluşturmayacaktır.
+
 > **Not:** Vite şablonunun varsayılan linter'ı artık `oxlint`. ADR-0015 ESLint +
 > Prettier öngördüğü ve eklenti ekosistemi (özellik izolasyonu kuralı) ESLint'te
 > olduğu için `oxlint` kaldırıldı.
@@ -256,3 +259,4 @@ Reddedilen bir paket varsa §2 tablosuna gerekçesiyle yazılır.
 | 2026-09-11 | 0.5 | Frontend paketleri eklendi (§4); TypeScript ve ESLint sürüm sabitleme gerekçeleri yazıldı | Bilgi İşlem |
 | 2026-09-11 | 0.6 | §4.4 konteyner taban imajları eklendi | Bilgi İşlem |
 | 2026-09-11 | 0.7 | Tarih seçimi paketleri eklendi; MUI X Pro bileşenleri reddedilenler tablosuna işlendi | Bilgi İşlem |
+| 2026-09-12 | 0.8 | §4.3 TypeScript 6 hazırlığı notu eklendi (baseUrl kaldırıldı) | Bilgi İşlem |
