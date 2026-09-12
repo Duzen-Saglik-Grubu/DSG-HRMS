@@ -1,7 +1,7 @@
 # A1 — Teknik İskelet · Aşama Kapanış Değerlendirmesi
 
 **Belge kimliği:** MAN-004
-**Son güncelleme:** 2026-09-11
+**Son güncelleme:** 2026-09-12
 **İlgili süreçler:** MAN.1 (Proje Planlama), MAN.2 (Proje Değerlendirme ve Kontrol), MAN.8 (Kalite Güvence)
 **Durum:** Bilgi İşlem değerlendirmesi — üst yönetim bilgisine sunulacak
 
@@ -135,26 +135,43 @@ iskeletle İK'ya açılması, beklenti yönetimi açısından uygun görülmedi.
 
 ### 6.4 İK'ya iletilen veri düzeltme listesi
 
-LOGO verisi 2026-09-11 tarihinde yeniden ölçüldü. **Kritik bulgu ağırlaştı:**
+LOGO verisi 2026-09-12 tarihinde yeniden ölçüldü.
 
-| Bulgu | 2026-09-09 | 2026-09-11 |
-|---|---|---|
-| Aktif personel | 583 | 584 |
-| Kurumsal e-posta yok | 38 | 38 |
-| Cep telefonu yok | 13 | 13 |
-| **Hiçbir iletişim bilgisi yok** | 12 | **12** |
-| Telefon biçimi geçersiz | 1 | **3** |
-| **Aynı e-posta birden fazla kişide** | 4 | **37** |
-| Kurumsal olmayan alan adı | 58 | 58 |
+**Kapsam: 564 aktif kişi / 584 sicil kaydı.** Bir kişinin birden fazla sicili
+olabildiği için (LOGO'da 140 kişi) sayımlar **kişi (TCKN) bazındadır**.
 
-> **Aynı e-posta bulgusu 4'ten 37 kişiye çıktı.** 13 farklı adres paylaşılıyor; bir
-> adres **10 kişiye** tanımlı. Bu, `R-12` riskinin öngörülenden büyük olduğunu
-> gösteriyor: ortak posta kutusuna giden doğrulama kodu ile bir kişi başkasının adına
-> üye olabilir.
+| Bulgu | Kişi |
+|---|---|
+| TCKN boş | 0 |
+| Doğum tarihi boş | 0 |
+| Kurumsal e-posta yok | 38 |
+| Cep telefonu yok | 13 |
+| **Hiçbir iletişim bilgisi yok** | **12** |
+| Telefon biçimi geçersiz | 1 |
+| Aynı e-posta birden fazla kişide | 4 |
+| Kurumsal olmayan alan adı | 58 |
 
 **Eylem:** Güncel liste İK'ya iletildi. Kimlik Yönetimi modülü devreye alınmadan önce
-en az "hiçbir iletişim bilgisi yok" (12 kişi) ve "aynı e-posta" (37 kişi) listelerinin
-kapatılması gerekiyor.
+en az "hiçbir iletişim bilgisi yok" (12 kişi) listesinin kapatılması gerekiyor.
+
+#### Ölçümde yapılan hata ve düzeltmesi
+
+İlk yenilemede "aynı e-posta" bulgusu **37 kişi** olarak raporlandı. Sayım **sicil
+bazında** yapılmıştı; aynı TCKN'ye ait farklı sicil kayıtları ayrı kişi sayılmıştı.
+Kişi (TCKN) bazlı doğru değer **4 kişi / 1 adres**.
+
+Aynı ölçümde iki hata daha bulundu:
+
+| Hata | Kök neden | Düzeltme |
+|---|---|---|
+| Raporda bozuk satır | Telefon alanında **satır sonu (CR/LF) karakteri** var; kayıt ikiye bölünmüş | Tüm metin alanlarında CR/LF/TAB temizleniyor |
+| "Biçim hatalı" görünen geçerli numara | Aynı CR/LF karakteri numarayı geçersiz gösteriyordu | Normalizasyon sonrası numara geçerli; listeden çıktı |
+| Neden hatalı olduğu anlaşılmıyordu | Liste yalnızca "biçim hatalı" diyordu | Her satıra **gerekçe** eklendi (örn. "Eksik hane (9 hane, 10 olmalı)") |
+
+> **Ders:** `KR-009`/`KR-014` ile kişi–istihdam ayrımı mimaride yapılmıştı, ancak
+> **raporlamada uygulanmamıştı.** Kişi sayısı gereken yerde sicil sayılırsa sonuç
+> sessizce yanlış çıkar. Bu ayrım bundan sonra her veri kalitesi ölçümünde açıkça
+> belirtilecektir. Hatayı İK sorumlusu tespit etti.
 
 ---
 
@@ -164,13 +181,13 @@ kapatılması gerekiyor.
 |---|---|
 | `R-03` KVKK yükümlülüğü | **Azaldı.** Maskeleme, denetim izi, erişim kaydı ve izlerde veri temizliği kuruldu ve testlerle doğrulandı |
 | `R-05` Bilgi tekelliği | **Azaldı.** Kararlar ve gerekçeler ADR + karar defterinde yazılı; kod yorumları gerekçe taşıyor |
-| `R-12` Aynı e-posta | **Arttı.** 4 → 37 kişi. Önlem aynı (kanal sunulmaz), ancak veri düzeltme aciliyeti yükseldi |
+| `R-12` Aynı e-posta | **Değişmedi.** 1 adres / 4 kişi. (Ara ölçümde 37 kişi görünmüştü; sicil bazlı sayım hatasıydı, düzeltildi — §6.4) |
 | `R-16` Dal koruma | **Azaldı.** Telafi edici kontrollere PR izlenebilirlik denetimi eklendi (#18) |
 | `R-02` LOGO şema değişikliği | **Değişmedi.** Şema doğrulama denetimi LOGO entegrasyon modülüyle gelecek |
 
 **Yeni risk önerisi yok.** A1 sırasında karşılaşılan sorunların tamamı (araç sürümleri,
-konteyner açıkları, nginx başlık kalıtımı) **tespit edildikleri anda çözüldü**;
-kalıcı risk bırakmadılar.
+konteyner açıkları, nginx başlık kalıtımı, raporlamada kişi–sicil karışıklığı)
+**tespit edildikleri anda çözüldü**; kalıcı risk bırakmadılar.
 
 ---
 
@@ -186,6 +203,10 @@ kalıcı risk bırakmadılar.
    konuyu kapattı.
 4. **Uygulamayı gerçekten çalıştırmak.** Vite vekili ve nginx başlıkları hataları
    yalnızca çalıştırınca görüldü — testler ikisini de yakalamamıştı.
+5. **Çıktıyı okuyan birinin gözü.** Veri kalitesi raporundaki üç hata (sicil–kişi
+   karışıklığı, bozuk satır, açıklanmayan bulgu) İK sorumlusu tarafından tespit
+   edildi. Üretilen çıktı, üreten tarafından değil **kullanan** tarafından
+   doğrulandığında gerçek hatalar ortaya çıkıyor.
 
 **İşe yaramayan / düzeltilen**
 
@@ -243,3 +264,4 @@ işlendikten sonra modül geliştirmesi başlayacaktır (TEC.2 → TEC.3 → TEC
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-11 | 0.1 | İlk oluşturma — A1 kapanış değerlendirmesi | Bilgi İşlem |
+| 2026-09-12 | 0.2 | §6.4 düzeltildi: veri kalitesi ölçümü kişi (TCKN) bazına çevrildi; ölçüm hataları ve dersleri eklendi | Bilgi İşlem |
