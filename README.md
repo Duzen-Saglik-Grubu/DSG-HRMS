@@ -11,7 +11,7 @@ Proje **TS ISO/IEC TS 33061 Seviye 2** çerçevesinde yürütülmektedir.
 
 | | |
 |---|---|
-| **Aşama** | A1 — Teknik İskelet |
+| **Aşama** | A1 tamamlandı → A2 — Temel Modüller |
 | **Sürüm** | Henüz sürüm yok |
 | **Kapsam** | 35 modül (5 Temel · 10 Yatay · 20 İş) |
 
@@ -31,6 +31,7 @@ hangi bilginin nerede olduğunu gösteren harita.
 | [Proje Planı](docs/33061/MAN.1-proje-planlama/proje-plani.md) | Hedefler, aşamalar, kaynaklar, izleme |
 | [İş Kırılım Yapısı](docs/33061/MAN.1-proje-planlama/is-kirilim-yapisi.md) | WBS ve kritik yol |
 | [Risk Kayıt Defteri](docs/33061/MAN.4-risk-yonetimi/risk-kayit-defteri.md) | Açık riskler ve önlemler |
+| [A1 Kapanış Değerlendirmesi](docs/33061/MAN.1-proje-planlama/A1-asama-kapanis-degerlendirmesi.md) | Teknik iskelet aşamasının sonuçları ve kanıtları |
 | [Olgunluk Kriterleri](docs/33061/00-OLGUNLUK-SEVIYESI-KRITERLERI.md) | Seviye 2 kriterleri ve öz değerlendirme |
 
 ---
