@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-09-12
+**Son güncelleme:** 2026-09-15
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -220,9 +220,20 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 
 ---
 
+### R-17 — UAT ortamının şifrelenmemiş bağlantı (HTTP) üzerinden yayımlanması
+| | |
+|---|---|
+| **Kategori** | Güvenlik |
+| **Açıklama** | UAT ortamı `http://insankaynaklaritest.duzen.com.tr` adresinde **düz HTTP** ile yayımlanmaktadır. Şu an uygulamada oturum açma bulunmadığı için taşınan veri yoktur; ancak **T3 Kimlik Yönetimi devreye girdiğinde** parolalar, doğrulama kodları ve oturum çerezleri aynı ağdaki bir dinleyici tarafından okunabilir hâle gelir. Ayrıca yenileme jetonu çerezi `Secure` işaretiyle tanımlanacağından (ADR-0006 §8) HTTP üzerinde **hiç çalışmaz** — yani TLS olmadan modül teknik olarak da kullanılamaz. |
+| **O / E / Puan** | 3 / 3 / **9** |
+| **Sahibi** | Bilgi İşlem |
+| **Önlem** | (1) Kurum içi sertifika ile UAT ve üretim ortamlarında **TLS zorunlu** kılınacak; HTTP isteği HTTPS'e yönlendirilecek. (2) Bu iş **T3 Kimlik Yönetimi devreye alınmadan önce** tamamlanacaktır — modülün ön koşuludur. (3) Sertifika yenileme sorumluluğu ve takvimi Bilgi İşlem tarafından takip edilecek. |
+| **Durum** | Açık — T3 öncesi kapatılacak |
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-03 | 0.1 | İlk oluşturma; R-01…R-11 kayıtları | Bilgi İşlem |
 | 2026-09-12 | 0.4 | R-12 ölçümü düzeltildi: sicil bazlı sayım nedeniyle 37 kişi görünmüştü; kişi (TCKN) bazlı doğru değer **4 kişi / 1 adres**. Puan 6 olarak kaldı | Bilgi İşlem |
+| 2026-09-15 | 0.5 | R-17 eklendi (UAT ortamında TLS bulunmaması) | Bilgi İşlem |

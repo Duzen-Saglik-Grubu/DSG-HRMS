@@ -112,19 +112,27 @@ cd ../frontend/dsg-hrms-web
 npm ci && npm run dev                         # http://localhost:5173
 ```
 
-### UAT yığını
+### UAT ortamı
 
-Kabul testi ortamı **ayrı veritabanı, ayrı hacim ve ayrı portlarla** çalışır
-([`KR-024`](docs/karar-kayit-defteri.md)); geliştirme verisiyle karışmaz.
+Kabul testi ortamı **ayrı sunucuda** çalışır (`KR-024`); geliştirme verisiyle karışmaz.
+
+| | |
+|---|---|
+| Adres | http://insankaynaklaritest.duzen.com.tr |
+| Sunucu | `192.168.3.202` — Ubuntu 26.04 LTS |
+
+Dağıtım tek komutla yapılır:
 
 ```bash
-cd docker
-cp .env.uat.ornek .env.uat
-docker compose -f compose.uat.yml --env-file .env.uat up -d
+./docker/uat-dagit.sh
 ```
 
-UAT'ye **yalnızca etiketlenmiş imajlar** gider; "en son kod" değil. Kabul formu o
-sürüm numarasına yazılır.
+Betik kaynağı aktarır, imajları sunucuda derler, şemayı **idempotent** SQL betiğiyle
+uygular, yığını başlatır ve **doğrular** — web yanıt vermiyorsa veya API dışarıya
+açık kalmışsa hata verip durur.
+
+Ayrıntı, ilk kurulum ve işletim komutları:
+[UAT Kurulum Runbook](docs/33061/TEC.10-gecis/uat-ortami-kurulum-runbook.md)
 
 > **Git kancaları zorunludur.** `main` dalına doğrudan gönderimi engeller ve commit
 > mesajı biçimini denetler. GitHub Free planında özel depolarda sunucu tarafı dal
