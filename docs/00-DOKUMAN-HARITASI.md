@@ -121,6 +121,7 @@ Aşağıdaki tablolarda "33061 Süreç Çıktısı" sütunu, standardın Madde 5
 | 33061 Süreç Çıktısı | Bizdeki karşılığı |
 |---|---|
 | Yaklaşım | `YAKLASIM.md` (kurulum, kesim/cut-over, geri dönüş planı) |
+| **Ortam kurulum runbook** | `uat-ortami-kurulum-runbook.md` — UAT sunucusu kurulumu, dağıtım ve doğrulama |
 | Kurulmuş sistem | Üretim ortamı dağıtım kaydı |
 | Geçiş raporu | `raporlar/` — veri göçü mutabakat raporları, kesim raporu |
 | Kayıt | `kayitlar/` — göç denemeleri, kullanıcı eğitim kayıtları |
