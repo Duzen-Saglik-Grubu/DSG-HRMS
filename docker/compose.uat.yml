@@ -75,6 +75,11 @@ services:
     container_name: dsg-hrms-uat-web
     ports:
       - '${WEB_PORT:-8081}:8080'
+      - '${WEB_TLS_PORT:-8443}:8443'
+    volumes:
+      # Sertifikalar SALT OKUNUR baglanir. Dizin bosken konteyner duz HTTP ile
+      # calisir; sertifika kopyalandiginda TLS kendiliginden etkinlesir.
+      - ${TLS_DIZINI:-./tls-bos}:/etc/nginx/tls:ro
     depends_on:
       api:
         condition: service_started
