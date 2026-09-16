@@ -23,14 +23,37 @@ export const apiClient: AxiosInstance = axios.create({
 export const CORRELATION_HEADER = 'X-Correlation-Id';
 
 /**
- * Tarayici tarafinda istek kimligi uretir.
+ * Tarayici tarafinda istek kimligi uretir (32 onaltilik karakter).
+ *
+ * <b>Neden `crypto.randomUUID` tek basina kullanilmaz?</b> Bu islev yalnizca
+ * GUVENLI BAGLAMDA (HTTPS veya `localhost`) tanimlidir. Duz HTTP uzerinden bir
+ * alan adiyla acildiginda `undefined` olur ve cagri hata firlatir. Gelistirmede
+ * `localhost` guvenli baglam sayildigi icin bu durum ancak sunucuya
+ * dagitildiginda gorunur hâle gelir.
+ *
+ * `crypto.getRandomValues` boyle bir kisitlamaya tabi degildir; yedek olarak
+ * kullanilir.
  */
 function createCorrelationId(): string {
-  return crypto.randomUUID().replaceAll('-', '');
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID().replaceAll('-', '');
+  }
+
+  const baytlar = new Uint8Array(16);
+  crypto.getRandomValues(baytlar);
+
+  return Array.from(baytlar, (bayt) => bayt.toString(16).padStart(2, '0')).join('');
 }
 
 apiClient.interceptors.request.use((config) => {
-  config.headers.set(CORRELATION_HEADER, createCorrelationId());
+  // Izleme kimligi bir KOLAYLIKTIR: destek talebini gunluk kaydiyla eslestirir.
+  // Uretilemiyorsa istek yine de gitmelidir - yardimci bir ozelligin asil islevi
+  // engellemesi kabul edilemez. Bu hata bir kez yasandi (#39).
+  try {
+    config.headers.set(CORRELATION_HEADER, createCorrelationId());
+  } catch {
+    // Kimlik uretilemedi; istek kimliksiz devam eder.
+  }
 
   return config;
 });

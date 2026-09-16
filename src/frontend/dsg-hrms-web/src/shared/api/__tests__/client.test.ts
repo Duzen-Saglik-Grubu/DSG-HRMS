@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { AxiosError, type AxiosAdapter, type AxiosResponse } from 'axios';
+import axios, { AxiosError, type AxiosAdapter, type AxiosResponse } from 'axios';
 import { apiClient, CORRELATION_HEADER } from '../client';
 import { fetchHealth } from '../health';
 import type { ApiError } from '../problemDetails';
@@ -114,12 +114,105 @@ describe('apiClient', () => {
   });
 });
 
+describe('izleme kimligi - guvenli olmayan baglam', () => {
+  // "crypto.randomUUID" YALNIZCA guvenli baglamda (HTTPS veya localhost) tanimlidir.
+  // Duz HTTP uzerinden bir alan adiyla acildiginda yoktur; bu durumda uygulama
+  // hicbir istek gonderemiyordu (#39).
+  // Metot referansini dogrudan almak yerine baglami korunmus bir sarmalayici
+  // saklanir; boylece geri yuklendiginde "this" baglantisi bozulmaz.
+  const gercekRandomUUID = crypto.randomUUID.bind(crypto);
+
+  afterEach(() => {
+    Object.defineProperty(crypto, 'randomUUID', {
+      value: gercekRandomUUID,
+      configurable: true,
+      writable: true,
+    });
+  });
+
+  function randomUUIDKaldir(): void {
+    Object.defineProperty(crypto, 'randomUUID', {
+      value: undefined,
+      configurable: true,
+      writable: true,
+    });
+  }
+
+  it('randomUUID yokken de istek gonderilir', async () => {
+    randomUUIDKaldir();
+
+    let ulasti = false;
+    sahteYanit((config) => {
+      ulasti = true;
+
+      return { data: {}, status: 200, statusText: 'OK', headers: {}, config };
+    });
+
+    await apiClient.get('/deneme');
+
+    // Asil dogrulama: istek SUNUCUYA ULASTI. Onceki kodda ara katman hata
+    // firlattigi icin istek hic gonderilmiyordu.
+    expect(ulasti).toBe(true);
+  });
+
+  it('randomUUID yokken de gecerli bir kimlik uretilir', async () => {
+    randomUUIDKaldir();
+
+    let gonderilen: string | undefined;
+    sahteYanit((config) => {
+      gonderilen = config.headers.get(CORRELATION_HEADER) as string;
+
+      return { data: {}, status: 200, statusText: 'OK', headers: {}, config };
+    });
+
+    await apiClient.get('/deneme');
+
+    expect(gonderilen).toMatch(/^[0-9a-f]{32}$/);
+  });
+
+  it('kimlik uretimi tamamen basarisiz olsa bile istek engellenmez', async () => {
+    // Izleme kimligi bir kolayliktir; asil islevi engellememelidir.
+    randomUUIDKaldir();
+
+    const gercekGetRandomValues = crypto.getRandomValues.bind(crypto);
+    Object.defineProperty(crypto, 'getRandomValues', {
+      value: () => {
+        throw new Error('kullanilamiyor');
+      },
+      configurable: true,
+      writable: true,
+    });
+
+    let ulasti = false;
+    sahteYanit((config) => {
+      ulasti = true;
+
+      return { data: {}, status: 200, statusText: 'OK', headers: {}, config };
+    });
+
+    try {
+      await apiClient.get('/deneme');
+    } finally {
+      Object.defineProperty(crypto, 'getRandomValues', {
+        value: gercekGetRandomValues,
+        configurable: true,
+        writable: true,
+      });
+    }
+
+    expect(ulasti).toBe(true);
+  });
+});
+
 describe('fetchHealth', () => {
   it('saglik ucunu surumsuz adresten cagirir', async () => {
     let istenenUrl: string | undefined;
 
     sahteYanit((config) => {
-      istenenUrl = `${config.baseURL ?? ''}${config.url ?? ''}`;
+      // Axios'un GERCEKTE urettigi adres olculur. Daha once baseURL ve url
+      // dizgileri birlestiriliyordu; bu, istegin gittigi adresi degil testin
+      // kendi kurdugu metni dogruluyordu (#39).
+      istenenUrl = axios.getUri(config);
 
       return {
         data: { status: 'Healthy', totalDurationMs: 1, checks: [] },
@@ -133,7 +226,7 @@ describe('fetchHealth', () => {
     const sonuc = await fetchHealth();
 
     // Saglik uclari sozlesmenin parcasi degildir ve "/api/v1" altinda yasamaz.
-    expect(istenenUrl).toBe('//health/ready');
+    expect(istenenUrl).toBe('/health/ready');
     expect(sonuc.status).toBe('Healthy');
   });
 });
