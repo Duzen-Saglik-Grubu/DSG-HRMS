@@ -16,16 +16,18 @@
 | | |
 |---|---|
 | **Sunucu** | `192.168.3.202` — Ubuntu 26.04 LTS · 2 çekirdek · 7,3 GB RAM · 87 GB disk |
-| **Adres** | http://insankaynaklaritest.duzen.com.tr |
-| **Uygulama dizini** | `/opt/dsg-hrms` |
+| **Adres** | **https://insankaynaklaritest.duzen.com.tr** — HTTP, HTTPS'e yönlendirilir |
+| **Uygulama dizini** | `/opt/dsg-hrms` (sırlar: `/opt/dsg-hrms/gizli/`, sertifika: `/opt/dsg-hrms/tls/`) |
 | **Erişim** | SSH anahtarı (`dsg-hrms-uat-deploy`) |
 | **Amaç** | İK kabul testi (`KR-024`) — **gerçek veri değil**, maskelenmiş kopya |
+| **Sertifika** | Let's Encrypt · **bitiş 16.12.2026** · yenileme **elle** (`KR-067`, `R-18`) |
 
 ### Yayımlanan portlar
 
 | Port | Erişim | Ne |
 |---|---|---|
-| `80` | **Ağa açık** | Web arayüzü (nginx) |
+| `443` | **Ağa açık** | Web arayüzü — **HTTPS** (nginx) |
+| `80` | **Ağa açık** | Yalnızca HTTPS'e yönlendirme (301) |
 | `5299` | Yalnızca `127.0.0.1` | API — web konteyneri Docker ağı üzerinden erişir |
 | `5434` | Yalnızca `127.0.0.1` | PostgreSQL |
 
@@ -59,27 +61,39 @@ systemctl is-enabled docker   # "enabled" dönmeli: sunucu yeniden başlarsa yı
 
 **Parola sunucuda üretilir; hiçbir yere yazılmaz, depoya girmez** (`KR-038`).
 
+Dosya **kaynak ağacının dışında**, `/opt/dsg-hrms/gizli/` altında durur.
+
+> **Neden dışarıda?** Dağıtım betiği `/opt/dsg-hrms/docker` dizinini **silip yeniden
+> oluşturur**. Dosya orada dururken her dağıtım, ihtiyaç duyduğu sırrı kendi eliyle
+> siliyordu ve yığın `couldn't find env file` ile ayağa kalkmıyordu. Bu 17.09.2026'da
+> yaşandı; parola çalışan konteynerin ortamından kurtarılabildi. **Bir sır, dağıtımın
+> sildiği ağacın içinde yaşamamalıdır.**
+
 ```bash
-cd /opt/dsg-hrms/docker
+mkdir -p /opt/dsg-hrms/gizli && chmod 700 /opt/dsg-hrms/gizli
 PAROLA=$(openssl rand -base64 30 | tr -d "/+=" | head -c 32)
 
-cat > .env.uat <<SON
+cat > /opt/dsg-hrms/gizli/.env.uat <<SON
 POSTGRES_DB=dsg_hrms_uat
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=$PAROLA
-POSTGRES_PORT=127.0.0.1:5434
-API_PORT=127.0.0.1:5299
+POSTGRES_PORT=5434
+API_PORT=5299
 WEB_PORT=80
 API_IMAGE=dsg-hrms-api:uat
 WEB_IMAGE=dsg-hrms-web:uat
+TLS_DIZINI=/opt/dsg-hrms/tls
+WEB_TLS_PORT=443
 SON
 
-chmod 600 .env.uat
+chmod 600 /opt/dsg-hrms/gizli/.env.uat
 ```
 
-> `POSTGRES_PORT` ve `API_PORT` değerlerindeki `127.0.0.1:` öneki bilinçlidir:
-> Compose bu değeri `<host>:<port>:<konteyner portu>` olarak yorumlar ve servisi
-> yalnızca sunucu içine açar.
+> **Port değerlerine `127.0.0.1:` öneki YAZILMAZ.** Önek artık `compose.uat.yml`
+> içinde sabittir. Önceden güvenli bağlama, elle yazılan bu dosyanın biçimine
+> bağlıydı; bir kez sade port yazıldığında API tüm ağa açıldı (17.09.2026 —
+> dağıtım betiğinin kendi kontrolü yakaladı). Bir güvenlik özelliği, yazım hatasına
+> dayanıklı olmalıdır.
 
 ---
 
@@ -95,9 +109,10 @@ tar czf - --exclude=node_modules --exclude=bin --exclude=obj --exclude=dist \
       && mkdir -p /opt/dsg-hrms && tar xzf - -C /opt/dsg-hrms'
 ```
 
-> `.env.uat` silinmez: yalnızca `src` ve `docker` dizinleri yenilenir. Compose dosyası
-> `docker/` altında olduğu için yeniden kopyalanır; ortam dosyası ise `.gitignore`
-> kapsamında olduğundan paket içinde gelmez.
+> **Bu adım `docker/` dizinini SİLER.** Bu yüzden ortam dosyası oraya konmaz;
+> `/opt/dsg-hrms/gizli/.env.uat` altında, aktarımın dokunmadığı bir yerde durur
+> (bkz. §2.2). Belgenin önceki sürümü "`.env.uat` silinmez" diyordu; bu **yanlıştı**
+> ve 17.09.2026'da dağıtım sırrı kendi eliyle sildi.
 
 ### 3.2 İmajları derle
 
@@ -138,7 +153,7 @@ docker exec -i dsg-hrms-uat-postgres \
 
 ```bash
 cd /opt/dsg-hrms/docker
-docker compose -f compose.uat.yml --env-file .env.uat up -d
+docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/gizli/.env.uat up -d
 ```
 
 ---
@@ -174,10 +189,10 @@ curl -s -o /dev/null -w "%{http_code}\n" --max-time 5 http://192.168.3.202:5299/
 
 | İş | Komut |
 |---|---|
-| Durum | `docker ps` · `docker compose -f compose.uat.yml --env-file .env.uat ps` |
-| Günlükler | `docker compose -f compose.uat.yml --env-file .env.uat logs -f api` |
-| Yeniden başlat | `docker compose -f compose.uat.yml --env-file .env.uat restart` |
-| Durdur | `docker compose -f compose.uat.yml --env-file .env.uat down` |
+| Durum | `docker ps` · `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/gizli/.env.uat ps` |
+| Günlükler | `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/gizli/.env.uat logs -f api` |
+| Yeniden başlat | `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/gizli/.env.uat restart` |
+| Durdur | `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/gizli/.env.uat down` |
 | **Veriyi de sil** | `... down -v` — **UAT verisi gider**, İK'ya haber verilmeden yapılmaz |
 
 **Yedek:** UAT verisi maskelenmiş test verisidir; düzenli yedeklenmez. İK kabul testi
@@ -198,14 +213,102 @@ docker exec dsg-hrms-uat-postgres pg_dump -U postgres dsg_hrms_uat | gzip > /opt
 | Konteynerler root olmayan kullanıcıyla çalışıyor | ✅ (`KR-065`) |
 | **SSH parola ile girişin kapatılması** | ⚠️ **Öneriliyor** — anahtar kuruldu, parola hâlâ açık |
 | **Sunucu parolasının değiştirilmesi** | ⚠️ **Öneriliyor** — kurulum sırasında paylaşıldı |
-| **HTTPS (TLS)** | ⚠️ Açık — şu an düz HTTP. Kurum içi sertifika ile kapatılmalı |
+| **HTTPS (TLS)** | ✅ Yapıldı — Let's Encrypt, 17.09.2026 (`KR-067`) |
+| **Sertifikanın süresinin dolması** | ⚠️ **İzleniyor** (`R-18`) — yenileme elle; bitiş **16.12.2026** |
+| **HSTS** | ⛔ Bilinçli olarak kapalı — gerekçe §7 |
 | Güvenlik duvarı (ufw) | ⚠️ Açık — yalnızca 22 ve 80'e izin verilmesi önerilir |
 | Kimlik doğrulama | ⏳ T3 Kimlik Yönetimi ile gelecek; şu an uygulamada oturum yok |
 
-> **HTTPS neden önemli:** Kimlik Yönetimi devreye girdiğinde parolalar ve oturum
-> çerezleri ağ üzerinden geçecek. Düz HTTP'de bunlar aynı ağdaki biri tarafından
-> okunabilir. Ayrıca oturum çerezi `Secure` işaretiyle tanımlandığında (ADR-0006 §8)
-> HTTP üzerinden **hiç çalışmaz**. TLS, T3 devreye alınmadan önce kurulmalıdır.
+---
+
+## 7. TLS sertifikası
+
+### 7.1 Nasıl çalışıyor
+
+Sertifika **Let's Encrypt**'ten, **DNS-01** doğrulamasıyla alınır (`KR-067`). DNS-01
+seçilmesinin nedeni, sunucunun internete açılmasını gerektirmemesidir; sistem yalnızca
+kurum içinden erişilebilir kalır.
+
+nginx imajı **tek imaj, iki mod** çalışır (`nginx/secim.sh`): `/etc/nginx/tls` altında
+sertifika varsa TLS, yoksa düz HTTP. Böylece geliştirme ortamı sertifikasız çalışmaya
+devam ederken UAT ve üretim **aynı imajı** kullanır.
+
+| Dosya | Yer |
+|---|---|
+| Certbot sertifikaları | `/etc/letsencrypt/live/insankaynaklaritest.duzen.com.tr/` |
+| Konteynerin okuduğu kopya | `/opt/dsg-hrms/tls/` (sahip UID 101 = konteyner içindeki `nginx`) |
+| Doğrulama kancası | `/opt/acme/hook.sh` — depoda: `docker/acme-dns-kancasi.sh` |
+| Dağıtım kancası | `/usr/local/sbin/dsg-tls-yenile.sh` — depoda: `docker/tls-yenile.sh` |
+
+> Her iki kanca da **kaynak ağacının dışında** kurulur. Dağıtım `/opt/dsg-hrms/docker`
+> dizinini sildiği için, orada duran bir betik ilk dağıtımda kaybolurdu.
+
+### 7.2 Yenileme (90 günde bir, ELLE)
+
+Kurum DNS'i ayrı bir ekip tarafından yönetildiğinden TXT kaydı otomatik
+güncellenemiyor; yenileme bilinçli olarak elle yapılır (`KR-067`). `certbot.timer`
+bu nedenle **kapatılmıştır** — açık bırakılsaydı certbot günde iki kez kancayı
+çalıştırır, kanca da kimsenin eklemediği kaydı 12 saat beklerdi.
+
+**Sıralama önemlidir. Şu sırayla yapılır:**
+
+1. **Önce certbot başlatılır**, sonra kayıt eklenir — tersi değil:
+
+   ```bash
+   setsid nohup certbot certonly --manual --preferred-challenges dns      --manual-auth-hook /opt/acme/hook.sh      --agree-tos --no-eff-email --register-unsafely-without-email --non-interactive      --domain insankaynaklaritest.duzen.com.tr      > /opt/acme/certbot.log 2>&1 < /dev/null &
+   ```
+
+2. Beklenen değer okunur: `cat /opt/acme/beklenen-kayit.txt`
+
+3. TXT kaydı **HER İKİ yetkili sunucuya birden** eklenir:
+   **`ankara.duzen.com.tr` (212.57.13.19)** ve **`cayyolu.duzen.com.tr` (212.156.67.66)**.
+   Her ikisinde de **SOA seri numarası artırılır** ve `rndc reload` yapılır.
+
+4. Doğrulama izlenir: `tail -f /opt/acme/certbot.log`
+
+5. Başarılı olduğunda sertifika `renew_hook` ile `/opt/dsg-hrms/tls` altına kopyalanır
+   ve web konteyneri yeniden başlatılır — ek işlem gerekmez.
+
+6. Doğrulanır (bkz. §7.3) ve **yeni bitiş tarihi bu runbook'un §1 tablosuna yazılır**.
+
+> **Neden bu sıra?** certbot koşumu bir kez düşerse doğrulama yetkisi geçersizleşir ve
+> **yeni bir jeton** üretilir; eklenen kayıt işe yaramaz. 16–17.09.2026'da bu üç kez
+> yaşandı. certbot beklediği sürece jeton sabit kalır.
+
+> **İki sunucu da neden şart?** Let's Encrypt doğrulamayı **birden çok noktadan** yapar.
+> Kayıt yalnızca birinde olduğunda hata `During secondary validation: NXDOMAIN`
+> şeklinde gelir — teşhisi zor bir belirtidir. Bu iki sunucu arasında bölge aktarımı
+> **yoktur**, bağımsız yönetilirler; birine eklemek yetmez.
+
+> **Eski kayıt silinmeyebilir.** Bir ada birden fazla TXT kaydı tanımlanabilir; yenisi
+> eklenince Let's Encrypt aradığı değeri bulur.
+
+### 7.3 Doğrulama
+
+```bash
+# Sertifika geçerli mi? "-k" KULLANILMAZ - doğrulamayı kapatmak kontrolü anlamsız kılar.
+curl -s -o /dev/null -w 'durum=%{http_code} tls=%{ssl_verify_result}
+' https://insankaynaklaritest.duzen.com.tr/
+# Beklenen: durum=200 tls=0
+
+# HTTP, HTTPS'e yönlendiriyor mu?
+curl -s -o /dev/null -w 'durum=%{http_code} hedef=%{redirect_url}
+' http://insankaynaklaritest.duzen.com.tr/
+# Beklenen: durum=301, hedef https:// ile başlar
+
+# Bitiş tarihi
+openssl x509 -in /opt/dsg-hrms/tls/fullchain.pem -noout -enddate
+```
+
+`./docker/uat-dagit.sh` bu kontrolleri dağıtımın sonunda **kendisi yapar** ve
+başarısız olursa dağıtımı hata ile bitirir.
+
+### 7.4 HSTS neden açık değil
+
+HSTS, tarayıcıya "bu siteye artık yalnızca HTTPS ile bağlan" der ve bu bilgi
+tarayıcıda saklanır. Sertifika bir gün yenilenmeyi kaçırırsa kullanıcı uyarıyı
+**atlayamaz** ve sistem tamamen erişilemez hâle gelir. Yenileme elle yapıldığı sürece
+bu cezanın ağırlığı kabul edilemez. HSTS, yenileme otomatikleştiğinde açılacaktır.
 
 ---
 
@@ -214,3 +317,4 @@ docker exec dsg-hrms-uat-postgres pg_dump -U postgres dsg_hrms_uat | gzip > /opt
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-15 | 0.1 | İlk oluşturma — UAT sunucusu kurulumu ve dağıtım adımları | Bilgi İşlem |
+| 2026-09-17 | 0.2 | TLS devreye alındı (§7): Let's Encrypt sertifikası, elle yenileme yordamı, doğrulama. Ortam dosyası `gizli/` altına taşındı — dağıtım onu siliyordu. `127.0.0.1:` öneki compose dosyasına sabitlendi | Bilgi İşlem |

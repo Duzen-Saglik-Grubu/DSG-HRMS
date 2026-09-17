@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-09-15
+**Son güncelleme:** 2026-09-17
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -203,15 +203,16 @@ raporunda ayrıca ele alınır.
 
 | Puan | Risk sayısı | Riskler |
 |---|---:|---|
-| 9 | 1 | R-01 |
+| 9 | 2 | R-01, R-18 |
 | 6 | 8 | R-03, R-04, R-05, R-06, R-08, R-12, R-13, R-15 |
 | 4 | 3 | R-09, R-14, R-16 |
 | 3 | 1 | R-02 |
-| Kapandı | 3 | R-07, R-10, R-11 |
+| Kapandı | 4 | R-07, R-10, R-11, **R-17** |
 
-**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-08, R-12, R-13, R-15
+**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-08, R-12, R-13, R-15, R-18
 
-**Son gözden geçirme:** 2026-09-08 — `R-16` (dal koruma kısıtı) eklendi; GitHub kurulumu sırasında tespit edildi.
+**Son gözden geçirme:** 2026-09-16 — `R-18` (elle sertifika yenilemesi) eklendi; R-17'nin önlemi Let's Encrypt / DNS-01 kararıyla güncellendi. Bu gözden geçirmede, R-17 eklenirken **özet tablosunun güncellenmediği** fark edildi ve düzeltildi: kayıt eklemek yeterli değildir, özet de aynı anda güncellenmelidir.
+Önceki: 2026-09-08 — `R-16` (dal koruma kısıtı) eklendi; GitHub kurulumu sırasında tespit edildi.
 Önceki: 2026-09-07 — `R-15` (kapsam büyüklüğü) eklendi; `R-02`'nin
 olasılığı, LOGO sürüm yükseltmelerinin TRISOFT tarafından önceden bildirildiği ve geçmiş
 yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e düşürüldü**.
@@ -227,8 +228,20 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **Açıklama** | UAT ortamı `http://insankaynaklaritest.duzen.com.tr` adresinde **düz HTTP** ile yayımlanmaktadır. Şu an uygulamada oturum açma bulunmadığı için taşınan veri yoktur; ancak **T3 Kimlik Yönetimi devreye girdiğinde** parolalar, doğrulama kodları ve oturum çerezleri aynı ağdaki bir dinleyici tarafından okunabilir hâle gelir. Ayrıca yenileme jetonu çerezi `Secure` işaretiyle tanımlanacağından (ADR-0006 §8) HTTP üzerinde **hiç çalışmaz** — yani TLS olmadan modül teknik olarak da kullanılamaz. |
 | **O / E / Puan** | 3 / 3 / **9** |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) Kurum içi sertifika ile UAT ve üretim ortamlarında **TLS zorunlu** kılınacak; HTTP isteği HTTPS'e yönlendirilecek. (2) Bu iş **T3 Kimlik Yönetimi devreye alınmadan önce** tamamlanacaktır — modülün ön koşuludur. (3) Sertifika yenileme sorumluluğu ve takvimi Bilgi İşlem tarafından takip edilecek. |
-| **Durum** | Açık — T3 öncesi kapatılacak |
+| **Önlem** | (1) **Let's Encrypt** sertifikası ile UAT ve üretim ortamlarında **TLS zorunlu** kılınacak; HTTP isteği HTTPS'e yönlendirilecek. Kurum içi (self-signed) sertifika yerine Let's Encrypt seçilmiştir: her istemciye elle kök sertifika dağıtma yükü doğmaz. Doğrulama **DNS-01** yöntemiyle yapılır; bu yöntem sunucunun internete açılmasını gerektirmez, dolayısıyla "yalnızca kurum içi erişim" kısıtı korunur. (2) Bu iş **T3 Kimlik Yönetimi devreye alınmadan önce** tamamlanacaktır — modülün ön koşuludur. (3) Yenileme riski ayrıca **R-18** altında izlenir. |
+| **Durum** | **Kapandı — 17.09.2026.** UAT `https://insankaynaklaritest.duzen.com.tr` üzerinden yayında; HTTP 301 ile yönlendiriliyor, sertifika doğrulaması `curl` ile sınandı (`ssl_verify_result=0`). Yenileme riski **R-18** altında devam eder. |
+
+---
+
+### R-18 — TLS sertifikası yenilemesinin elle yapılması nedeniyle süresinin dolması
+| | |
+|---|---|
+| **Kategori** | Kullanılabilirlik |
+| **Açıklama** | Let's Encrypt sertifikaları **90 gün** geçerlidir. Kurum DNS yöneticisiyle yapılan görüşmede, DNS TXT kaydının otomatik güncellenmeyeceği, yenileme zamanı yaklaştığında **elle güncelleneceği** kararlaştırılmıştır (2026-09-16). Böylece yenileme, otomatik bir işin değil bir kişinin hatırlamasına bağlı hâle gelir. Sertifika süresi dolduğunda tarayıcı bağlantıyı engeller ve sistem **tamamen erişilemez** olur — kısmi değil, tam kesinti. Risk 90 günde bir tekrarlanır; tek bir unutma yeterlidir. |
+| **O / E / Puan** | 3 / 3 / **9** |
+| **Sahibi** | Bilgi İşlem |
+| **Önlem** | (1) **Sistem içi uyarı** (asıl önlem): Y4 Sistem Yönetimi modülünde sertifikanın kalan geçerlilik günü izlenir; eşiğin (varsayılan 10 gün) altına düştüğünde sistem yöneticisine **e-posta ve SMS** gönderilir — bkz. gereksinim #42. Uyarı, **sunulan** sertifikadan okunur; böylece "dosya yenilendi ama nginx yeniden yüklenmedi" durumu da yakalanır. (2) Alıcı tek kişi değil, **sistem yöneticisi rolüdür**; tek kişinin izinli olması uyarıyı kör etmez. (3) **Ara dönem** (Y4 hazır olana kadar): sertifikanın bitiş tarihi UAT runbook'una yazılır ve Bilgi İşlem takvim hatırlatmasıyla takip eder. (4) **HSTS bilinçli olarak kapalı tutulur**: sertifika kaçırılırsa kullanıcı uyarıyı atlayarak sisteme erişebilir; HSTS bunu imkânsız kılardı. HSTS ancak yenileme otomatikleştiğinde açılacaktır. |
+| **Durum** | Açık — ara dönem önlemi yürürlükte; asıl önlem A3 aşamasında (#42) |
 
 ## Değişiklik Geçmişi
 
@@ -237,3 +250,5 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-09-03 | 0.1 | İlk oluşturma; R-01…R-11 kayıtları | Bilgi İşlem |
 | 2026-09-12 | 0.4 | R-12 ölçümü düzeltildi: sicil bazlı sayım nedeniyle 37 kişi görünmüştü; kişi (TCKN) bazlı doğru değer **4 kişi / 1 adres**. Puan 6 olarak kaldı | Bilgi İşlem |
 | 2026-09-15 | 0.5 | R-17 eklendi (UAT ortamında TLS bulunmaması) | Bilgi İşlem |
+| 2026-09-16 | 0.6 | R-17 önlemi güncellendi (Let's Encrypt / DNS-01 kararı); **R-18** eklendi (elle yenileme nedeniyle sertifika süresinin dolması) | Bilgi İşlem |
+| 2026-09-17 | 0.7 | **R-17 kapandı** (UAT TLS ile yayında). R-18 açık kalmaya devam ediyor | Bilgi İşlem |

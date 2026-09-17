@@ -1,0 +1,5 @@
+Bu dizin BILEREK bostur.
+
+Sertifika tanimlanmamis ortamlarda (gelistirme) web konteyneri bu bos dizini
+baglar ve duz HTTP ile calisir. Sertifikali ortamlarda TLS_DIZINI ortam
+degiskeni gercek sertifika dizinini gosterir.
