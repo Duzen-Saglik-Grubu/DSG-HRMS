@@ -292,6 +292,7 @@ Refs: #42
 
 | Kural | Değer |
 |---|---|
+| **Başlık** | **Conventional Commits** — issue biçimi (`[GÖREV] …`) **kullanılmaz**. Bkz. §5.1 |
 | Şablon | `.github/PULL_REQUEST_TEMPLATE.md` doldurulur |
 | Issue bağlantısı | **Zorunlu** — `Closes #42` (görev/hata) veya `Refs #42` (gereksinim) |
 | Milestone | **Zorunlu** — PR ve issue aynı aşamaya (A0/A1/A2/A3/AS) bağlanır |
@@ -301,7 +302,33 @@ Refs: #42
 | Birleştirme | **Squash merge** — `main` geçmişi okunabilir kalır |
 | Dal | Birleştirme sonrası **silinir** |
 
-### 5.1 `Closes` ve `Refs` ayrımı
+### 5.1 PR başlığı
+
+PR başlığı, **commit mesajlarıyla aynı biçimi** kullanır (§4):
+
+```
+<tür>(<kapsam>): <özet>
+```
+
+| | |
+|---|---|
+| ✅ Doğru | `feat(uat): TLS (HTTPS) devreye alındı` |
+| ✅ Doğru | `fix(frontend): izleme kimliği güvenli olmayan bağlamda da üretiliyor` |
+| ❌ Yanlış | `[GÖREV] UAT ortamında TLS kurulumu` — bu **issue** biçimidir |
+
+**Neden bu biçim zorunlu:** Birleştirme **squash merge** ile yapılır ve GitHub,
+squash commit'inin konu satırını **PR başlığından** üretir. Uyumsuz bir PR başlığı,
+Conventional Commits'e uymayan bir commit olarak `main` geçmişine girer. Yerel
+`commit-msg` kancası bunu **yakalayamaz**; o yalnızca yerel commit'lere bakar.
+Denetlenebilecek tek yer CI'dır.
+
+Başlık biçimi **CI tarafından denetlenir**
+([`pr-izlenebilirlik-denetimi.yml`](.github/workflows/pr-izlenebilirlik-denetimi.yml)).
+
+> Bu kural #44 düzeltici faaliyetinin sonucudur. Kural yazılı olmadığı için 20 PR
+> boyunca yalnızca alışkanlıkla korunmuş, 21.'sinde kırılmıştı.
+
+### 5.2 `Closes` ve `Refs` ayrımı
 
 | Anahtar kelime | Etkisi | Ne zaman |
 |---|---|---|
@@ -316,7 +343,7 @@ Her iki alan da **CI tarafından denetlenir**
 ([`pr-izlenebilirlik-denetimi.yml`](.github/workflows/pr-izlenebilirlik-denetimi.yml)):
 milestone veya issue bağlantısı eksikse kontrol başarısız olur.
 
-### 5.2 Taslak (draft) PR
+### 5.3 Taslak (draft) PR
 
 İş yarımken PR **taslak** olarak açılabilir. Bu, CI'ın erken çalışmasını ve geri
 bildirimin erken alınmasını sağlar. Taslak PR birleştirilemez.
@@ -451,4 +478,5 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 | 2026-09-10 | 0.2 | §3.2 kodlama dili (KR-058) ve §3.3 günlük kaydı / kişisel veri kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |
 | 2026-09-10 | 0.3 | §3.4 erişim kaydı kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |
 | 2026-09-10 | 0.4 | §3.5 hata fırlatma kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |
-| 2026-09-10 | 0.5 | §5 milestone zorunluluğu ve §5.1 `Closes`/`Refs` ayrımı eklendi (düzeltici faaliyet #17) | Bilgi İşlem |
+| 2026-09-10 | 0.5 | §5 milestone zorunluluğu ve `Closes`/`Refs` ayrımı eklendi (düzeltici faaliyet #17) — o gün §5.1, bugün §5.2 | Bilgi İşlem |
+| 2026-09-17 | 0.6 | §5.1 **PR başlığı** kuralı eklendi; alt bölümler yeniden numaralandı (düzeltici faaliyet #44) | Bilgi İşlem |

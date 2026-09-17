@@ -6,6 +6,9 @@
 #
 # Bu denetim, #17 duzeltici faaliyetinin sonucudur: kural yazili olmadigi ve
 # otomatik denetlenmedigi icin milestone ve issue baglantisi unutulabiliyordu.
+#
+# 17.09.2026'da ayni kok neden BASLIK icin tekrarladi (#44): 20 PR boyunca yalnizca
+# aliskanlikla korunan bicim, 21.'sinde kirildi. Baslik denetimi o gun eklendi.
 
 name: PR izlenebilirlik denetimi
 
@@ -19,10 +22,21 @@ permissions:
 
 jobs:
   izlenebilirlik:
-    name: Milestone ve issue baglantisi
+    name: Baslik, milestone ve issue baglantisi
     runs-on: ubuntu-latest
 
     steps:
+      # Denetimin KENDISI once sinanir.
+      #
+      # Baslik kurali bir duzenli ifadeye dayaniyor. Duzenli ifadeler sessizce
+      # bozulur: yanlis yazilmis bir ifade her basligi gecirir ve kapi calisiyor
+      # gorunurken hicbir sey denetlemez. Betik, ifadeyi is akisi dosyasindan
+      # AYNEN okuyup 13 ornek uzerinde sinar; kopyasini degil, calisani dener.
+      - uses: actions/checkout@v4
+
+      - name: Baslik kuralini sina
+        run: node .github/scripts/baslik-bicimi-testi.mjs
+
       - name: Denetle
         uses: actions/github-script@v7
         with:
@@ -31,14 +45,43 @@ jobs:
             const body = pr.body || '';
             const eksikler = [];
 
-            // --- 1. Milestone ---
+            // --- 1. Baslik bicimi ---
+            //
+            // Neden CI'da? Birlestirme "squash merge" ile yapilir ve GitHub, squash
+            // commit'inin konu satirini PR BASLIGINDAN uretir. Uyumsuz bir baslik,
+            // Conventional Commits'e uymayan bir commit olarak main'e girer.
+            // Yerel "commit-msg" kancasi bunu goremez; yalnizca yerel commit'lere
+            // bakar. Denetlenebilecek tek yer burasidir.
+            //
+            // Turler CONTRIBUTING.md §4 ile ayni listedir.
+            const TURLER = 'feat|fix|docs|test|refactor|perf|build|ci|chore';
+            const BASLIK_BICIMI = new RegExp(
+              '^(' + TURLER + ')(\\([a-z0-9._-]+\\))?!?: .+');
+            const baslik = pr.title || '';
+
+            if (!BASLIK_BICIMI.test(baslik)) {
+              // Issue bicimi en sik yapilan hatadir; ayrica soylenir ki
+              // gelistirici neyi duzeltecegini aramak zorunda kalmasin.
+              const issueBicimi = /^\s*\[[^\]]+\]/.test(baslik);
+
+              eksikler.push(
+                'Baslik Conventional Commits bicimine uymuyor: "' + baslik + '"' +
+                (issueBicimi
+                  ? '\n    Bu bir ISSUE basligi bicimidir ("[GOREV] ..."); PR\'larda kullanilmaz.'
+                  : '') +
+                '\n    Beklenen: <tur>(<kapsam>): <ozet>' +
+                '\n    Ornek:    feat(uat): TLS devreye alindi' +
+                '\n    Turler:   ' + TURLER.split('|').join(', '));
+            }
+
+            // --- 2. Milestone ---
             if (!pr.milestone) {
               eksikler.push(
                 'Milestone atanmamis. PR bir asamaya (A0/A1/A2/A3/AS) bagli olmalidir; ' +
                 'asama planlamasi ve ilerleme olcumu buna dayanir.');
             }
 
-            // --- 2. Issue baglantisi ---
+            // --- 3. Issue baglantisi ---
             // "Closes #42" issue'yu kapatir ve resmi baglantiyi uretir.
             // "Refs #42" yalnizca metinsel bagdir; gereksinim issue'lari icin
             // kullanilir (modul kabul edilene kadar acik kalirlar).
@@ -51,7 +94,7 @@ jobs:
                 '"Refs #42" (gereksinim) bulunmalidir.');
             }
 
-            // --- 3. Sablonun doldurulmus olmasi ---
+            // --- 4. Sablonun doldurulmus olmasi ---
             if (/^Closes #\s*$/m.test(body)) {
               eksikler.push(
                 'PR sablonundaki "Closes #" satiri doldurulmamis.');
@@ -66,5 +109,6 @@ jobs:
             }
 
             core.info('Izlenebilirlik denetimi gecti.');
+            core.info(`Baslik: ${baslik}`);
             core.info(`Milestone: ${pr.milestone.title}`);
             core.info(`Issue baglantisi: ${kapatma ? 'Closes/Fixes' : 'Refs'}`);
