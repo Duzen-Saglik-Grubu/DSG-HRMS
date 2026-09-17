@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.1-WBS
 **Süreç:** MAN.1 — Proje Planlama
-**Son güncelleme:** 2026-09-07
+**Son güncelleme:** 2026-09-17
 **33061 karşılığı:** *Work breakdown structure*
 
 > **Kullanım:** Bu belge işin **yapısını** tanımlar; **durumunu** değil. Görevlerin
@@ -38,6 +38,22 @@ DSG-HRMS
 ---
 
 ## 3. Kırılım ayrıntısı
+
+> ### Her modülün başlangıç koşulu
+>
+> Aşağıdaki tablolar modüllerin **ne** içerdiğini gösterir; **ne zaman
+> başlanabileceğini** değil. Bir modülün geliştirmesine başlanabilmesi için
+> **İK ile o modüle özel gereksinim toplantısı yapılmış ve gereksinimler İK
+> onayından geçmiş olmalıdır** (`KR-068`).
+>
+> Teknik ön koşulun (bir modülün başka bir modüle bağımlılığı) karşılanmış olması
+> **yeterli değildir.** T1'in teknik bir ön koşulu yoktur; yine de kendi gereksinim
+> toplantısı yapılmadan başlanmaz.
+>
+> **Hazırlık bunun dışındadır.** Geçmiş notlardan gereksinim taslağı üretmek, veri
+> kalitesini ölçmek, açık soruları çıkarmak serbesttir ve teşvik edilir — toplantı
+> bu girdilerle çok daha verimli geçer. Taslak, **toplantı girdisidir**; onaylanmış
+> gereksinim değildir.
 
 ### 1. Hazırlık ve Planlama (A0)
 
@@ -77,7 +93,8 @@ DSG-HRMS
 
 ### 3. Temel Modüller (A2)
 
-Sırayla yapılır; önceliklendirmeye tabi değildir.
+Sırayla yapılır; önceliklendirmeye tabi değildir. **Her modül kendi İK gereksinim
+toplantısıyla başlar** (`KR-068`) — T1 dâhil.
 
 | Kod | Modül | Ana işler |
 |---|---|---|
@@ -89,6 +106,10 @@ Sırayla yapılır; önceliklendirmeye tabi değildir.
 
 > ★ = kullanıcıya teslim edilen ilk modül. T1 ve T2 onunla birlikte inşa edilir.
 > T3'ün çalışması için **Y1'in gönderim altyapısı** (e-posta + SMS) da bu aşamada gelir.
+
+> **§5'teki standart alt kırılım temel modüller için de geçerlidir** — özellikle
+> `.1 Gereksinim toplantısı ve kayıt (TEC.2)` adımı. Bu adım yalnızca iş modülleri
+> altında yazılmıştı; temel modüllerde de aynen uygulanır (`KR-068`).
 
 ### 4. Yatay Altyapı Modülleri (A3)
 
@@ -256,3 +277,4 @@ Sırayla yapılır; önceliklendirmeye tabi değildir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-07 | 0.1 | İlk oluşturma — 7 aşama, 35 modül, kritik yol | Bilgi İşlem |
+| 2026-09-17 | 0.2 | Modül başlangıç koşulu eklendi: her modül kendi İK gereksinim toplantısıyla başlar (`KR-068`) | Bilgi İşlem |
