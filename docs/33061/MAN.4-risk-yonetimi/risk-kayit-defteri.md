@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-09-16
+**Son güncelleme:** 2026-09-17
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -203,13 +203,13 @@ raporunda ayrıca ele alınır.
 
 | Puan | Risk sayısı | Riskler |
 |---|---:|---|
-| 9 | 3 | R-01, R-17, R-18 |
+| 9 | 2 | R-01, R-18 |
 | 6 | 8 | R-03, R-04, R-05, R-06, R-08, R-12, R-13, R-15 |
 | 4 | 3 | R-09, R-14, R-16 |
 | 3 | 1 | R-02 |
-| Kapandı | 3 | R-07, R-10, R-11 |
+| Kapandı | 4 | R-07, R-10, R-11, **R-17** |
 
-**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-08, R-12, R-13, R-15, R-17, R-18
+**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-08, R-12, R-13, R-15, R-18
 
 **Son gözden geçirme:** 2026-09-16 — `R-18` (elle sertifika yenilemesi) eklendi; R-17'nin önlemi Let's Encrypt / DNS-01 kararıyla güncellendi. Bu gözden geçirmede, R-17 eklenirken **özet tablosunun güncellenmediği** fark edildi ve düzeltildi: kayıt eklemek yeterli değildir, özet de aynı anda güncellenmelidir.
 Önceki: 2026-09-08 — `R-16` (dal koruma kısıtı) eklendi; GitHub kurulumu sırasında tespit edildi.
@@ -229,7 +229,7 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **O / E / Puan** | 3 / 3 / **9** |
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | (1) **Let's Encrypt** sertifikası ile UAT ve üretim ortamlarında **TLS zorunlu** kılınacak; HTTP isteği HTTPS'e yönlendirilecek. Kurum içi (self-signed) sertifika yerine Let's Encrypt seçilmiştir: her istemciye elle kök sertifika dağıtma yükü doğmaz. Doğrulama **DNS-01** yöntemiyle yapılır; bu yöntem sunucunun internete açılmasını gerektirmez, dolayısıyla "yalnızca kurum içi erişim" kısıtı korunur. (2) Bu iş **T3 Kimlik Yönetimi devreye alınmadan önce** tamamlanacaktır — modülün ön koşuludur. (3) Yenileme riski ayrıca **R-18** altında izlenir. |
-| **Durum** | Açık — T3 öncesi kapatılacak |
+| **Durum** | **Kapandı — 17.09.2026.** UAT `https://insankaynaklaritest.duzen.com.tr` üzerinden yayında; HTTP 301 ile yönlendiriliyor, sertifika doğrulaması `curl` ile sınandı (`ssl_verify_result=0`). Yenileme riski **R-18** altında devam eder. |
 
 ---
 
@@ -251,3 +251,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-09-12 | 0.4 | R-12 ölçümü düzeltildi: sicil bazlı sayım nedeniyle 37 kişi görünmüştü; kişi (TCKN) bazlı doğru değer **4 kişi / 1 adres**. Puan 6 olarak kaldı | Bilgi İşlem |
 | 2026-09-15 | 0.5 | R-17 eklendi (UAT ortamında TLS bulunmaması) | Bilgi İşlem |
 | 2026-09-16 | 0.6 | R-17 önlemi güncellendi (Let's Encrypt / DNS-01 kararı); **R-18** eklendi (elle yenileme nedeniyle sertifika süresinin dolması) | Bilgi İşlem |
+| 2026-09-17 | 0.7 | **R-17 kapandı** (UAT TLS ile yayında). R-18 açık kalmaya devam ediyor | Bilgi İşlem |
