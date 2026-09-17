@@ -1,12 +1,18 @@
 # Pull Request
 
+<!--
+  BASLIK: Conventional Commits bicimi kullanilir - "feat(uat): ..." gibi.
+  Issue bicimi ("[GOREV] ...") PR'da KULLANILMAZ: squash merge, bu basligi
+  main uzerindeki commit'in konu satiri yapar. Ayrinti: CONTRIBUTING.md §5.1
+-->
+
 ## Bağlantılı issue
 
 <!--
   Zorunlu.
   Closes #42  -> gorev/hata issue'u: issue kapanir, resmi baglanti olusur
   Refs #42    -> gereksinim issue'u: issue acik kalir
-  Ayrinti: CONTRIBUTING.md §5.1
+  Ayrinti: CONTRIBUTING.md §5.2
 -->
 Closes #
 
