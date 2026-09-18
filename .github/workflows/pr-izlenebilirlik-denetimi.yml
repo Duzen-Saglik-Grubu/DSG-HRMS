@@ -77,7 +77,8 @@ jobs:
             // --- 2. Milestone ---
             if (!pr.milestone) {
               eksikler.push(
-                'Milestone atanmamis. PR bir asamaya (A0/A1/A2/A3/AS) bagli olmalidir; ' +
+                'Milestone atanmamis. PR, isin ait oldugu WBS kalemine karsilik gelen ' +
+                'milestone\'a baglanmalidir (A0/A1/A2/A3/A4+/AS veya surec isleri icin SK); ' +
                 'asama planlamasi ve ilerleme olcumu buna dayanir.');
             }
 
