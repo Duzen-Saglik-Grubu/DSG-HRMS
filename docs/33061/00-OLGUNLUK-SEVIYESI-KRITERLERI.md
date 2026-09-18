@@ -1,7 +1,7 @@
 # Olgunluk Seviyesi Kriterleri ve Öz Değerlendirme
 
 **Belge kimliği:** 33061-OSK
-**Son güncelleme:** 2026-09-07
+**Son güncelleme:** 2026-09-18
 **Hedef:** TS ISO/IEC TS 33061 kapsamındaki süreçlerde **Yetenek Seviyesi 2 (Yönetilen Süreç)**
 **Dayanak:** TS ISO/IEC TS 33061 (süreç boyutu) + TS ISO/IEC 33020 (ölçüm çerçevesi, Madde 5)
 
@@ -127,21 +127,32 @@ kanıtın fiilen mevcut olmasına göre yapılır — "yapılacak" olan sayılma
 
 | Süreç | PA 1.1 | PA 2.1 | PA 2.2 | Seviye | Not |
 |---|---|---|---|---|---|
-| TEC.2 Paydaş ihtiyaç ve gereksinimleri | P | — | — | — | Vizyon-kapsam ve paydaş listesi hazır (onay bekliyor); modül gereksinimleri toplanacak |
-| TEC.3 Sistem/yazılım gereksinimleri | — | — | — | — | |
-| TEC.5 Tasarım tanımlama | P | — | — | — | 15 ADR yazıldı (tasarım gerekçesi); tasarım modeli ve arayüz tanımı bekliyor |
-| TEC.7 Gerçekleştirme | — | — | — | — | İskelet kurulmadı |
-| TEC.8 Entegrasyon | — | — | — | — | |
-| TEC.9 Doğrulama | — | — | — | — | |
-| TEC.10 Geçiş | — | — | — | — | Veri envanteri yapıldı |
-| TEC.11 Geçerleme | — | — | — | — | |
-| TEC.13 Bakım | — | — | — | — | |
-| MAN.1 Proje planlama | P | — | — | — | Proje planı, WBS ve RACI hazır (üst yönetim onayı bekliyor) |
-| MAN.2 Proje değerlendirme ve kontrol | — | — | — | — | |
-| MAN.4 Risk yönetimi | P | — | — | — | Risk defteri oluşturuldu |
-| MAN.5 Konfigürasyon yönetimi | P | — | — | — | Git başlatıldı, GitHub kurulumu bekliyor |
-| MAN.6 Bilgi yönetimi | P | — | — | — | Doküman haritası oluşturuldu |
-| MAN.8 Kalite güvence | — | — | — | — | |
+| MAN.4 Risk yönetimi | **F** | L | L | **2** | 18 risk; ölçülüyor, düzeltiliyor, kapanıyor |
+| MAN.1 Proje planlama | L | L | L | 1 | Plan ve RACI **onay bekliyor** → MAN.1(c) eksik |
+| MAN.5 Konfigürasyon yönetimi | L− | L | L | 1 | Konfigürasyon öğeleri belgesi ve denetim yok; CHANGELOG bayat |
+| MAN.6 Bilgi yönetimi | L− | P+ | L− | 1 | Bilgi kayıt defteri, saklama/imha düzeni yok |
+| MAN.8 Kalite güvence | L | L | L | 1 | Ürün değerlendirmesi güçlü; süreç değerlendirmesi ilk kez 18.09'da yapıldı |
+| TEC.5 Tasarım tanımlama | L | L | L | 1 | 16 ADR + OpenAPI; izlenebilirlik yok |
+| TEC.7 Gerçekleştirme | L+ | L | L | 1 | Çalışan iskelet; gereksinim ↔ kod bağı yok |
+| TEC.8 Entegrasyon | L | L | P+ | 1 | UAT yığını çalışıyor; dış arayüzler ve rapor yok |
+| TEC.9 Doğrulama | L+ | L | L− | 1 | 168 test, kontroller kırılarak kanıtlandı; izlenebilirlik yok |
+| TEC.10 Geçiş | L− | L | L | 1 | UAT kuruldu ve TLS ile yayında; göç ve eğitim sırası gelmedi |
+| MAN.2 Proje değerlendirme ve kontrol | P+ | P+ | L | 0 | Ölçütler ölçülmüyor; dönemsel durum raporu yok |
+| TEC.2 Paydaş ihtiyaç ve gereksinimleri | P+ | P+ | L− | 0 | Modül gereksinimleri İK toplantılarıyla gelecek (`KR-068`) |
+| TEC.13 Bakım | P− | P | P | 0 | Üretim yok; yalnızca hata issue'ları |
+| TEC.3 Sistem/yazılım gereksinimleri | N | — | — | 0 | Sırası gelmedi |
+| TEC.11 Geçerleme | N | — | — | 0 | Sırası gelmedi — kabul edilecek modül yok |
+
+**Dayanak:** `MAN.8-kalite-guvence/raporlar/2026-09-18-surec-gozden-gecirme-raporu.md`
+
+> **Seviye 2'nin önündeki en büyük tek engel:** `izlenebilirlik-matrisi.md` hiç
+> oluşturulmadı. Sekiz sürecin çıktı listesinde izlenebilirlik maddesi bulunuyor;
+> matris olmadan hiçbiri `F` alamaz (bkz. rapor, BULGU-01).
+
+> **Ölçek kuralı:** Bu tabloda **yalnızca N/P/L/F** kullanılır. Aşama kapanış belgeleri
+> kendi sözlüğünü ("Kurulmuş", "İşletiliyor" gibi) üretmez; bu tabloya atıf yapar.
+> A1 kapanışında iki farklı ölçek kullanılmıştı ve dereceler birleştirilemiyordu
+> (BULGU-03).
 
 **Seviye sütunu nasıl doldurulur:** PA 1.1 = F **ve** PA 2.1 ≥ L **ve** PA 2.2 ≥ L ise
 Seviye 2. PA 1.1 ≥ L ise Seviye 1. Aksi hâlde Seviye 0.
@@ -169,3 +180,4 @@ Seviye 2. PA 1.1 ≥ L ise Seviye 1. Aksi hâlde Seviye 0.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-04 | 0.1 | TS ISO/IEC 33020 incelemesi sonrası ilk oluşturma | Bilgi İşlem |
+| 2026-09-18 | 0.2 | §6 öz değerlendirme tablosu ilk kez gerçek kanıtla güncellendi; 15 süreç derecelendirildi (MAN.8 süreç gözden geçirmesi) | Bilgi İşlem |

@@ -3,7 +3,7 @@
 **Proje:** DSG-HRMS — Düzen Sağlık Grubu İnsan Kaynakları Yönetim Sistemi
 **Amaç:** Bu doküman, TS ISO/IEC TS 33061 Seviye 2 kapsamında üretilen tüm kanıtların nerede tutulduğunu tek sayfadan gösterir. Bir denetçi ya da yeni katılan bir ekip üyesi aradığı kaydı buradan bulur.
 
-**Son güncelleme:** 2026-09-07
+**Son güncelleme:** 2026-09-18
 **Doküman sahibi:** Bilgi İşlem Birim Sorumlusu
 
 ---
@@ -219,6 +219,7 @@ Aşağıdaki tablolarda "33061 Süreç Çıktısı" sütunu, standardın Madde 5
 | Kalite güvence sistemi | CI/CD kalite kapıları (GitHub Actions) |
 | Düzeltici faaliyet | GitHub Issue (etiket: `duzeltici-faaliyet`) |
 | Kalite güvence raporu | `raporlar/` — dönemsel kalite raporu |
+| **Süreç değerlendirme raporu** (`MAN.8.BP3`) | `raporlar/YYYY-AA-GG-surec-gozden-gecirme-raporu.md` — 33061 süreçlerinin standarda karşı değerlendirilmesi |
 | Olay ve problem kayıtları | GitHub Issue (etiket: `hata`) |
 
 ---
@@ -258,3 +259,4 @@ Bazı kanıtlar birden fazla sürece hizmet eder. Tek kopya tutulur:
 |---|---|---|---|
 | 2026-09-03 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-07 | 0.2 | Karar kayıt defteri, ADR dizini, modül listesi ve vizyon-kapsam belgeleri haritaya eklendi | Bilgi İşlem |
+| 2026-09-18 | 0.3 | MAN.8 çıktılarına **süreç değerlendirme raporu** eklendi (`MAN.8.BP3`) | Bilgi İşlem |
