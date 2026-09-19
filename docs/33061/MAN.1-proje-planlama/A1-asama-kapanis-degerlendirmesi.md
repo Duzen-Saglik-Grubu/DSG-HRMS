@@ -234,8 +234,16 @@ konteyner açıkları, nginx başlık kalıtımı, raporlamada kişi–sicil kar
 | TEC.11 Geçerleme | — | **Başlamadı** | UAT sunucusu bekleniyor |
 | MAN.4 Risk Yönetimi | İşletiliyor | **İşletiliyor** | Bu belgede gözden geçirme yapıldı |
 
-> **Not:** Bu bir **öz değerlendirmedir**, resmî derecelendirme değildir. Belgelenmiş
-> Seviye 2 kriterleri belgelendirme kuruluşundan alındığında yeniden değerlendirilecektir.
+> **Not:** Bu bir **öz değerlendirmedir**, resmî derecelendirme değildir.
+>
+> **Sonradan düşülen not (18.09.2026):** Bu tabloda kullanılan sözlük
+> ("Kurulmuş / İşletiliyor / Kısmen / Başlamadı") TS ISO/IEC 33020'de yer almaz ve
+> N/P/L/F ölçeğiyle birleştirilemediği için yetenek seviyesine yuvarlanamıyordu.
+> 18.09.2026 tarihli süreç gözden geçirmesinde bu bir bulgu olarak kaydedildi
+> (BULGU-03) ve derecelendirme 33020 ölçeğine taşındı. **Tablo olduğu gibi
+> bırakılmıştır** — o gün yapılan değerlendirmenin kaydıdır. Güncel dereceler için:
+> `docs/33061/00-OLGUNLUK-SEVIYESI-KRITERLERI.md` §6 ve
+> `docs/33061/MAN.8-kalite-guvence/raporlar/2026-09-18-surec-gozden-gecirme-raporu.md`.
 
 ---
 
