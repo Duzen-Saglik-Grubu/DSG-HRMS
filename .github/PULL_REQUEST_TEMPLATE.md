@@ -61,6 +61,9 @@ Closes #
 - [ ] İlgili dokümanlar güncellendi
 - [ ] Yeni mimari karar alındıysa **ADR yazıldı**
 - [ ] Karar kayıt defteri güncellendi (gerekiyorsa)
+- [ ] **İzlenebilirlik matrisi** güncellendi — gereksinim, tasarım, kod veya test
+      değiştiyse zorunlu. Ayrı bir işe bırakılan izlenebilirlik kaydı çürür
+      (`docs/33061/izlenebilirlik-matrisi.md` §3)
 
 ---
 
