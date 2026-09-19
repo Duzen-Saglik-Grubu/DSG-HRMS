@@ -255,10 +255,43 @@ toplantısıyla başlar** (`KR-068`) — T1 dâhil.
 
 | WBS düzeyi | GitHub karşılığı |
 |---|---|
-| Aşama (1–7) | Milestone |
+| Aşama (1–7) | Milestone — **yedisinin de karşılığı vardır** |
 | Modül (T/Y/İ) | Issue etiketi (`modul:izin`, `modul:kimlik` …) + Milestone |
 | Alt kalem (`.1`–`.11`) | Issue |
 | Görev | Issue içindeki kontrol listesi veya alt issue |
+
+### 5.1 Milestone karşılıkları
+
+| WBS kalemi | Milestone |
+|---|---|
+| 1. Hazırlık ve Planlama | `A0 — Hazırlık ve Planlama` |
+| 2. Teknik İskelet | `A1 — Teknik İskelet` |
+| 3. Temel Modüller | `A2 — Temel Modüller` |
+| 4. Yatay Altyapı Modülleri | `A3 — Yatay Altyapı` |
+| 5. İş Modülleri | `A4+` (modül grupları hâlinde açılır) |
+| 6. Veri Göçü ve Geçiş | `AS — Geçiş ve Devreye Alma` |
+| 7. Süreç Yönetimi ve Kanıt (sürekli) | `SK — Süreç ve Kalite (sürekli)` |
+
+### 5.2 Hangi milestone? — tek cümlelik kural
+
+> **Bir issue veya PR, işin ait olduğu WBS kalemine karşılık gelen milestone'a atanır;
+> işin ne zaman yapıldığına göre değil.**
+
+Bu kural, aşağıdaki üç yanlışı birden engeller:
+
+1. **Aşama kapandı diye işi bir sonraki aşamaya yazmak.** A1 teslim edilen iskeletteki
+   bir kusur, A1 kapandıktan sonra düzeltilse bile **A1'e** aittir. Aksi hâlde A1
+   olduğundan temiz, sonraki aşama olduğundan yüklü görünür. (Kapalı bir milestone'a
+   atama yapmak için milestone geçici olarak açılır ve iş bitince yeniden kapatılır.)
+2. **Süreç işlerini bir ürün aşamasına yazmak.** Düzeltici faaliyetler, gözden
+   geçirmeler ve öz değerlendirme **7. kaleme** aittir; bir aşamaya değil.
+3. **Etiket ile milestone'un çelişmesi.** Süreç etiketi `surec:TEC.10` (Geçiş) olan bir
+   iş, `A2 — Temel Modüller` altında duramaz.
+
+> **Neden önemli:** Milestone, aşama ilerlemesinin **ölçüldüğü** yerdir
+> (`PA 2.1 (c)`). Yanlış atama, ölçüyü sessizce bozar: 18.09.2026 gözden geçirmesinde
+> A2 "12 kapalı" görünüyordu, oysa **tek bir temel modül işi yapılmamıştı**
+> (BULGU-08).
 
 **Pano sütunları:** `Backlog` → `In Progress` → `Review` → `Done`
 
@@ -278,3 +311,4 @@ toplantısıyla başlar** (`KR-068`) — T1 dâhil.
 |---|---|---|---|
 | 2026-09-07 | 0.1 | İlk oluşturma — 7 aşama, 35 modül, kritik yol | Bilgi İşlem |
 | 2026-09-17 | 0.2 | Modül başlangıç koşulu eklendi: her modül kendi İK gereksinim toplantısıyla başlar (`KR-068`) | Bilgi İşlem |
+| 2026-09-18 | 0.3 | §5 milestone eşlemesi tamamlandı ve atama kuralı yazıldı; WBS 7 için `SK` milestone'u açıldı (BULGU-08) | Bilgi İşlem |
