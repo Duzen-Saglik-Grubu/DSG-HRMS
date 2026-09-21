@@ -137,6 +137,13 @@ iskeletle İK'ya açılması, beklenti yönetimi açısından uygun görülmedi.
 
 LOGO verisi 2026-09-12 tarihinde yeniden ölçüldü.
 
+> **Sonradan düşülen not (2026-09-21):** İK, iletişim bilgisi eksik personelin
+> kayıtlarını LOGO üzerinde düzeltti ve ölçüm yenilendi: kurumsal e-postası olmayan
+> **38 → 5**, hiçbir iletişim bilgisi olmayan **12 → 4**, kişisel e-posta kullanan
+> **59 → 0**; `R-13` kapandı. **Aşağıdaki tablo A1 kapanışındaki durumun kaydıdır ve
+> değiştirilmemiştir.** Güncel değerler:
+> `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.5–§1.6.
+
 **Kapsam: 564 aktif kişi / 584 sicil kaydı.** Bir kişinin birden fazla sicili
 olabildiği için (LOGO'da 140 kişi) sayımlar **kişi (TCKN) bazındadır**.
 

@@ -111,38 +111,42 @@ tamamının personeli tek tabloda tutulmakta, firma ayrımı `FIRMNR` alanı ile
 Üyelik akışında kişi TCKN, doğum tarihi ve kurumsal e-posta ile eşleştirilecek; doğrulama
 kodu LOGO'da kayıtlı kurumsal e-posta veya cep telefonuna gönderilecektir.
 
-**Ölçüm kapsamı (`KR-034`):** aktif personel, `0001000` sicili hariç → **583 kişi**
-**Ölçüm tarihi:** 2026-09-09
+**Ölçüm kapsamı (`KR-034`):** aktif personel, `0001000` sicili hariç →
+**564 kişi / 584 sicil kaydı**
+**Ölçüm tarihi:** 2026-09-21 (önceki ölçüm: 2026-09-09)
 
-| Alan | Dolu | Eksik | Kaynak |
-|---|---:|---:|---|
-| **TCKN** | 583 | **0** ✅ | `LH_001_PERSON.TTFNO` |
-| **Doğum tarihi** | 583 | **0** ✅ | `LH_001_PERSON.BIRTHDATE` |
-| Kurumsal e-posta | 545 | **38** | `LH_001_CONTACT` (`TYP=6`) |
-| Cep telefonu | 570 | **13** | `LH_001_CONTACT` (`TYP=3`) |
+> **İK düzeltme çalışması yaptı.** Bu tablo, İK biriminin LOGO üzerinde yaptığı
+> iletişim bilgisi tamamlamasının ardından yeniden ölçülmüştür. Parantez içindeki
+> değerler önceki ölçümdür.
+
+| Alan | Dolu | Eksik | Önceki | Kaynak |
+|---|---:|---:|---:|---|
+| **TCKN** | 584 | **0** ✅ | 0 | `LH_001_PERSON.TTFNO` |
+| **Doğum tarihi** | 584 | **0** ✅ | 0 | `LH_001_PERSON.BIRTHDATE` |
+| Kurumsal e-posta | 579 | **5** | 38 | `LH_001_CONTACT` (`TYP=6`) |
+| Cep telefonu | 572 | **12** | 13 | `LH_001_CONTACT` (`TYP=3`) |
 
 **Ek kontroller:**
 
-| Kontrol | Sonuç |
-|---|---:|
-| Telefon biçimi geçersiz (normalize edilince 10 haneli ve `5` ile başlamıyor) | **1** |
-| **Ne e-posta ne telefon — hiçbir iletişim bilgisi yok** | **12** ⚠️ |
+| Kontrol | Sonuç | Önceki |
+|---|---:|---:|
+| Telefon biçimi geçersiz (normalize edilince 10 haneli ve `5` ile başlamıyor) | **0** ✅ | 1 |
+| **Ne e-posta ne telefon — hiçbir iletişim bilgisi yok** | **4** ⚠️ | 12 |
 
 > **İyi haber:** Aktif personelin tamamında TCKN ve doğum tarihi doludur. Üyelik akışının
 > kimlik eşleştirme adımı bu iki alan açısından sorunsuz çalışacaktır.
 
-**⚠️ En kritik bulgu — 12 personel hiçbir kanaldan doğrulanamaz.**
+**⚠️ En kritik bulgu — 4 personel hiçbir kanaldan doğrulanamaz.** (önceki ölçümde 12)
 
-38 kişide e-posta, 13 kişide telefon eksiktir; ancak bu iki kümenin **kesişimi 12
-kişidir**. Yani:
+5 kişide e-posta, 12 kişide telefon eksiktir; bu iki kümenin **kesişimi 4 kişidir**:
 
-| Durum | Kişi | Sonuç |
-|---|---:|---|
-| Yalnız e-posta eksik (telefonu var) | 26 | SMS ile doğrulanabilir |
-| Yalnız telefon eksik (e-postası var) | 1 | E-posta ile doğrulanabilir |
-| **İkisi de eksik** | **12** | **Hiçbir kanaldan doğrulanamaz** |
+| Durum | Kişi | Önceki | Sonuç |
+|---|---:|---:|---|
+| Yalnız e-posta eksik (telefonu var) | 1 | 26 | SMS ile doğrulanabilir |
+| Yalnız telefon eksik (e-postası var) | 8 | 1 | E-posta ile doğrulanabilir |
+| **İkisi de eksik** | **4** | **12** | **Hiçbir kanaldan doğrulanamaz** |
 
-Bu 12 kişi, sistem devreye alındığında **kendi başına üye olamaz.** İki seçenek vardır:
+Bu 4 kişi, sistem devreye alındığında **kendi başına üye olamaz.** İki seçenek vardır:
 
 1. İK, devreye alma öncesinde bu kişilerin iletişim bilgilerini LOGO'da tamamlar
    (**tercih edilen**), veya
@@ -171,25 +175,30 @@ ve **kurum denetiminde** olması bir güvenlik gereksinimidir. Aktif personel ü
 
 **Alan adı dağılımı:**
 
-| Alan adı | Kişi | Değerlendirme |
-|---|---:|---|
-| `@duzen.com.tr` | 478 | Kurumsal ✅ |
-| `@gmail.com` | 50 | Kurumsal değil ⚠️ |
-| `@hotmail.com` | 5 | Kurumsal değil ⚠️ |
-| `@zeytinim.com` | 5 | Kurumsal ✅ |
-| `@icloud.com` | 3 | Kurumsal değil ⚠️ |
-| `@labpt.com.tr` | 3 | Kurumsal ✅ |
-| `@yahoo.com` | 2 | Kurumsal değil ⚠️ |
+| Alan adı | Kayıt | Önceki | Değerlendirme |
+|---|---:|---:|---|
+| `@duzen.com.tr` | 522 | 478 | Kurumsal ✅ |
+| `@zeytinim.com` | 54 | 5 | Kurumsal ✅ |
+| `@labpt.com.tr` | 3 | 3 | Kurumsal ✅ |
+| `@gmail.com` | **0** | 50 | Kurumsal değil |
+| `@hotmail.com` | **0** | 5 | Kurumsal değil |
+| `@icloud.com` | **0** | 3 | Kurumsal değil |
+| `@yahoo.com` | **0** | 2 | Kurumsal değil |
 
-> Yukarıdaki dağılım 2026-09-04 ölçümüne aittir. LOGO canlı bir sistem olduğu için toplam
-> sayılar günden güne birkaç kayıt oynayabilir (bkz. §1.7).
+> Dağılım 2026-09-21 ölçümüne aittir (önceki: 2026-09-04). LOGO canlı bir sistem olduğu
+> için toplam sayılar günden güne birkaç kayıt oynayabilir (bkz. §1.7).
 
-**Bulgu 1 — Kurumsal olmayan adres: 59 aktif personel** (2026-09-05 ölçümü).
-Doğrulama kodu, kurum denetiminde olmayan kişisel bir posta kutusuna gider. Personel işten
-ayrıldıktan sonra da bu kutuya erişimi devam eder; kurum bu erişimi kesemez.
-→ Risk `R-13`
+**Bulgu 1 — Kurumsal olmayan adres: 0 aktif personel** (2026-09-21 ölçümü; önceki
+ölçümde 59). İK, kişisel adreslerin tamamını kurumsal adreslerle değiştirmiştir.
+→ Risk `R-13` **kapandı**
 
-**Bulgu 2 — Paylaşılan e-posta adresi: 4 personel, 2 adres.**
+> **Teknik kontrol kaldırılmaz.** Bugün kişisel adres bulunmaması, yarın da
+> bulunmayacağı anlamına gelmez: LOGO canlı bir sistemdir ve yeni kayıt her gün
+> açılabilir. Kurumsal olmayan adrese doğrulama kodu göndermeme kuralı
+> (`REQ-KMLK-008`, `KR-019`) kalıcı bir kontroldür.
+
+**Bulgu 2 — Paylaşılan e-posta adresi: 4 personel, 1 adres** (2026-09-21 ölçümü;
+değişmedi).
 İki e-posta adresi, farklı TCKN'li birden fazla aktif personele tanımlıdır. Bu, İK
 biriminin öngördüğü durumu doğrular: kurumsal adresi olmayan personele başka bir kişinin
 (örneğin sorumlusunun) adresi tanımlanmış olabilir. Kontrol yalnızca belirli bir görev
