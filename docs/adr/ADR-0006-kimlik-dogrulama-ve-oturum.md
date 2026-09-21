@@ -92,23 +92,48 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
 
 ### 6. Parola politikası
 
-- En az **12 karakter**. Karmaşıklık kuralı (büyük/küçük/rakam/simge) **dayatılmaz** —
-  uzunluk daha etkilidir ve kullanıcıyı tahmin edilebilir kalıplara itmez.
+- En az **6 karakter** (`KR-070`, 21.09.2026). Karmaşıklık kuralı (büyük/küçük/rakam/simge)
+  **dayatılmaz**. İki değer de Sistem Yönetimi parametresidir.
+
+  > **Bu değer bilinçli bir ödündür.** ADR'nin ilk sürümü 12 karakter öngörüyordu;
+  > uzunluk karmaşıklıktan etkilidir ve bu teknik değerlendirme **değişmemiştir**.
+  > Ancak kullanıcıların önemli bölümü seyrek kullanıcıdır ve uzun parola, parola
+  > unutma ile hesap kilitlenme vakalarını artırmaktadır. Karar, aşağıdaki telafi
+  > edici kontrollerle birlikte alınmıştır ve bu kontroller **devre dışı
+  > bırakılamaz**: sızmış parola kontrolü, hesap kilitleme (§5) ve tek aktif oturum.
+  > Değer parametre olduğu için ihtiyaç doğduğunda artırılabilir.
 - **Sızmış parola kontrolü:** yaygın sızıntı listesi uygulama içinde çevrimdışı
   tutulur; listede olan parola kabul edilmez. Dış servise sorgu yapılmaz.
+  **En az uzunluk 6'ya indirildikten sonra bu kontrol, parola güvenliğinin asıl
+  dayanağıdır** (`KR-070`).
 - Saklama: **ASP.NET Core Identity varsayılanı** (PBKDF2, yüksek yineleme sayısı) veya
   eşdeğeri. Parola hiçbir koşulda geri döndürülebilir biçimde saklanmaz.
-- Zorunlu periyodik parola değişimi **uygulanmaz** (güncel güvenlik rehberleri bunu
-  önermiyor; kullanıcıyı zayıf kalıplara itiyor).
+- Zorunlu periyodik parola değişimi **varsayılan olarak uygulanmaz** (güncel güvenlik
+  rehberleri bunu önermiyor; kullanıcıyı zayıf kalıplara itiyor). Sistem Yönetimi
+  parametresiyle açılabilir.
 - Parola sıfırlama, üyelik akışıyla aynı doğrulama mekanizmasını kullanır.
 
 ### 7. İki aşamalı doğrulama (2FA)
 
-Giriş sonrası 2FA **uygulanmayacaktır** (`KR-017`). Gerekçe: uygulama yalnızca yerel
-ağda çalışacak, dışarıya açılmayacaktır; kullanım kolaylığı önceliklendirilmiştir.
+2FA **geliştirilecek**, ancak Sistem Yönetimi parametresiyle yönetilecek ve
+**varsayılan değeri KAPALI** olacaktır (`KR-069`, 21.09.2026).
 
-> **Not:** Uygulama ileride internete açılırsa bu karar **yeniden değerlendirilmelidir.**
-> Bu, ADR'nin gözden geçirme tetikleyicisidir.
+> **Bu, `KR-017`'nin yerini alır.** Önceki karar 2FA'yı tümüyle kapsam dışı
+> bırakıyordu. Gerekçesi — uygulamanın yalnızca yerel ağda çalışması — hâlâ geçerli;
+> değişen şey, işlevi **hiç geliştirmemenin** ileride yeni sürüm beklemek anlamına
+> gelmesidir. Geliştirip kapalı tutmak, kararı kod değişikliği olmadan tersine
+> çevirmeyi mümkün kılar.
+
+**Uygulama kuralları:**
+
+- 2FA açıkken, parola doğrulandıktan sonra doğrulama kodu istenir. Kod, üyelik
+  akışıyla **aynı altyapıyı** kullanır (§3): aynı uzunluk, aynı süre, aynı deneme
+  sınırı, hash'li saklama, tek kullanımlık. İkinci bir kod mekanizması kurulmaz.
+- Parametrenin **açık ve kapalı hâli ayrı ayrı test edilir.** Varsayılanı kapalı olan
+  bir işlev test edilmezse ilk açıldığı gün bozuk çıkar.
+- Parametre açılmadan önce, hiçbir doğrulama kanalı bulunmayan personel listelenir ve
+  uyarı verilir. Aksi hâlde bu kişiler (12 aktif personel, `R-12`) sisteme **giremez**
+  hâle gelir ve nedeni anlaşılmaz.
 
 ### 8. Oturum yönetimi
 
@@ -161,7 +186,8 @@ JavaScript ile okunabilir. `HttpOnly` çerez okunamaz.
 (enumeration, XSS, jeton çalınması, kaba kuvvet) baştan ele alınmış.
 
 **Olumsuz / kabul edilen ödünler:**
-- 2FA yok; bu, ağın yerel olmasına dayanan bir varsayımdır. Varsayım değişirse karar
+- 2FA varsayılan olarak kapalıdır; bu, ağın yerel olmasına dayanan bir varsayımdır.
+  Varsayım değişirse **parametre açılır** — geliştirme gerekmez. Karar
   yeniden değerlendirilecektir.
 - Kurumsal e-postası olmayan 39 personel devreye alma öncesi İK tarafından
   tamamlanmazsa üyelik akışında sorun yaşayacaktır (`R-08`).
@@ -183,3 +209,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-09-21 | 0.2 | §6 parola uzunluğu 12 → 6 (`KR-070`); §7 yeniden yazıldı: 2FA geliştirilecek, varsayılan kapalı (`KR-069`, `KR-017` yürürlükten kalktı) | Bilgi İşlem |
