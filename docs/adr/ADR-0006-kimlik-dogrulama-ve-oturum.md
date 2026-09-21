@@ -132,7 +132,7 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
 - Parametrenin **açık ve kapalı hâli ayrı ayrı test edilir.** Varsayılanı kapalı olan
   bir işlev test edilmezse ilk açıldığı gün bozuk çıkar.
 - Parametre açılmadan önce, hiçbir doğrulama kanalı bulunmayan personel listelenir ve
-  uyarı verilir. Aksi hâlde bu kişiler (12 aktif personel, `R-12`) sisteme **giremez**
+  uyarı verilir. Aksi hâlde bu kişiler (2026-09-21 ölçümüyle 4 aktif personel, `R-08`) sisteme **giremez**
   hâle gelir ve nedeni anlaşılmaz.
 
 ### 8. Oturum yönetimi

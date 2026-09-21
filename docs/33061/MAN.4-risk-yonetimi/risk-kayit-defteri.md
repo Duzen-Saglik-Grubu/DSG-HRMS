@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-09-17
+**Son güncelleme:** 2026-09-21
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -109,10 +109,10 @@ raporunda ayrıca ele alınır.
 | | |
 |---|---|
 | **Kategori** | Veri Kalitesi / Devreye Alma |
-| **Açıklama** | 583 aktif personelin **38'inde kurumsal e-posta**, **13'ünde cep telefonu** kayıtlı değildir; **12'sinde ise ikisi de yoktur**. Bu 12 kişi **hiçbir kanaldan** doğrulama kodu alamaz ve kendi başına üye olamaz. Ayrıca 1 kişinin telefon numarası geçerli cep biçiminde değildir. Kurumsal adresi olmayanlar için SMS doğrulaması zorunlu kılınmadığından (`KR-020`), kalıcı çözüm veri düzeltmesidir. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.5) |
-| **O / E / Puan** | 3 / 2 / **6** |
+| **Açıklama** | **Güncel ölçüm (2026-09-21):** 584 aktif kayıttan **5'inde kurumsal e-posta**, **12'sinde cep telefonu** kayıtlı değildir; **4'ünde ise ikisi de yoktur**. Bu 4 kişi **hiçbir kanaldan** doğrulama kodu alamaz ve kendi başına üye olamaz. Geçersiz telefon biçimi kalmamıştır. **Önceki ölçüm (2026-09-09):** 38 / 13 / 12 ve 1 geçersiz numara. İK'nın LOGO üzerinde yaptığı düzeltme, hiçbir kanaldan doğrulanamayan kişi sayısını **12'den 4'e** indirdi. Kurumsal adresi olmayanlar için SMS doğrulaması zorunlu kılınmadığından (`KR-020`), kalıcı çözüm veri düzeltmesidir. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.5) |
+| **O / E / Puan** | 2 / 2 / **4** (önceki: 3 / 2 / 6 — olasılık, etkilenen kişi sayısı 12'den 4'e indiği için düşürüldü) |
 | **Sahibi** | İK Birimi |
-| **Önlem** | (0) **Öncelik: iletişim bilgisi hiç olmayan 12 kişi.** Bu kişiler tamamlanmadan sisteme giremezler. (1) İK, devreye alma öncesinde eksik iletişim bilgilerini LOGO'da tamamlayacak. (2) Sistem, eksik iletişim bilgisi olan aktif personeli listeleyen bir yönetim raporu sunacak. (3) Hiçbir iletişim bilgisi olmayan personel için İK'nın gerekçe girerek hesap açabildiği, tam loglanan **istisna akışı** tasarlanacak (Kullanıcı Yönetimi modülü). |
+| **Önlem** | (0) **Öncelik: iletişim bilgisi hiç olmayan 4 kişi.** Bu kişiler tamamlanmadan sisteme giremezler. (1) İK, devreye alma öncesinde eksik iletişim bilgilerini LOGO'da tamamlayacak. (2) Sistem, eksik iletişim bilgisi olan aktif personeli listeleyen bir yönetim raporu sunacak. (3) Hiçbir iletişim bilgisi olmayan personel için İK'nın gerekçe girerek hesap açabildiği, tam loglanan **istisna akışı** tasarlanacak (Kullanıcı Yönetimi modülü). |
 | **Durum** | Açık |
 
 ### R-09 — Mevcut sistemin PostgreSQL 14 sürümünün destek dışına çıkması
@@ -149,11 +149,11 @@ raporunda ayrıca ele alınır.
 | | |
 |---|---|
 | **Kategori** | Güvenlik |
-| **Açıklama** | 584 aktif personelin **59'unda** LOGO'da kayıtlı e-posta adresi kişisel bir adrestir (gmail, hotmail, icloud, yahoo). Doğrulama kodu kurum denetimi dışındaki bir posta kutusuna gider. Personel işten ayrıldıktan sonra da bu kutuya erişimi sürer; kurum erişimi kesemez. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.6) |
-| **O / E / Puan** | 3 / 2 / **6** |
+| **Açıklama** | **Güncel ölçüm (2026-09-21): 0 kişi.** İK, kişisel adreslerin tamamını kurumsal adreslerle değiştirmiştir. **Önceki ölçüm (2026-09-05):** 584 aktif kayıttan 59'unda e-posta adresi kişisel bir adresti (gmail, hotmail, icloud, yahoo); doğrulama kodu kurum denetimi dışındaki bir posta kutusuna gidiyordu. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.6) |
+| **O / E / Puan** | 3 / 2 / **6** (gerçekleşmedi; veri düzeltmesiyle ortadan kalktı) |
 | **Sahibi** | İK Birimi + Bilgi İşlem |
 | **Önlem** | (1) İK, kurumsal e-posta adresi olmayan personele kurumsal adres tanımlayacak. Kalıcı çözüm veri düzeltmesidir; kurumsal adresi olmayanlar için SMS doğrulaması **zorunlu kılınmayacaktır** (`KR-020`). (2) Sistem, kabul edilen kurumsal alan adlarını (`@duzen.com.tr`, `@zeytinim.com`, `@labpt.com.tr`) **yapılandırılabilir bir liste** olarak tutacak; liste dışı adreslere e-posta ile doğrulama kodu gönderilmeyecek. (3) Bu kural Kullanıcı Yönetimi modülü gereksinimlerinde karara bağlanacaktır. |
-| **Durum** | Açık |
+| **Durum** | **Kapandı — 2026-09-21.** Ölçüm 0 kişi. **Teknik kontrol kaldırılmaz:** LOGO canlı bir sistemdir, yeni kayıt her gün açılabilir. Kurumsal olmayan adrese doğrulama kodu göndermeme kuralı (`KR-019`, `REQ-KMLK-008`) kalıcıdır; risk kapanmıştır, kural kapanmaz |
 
 ### R-11 — TSE standard dokümanının telif ihlali oluşturacak şekilde paylaşılması
 | | |
@@ -204,14 +204,15 @@ raporunda ayrıca ele alınır.
 | Puan | Risk sayısı | Riskler |
 |---|---:|---|
 | 9 | 2 | R-01, R-18 |
-| 6 | 8 | R-03, R-04, R-05, R-06, R-08, R-12, R-13, R-15 |
-| 4 | 3 | R-09, R-14, R-16 |
+| 6 | 6 | R-03, R-04, R-05, R-06, R-12, R-15 |
+| 4 | 4 | **R-08**, R-09, R-14, R-16 |
 | 3 | 1 | R-02 |
-| Kapandı | 4 | R-07, R-10, R-11, **R-17** |
+| Kapandı | 5 | R-07, R-10, R-11, R-17, **R-13** |
 
-**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-08, R-12, R-13, R-15, R-18
+**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-12, R-15, R-18
 
-**Son gözden geçirme:** 2026-09-16 — `R-18` (elle sertifika yenilemesi) eklendi; R-17'nin önlemi Let's Encrypt / DNS-01 kararıyla güncellendi. Bu gözden geçirmede, R-17 eklenirken **özet tablosunun güncellenmediği** fark edildi ve düzeltildi: kayıt eklemek yeterli değildir, özet de aynı anda güncellenmelidir.
+**Son gözden geçirme:** 2026-09-21 — LOGO verisi, İK'nın düzeltme çalışmasından sonra yeniden ölçüldü. `R-13` **kapandı** (kişisel e-posta 59 → 0); `R-08` puanı 6'dan 4'e düştü (hiçbir iletişim bilgisi olmayan kişi 12 → 4); `R-12` değişmedi (4 kişi / 1 adres).
+Önceki: 2026-09-16 — `R-18` (elle sertifika yenilemesi) eklendi; R-17'nin önlemi Let's Encrypt / DNS-01 kararıyla güncellendi. Bu gözden geçirmede, R-17 eklenirken **özet tablosunun güncellenmediği** fark edildi ve düzeltildi: kayıt eklemek yeterli değildir, özet de aynı anda güncellenmelidir.
 Önceki: 2026-09-08 — `R-16` (dal koruma kısıtı) eklendi; GitHub kurulumu sırasında tespit edildi.
 Önceki: 2026-09-07 — `R-15` (kapsam büyüklüğü) eklendi; `R-02`'nin
 olasılığı, LOGO sürüm yükseltmelerinin TRISOFT tarafından önceden bildirildiği ve geçmiş
@@ -252,3 +253,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-09-15 | 0.5 | R-17 eklendi (UAT ortamında TLS bulunmaması) | Bilgi İşlem |
 | 2026-09-16 | 0.6 | R-17 önlemi güncellendi (Let's Encrypt / DNS-01 kararı); **R-18** eklendi (elle yenileme nedeniyle sertifika süresinin dolması) | Bilgi İşlem |
 | 2026-09-17 | 0.7 | **R-17 kapandı** (UAT TLS ile yayında). R-18 açık kalmaya devam ediyor | Bilgi İşlem |
+| 2026-09-21 | 0.8 | LOGO verisi yeniden ölçüldü: **R-13 kapandı** (kişisel e-posta 59 → 0); R-08 ölçümü güncellendi ve puanı 6 → 4 düştü (12 → 4 kişi); R-12 değişmedi | Bilgi İşlem |
