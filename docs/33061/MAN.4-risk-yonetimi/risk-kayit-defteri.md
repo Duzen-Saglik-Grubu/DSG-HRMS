@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-09-21
+**Son güncelleme:** 2026-09-22
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -109,10 +109,10 @@ raporunda ayrıca ele alınır.
 | | |
 |---|---|
 | **Kategori** | Veri Kalitesi / Devreye Alma |
-| **Açıklama** | **Güncel ölçüm (2026-09-21):** 584 aktif kayıttan **5'inde kurumsal e-posta**, **12'sinde cep telefonu** kayıtlı değildir; **4'ünde ise ikisi de yoktur**. Bu 4 kişi **hiçbir kanaldan** doğrulama kodu alamaz ve kendi başına üye olamaz. Geçersiz telefon biçimi kalmamıştır. **Önceki ölçüm (2026-09-09):** 38 / 13 / 12 ve 1 geçersiz numara. İK'nın LOGO üzerinde yaptığı düzeltme, hiçbir kanaldan doğrulanamayan kişi sayısını **12'den 4'e** indirdi. Kurumsal adresi olmayanlar için SMS doğrulaması zorunlu kılınmadığından (`KR-020`), kalıcı çözüm veri düzeltmesidir. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.5) |
-| **O / E / Puan** | 2 / 2 / **4** (önceki: 3 / 2 / 6 — olasılık, etkilenen kişi sayısı 12'den 4'e indiği için düşürüldü) |
+| **Açıklama** | **Güncel ölçüm (2026-09-22):** 564 aktif kişiden **4'ünde kurumsal e-posta**, **10'unda cep telefonu** kayıtlı değildir; **2'sinde ise ikisi de yoktur**. Bu 2 kişi **hiçbir kanaldan** doğrulama kodu alamaz ve kendi başına üye olamaz. Geçersiz telefon biçimi kalmamıştır. **Önceki ölçümler:** 21.09.2026 → 5 / 12 / 4; 09.09.2026 → 38 / 13 / 12 ve 1 geçersiz numara. İK'nın iki turda yaptığı düzeltme, hiçbir kanaldan doğrulanamayan kişi sayısını **12 → 4 → 2**'ye indirdi. Kurumsal adresi olmayanlar için SMS doğrulaması zorunlu kılınmadığından (`KR-020`), kalıcı çözüm veri düzeltmesidir. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.5) |
+| **O / E / Puan** | 2 / 2 / **4** (ilk değer 3 / 2 / 6 idi; etkilenen kişi sayısı 12'den 2'ye indiği için olasılık düşürüldü. Puan 4'te tutuluyor: kalan 2 kişi düzeltilmezse etki KESİNDİR — o kişiler sisteme giremez) |
 | **Sahibi** | İK Birimi |
-| **Önlem** | (0) **Öncelik: iletişim bilgisi hiç olmayan 4 kişi.** Bu kişiler tamamlanmadan sisteme giremezler. (1) İK, devreye alma öncesinde eksik iletişim bilgilerini LOGO'da tamamlayacak. (2) Sistem, eksik iletişim bilgisi olan aktif personeli listeleyen bir yönetim raporu sunacak. (3) Hiçbir iletişim bilgisi olmayan personel için İK'nın gerekçe girerek hesap açabildiği, tam loglanan **istisna akışı** tasarlanacak (Kullanıcı Yönetimi modülü). |
+| **Önlem** | (0) **Öncelik: iletişim bilgisi hiç olmayan 2 kişi.** Bu kişiler tamamlanmadan sisteme giremezler. (1) İK, devreye alma öncesinde eksik iletişim bilgilerini LOGO'da tamamlayacak. (2) Sistem, eksik iletişim bilgisi olan aktif personeli listeleyen bir yönetim raporu sunacak. (3) Hiçbir iletişim bilgisi olmayan personel için İK'nın gerekçe girerek hesap açabildiği, tam loglanan **istisna akışı** tasarlanacak (Kullanıcı Yönetimi modülü). |
 | **Durum** | Açık |
 
 ### R-09 — Mevcut sistemin PostgreSQL 14 sürümünün destek dışına çıkması
@@ -139,11 +139,11 @@ raporunda ayrıca ele alınır.
 | | |
 |---|---|
 | **Kategori** | Güvenlik / Veri Kalitesi |
-| **Açıklama** | **2026-09-12 ölçümü: 1 e-posta adresi, 4 ayrı kişiye (farklı TCKN) tanımlıdır.** Üyelik doğrulama kodu bu adrese gideceği için, posta kutusuna erişimi olan kişi **başkasının adına hesap açabilir** ve o kişinin özlük verilerine erişebilir. Kontrol tüm aktif personel üzerinde çalıştırılmıştır, belirli bir görev grubuyla sınırlı değildir. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.6) |
-| **O / E / Puan** | 2 / 3 / **6** |
+| **Açıklama** | **Güncel ölçüm (2026-09-22): 0 paylaşılan adres.** İK, paylaşılan adres kullanan personele kendilerine ait e-posta adresi tanımlamıştır. **Önceki ölçüm (2026-09-12 ve 2026-09-21): 1 e-posta adresi, 4 ayrı kişiye (farklı TCKN) tanımlıydı.** Üyelik doğrulama kodu bu adrese gideceği için, posta kutusuna erişimi olan kişi **başkasının adına hesap açabilir** ve o kişinin özlük verilerine erişebilir. Kontrol tüm aktif personel üzerinde çalıştırılmıştır, belirli bir görev grubuyla sınırlı değildir. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.6) |
+| **O / E / Puan** | 2 / 3 / **6** (gerçekleşmedi; veri düzeltmesiyle ortadan kalktı) |
 | **Sahibi** | İK Birimi + Bilgi İşlem |
 | **Önlem** | (1) İK, ilgili personellere kendilerine ait ayrı e-posta adresi tanımlayacak. **Bu, Kimlik Yönetimi modülünün devreye alınması için ön koşuldur.** (2) Sistem, üyelik akışında **e-posta adresinin birden fazla kişiye tanımlı olması durumunda o adrese doğrulama kodu göndermeyecek**, kaydı istisna akışına yönlendirecek. (3) Senkronizasyon, paylaşılan e-posta adreslerini tespit edip uyarı raporunda listeleyecek. |
-| **Durum** | Açık |
+| **Durum** | **Kapandı — 2026-09-22.** Ölçüm 0 paylaşılan adres. **Teknik kontrol kaldırılmaz:** paylaşılan adrese doğrulama kodu göndermeme kuralı (`KR-018`, `REQ-KMLK-009`) kalıcıdır. Bugün paylaşılan adres bulunmaması, yarın açılacak bir kaydın da öyle olacağı anlamına gelmez |
 
 ### R-13 — Kurumsal olmayan e-posta adresine doğrulama kodu gönderilmesi
 | | |
@@ -204,14 +204,15 @@ raporunda ayrıca ele alınır.
 | Puan | Risk sayısı | Riskler |
 |---|---:|---|
 | 9 | 2 | R-01, R-18 |
-| 6 | 6 | R-03, R-04, R-05, R-06, R-12, R-15 |
-| 4 | 4 | **R-08**, R-09, R-14, R-16 |
+| 6 | 5 | R-03, R-04, R-05, R-06, R-15 |
+| 4 | 4 | R-08, R-09, R-14, R-16 |
 | 3 | 1 | R-02 |
-| Kapandı | 5 | R-07, R-10, R-11, R-17, **R-13** |
+| Kapandı | 6 | R-07, R-10, R-11, R-17, R-13, **R-12** |
 
-**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-12, R-15, R-18
+**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-15, R-18
 
-**Son gözden geçirme:** 2026-09-21 — LOGO verisi, İK'nın düzeltme çalışmasından sonra yeniden ölçüldü. `R-13` **kapandı** (kişisel e-posta 59 → 0); `R-08` puanı 6'dan 4'e düştü (hiçbir iletişim bilgisi olmayan kişi 12 → 4); `R-12` değişmedi (4 kişi / 1 adres).
+**Son gözden geçirme:** 2026-09-22 — İK'nın ikinci düzeltme turundan sonra ölçüm yenilendi. `R-12` **kapandı** (paylaşılan adres 4 kişi / 1 adres → 0). `R-08` ölçümü güncellendi: hiçbir iletişim bilgisi olmayan kişi **4 → 2**; puan 4'te tutuldu.
+Önceki: 2026-09-21 — LOGO verisi, İK'nın düzeltme çalışmasından sonra yeniden ölçüldü. `R-13` **kapandı** (kişisel e-posta 59 → 0); `R-08` puanı 6'dan 4'e düştü (hiçbir iletişim bilgisi olmayan kişi 12 → 4); `R-12` değişmedi (4 kişi / 1 adres).
 Önceki: 2026-09-16 — `R-18` (elle sertifika yenilemesi) eklendi; R-17'nin önlemi Let's Encrypt / DNS-01 kararıyla güncellendi. Bu gözden geçirmede, R-17 eklenirken **özet tablosunun güncellenmediği** fark edildi ve düzeltildi: kayıt eklemek yeterli değildir, özet de aynı anda güncellenmelidir.
 Önceki: 2026-09-08 — `R-16` (dal koruma kısıtı) eklendi; GitHub kurulumu sırasında tespit edildi.
 Önceki: 2026-09-07 — `R-15` (kapsam büyüklüğü) eklendi; `R-02`'nin
@@ -254,3 +255,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-09-16 | 0.6 | R-17 önlemi güncellendi (Let's Encrypt / DNS-01 kararı); **R-18** eklendi (elle yenileme nedeniyle sertifika süresinin dolması) | Bilgi İşlem |
 | 2026-09-17 | 0.7 | **R-17 kapandı** (UAT TLS ile yayında). R-18 açık kalmaya devam ediyor | Bilgi İşlem |
 | 2026-09-21 | 0.8 | LOGO verisi yeniden ölçüldü: **R-13 kapandı** (kişisel e-posta 59 → 0); R-08 ölçümü güncellendi ve puanı 6 → 4 düştü (12 → 4 kişi); R-12 değişmedi | Bilgi İşlem |
+| 2026-09-22 | 0.9 | İK ikinci düzeltme turu: **R-12 kapandı** (paylaşılan adres → 0); R-08 ölçümü güncellendi (4 → 2 kişi) | Bilgi İşlem |
