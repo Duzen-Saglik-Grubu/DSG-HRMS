@@ -113,40 +113,40 @@ kodu LOGO'da kayıtlı kurumsal e-posta veya cep telefonuna gönderilecektir.
 
 **Ölçüm kapsamı (`KR-034`):** aktif personel, `0001000` sicili hariç →
 **564 kişi / 584 sicil kaydı**
-**Ölçüm tarihi:** 2026-09-21 (önceki ölçüm: 2026-09-09)
+**Ölçüm tarihi:** 2026-09-22 (önceki ölçümler: 2026-09-21, 2026-09-09)
 
-> **İK düzeltme çalışması yaptı.** Bu tablo, İK biriminin LOGO üzerinde yaptığı
-> iletişim bilgisi tamamlamasının ardından yeniden ölçülmüştür. Parantez içindeki
-> değerler önceki ölçümdür.
+> **İK düzeltme çalışması sürüyor.** Tablo, İK biriminin LOGO üzerinde yaptığı
+> iletişim bilgisi tamamlamasının ardından **iki kez** yeniden ölçülmüştür.
+> Eksik sütunu kişi (TCKN) bazındadır.
 
-| Alan | Dolu | Eksik | Önceki | Kaynak |
+| Alan | Eksik (22.09) | 21.09 | 09.09 | Kaynak |
 |---|---:|---:|---:|---|
-| **TCKN** | 584 | **0** ✅ | 0 | `LH_001_PERSON.TTFNO` |
-| **Doğum tarihi** | 584 | **0** ✅ | 0 | `LH_001_PERSON.BIRTHDATE` |
-| Kurumsal e-posta | 579 | **5** | 38 | `LH_001_CONTACT` (`TYP=6`) |
-| Cep telefonu | 572 | **12** | 13 | `LH_001_CONTACT` (`TYP=3`) |
+| **TCKN** | **0** ✅ | 0 | 0 | `LH_001_PERSON.TTFNO` |
+| **Doğum tarihi** | **0** ✅ | 0 | 0 | `LH_001_PERSON.BIRTHDATE` |
+| Kurumsal e-posta | **4** | 5 | 38 | `LH_001_CONTACT` (`TYP=6`) |
+| Cep telefonu | **10** | 12 | 13 | `LH_001_CONTACT` (`TYP=3`) |
 
 **Ek kontroller:**
 
-| Kontrol | Sonuç | Önceki |
-|---|---:|---:|
-| Telefon biçimi geçersiz (normalize edilince 10 haneli ve `5` ile başlamıyor) | **0** ✅ | 1 |
-| **Ne e-posta ne telefon — hiçbir iletişim bilgisi yok** | **4** ⚠️ | 12 |
+| Kontrol | 22.09 | 21.09 | 09.09 |
+|---|---:|---:|---:|
+| Telefon biçimi geçersiz (normalize edilince 10 haneli ve `5` ile başlamıyor) | **0** ✅ | 0 | 1 |
+| **Ne e-posta ne telefon — hiçbir iletişim bilgisi yok** | **2** ⚠️ | 4 | 12 |
 
 > **İyi haber:** Aktif personelin tamamında TCKN ve doğum tarihi doludur. Üyelik akışının
 > kimlik eşleştirme adımı bu iki alan açısından sorunsuz çalışacaktır.
 
-**⚠️ En kritik bulgu — 4 personel hiçbir kanaldan doğrulanamaz.** (önceki ölçümde 12)
+**⚠️ En kritik bulgu — 2 personel hiçbir kanaldan doğrulanamaz.** (09.09'da 12, 21.09'da 4)
 
-5 kişide e-posta, 12 kişide telefon eksiktir; bu iki kümenin **kesişimi 4 kişidir**:
+4 kişide e-posta, 10 kişide telefon eksiktir; bu iki kümenin **kesişimi 2 kişidir**:
 
-| Durum | Kişi | Önceki | Sonuç |
-|---|---:|---:|---|
-| Yalnız e-posta eksik (telefonu var) | 1 | 26 | SMS ile doğrulanabilir |
-| Yalnız telefon eksik (e-postası var) | 8 | 1 | E-posta ile doğrulanabilir |
-| **İkisi de eksik** | **4** | **12** | **Hiçbir kanaldan doğrulanamaz** |
+| Durum | Kişi | 21.09 | 09.09 | Sonuç |
+|---|---:|---:|---:|---|
+| Yalnız e-posta eksik (telefonu var) | 2 | 1 | 26 | SMS ile doğrulanabilir |
+| Yalnız telefon eksik (e-postası var) | 8 | 8 | 1 | E-posta ile doğrulanabilir |
+| **İkisi de eksik** | **2** | **4** | **12** | **Hiçbir kanaldan doğrulanamaz** |
 
-Bu 4 kişi, sistem devreye alındığında **kendi başına üye olamaz.** İki seçenek vardır:
+Bu 2 kişi, sistem devreye alındığında **kendi başına üye olamaz.** İki seçenek vardır:
 
 1. İK, devreye alma öncesinde bu kişilerin iletişim bilgilerini LOGO'da tamamlar
    (**tercih edilen**), veya
@@ -185,11 +185,11 @@ ve **kurum denetiminde** olması bir güvenlik gereksinimidir. Aktif personel ü
 | `@icloud.com` | **0** | 3 | Kurumsal değil |
 | `@yahoo.com` | **0** | 2 | Kurumsal değil |
 
-> Dağılım 2026-09-21 ölçümüne aittir (önceki: 2026-09-04). LOGO canlı bir sistem olduğu
+> Dağılım 2026-09-22 ölçümüne aittir (öncekiler: 2026-09-21, 2026-09-04). LOGO canlı bir sistem olduğu
 > için toplam sayılar günden güne birkaç kayıt oynayabilir (bkz. §1.7).
 
-**Bulgu 1 — Kurumsal olmayan adres: 0 aktif personel** (2026-09-21 ölçümü; önceki
-ölçümde 59). İK, kişisel adreslerin tamamını kurumsal adreslerle değiştirmiştir.
+**Bulgu 1 — Kurumsal olmayan adres: 0 aktif personel** (2026-09-22 ölçümünde de 0;
+ilk ölçümde 59). İK, kişisel adreslerin tamamını kurumsal adreslerle değiştirmiştir.
 → Risk `R-13` **kapandı**
 
 > **Teknik kontrol kaldırılmaz.** Bugün kişisel adres bulunmaması, yarın da
@@ -197,8 +197,16 @@ ve **kurum denetiminde** olması bir güvenlik gereksinimidir. Aktif personel ü
 > açılabilir. Kurumsal olmayan adrese doğrulama kodu göndermeme kuralı
 > (`REQ-KMLK-008`, `KR-019`) kalıcı bir kontroldür.
 
-**Bulgu 2 — Paylaşılan e-posta adresi: 4 personel, 1 adres** (2026-09-21 ölçümü;
-değişmedi).
+**Bulgu 2 — Paylaşılan e-posta adresi: 0 personel, 0 adres** (2026-09-22 ölçümü;
+21.09'da 4 personel / 1 adres, ilk ölçümde 4 personel / 1 adres).
+İK, paylaşılan adres kullanan personele kendilerine ait adres tanımlamıştır.
+→ Risk `R-12` **kapandı**
+
+> **Teknik kontrol kaldırılmaz.** `R-13`'te olduğu gibi: bugün paylaşılan adres
+> bulunmaması, yarın da bulunmayacağı anlamına gelmez. Paylaşılan bir adrese doğrulama
+> kodu göndermeme kuralı (`REQ-KMLK-009`, `KR-018`) kalıcı bir kontroldür.
+
+**Aşağıdaki paragraf, bulgunun ilk tespit edildiği hâliyle korunmuştur:**
 İki e-posta adresi, farklı TCKN'li birden fazla aktif personele tanımlıdır. Bu, İK
 biriminin öngördüğü durumu doğrular: kurumsal adresi olmayan personele başka bir kişinin
 (örneğin sorumlusunun) adresi tanımlanmış olabilir. Kontrol yalnızca belirli bir görev
