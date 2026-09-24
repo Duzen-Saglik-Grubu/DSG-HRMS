@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017`, `KR-018`, `KR-019`, `KR-020`, `KR-042`
+**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **İlgili riskler:** `R-08`, `R-12`, `R-13`, `R-14`
 
@@ -55,26 +55,42 @@ Kurallar:
 | Uzunluk | 6 hane, kriptografik olarak güvenli üretici ile |
 | Geçerlilik süresi | **5 dakika** |
 | Yanlış deneme sınırı | **3** — aşılırsa kod iptal edilir, yeniden istenmesi gerekir |
-| Saklama | Veritabanında **hash'lenmiş** olarak (düz metin saklanmaz) |
+| Saklama | Veritabanında **anahtarlı özet (HMAC-SHA256)** olarak; düz metin saklanmaz. Düz özet yetmez: 6 haneli kodun 1.000.000 olasılığı saniyeler içinde denenir (`SG-KMLK-025`) |
 | Loglama | Kod **hiçbir yere loglanmaz** (SMS/e-posta içeriği dâhil) |
 | Tek kullanımlık | Doğrulanan kod anında geçersiz kılınır |
 
 ### 4. Kanal seçilebilirliği kuralları
 
-| Durum | E-posta ile doğrulama | SMS ile doğrulama |
-|---|---|---|
-| Kurumsal e-posta kayıtlı ve kişiye özel | ✅ | — |
-| E-posta **kurumsal alan adı dışında** | ❌ Sunulmaz (`KR-019`) | ✅ |
-| E-posta **birden fazla kişiye tanımlı** | ❌ Sunulmaz (`KR-018`) | ✅ |
-| E-posta kayıtlı değil | ❌ | ✅ |
-| Cep telefonu kayıtlı değil | — | ❌ |
-| Hiçbiri kullanılamıyor | İstisna akışı (İK elle açar, gerekçe girer, tam loglanır) | |
+> **24.09.2026 güncellemesi (`KR-073`, `KR-075`, `KR-076`):** Giriş kimliği kurumsal
+> e-posta olduğundan ve üyelikte girilen e-postanın LOGO'dakiyle eşleşmesi
+> gerektiğinden, **kurumsal e-postası olmayan kişi üye olamaz.** Aşağıdaki tablo buna
+> göre yeniden yazıldı; önceki tablodaki "yalnızca SMS" satırları üyelikte artık ortaya
+> çıkmaz.
+
+| Durum | Üyelik | E-posta kanalı | SMS kanalı |
+|---|---|---|---|
+| Kurumsal e-posta kişiye tekil, cep telefonu geçerli | ✅ | ✅ | ✅ |
+| Kurumsal e-posta kişiye tekil, cep telefonu yok/geçersiz | ✅ | ✅ | ❌ |
+| E-posta **kurumsal alan adı dışında** (`KR-019`) | ❌ | — | — |
+| E-posta **birden fazla kişiye tanımlı** (`KR-018`) | ❌ Uyarı listesine düşer; İK LOGO'da düzeltir | — | — |
+| E-posta kayıtlı değil | ❌ İK LOGO'da tanımlar | — | — |
+| Hiçbir iletişim bilgisi yok | ❌ Sisteme alınmaz (`KR-076`) | — | — |
+
+**Üyelikte zorlanan personel için İK destekli davet (`KR-075`):** İK, sistemden tek
+kullanımlık parola oluşturma bağlantısı gönderir. Bağlantı **yalnızca LOGO'daki
+kurumsal e-postaya** gider; İK adres girmez, parolayı bilmez. Geçerlilik 3 saat
+(parametre). Önceki "İK elle hesap açar" istisna akışının yerini alır.
 
 **Kabul edilen kurumsal alan adları** (`@duzen.com.tr`, `@zeytinim.com`, `@labpt.com.tr`)
 koda gömülmez; **yönetilebilir parametre** olarak tutulur (`KR-019`).
 
-Kurumsal adresi olmayan personel için SMS **zorunlu kılınmaz** (`KR-020`); kalıcı çözüm
-İK'nın LOGO'da adres tanımlamasıdır.
+`KR-020` (kurumsal adresi olmayana SMS zorunlu kılınmaz) `KR-073` ile **konusuz
+kalmıştır**: kurumsal adresi olmayan kişi zaten üye olamaz; kalıcı çözüm İK'nın
+LOGO'da adres tanımlamasıdır. SMS kanalı iki adımlı doğrulama ve parola sıfırlamada
+geçerliliğini korur.
+
+Eşleşmenin sızmaması (`KR-016`) ile kanal gösterimi arasındaki gerilim ve çözümü:
+`SG-KMLK.md` §6, AN-01.
 
 ### 5. Hız sınırlama ve kilitleme
 
@@ -83,7 +99,7 @@ Kurumsal adresi olmayan personel için SMS **zorunlu kılınmaz** (`KR-020`); ka
 | TCKN başına üyelik denemesi | 5 deneme / saat |
 | IP başına üyelik denemesi | 20 deneme / saat |
 | Kod gönderimi (kişi başına) | 3 gönderim / 15 dakika |
-| Giriş denemesi (hesap başına) | 5 başarısız deneme → 15 dakika kilit |
+| Giriş denemesi (**girilen e-posta** başına — hesap var olmasa da; `SG-KMLK-033`) | 5 başarısız deneme → 15 dakika kilit |
 
 Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
 
@@ -215,3 +231,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-21 | 0.2 | §6 parola uzunluğu 12 → 6 (`KR-070`); §7 yeniden yazıldı: 2FA geliştirilecek, varsayılan kapalı (`KR-069`, `KR-017` yürürlükten kalktı) | Bilgi İşlem |
 | 2026-09-24 | 0.3 | §8: giriş kimliği kurumsal e-posta (`KR-073`), hareketsizlik 30 dk ve meşru uzun etkinlik (`KR-074`); ödünler bölümündeki bayat "39 personel" güncellendi | Bilgi İşlem |
+| 2026-09-24 | 0.4 | §3 kod saklama: anahtarlı özet; §5 kilit sayacı girilen e-postaya bağlı; §4 kanal tablosu `KR-073`, `KR-075`, `KR-076` ile yeniden yazıldı (İK destekli davet, `KR-020` konusuz) | Bilgi İşlem |

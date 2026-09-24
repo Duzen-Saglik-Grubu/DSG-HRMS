@@ -3,7 +3,7 @@
 **Proje:** DSG-HRMS — Düzen Sağlık Grubu İnsan Kaynakları Yönetim Sistemi
 **Amaç:** Bu doküman, TS ISO/IEC TS 33061 Seviye 2 kapsamında üretilen tüm kanıtların nerede tutulduğunu tek sayfadan gösterir. Bir denetçi ya da yeni katılan bir ekip üyesi aradığı kaydı buradan bulur.
 
-**Son güncelleme:** 2026-09-18
+**Son güncelleme:** 2026-09-24
 **Doküman sahibi:** Bilgi İşlem Birim Sorumlusu
 
 ---
@@ -63,7 +63,7 @@ Aşağıdaki tablolarda "33061 Süreç Çıktısı" sütunu, standardın Madde 5
 | 33061 Süreç Çıktısı | Bizdeki karşılığı |
 |---|---|
 | Yaklaşım | `YAKLASIM.md` |
-| Sistem/yazılım gereksinimleri | `gereksinimler/SG-<MODÜL>.md` (her madde `REQ-<MODÜL>-<no>` kimlikli) |
+| Sistem/yazılım gereksinimleri | `gereksinimler/SG-<MODÜL>.md` (her madde `SG-<MODÜL>-<no>` kimlikli; bkz. TEC.3 YAKLASIM §3.1) |
 | Doğrulama kriterleri (Verification criteria) | Her gereksinimin "Doğrulama Yöntemi" alanı → test senaryosu kimliği |
 | Sistem fonksiyon modeli | `docs/mimari/fonksiyon-modeli.md` |
 | İzlenebilirlik eşlemesi | `docs/33061/izlenebilirlik-matrisi.md` |
@@ -245,7 +245,7 @@ Bazı kanıtlar birden fazla sürece hizmet eder. Tek kopya tutulur:
 ## 4. Doküman kuralları
 
 1. **Dil:** Teknik terimler dışında tüm dokümanlar Türkçedir.
-2. **Kimliklendirme:** Paydaş gereksinimi `PG-<MODÜL>-<no>`, sistem gereksinimi `REQ-<MODÜL>-<no>`, risk `R-<no>`, mimari karar `ADR-<no>`, test senaryosu `TS-<MODÜL>-<no>`.
+2. **Kimliklendirme:** Paydaş gereksinimi `PG-<MODÜL>-<no>`, sistem gereksinimi `SG-<MODÜL>-<no>` (T3 paydaş gereksinimleri istisnaen `REQ-KMLK-<no>` kimliğiyle onaylandı), risk `R-<no>`, mimari karar `ADR-<no>`, test senaryosu `TS-<MODÜL>-<no>`.
 3. **Tarih biçimi:** Dosya adlarında ve içerikte `YYYY-AA-GG`.
 4. **Değişiklik:** Her dokümanın başında "Son güncelleme", sonunda değişiklik geçmişi bulunur. Doküman değişiklikleri de Pull Request ile yapılır (MAN.5).
 5. **Sır barındırmama:** Hiçbir dokümanda parola, bağlantı dizesi (connection string), API anahtarı veya gerçek kişisel veri örneği yer almaz.
@@ -260,3 +260,4 @@ Bazı kanıtlar birden fazla sürece hizmet eder. Tek kopya tutulur:
 | 2026-09-03 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-07 | 0.2 | Karar kayıt defteri, ADR dizini, modül listesi ve vizyon-kapsam belgeleri haritaya eklendi | Bilgi İşlem |
 | 2026-09-18 | 0.3 | MAN.8 çıktılarına **süreç değerlendirme raporu** eklendi (`MAN.8.BP3`) | Bilgi İşlem |
+| 2026-09-24 | 0.4 | Sistem gereksinimi kimliği `REQ-<MODÜL>-<no>` → `SG-<MODÜL>-<no>` (T3 paydaş gereksinimleriyle çakışma; TEC.3 YAKLASIM §3.1) | Bilgi İşlem |
