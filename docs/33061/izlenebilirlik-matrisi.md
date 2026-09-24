@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-09-18
+**Son güncelleme:** 2026-09-24
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 
@@ -124,12 +124,69 @@ gelecektir.
 
 ## 5. T3 — Kimlik Yönetimi
 
-> İlk gerçek modül çevrimi. Satırlar, İK gereksinim toplantısı sonrası açılacak
-> (`TEC.2/YAKLASIM.md` §3) ve modül ilerledikçe **aynı PR'larda** doldurulacak.
+> İlk gerçek modül çevrimi. Gereksinimler **23.09.2026 İK toplantısında onaylandı**
+> (`TEC.2/kayitlar/2026-09-23-kimlik-gereksinim-toplantisi.md`); 56 satırın tamamı
+> açıldı. Kaynak sütunu dolu, diğer halkalar işin yapıldığı PR'larda doldurulacak
+> (§3). Kaynak metinlerin tamamı: `TEC.2/paydas-gereksinimleri/PG-KMLK.md`.
 
 | # | Kaynak | Sistem gereksinimi | Tasarım | Gerçekleştirme | Doğrulama | Kabul |
 |---|---|---|---|---|---|---|
-| | *(toplantı sonrası açılacak)* | | | | | |
+| 1 | `REQ-KMLK-001` Personel, giriş ekranındaki "Üye Ol" bağlantısıyla kendi hesabını kend… | — | — | — | — | — |
+| 2 | `REQ-KMLK-002` Üyelik doğrulaması TCKN + doğum tarihi + kurumsal e-posta bilgileriyle… | — | — | — | — | — |
+| 3 | `REQ-KMLK-003` Eşleşme LOGO anlık görüntüsü üzerinden yapılır; yalnızca AKTİF istihda… | — | — | — | — | — |
+| 4 | `REQ-KMLK-004` Bilgiler eşleşse de eşleşmese de kullanıcıya AYNI ekran ve AYNI mesaj … | — | — | — | — | — |
+| 5 | `REQ-KMLK-005` Doğrulama kanalı kullanıcıya seçtirilir: e-posta veya SMS. Hangi kanal… | — | — | — | — | — |
+| 6 | `REQ-KMLK-006` SMS seçilip kod ulaşmazsa kullanıcı aynı ekrandan e-posta kanalına geç… | — | — | — | — | — |
+| 7 | `REQ-KMLK-007` Kurumsal e-posta adresi bulunmayan personel için e-posta kanalı sunulm… | — | — | — | — | — |
+| 8 | `REQ-KMLK-008` Kurumsal alan adı dışındaki e-posta adreslerine (gmail, hotmail vb.) d… | — | — | — | — | — |
+| 9 | `REQ-KMLK-009` Aynı e-posta adresi birden fazla kişiye tanımlıysa o adrese doğrulama … | — | — | — | — | — |
+| 10 | `REQ-KMLK-010` Cep telefonu tanımlı olmayan personel için SMS kanalı sunulmaz. | — | — | — | — | — |
+| 11 | `REQ-KMLK-011` İK, personele tek kullanımlık parola bağlantısı gönderebilir; yalnızca LOGO'daki kurumsal e-postaya… | — | — | — | — | — |
+| 12 | `REQ-KMLK-012` Kabul edilen kurumsal alan adları koda gömülmez; Sistem Yönetimi param… | — | — | — | — | — |
+| 13 | `REQ-KMLK-013` TCKN’si bulunmayan LOGO kartı için sistemde Kişi kaydı oluşturulmaz; k… | — | — | — | — | — |
+| 14 | `REQ-KMLK-014` Bir kişinin birden fazla sicil numarası olsa da TEK hesabı olur. | — | — | — | — | — |
+| 15 | `REQ-KMLK-015` Doğrulama kodu 6 hanedir (parametre: PRM-KML-09) ve kriptografik güven… | — | — | — | — | — |
+| 16 | `REQ-KMLK-016` Kod 5 dakika geçerlidir (parametre: PRM-KML-10). | — | — | — | — | — |
+| 17 | `REQ-KMLK-017` Kod en fazla 3 kez yanlış girilebilir; aşılırsa kod iptal edilir ve ye… | — | — | — | — | — |
+| 18 | `REQ-KMLK-018` Kod veritabanında şifrelenmiş (hash) saklanır; düz metin tutulmaz ve h… | — | — | — | — | — |
+| 19 | `REQ-KMLK-019` Doğrulanan kod anında geçersiz kılınır (tek kullanımlık). | — | — | — | — | — |
+| 20 | `REQ-KMLK-020` Kod ekranında kalan süre görünür ve "kodu tekrar gönder" seçeneği bulu… | — | — | — | — | — |
+| 21 | `REQ-KMLK-021` SMS gönderimleri NetGSM standart servisi üzerinden, DUZEN başlığıyla y… | — | — | — | — | — |
+| 22 | `REQ-KMLK-022` Kullanıcı kurumsal e-posta adresi ve parolasıyla giriş yapar. | — | — | — | — | — |
+| 23 | `REQ-KMLK-023` Hatalı girişte "kullanıcı adı veya parola hatalı" denir; hangisinin ya… | — | — | — | — | — |
+| 24 | `REQ-KMLK-024` 5 başarısız giriş denemesinden sonra hesap 15 dakika kilitlenir (param… | — | — | — | — | — |
+| 25 | `REQ-KMLK-025` Giriş sonrası ikinci doğrulama adımı (2FA) GELİŞTİRİLİR; varsayılan ol… | — | — | — | — | — |
+| 26 | `REQ-KMLK-026` Oturum 15 dakikalık erişim jetonu ve 8 saatlik yenileme jetonu ile yön… | — | — | — | — | — |
+| 27 | `REQ-KMLK-027` Çıkış yapıldığında oturum sunucu tarafında da sonlandırılır. | — | — | — | — | — |
+| 28 | `REQ-KMLK-028` Parola en az 6 karakter olmalıdır; karmaşıklık (büyük/küçük harf, raka… | — | — | — | — | — |
+| 29 | `REQ-KMLK-029` Yaygın sızıntı listesinde bulunan parolalar kabul edilmez; kontrol çev… | — | — | — | — | — |
+| 30 | `REQ-KMLK-030` Zorunlu periyodik parola değişimi varsayılan olarak uygulanmaz (parame… | — | — | — | — | — |
+| 31 | `REQ-KMLK-031` Parola sıfırlama, üyelikle aynı doğrulama akışını kullanır (kanal seçi… | — | — | — | — | — |
+| 32 | `REQ-KMLK-032` Oturum içinde parola değiştirirken mevcut parola sorulur. | — | — | — | — | — |
+| 33 | `REQ-KMLK-033` Parola geri döndürülebilir biçimde saklanmaz ve hiçbir kayda yazılmaz. | — | — | — | — | — |
+| 34 | `REQ-KMLK-034` Personelin tüm aktif istihdamları sona erdiğinde hesabı otomatik pasif… | — | — | — | — | — |
+| 35 | `REQ-KMLK-035` Personel yeniden işe girdiğinde mevcut hesabı yeniden aktifleşir; yeni… | — | — | — | — | — |
+| 36 | `REQ-KMLK-036` İK, bir hesabı elle pasife alabilir; gerekçe zorunludur. | — | — | — | — | — |
+| 37 | `REQ-KMLK-037` Hesap durum değişiklikleri (açılma, pasifleşme, kilitlenme) denetim iz… | — | — | — | — | — |
+| 38 | `REQ-KMLK-038` Üyelik denemeleri TCKN başına saatte 5, IP başına saatte 20 ile sınırl… | — | — | — | — | — |
+| 39 | `REQ-KMLK-039` Kod gönderimi kişi başına 15 dakikada en fazla 3 kez yapılabilir; sını… | — | — | — | — | — |
+| 40 | `REQ-KMLK-040` Tüm kimlik olayları (giriş, başarısız giriş, kilitlenme, kod gönderimi… | — | — | — | — | — |
+| 41 | `REQ-KMLK-041` Kişisel veriler günlük kayıtlarında maskelenir (TCKN 123*901, telefon … | — | — | — | — | — |
+| 42 | `REQ-KMLK-042` Doğrulama kodu ve parola sıfırlama iletileri bildirim istisnasından MU… | — | — | — | — | — |
+| 43 | `REQ-KMLK-043` Tüm ekranlar ve hata mesajları Türkçedir; teknik terim kullanılmaz. | — | — | — | — | — |
+| 44 | `REQ-KMLK-044` Giriş ve üyelik ekranları telefon ve tablette de kullanılabilir. | — | — | — | — | — |
+| 45 | `REQ-KMLK-045` Ekranlar klavye ile kullanılabilir; form alanlarının etiketi vardır. | — | — | — | — | — |
+| 46 | `REQ-KMLK-046` Hata ekranında kullanıcıya bir takip numarası gösterilir. | — | — | — | — | — |
+| 47 | `REQ-KMLK-047` Giriş, üye ol, doğrulama ve parola ekranları ekranı iki bölüme ayıran … | — | — | — | — | — |
+| 48 | `REQ-KMLK-048` Giriş ve doğrulama ekranlarında kurumsal logo kullanılır; logo, Sistem… | — | — | — | — | — |
+| 49 | `REQ-KMLK-049` Bir kullanıcı yeni bir tarayıcıdan giriş yaptığında önceki oturumu son… | — | — | — | — | — |
+| 50 | `REQ-KMLK-050` Oturumun başka bir yerden sonlandırıldığı kullanıcıya açıkça bildirili… | — | — | — | — | — |
+| 51 | `REQ-KMLK-051` 2FA açıkken, parola doğrulandıktan sonra kullanıcıdan doğrulama kodu i… | — | — | — | — | — |
+| 52 | `REQ-KMLK-052` 2FA açıkken hiçbir doğrulama kanalı bulunmayan kullanıcı sisteme girem… | — | — | — | — | — |
+| 53 | `REQ-KMLK-053` 2FA'nın açık ve kapalı hâli (PRM-KML-08) ayrı ayrı test edilir. | — | — | — | — | — |
+| 54 | `REQ-KMLK-054` Meşru uzun süreli etkinlik sırasında (ör. eğitim videosu oynatılırken)… | — | — | — | — | — |
+| 55 | `REQ-KMLK-055` İlk girişte parola değiştirme zorunluluğu Sistem Yönetimi parametresiy… | — | — | — | — | — |
+| 56 | `REQ-KMLK-056` Üyelik ve giriş ekranlarında "sorun yaşarsanız" başvurulacak birim ola… | — | — | — | — | — |
 
 ---
 
@@ -155,3 +212,4 @@ dâhil edilmedi; T1'de dâhil olacak.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-18 | 0.1 | İlk oluşturma — yapı, bakım kuralı ve A1 kalemleri (BULGU-01) | Bilgi İşlem |
+| 2026-09-24 | 0.2 | §5 T3 satırları açıldı — 23.09.2026 İK toplantısında onaylanan 56 gereksinim | Bilgi İşlem |

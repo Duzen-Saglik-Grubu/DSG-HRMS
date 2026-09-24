@@ -87,7 +87,7 @@ tamamının personeli tek tabloda tutulmakta, firma ayrımı `FIRMNR` alanı ile
 
 **Yorum:**
 
-1. **1.531 kart ↔ 1.360 kişi.** Kart (sicil) ile kişi aynı şey değildir. 140 kişi LOGO'da
+1. **1.531 kart ↔ 1.360 kişi** (03.09.2026; 24.09.2026 yeniden ölçümü: 1.537 kart ↔ 1.363 kişi, 141 kişi çoklu sicil, **12'si eş zamanlı aktif — değişmedi**). Kart (sicil) ile kişi aynı şey değildir. 140 kişi LOGO'da
    birden fazla sicil kaydına sahiptir. Bu, İK biriminin bildirdiği iki durumun sayısal
    karşılığıdır: (a) emekli olup işe devam eden personele yeni sicil açılması,
    (b) aynı kişinin farklı görevler için ayrı sicillerde tanımlanması.
