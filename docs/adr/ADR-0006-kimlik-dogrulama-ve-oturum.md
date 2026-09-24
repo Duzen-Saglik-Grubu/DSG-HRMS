@@ -141,7 +141,9 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
 |---|---|
 | Yöntem | **JWT erişim jetonu** + **yenileme jetonu** |
 | Erişim jetonu ömrü | 15 dakika |
-| Yenileme jetonu ömrü | 8 saat (mesai günü); hareketsizlikte 1 saat sonra düşer |
+| Giriş kimliği | **Kurumsal e-posta adresi** (`KR-073`) — sicil birden fazla olabildiği için uygun değil |
+| Yenileme jetonu ömrü | 8 saat (mesai günü); hareketsizlikte **30 dakika** sonra düşer (`KR-074`; önceki değer 1 saat) |
+| Meşru uzun etkinlik | Eğitim videosu gibi etkinlik sürerken sayfa **etkinlik sinyali** gönderir; hareketsizlik sayacı sıfırlanır. 8 saatlik üst sınır her durumda geçerlidir (`KR-074`) |
 | Erişim jetonu saklama | Tarayıcı belleğinde (JavaScript değişkeni) — **`localStorage` kullanılmaz** |
 | Yenileme jetonu saklama | **`HttpOnly`, `Secure`, `SameSite=Strict` çerez** |
 | Yenileme jetonu döndürme | Her kullanımda yeni jeton üretilir; eskisi geçersizleşir (rotation) |
@@ -189,8 +191,10 @@ JavaScript ile okunabilir. `HttpOnly` çerez okunamaz.
 - 2FA varsayılan olarak kapalıdır; bu, ağın yerel olmasına dayanan bir varsayımdır.
   Varsayım değişirse **parametre açılır** — geliştirme gerekmez. Karar
   yeniden değerlendirilecektir.
-- Kurumsal e-postası olmayan 39 personel devreye alma öncesi İK tarafından
-  tamamlanmazsa üyelik akışında sorun yaşayacaktır (`R-08`).
+- Kurumsal e-postası olmayan personel **giriş yapamaz**: giriş kimliği e-postadır
+  (`KR-073`). Ölçüm: 09.09.2026'da 38, 22.09.2026'da **4** kişi; bunların 2'sinin
+  hiçbir iletişim bilgisi yoktur ve sisteme alınmayacaktır (`KR-076`). Telefonu olup
+  e-postası olmayan 2 kişi için karar bekleniyor (toplantı kaydı §10.1, `R-08`).
 
 **Yükümlülükler:**
 - Hız sınırlama, kilitleme ve kod hijyeni kuralları birim testleriyle kapsanacaktır.
@@ -210,3 +214,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-21 | 0.2 | §6 parola uzunluğu 12 → 6 (`KR-070`); §7 yeniden yazıldı: 2FA geliştirilecek, varsayılan kapalı (`KR-069`, `KR-017` yürürlükten kalktı) | Bilgi İşlem |
+| 2026-09-24 | 0.3 | §8: giriş kimliği kurumsal e-posta (`KR-073`), hareketsizlik 30 dk ve meşru uzun etkinlik (`KR-074`); ödünler bölümündeki bayat "39 personel" güncellendi | Bilgi İşlem |

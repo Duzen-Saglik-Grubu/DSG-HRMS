@@ -315,8 +315,8 @@ bilgi sistemleri, PDKS cihazları.
 | # | Varsayım | Yanlışsa etkisi |
 |---|---|---|
 | V1 | LOGO sürüm yükseltmeleri geçmişte olduğu gibi yalnızca **kolon ekleme** biçiminde kalacak; mevcut tablo ve kolonlar değişmeyecek | Entegrasyon kırılır (`R-02`). Varsayımı destekleyen durum: yükseltmeler TRISOFT tarafından **önceden bildiriliyor**, Mali İşler ve Bilgi İşlem ile tarih teyitleşiliyor ve mesai bitiminde yapılıyor. Şema sapma denetimi ayrıca güvence sağlar |
-| V2 | İK, devreye alma öncesi eksik iletişim bilgilerini LOGO'da tamamlayacak | 39 personel üye olamaz (`R-08`) |
-| V3 | Uygulama internete açılmayacak | 2FA kararı yeniden değerlendirilmeli (ADR-0006) |
+| V2 | İK, devreye alma öncesi eksik iletişim bilgilerini LOGO'da tamamlayacak | Kurumsal e-postası olmayan personel üye olamaz ve giriş yapamaz (`R-08`, `KR-073`). **Durum (22.09.2026):** varsayım büyük ölçüde gerçekleşti — iki düzeltme turunda kurumsal e-postası olmayan 38 → 4, hiçbir iletişim bilgisi olmayan 12 → 2 kişi |
+| V3 | Uygulama internete açılmayacak | 2FA parametresi açılır — işlev geliştirilmiş olacağı için yeni sürüm gerekmez (`KR-069`) |
 | V4 | NAS'ın kendi yedekleme düzeni var ve çalışıyor | Dosya kaybı riski (ADR-0013 §8) |
 | V5 | Mevcut sistemin verisi göç edilebilir kalitede | Göç süresi ve maliyeti artar (`R-01`) |
 | V6 | İzin hakediş kuralları mevcut mevzuata göre parametrelenebilir | Kural motoru tasarımı değişir (`R-06`) |
