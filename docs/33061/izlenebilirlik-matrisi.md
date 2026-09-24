@@ -141,7 +141,7 @@ gelecektir.
 | 8 | `REQ-KMLK-008` Kurumsal alan adı dışındaki e-posta adreslerine (gmail, hotmail vb.) d… | — | — | — | — | — |
 | 9 | `REQ-KMLK-009` Aynı e-posta adresi birden fazla kişiye tanımlıysa o adrese doğrulama … | — | — | — | — | — |
 | 10 | `REQ-KMLK-010` Cep telefonu tanımlı olmayan personel için SMS kanalı sunulmaz. | — | — | — | — | — |
-| 11 | `REQ-KMLK-011` Hiçbir kanalı kullanılamayan personel için İK hesabı elle açabilir (PR… | — | — | — | — | — |
+| 11 | `REQ-KMLK-011` İK, personele tek kullanımlık parola bağlantısı gönderebilir; yalnızca LOGO'daki kurumsal e-postaya… | — | — | — | — | — |
 | 12 | `REQ-KMLK-012` Kabul edilen kurumsal alan adları koda gömülmez; Sistem Yönetimi param… | — | — | — | — | — |
 | 13 | `REQ-KMLK-013` TCKN’si bulunmayan LOGO kartı için sistemde Kişi kaydı oluşturulmaz; k… | — | — | — | — | — |
 | 14 | `REQ-KMLK-014` Bir kişinin birden fazla sicil numarası olsa da TEK hesabı olur. | — | — | — | — | — |

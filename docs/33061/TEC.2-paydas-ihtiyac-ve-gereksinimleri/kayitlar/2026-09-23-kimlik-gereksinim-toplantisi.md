@@ -142,7 +142,7 @@ indirdi.
 | S-02 | İlk girişte parola yeniden değiştirilsin mi? | Üyelikte belirlenen parola yeterli. Sistem parametresi olsun, **varsayılanı kapalı**. | REQ-KMLK-055 eklendi, PRM-KML-20 |
 | S-03 | Kilitlenen hesabı İK hemen açabilsin mi? | **İK açabilsin** (parametre, varsayılan açık; kapatılabilir). | T5: REQ-KLNC-008, PRM-HSP-03 |
 | S-04 | İletişim bilgisi olmayan personelin hesabını kim açacak? | İstisna olarak **İK açabilecek**. *(İK notu: soru metninde 12 kişi yazıyordu, son ölçümde 2 kişi — güncellenmesi unutulmuş.)* | REQ-KMLK-011 netleşti |
-| S-05 | Elle açılan hesabın parolası nasıl iletilecek? | İK tetikler, **e-posta adresi sorulur**; onaylanınca sistem o adrese **tek kullanımlık bağlantı** gönderir, personel parolasını kendisi oluşturur. | REQ-KMLK-011 netleşti — bkz. §10 |
+| S-05 | Elle açılan hesabın parolası nasıl iletilecek? | **Revize edildi (24.09.2026, §11):** İK tetikler; personelin **LOGO'da tanımlı kurumsal e-postası varsa** sistem o adrese otomatik olarak **tek kullanımlık bağlantı** gönderir. Kurumsal e-posta tanımlı değilse bağlantı **gönderilemez.** Bağlantı geçerlilik süresi sistem parametresidir, **varsayılan 3 saat.** Personel parolasını bağlantı üzerinden kendisi oluşturur. *(Toplantıdaki ilk cevap: İK e-posta adresini elle girecekti.)* | REQ-KMLK-011 netleşti, PRM-HSP-04 |
 | S-06 | Aynı kullanıcı birden fazla cihazda açık kalabilsin mi? | **Yeni giriş öncekini sonlandıracak.** | REQ-KMLK-049/050 (15.09'da netleşmişti) |
 | S-07 | Oturum süresi ve hareketsizlik uygun mu? | Hareketsizlik varsayılanı **30 dk** uygun. | REQ-KMLK-026 değişti, PRM-KML-13 |
 | S-08 | TCKN + doğum tarihi + e-posta yeterli mi? | **Yeterli.** | Değişiklik yok |
@@ -176,12 +176,14 @@ indirdi.
 
 ## 10. Toplantı sonrası Bilgi İşlem değerlendirmesi
 
+> **Durum: iki çekince de 24.09.2026'da İK ile görüşülerek çözüldü** — bkz. §11.
+
 > **Bu bölüm toplantı mutabakatının parçası değildir.** Toplantıdan sonra, cevapların
 > birbiriyle ve mevcut kararlarla tutarlılığı incelenirken tespit edilmiştir. Her ikisi
 > de **İK kararını değiştirmez**; kararın uygulanma biçimine ilişkin bir çekincedir ve
 > İK ile teyit edilecektir.
 
-### 10.1 E-posta ile giriş, kurumsal e-postası olmayan personeli dışarıda bırakır
+### 10.1 E-posta ile giriş, kurumsal e-postası olmayan personeli dışarıda bırakır — ✅ çözüldü
 
 **Durum:** Giriş kimliği kurumsal e-posta oldu (S-01). 22.09.2026 ölçümüne göre
 **4 aktif kişide kurumsal e-posta yok:**
@@ -205,7 +207,7 @@ olmak zorundadır.** Paylaşılan adres yasağı (`KR-018`) bir güvenlik kural�
 0), ancak LOGO'da yarın açılacak bir kayıt bu durumu yeniden üretebilir; senkronizasyon
 bu durumda kaydı uyarı listesine almalıdır.
 
-### 10.2 Elle hesap açmada girilen e-posta adresinin sınırlanması
+### 10.2 Elle hesap açmada girilen e-posta adresinin sınırlanması — ✅ çözüldü
 
 **Durum:** İK, e-posta adresini girip onaylayacak; tek kullanımlık bağlantı o adrese
 gidecek (S-05).
@@ -235,8 +237,59 @@ kuralları şimdi netleştirmek, sonradan açık kapatmaktan ucuzdur.
 
 ---
 
+## 11. Toplantı sonrası teyit — 2026-09-24
+
+§10'daki iki çekince, Bilgi İşlem Birim Sorumlusu tarafından İK ile ayrıca görüşüldü.
+İK, S-05 cevabını doldurulmuş gereksinim dosyasında **kendisi revize etti.**
+
+### 11.1 → §10.1: telefonu olup e-postası olmayan 2 kişi
+
+**Karar:** İK bu kişilere **kurumsal e-posta tanımlayacak.**
+
+Böylece e-posta ile giriş kararı (S-01, `KR-073`) hiçbir aktif personeli dışarıda
+bırakmaz — hiçbir iletişim bilgisi olmayan 2 kişi hariç; onlar için ayrı karar var
+(`KR-076`).
+
+### 11.2 → §10.2: elle hesap açmada adres
+
+**Karar (S-05 revize):** İK **adres girmez.** Bağlantı yalnızca personelin **LOGO'da
+tanımlı kurumsal e-postasına** gider; tanımlı değilse gönderilemez. Bağlantı
+tek kullanımlıktır, geçerlilik süresi parametredir (**varsayılan 3 saat**, PRM-HSP-04).
+
+Bu karar, §10.2'deki üç riskin **üçünü birden** ortadan kaldırır:
+
+| Risk | Nasıl kapandı |
+|---|---|
+| Bağlantının kurum dışına gitmesi (`KR-019`) | Adres LOGO'dan gelir; LOGO adresleri zaten kurumsal alan adı kuralına tabi |
+| Bağlantının başka bir personele gitmesi (`KR-018`) | İK adres giremediği için bu yol yok; paylaşılan adres kuralı LOGO adresine de uygulanır |
+| HRMS ile LOGO arasında iki doğruluk kaynağı | Adres yalnızca LOGO'dan okunur; HRMS'te ayrı bir adres tutulmaz |
+
+Bilgi İşlem'in önerisinden **daha güçlü** bir çözümdür: öneri, elle girilen adresi
+kurallarla sınırlamaktı; İK kararı elle girişi tamamen kaldırdı.
+
+### 11.3 Akışın niteliği değişti — not
+
+Bağlantı artık yalnızca kurumsal e-postası **olan** personele gönderilebildiği için bu
+akış, "iletişim bilgisi olmayanlar için istisna" olmaktan çıktı; **İK destekli davet**
+hâline geldi. Kurumsal e-postası olan personel zaten kendi başına üye olabilir; bu akış,
+üyelik adımlarında zorlanan veya İK'nın doğrudan davet etmek istediği personel içindir.
+
+İletişim bilgisi olmayan personel için sisteme giriş yolu kalmamıştır — bu, `KR-076`
+ile tutarlıdır.
+
+### 11.4 Kapsam kararı — T1 çekirdeği
+
+Onaylı T3 gereksinimlerinin bir kısmı (REQ-KMLK-002, 003, 013, 014, 034) LOGO'dan
+senkronize edilmiş kişi/istihdam verisine dayanır. Karar: **yalnızca T3'ün ihtiyaç
+duyduğu kadarı** (kişi/istihdam modeli + LOGO senkronizasyonu) T3 kapsamında kurulur;
+T1 Personel Yönetimi ekranları T1'in kendi gereksinim toplantısından sonra geliştirilir
+(`KR-077`, `KR-068`).
+
+---
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-24 | 1.0 | Toplantı kaydı | Bilgi İşlem |
+| 2026-09-24 | 1.1 | §11 eklendi: iki çekincenin İK ile teyidi (S-05 revize, 2 kişiye e-posta tanımı) ve T1 kapsam kararı | Bilgi İşlem |

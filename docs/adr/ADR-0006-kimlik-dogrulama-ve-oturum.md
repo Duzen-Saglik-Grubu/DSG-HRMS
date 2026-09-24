@@ -194,7 +194,7 @@ JavaScript ile okunabilir. `HttpOnly` çerez okunamaz.
 - Kurumsal e-postası olmayan personel **giriş yapamaz**: giriş kimliği e-postadır
   (`KR-073`). Ölçüm: 09.09.2026'da 38, 22.09.2026'da **4** kişi; bunların 2'sinin
   hiçbir iletişim bilgisi yoktur ve sisteme alınmayacaktır (`KR-076`). Telefonu olup
-  e-postası olmayan 2 kişi için karar bekleniyor (toplantı kaydı §10.1, `R-08`).
+  e-postası olmayan 2 kişiye İK kurumsal e-posta tanımlayacaktır (24.09.2026, `R-08`).
 
 **Yükümlülükler:**
 - Hız sınırlama, kilitleme ve kod hijyeni kuralları birim testleriyle kapsanacaktır.
