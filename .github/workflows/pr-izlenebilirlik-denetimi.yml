@@ -9,6 +9,9 @@
 #
 # 17.09.2026'da ayni kok neden BASLIK icin tekrarladi (#44): 20 PR boyunca yalnizca
 # aliskanlikla korunan bicim, 21.'sinde kirildi. Baslik denetimi o gun eklendi.
+#
+# 25.09.2026'da DAL ADI icin ucuncu kez goruldu (#67): son 10 PR'in dali
+# CONTRIBUTING §3'te olmayan oneklerle acilmisti. Dal adi denetimi o gun eklendi.
 
 name: PR izlenebilirlik denetimi
 
@@ -22,7 +25,7 @@ permissions:
 
 jobs:
   traceability:
-    name: Baslik, milestone ve issue baglantisi
+    name: Baslik, dal adi, milestone ve issue baglantisi
     runs-on: ubuntu-latest
 
     steps:
@@ -36,6 +39,9 @@ jobs:
 
       - name: Baslik kuralini sina
         run: node .github/scripts/baslik-bicimi-testi.mjs
+
+      - name: Dal adi kuralini sina
+        run: node .github/scripts/dal-adi-testi.mjs
 
       # Gereksinim zinciri: paydas gereksinimi -> sistem gereksinimi -> matris.
       # Ayni esleme uc yerde duruyor (SYG §4, SYG §8, izlenebilirlik matrisi); elle
@@ -121,6 +127,39 @@ jobs:
                 'PR sablonundaki "Closes #" satiri doldurulmamis.');
             }
 
+            // --- 5. Dal adi ---
+            //
+            // Dal adi, degisikligin turunu PR acmadan gosteren tek isarettir.
+            // Kural yazili oldugu halde 10 PR boyunca listede olmayan onekler
+            // kullanildi (#67); ayni kok neden #17 ve #44'te de goruldu: yazili
+            // ama denetlenmeyen kural aliskanlikla kaybolur.
+            //
+            // Turler CONTRIBUTING.md §3 ile ayni listedir.
+            const BRANCH_TYPES = 'ozellik|hata|dokuman|bakim|duzeltici';
+            const BRANCH_PATTERN = new RegExp(
+              '^(' + BRANCH_TYPES + ')/(\\d+)-[a-z0-9]+(-[a-z0-9]+)*$');
+            const branch = pr.head.ref || '';
+            const branchMatch = BRANCH_PATTERN.exec(branch);
+
+            if (!branchMatch) {
+              problems.push(
+                'Dal adi CONTRIBUTING.md §3 bicimine uymuyor: "' + branch + '"' +
+                '\n    Beklenen: <tur>/<issue-no>-<kisa-aciklama>' +
+                '\n    Ornek:    dokuman/64-t3-sistem-gereksinimleri' +
+                '\n    Turler:   ' + BRANCH_TYPES.split('|').join(', '));
+            } else {
+              // Dal, bagli oldugu issue'nun numarasini tasimalidir; aksi halde
+              // dal adi yanlis isi gosterir.
+              const linkedIssues = [...body.matchAll(
+                /\b(?:clos(?:e[sd]?)|fix(?:e[sd]?)?|resolv(?:e[sd]?)|refs?)\s+#(\d+)/gi)]
+                .map(m => m[1]);
+              if (linkedIssues.length > 0 && !linkedIssues.includes(branchMatch[2])) {
+                problems.push(
+                  'Dal adindaki issue numarasi (#' + branchMatch[2] + ') PR govdesinde ' +
+                  'bagli issue\'lar arasinda yok (' + linkedIssues.map(n => '#' + n).join(', ') + ').');
+              }
+            }
+
             if (problems.length > 0) {
               core.setFailed(
                 'PR izlenebilirlik denetimi basarisiz:\n' +
@@ -131,5 +170,6 @@ jobs:
 
             core.info('Izlenebilirlik denetimi gecti.');
             core.info(`Baslik: ${title}`);
+            core.info(`Dal: ${branch}`);
             core.info(`Milestone: ${pr.milestone.title}`);
             core.info(`Issue baglantisi: ${hasClosingRef ? 'Closes/Fixes' : 'Refs'}`);
