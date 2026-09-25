@@ -77,7 +77,7 @@ açısından bir doküman değişikliği de kontrol edilmesi gereken bir değiş
 | `bakim` | Bağımlılık, altyapı, teknik borç | `bakim/63-paket-guncellemeleri` |
 | `duzeltici` | MAN.8 düzeltici faaliyet | `duzeltici/71-kapsam-esigi-dususu` |
 
-Türkçe karakter ve boşluk kullanılmaz.
+Türkçe karakter ve boşluk kullanılmaz. **Kural CI'da denetlenir** (PR izlenebilirlik denetimi): dal adı bu biçime uymuyorsa veya adındaki issue numarası PR'da bağlı issue'lar arasında yoksa PR birleştirilemez (düzeltici faaliyet #67).
 
 ### 3.1 Dallanma stratejisi
 
@@ -499,3 +499,4 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 | 2026-09-17 | 0.6 | §5.1 **PR başlığı** kuralı eklendi; alt bölümler yeniden numaralandı (düzeltici faaliyet #44) | Bilgi İşlem |
 | 2026-09-25 | 0.7 | §3.2 kodlama dilinin kabuk betiklerini, iş akışlarını ve çeviri anahtarlarını da kapsadığı açıkça yazıldı; kapsam dışı olanlar tanımlandı (düzeltici faaliyet #66) | Bilgi İşlem |
 | 2026-09-25 | 0.8 | §3.2 tablosuna Dockerfile, compose, uç nokta yolları ve issue şablonu alan kimlikleri eklendi (düzeltici faaliyet #66) | Bilgi İşlem |
+| 2026-09-25 | 0.9 | §3 dal adı kuralının CI'da denetlendiği yazıldı (düzeltici faaliyet #67) | Bilgi İşlem |
