@@ -1,7 +1,7 @@
 # Karar Kayıt Defteri
 
 **Belge kimliği:** KKD
-**Son güncelleme:** 2026-09-15
+**Son güncelleme:** 2026-09-25
 **Amaç:** Proje boyunca alınan kararların tek ve resmî kaydı. Bir kararın *ne olduğu*,
 *neden alındığı* ve *ne zaman alındığı* buradan izlenir.
 **İlgili süreçler:** MAN.2 (Proje Değerlendirme ve Kontrol), TEC.2, TEC.5
@@ -103,6 +103,7 @@
 | KR-075 | 2026-09-24 | İK destekli davet: **tek kullanımlık parola bağlantısı**, yalnızca LOGO'daki kurumsal e-postaya | İK, personele sistem üzerinden tek kullanımlık parola oluşturma bağlantısı gönderebilir. Bağlantı yalnızca personelin **LOGO'da tanımlı kurumsal e-postasına** otomatik gider; tanımlı değilse gönderilemez. **İK adres girmez, parolayı bilmez.** Geçerlilik süresi parametredir (varsayılan **3 saat**) | İK kararı (S-04; S-05 24.09.2026'da revize). Toplantıdaki ilk cevapta İK adresi elle girecekti; Bilgi İşlem bunun bağlantıyı kurum dışına veya başka bir personele gönderebileceğini (`KR-018`, `KR-019`) ve HRMS ile LOGO arasında ikinci bir doğruluk kaynağı yaratacağını belirtti. İK elle girişi tamamen kaldırdı — bu, önerilen kısıtlamalardan daha güçlü bir çözümdür: üç risk yapısal olarak ortadan kalktı. **Not:** akış artık iletişimsiz personel için istisna değil, İK destekli davettir; iletişim bilgisi olmayan personel için giriş yolu yoktur (`KR-076`) | İK + Bilgi İşlem | Yürürlükte |
 | KR-076 | 2026-09-23 | Hiçbir iletişim bilgisi olmayan personel sisteme **alınmayacak** | 22.09.2026 ölçümüyle hiçbir iletişim bilgisi olmayan 2 personel sisteme giriş yapmayacaktır | İK kararı (S-12). Bu kişiler için ne doğrulama kodu ne de giriş kimliği üretilebilir. İstisna akışı (`KR-075`) teknik olarak mevcuttur; ancak İK bu kişiler için kullanılmayacağını bildirmiştir. **Kapsam:** yalnızca iletişim bilgisi HİÇ olmayan kişiler — telefonu olup e-postası olmayan 2 kişi bu kararın kapsamında değildir (toplantı kaydı §10.1) | İK | Yürürlükte |
 | KR-077 | 2026-09-24 | T3 kapsamında **yalnızca T3'ün ihtiyaç duyduğu** T1 çekirdeği kurulacak | Kişi/istihdam veri modeli ve LOGO senkronizasyonu, onaylı T3 gereksinimlerinin (REQ-KMLK-002, 003, 013, 014, 034) gerektirdiği ölçüde **T3 kapsamında** kurulur. Personel listesi, kişi kartı, filtreler gibi T1 Personel Yönetimi **ekranları ve işlevleri** T1'in kendi İK gereksinim toplantısından sonra geliştirilir | Üyelik akışı, LOGO'dan senkronize edilmiş kişi verisi olmadan çalışamaz; bu veri aynı zamanda T1'in çekirdeğidir. `KR-068` her modülün kendi gereksinim toplantısıyla başlamasını şart koşar. Bu karar ikisini uzlaştırır: T3, **onaylı kendi gereksinimlerinin** gerektirdiği altyapıyı kurar; T1'in onaylanmamış gereksinimlerine dayanan hiçbir şey geliştirilmez. T1 toplantısında bu altyapıya ek gereksinim çıkarsa T1 kapsamında eklenir | İK + Bilgi İşlem | Yürürlükte |
+| KR-078 | 2026-09-25 | Üyelikte eşleşme gizliliği: **onaylı metin korunur**, kalan risk kabul edilir | REQ-KMLK-004 olduğu gibi uygulanır: bilgiler eşleşmese de kanal seçim ekranı görünür, kod gönderilmez. REQ-KMLK-010 de olduğu gibi uygulanır: cep telefonu olmayan kişiye yalnızca e-posta kanalı sunulur. Bu iki kuralın birlikte, telefonu olmayan personel (22.09.2026: 10 kişi) için eşleşmeyi dolaylı olarak ele vermesi **kabul edilen kalan risktir** | Farkı görebilmek için TCKN, doğum tarihi ve kurumsal e-postanın üçünün de doğru bilinmesi gerekir; öğrenilen tek bilgi kişinin kurumda çalıştığıdır ve kod yine kişinin kendi adresine gider. Eşleşmeyince hata göstermek bu bilgiyi herkes için açardı; her zaman iki kanal göstermek ise 10 kişiyi hiç gelmeyecek bir SMS'i beklemeye bırakırdı. T3 kabulünde İK'ya ayrıca gösterilecek (`SYG-KMLK.md` §6, AN-01) | Bilgi İşlem | Yürürlükte |
 
 ---
 
@@ -131,3 +132,4 @@
 | 2026-09-17 | 1.9 | KR-068 eklendi (modül başlangıç koşulu: İK gereksinim toplantısı ve onayı) | Bilgi İşlem |
 | 2026-09-21 | 2.0 | KR-069…KR-072 eklendi (2FA geliştirme kararı, parola uzunluğu, sır parametreleri, yönetici filtresi); **KR-017 yürürlükten kaldırıldı** | Bilgi İşlem |
 | 2026-09-24 | 2.1 | KR-073…KR-077 eklendi (T3 gereksinim toplantısı kararları: e-posta ile giriş, hareketsizlik 30 dk, İK destekli davet bağlantısı, iletişimsiz personel, T3 kapsamında T1 çekirdeği) | Bilgi İşlem |
+| 2026-09-25 | 2.2 | KR-078 eklendi (üyelikte eşleşme gizliliği ile kanal gösterimi arasındaki kalan riskin kabulü) | Bilgi İşlem |

@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`
+**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`, `KR-078`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **İlgili riskler:** `R-08`, `R-12`, `R-13`, `R-14`
 
@@ -55,7 +55,7 @@ Kurallar:
 | Uzunluk | 6 hane, kriptografik olarak güvenli üretici ile |
 | Geçerlilik süresi | **5 dakika** |
 | Yanlış deneme sınırı | **3** — aşılırsa kod iptal edilir, yeniden istenmesi gerekir |
-| Saklama | Veritabanında **anahtarlı özet (HMAC-SHA256)** olarak; düz metin saklanmaz. Düz özet yetmez: 6 haneli kodun 1.000.000 olasılığı saniyeler içinde denenir (`SG-KMLK-025`) |
+| Saklama | Veritabanında **anahtarlı özet (HMAC-SHA256)** olarak; düz metin saklanmaz. Düz özet yetmez: 6 haneli kodun 1.000.000 olasılığı saniyeler içinde denenir (`SYG-KMLK-025`) |
 | Loglama | Kod **hiçbir yere loglanmaz** (SMS/e-posta içeriği dâhil) |
 | Tek kullanımlık | Doğrulanan kod anında geçersiz kılınır |
 
@@ -90,7 +90,7 @@ LOGO'da adres tanımlamasıdır. SMS kanalı iki adımlı doğrulama ve parola s
 geçerliliğini korur.
 
 Eşleşmenin sızmaması (`KR-016`) ile kanal gösterimi arasındaki gerilim ve çözümü:
-`SG-KMLK.md` §6, AN-01.
+`SYG-KMLK.md` §6, AN-01 ve `KR-078`.
 
 ### 5. Hız sınırlama ve kilitleme
 
@@ -99,7 +99,7 @@ Eşleşmenin sızmaması (`KR-016`) ile kanal gösterimi arasındaki gerilim ve 
 | TCKN başına üyelik denemesi | 5 deneme / saat |
 | IP başına üyelik denemesi | 20 deneme / saat |
 | Kod gönderimi (kişi başına) | 3 gönderim / 15 dakika |
-| Giriş denemesi (**girilen e-posta** başına — hesap var olmasa da; `SG-KMLK-033`) | 5 başarısız deneme → 15 dakika kilit |
+| Giriş denemesi (**girilen e-posta** başına — hesap var olmasa da; `SYG-KMLK-033`) | 5 başarısız deneme → 15 dakika kilit |
 
 Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
 

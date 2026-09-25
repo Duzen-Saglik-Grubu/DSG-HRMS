@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.3-YAK
 **Süreç:** TEC.3 — Sistem/Yazılım Gereksinimlerinin Tanımlanması
-**Son güncelleme:** 2026-09-24
+**Son güncelleme:** 2026-09-25
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)` sürecin dokümante edilmiş bilgi
 gereksinimleri belirlenir · `PA 2.2 (b)` bu bilginin kontrol gereksinimleri belirlenir
 
@@ -69,24 +69,32 @@ Modülün paydaş gereksinimleri **İK onayından geçmiş ve depoda olmalıdır
 
 | Çıktı | Dosya | Ne zaman |
 |---|---|---|
-| **Sistem/yazılım gereksinimleri** | `gereksinimler/SG-<MODÜL>.md` | Paydaş gereksinimleri onaylandıktan sonra, geliştirmeden önce |
-| İzlenebilirlik | `docs/33061/izlenebilirlik-matrisi.md` — "Sistem gereksinimi" sütunu | SG belgesiyle **aynı PR'da** |
-| Analiz bulguları | SG belgesi §6 | SG belgesiyle birlikte |
+| **Sistem/yazılım gereksinimleri** | `gereksinimler/SYG-<MODÜL>.md` | Paydaş gereksinimleri onaylandıktan sonra, geliştirmeden önce |
+| İzlenebilirlik | `docs/33061/izlenebilirlik-matrisi.md` — "Sistem gereksinimi" sütunu | SYG belgesiyle **aynı PR'da** |
+| Analiz bulguları | SYG belgesi §6 | SYG belgesiyle birlikte |
 
 ### 3.1 Kimliklendirme
 
-`SG-<MODÜL>-<no>` — numara üç hane: `SG-KMLK-013`. Numara yeniden kullanılmaz; iptal
-edilen madde `İptal` notuyla kalır.
+`SYG-<MODÜL>-<no>` — **S**istem/**Y**azılım **G**ereksinimi; numara üç hane:
+`SYG-KMLK-013`. Numara yeniden kullanılmaz; iptal edilen madde `İptal` notuyla kalır.
 
-> **Neden `REQ-` değil?** Belge haritası ilk yazıldığında sistem gereksinimleri için
-> `REQ-<MODÜL>-<no>` öngörülmüştü. T3 paydaş gereksinimleri İK'ya `REQ-KMLK-nnn`
-> kimlikleriyle sunuldu ve **bu kimliklerle onaylandı** (PG-KMLK §3). Aynı öneki sistem
-> gereksinimlerine vermek iki farklı belgede aynı kimliği üretirdi. Sistem
-> gereksinimleri bu nedenle `SG-` önekini alır.
+> **Neden `SYG-`?**
+>
+> - **`REQ-` olamaz:** Belge haritası ilk yazıldığında sistem gereksinimleri için
+>   `REQ-<MODÜL>-<no>` öngörülmüştü. T3 paydaş gereksinimleri İK'ya `REQ-KMLK-nnn`
+>   kimlikleriyle sunuldu ve **bu kimliklerle onaylandı** (PG-KMLK §3). Aynı önek iki
+>   farklı belgede aynı kimliği üretirdi.
+> - **`SG-` yetmez:** Yalnızca sistem gereksinimlerini kapsıyormuş gibi okunur; oysa
+>   süreç ikisini birlikte kapsar (§1.1).
+> - **`SG-YG-` seçilmedi:** İki ayrı kategori varmış gibi okunur. Ayrıca projedeki diğer
+>   kimliklerin (`PG-KMLK-01`, `TS-KMLK-01`, `KR-001`) "tek önek + modül + numara"
+>   düzenini bozar.
+>
+> Karar: 25.09.2026, PR #65 incelemesi.
 
 ### 3.2 Belgenin bölümleri
 
-Her SG belgesi TEC.3 çıktılarına karşılık gelen şu bölümleri taşır:
+Her SYG belgesi TEC.3 çıktılarına karşılık gelen şu bölümleri taşır:
 
 | Bölüm | İçerik | TEC.3 çıktısı |
 |---|---|---|
@@ -118,19 +126,19 @@ madde CI'da otomatik test olmadan tamamlanmış sayılmaz.
 |---|---|
 | Sürüm | Her belge Git'te; değişiklik **Pull Request** ile yapılır |
 | Onay | En az bir gözden geçiren onayı (CONTRIBUTING §5) |
-| Kimlik | `SG-<MODÜL>-<no>`; numara yeniden kullanılmaz |
+| Kimlik | `SYG-<MODÜL>-<no>`; numara yeniden kullanılmaz |
 | **Kapsama** | **Otomatik:** `.github/scripts/gereksinim-izlenebilirlik-denetimi.mjs`, PR izlenebilirlik denetimi içinde her PR'da çalışır |
 | Değişiklik | Paydaş gereksiniminin anlamını değiştiren sistem gereksinimi değişikliği önce `tur:degisiklik-talebi` issue'su ve İK onayı gerektirir |
 | Tarih ve sahip | Her belgede "Son güncelleme" ve değişiklik geçmişi |
 
 **Otomatik denetim neyi yakalar?** Bağsız kalan paydaş gereksinimi; paydaş belgesinde
 olmayan kaynak kimliği; tekrar eden veya sırası bozuk kimlik; metin içinde karşılıksız
-atıf; SG §8 tablosu veya izlenebilirlik matrisi ile §4 arasındaki farklılık. Denetim
+atıf; SYG §8 tablosu veya izlenebilirlik matrisi ile §4 arasındaki farklılık. Denetim
 çalışmadan önce **kendini sınar**: bir paydaş gereksinimi bağsız bırakılmış gibi
 yapılır ve bunu yakalaması beklenir. Böylece hiçbir satırı eşleştiremeyen bozuk bir
 ifade "her şey yolunda" diyemez.
 
-> **Neden otomatik?** Aynı eşleme üç yerde durur: SG §4, SG §8 ve izlenebilirlik
+> **Neden otomatik?** Aynı eşleme üç yerde durur: SYG §4, SYG §8 ve izlenebilirlik
 > matrisi. Elle tutulan üç kopya ilk değişiklikte ayrılır ve izlenebilirlik varmış
 > gibi görünmeye devam eder. İlk çalıştırmada denetim, belgenin kendisinde iki sıra
 > hatası yakaladı.
@@ -141,12 +149,12 @@ ifade "her şey yolunda" diyemez.
 
 | TEC.3 çıktısı | Nerede karşılanır |
 |---|---|
-| a) Sistem ve öğeleri, arayüzleri, işlevleri, sınırları tanımlanır | `SG-<MODÜL>.md` §2 |
-| b) İşlevsel, performans, arayüz, işlevsel olmayan gereksinimler ve tasarım kısıtları tanımlanır | `SG-<MODÜL>.md` §4 (Tür sütunu) |
-| c) Kritik performans ölçütleri tanımlanır | `SG-<MODÜL>.md` §5 |
-| d) Gereksinimler analiz edilir | `SG-<MODÜL>.md` §6 |
-| e) Destekleyici sistemler mevcuttur | `SG-<MODÜL>.md` §7 |
-| f) Paydaş gereksinimlerine izlenebilirlik kurulur | `SG-<MODÜL>.md` §8 + `izlenebilirlik-matrisi.md` + otomatik denetim |
+| a) Sistem ve öğeleri, arayüzleri, işlevleri, sınırları tanımlanır | `SYG-<MODÜL>.md` §2 |
+| b) İşlevsel, performans, arayüz, işlevsel olmayan gereksinimler ve tasarım kısıtları tanımlanır | `SYG-<MODÜL>.md` §4 (Tür sütunu) |
+| c) Kritik performans ölçütleri tanımlanır | `SYG-<MODÜL>.md` §5 |
+| d) Gereksinimler analiz edilir | `SYG-<MODÜL>.md` §6 |
+| e) Destekleyici sistemler mevcuttur | `SYG-<MODÜL>.md` §7 |
+| f) Paydaş gereksinimlerine izlenebilirlik kurulur | `SYG-<MODÜL>.md` §8 + `izlenebilirlik-matrisi.md` + otomatik denetim |
 
 ---
 
@@ -161,4 +169,4 @@ ve süreç gözden geçirmelerinde ele alınır.
 
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
-| 2026-09-24 | 0.1 | İlk oluşturma — ilk SG belgesiyle (T3) birlikte | Bilgi İşlem |
+| 2026-09-24 | 0.1 | İlk oluşturma — ilk SYG belgesiyle (T3) birlikte | Bilgi İşlem |

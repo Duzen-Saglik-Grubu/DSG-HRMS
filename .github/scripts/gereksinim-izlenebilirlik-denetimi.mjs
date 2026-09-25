@@ -4,10 +4,10 @@
 //   1. Her paydaş gereksinimi en az bir sistem gereksinimine bağlı.
 //   2. Sistem gereksinimlerinin kaynak kimlikleri paydaş gereksinimleri belgesinde var.
 //   3. Sistem gereksinimi kimlikleri tekil ve sıralı; metin içi atıflar boşa düşmüyor.
-//   4. SG belgesinin §8 ters tablosu ve izlenebilirlik matrisinin "Sistem gereksinimi"
-//      sütunu, SG §4 ile AYNI eşlemeyi gösteriyor.
+//   4. SYG belgesinin §8 ters tablosu ve izlenebilirlik matrisinin "Sistem gereksinimi"
+//      sütunu, SYG §4 ile AYNI eşlemeyi gösteriyor.
 //
-// Neden otomatik? Eşleme üç yerde duruyor (SG §4, SG §8, matris). Elle tutulan üç
+// Neden otomatik? Eşleme üç yerde duruyor (SYG §4, SYG §8, matris). Elle tutulan üç
 // kopya, ilk değişiklikte birbirinden ayrılır ve izlenebilirlik varmış gibi görünür.
 //
 // Denetimin KENDİSİ de sınanır: gerçek belgelerden bir paydaş gereksinimi silinmiş
@@ -24,7 +24,7 @@ const STAKEHOLDER_DIR = join(ROOT, 'TEC.2-paydas-ihtiyac-ve-gereksinimleri/payda
 const SYSTEM_DIR = join(ROOT, 'TEC.3-sistem-yazilim-gereksinimleri/gereksinimler');
 const MATRIX_PATH = join(ROOT, 'izlenebilirlik-matrisi.md');
 
-/** "SG-KMLK-013, 016" -> ["SG-KMLK-013", "SG-KMLK-016"]; "—" -> [] */
+/** "SYG-KMLK-013, 016" -> ["SYG-KMLK-013", "SYG-KMLK-016"]; "—" -> [] */
 function expandIds(cell, prefix) {
   const s = cell.replace(/`/g, '').trim();
   if (s === '—' || s === '') return [];
@@ -35,7 +35,7 @@ const sameList = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]
 
 export function check(module, stakeholderDoc, systemDoc, matrixDoc) {
   const errors = [];
-  const sgPrefix = `SG-${module}-`;
+  const sygPrefix = `SYG-${module}-`;
 
   // Paydaş gereksinimleri: "| **REQ-KMLK-001** |" veya "| **PG-KMLK-01** |"
   const stakeholderIds = [...stakeholderDoc.matchAll(new RegExp(`^\\| \\*\\*((?:REQ|PG)-${module}-\\d+)\\*\\*`, 'gm'))]
@@ -43,8 +43,8 @@ export function check(module, stakeholderDoc, systemDoc, matrixDoc) {
   if (!stakeholderIds.length) return [`${module}: paydaş gereksinimi satırı bulunamadı`];
   const stakeholderSet = new Set(stakeholderIds);
 
-  // SG satırları: | **SG-KMLK-001** | metin | tür | kaynak | doğrulama | parametre |
-  const rows = [...systemDoc.matchAll(new RegExp(`^\\| \\*\\*(${sgPrefix}\\d{3})\\*\\* \\|(.*)$`, 'gm'))].map((m) => {
+  // SYG satırları: | **SYG-KMLK-001** | metin | tür | kaynak | doğrulama | parametre |
+  const rows = [...systemDoc.matchAll(new RegExp(`^\\| \\*\\*(${sygPrefix}\\d{3})\\*\\* \\|(.*)$`, 'gm'))].map((m) => {
     const cells = m[2].split(' | ');
     return { id: m[1], text: cells[0], sources: expandIds(cells[2] ?? '', '') };
   });
@@ -52,7 +52,7 @@ export function check(module, stakeholderDoc, systemDoc, matrixDoc) {
 
   const seen = new Set();
   rows.forEach((row, i) => {
-    const expectedId = `${sgPrefix}${String(i + 1).padStart(3, '0')}`;
+    const expectedId = `${sygPrefix}${String(i + 1).padStart(3, '0')}`;
     if (row.id !== expectedId) errors.push(`${row.id}: sıra bozuk (beklenen ${expectedId})`);
     if (seen.has(row.id)) errors.push(`${row.id}: tekrar eden kimlik`);
     seen.add(row.id);
@@ -62,27 +62,27 @@ export function check(module, stakeholderDoc, systemDoc, matrixDoc) {
     }
   });
   for (const row of rows) {
-    for (const m of row.text.matchAll(new RegExp(`${sgPrefix}\\d{3}`, 'g'))) {
+    for (const m of row.text.matchAll(new RegExp(`${sygPrefix}\\d{3}`, 'g'))) {
       if (!seen.has(m[0])) errors.push(`${row.id}: metindeki ${m[0]} atfı karşılıksız`);
     }
   }
 
-  // Beklenen eşleme: paydaş -> [SG]
+  // Beklenen eşleme: paydaş -> [SYG]
   const expected = new Map(stakeholderIds.map((id) => [id, []]));
   for (const row of rows) for (const s of row.sources) expected.get(s)?.push(row.id);
   for (const [id, sgs] of expected) if (!sgs.length) errors.push(`${id}: hiçbir sistem gereksinimine bağlı değil`);
 
-  // SG §8 ters tablo: | `REQ-KMLK-001` | SG-KMLK-013, 016 |
+  // SYG §8 ters tablo: | `REQ-KMLK-001` | SYG-KMLK-013, 016 |
   const reverse = new Map([...systemDoc.matchAll(new RegExp(`^\\| \`((?:REQ|PG)-${module}-\\d+)\` \\| ([^|]*) \\|$`, 'gm'))]
-    .map((m) => [m[1], expandIds(m[2], sgPrefix)]));
+    .map((m) => [m[1], expandIds(m[2], sygPrefix)]));
   for (const [id, sgs] of expected) {
-    if (!reverse.has(id)) errors.push(`SG §8: ${id} satırı yok`);
-    else if (!sameList(reverse.get(id), sgs)) errors.push(`SG §8: ${id} = ${reverse.get(id).join(', ')}; beklenen ${sgs.join(', ')}`);
+    if (!reverse.has(id)) errors.push(`SYG §8: ${id} satırı yok`);
+    else if (!sameList(reverse.get(id), sgs)) errors.push(`SYG §8: ${id} = ${reverse.get(id).join(', ')}; beklenen ${sgs.join(', ')}`);
   }
 
   // Matris: | n | `REQ-KMLK-001` metin | Sistem gereksinimi | ...
   const matrix = new Map([...matrixDoc.matchAll(new RegExp(`^\\| \\d+ \\| \`((?:REQ|PG)-${module}-\\d+)\`[^|]*\\| ([^|]*) \\|`, 'gm'))]
-    .map((m) => [m[1], expandIds(m[2], sgPrefix)]));
+    .map((m) => [m[1], expandIds(m[2], sygPrefix)]));
   for (const [id, sgs] of expected) {
     if (!matrix.has(id)) errors.push(`Matris: ${id} satırı yok`);
     else if (!sameList(matrix.get(id), sgs)) errors.push(`Matris: ${id} = ${matrix.get(id).join(', ') || '—'}; beklenen ${sgs.join(', ')}`);
@@ -93,7 +93,7 @@ export function check(module, stakeholderDoc, systemDoc, matrixDoc) {
 
 // ------------------------------------------------------------------ çalıştır
 const modules = existsSync(SYSTEM_DIR)
-  ? readdirSync(SYSTEM_DIR).map((f) => /^SG-([A-Z]+)\.md$/.exec(f)?.[1]).filter(Boolean)
+  ? readdirSync(SYSTEM_DIR).map((f) => /^SYG-([A-Z]+)\.md$/.exec(f)?.[1]).filter(Boolean)
   : [];
 if (!modules.length) {
   console.log('Sistem gereksinimi belgesi yok; denetlenecek bir şey yok.');
@@ -111,9 +111,9 @@ for (const module of modules) {
     continue;
   }
   const stakeholderDoc = readFileSync(stakeholderPath, 'utf8');
-  const systemDoc = readFileSync(join(SYSTEM_DIR, `SG-${module}.md`), 'utf8');
+  const systemDoc = readFileSync(join(SYSTEM_DIR, `SYG-${module}.md`), 'utf8');
 
-  // Önce denetimin kendisi: ilk paydaş gereksinimine yapılan tüm atıflar SG'den
+  // Önce denetimin kendisi: ilk paydaş gereksinimine yapılan tüm atıflar SYG'den
   // silinirse denetim bunu YAKALAMALI.
   const firstId = new RegExp(`\\| \\*\\*((?:REQ|PG)-${module}-\\d+)\\*\\*`).exec(stakeholderDoc)?.[1];
   if (firstId) {
@@ -131,7 +131,7 @@ for (const module of modules) {
     for (const e of errors) console.error(`    ${e}`);
     failures++;
   } else {
-    console.log(`✓ ${module}: her paydaş gereksinimi karşılanıyor; SG §8 ve izlenebilirlik matrisi SG §4 ile tutarlı`);
+    console.log(`✓ ${module}: her paydaş gereksinimi karşılanıyor; SYG §8 ve izlenebilirlik matrisi SYG §4 ile tutarlı`);
   }
 }
 

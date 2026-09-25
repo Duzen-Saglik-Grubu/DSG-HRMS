@@ -38,7 +38,7 @@ jobs:
         run: node .github/scripts/baslik-bicimi-testi.mjs
 
       # Gereksinim zinciri: paydas gereksinimi -> sistem gereksinimi -> matris.
-      # Ayni esleme uc yerde duruyor (SG §4, SG §8, izlenebilirlik matrisi); elle
+      # Ayni esleme uc yerde duruyor (SYG §4, SYG §8, izlenebilirlik matrisi); elle
       # tutulan kopyalar ilk degisiklikte ayrilir. Betik once kendini sinar.
       - name: Gereksinim izlenebilirligini denetle
         run: node .github/scripts/gereksinim-izlenebilirlik-denetimi.mjs
