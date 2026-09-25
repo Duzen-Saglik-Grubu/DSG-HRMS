@@ -5,8 +5,8 @@
 # kucuk imaj, daha az saldiri yuzeyi demektir.
 
 # ---------- 1. Asama: derleme ----------
-FROM mcr.microsoft.com/dotnet/sdk:10.0-noble AS derleme
-WORKDIR /kaynak
+FROM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build
+WORKDIR /src
 
 # Once yalnizca proje dosyalari kopyalanir ve paketler geri yuklenir.
 # Kaynak kodu degistiginde bu katman ONBELEKTEN gelir; derleme suresi kisalir.
@@ -29,11 +29,11 @@ COPY . .
 RUN dotnet publish Dsg.Hrms.Api/Dsg.Hrms.Api.csproj \
     --no-restore \
     --configuration Release \
-    --output /uygulama \
+    --output /app \
     -warnaserror
 
 # ---------- 2. Asama: calisma zamani ----------
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble AS calisma
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble AS runtime
 
 # Turkce kultur ve ICU gereklidir (ad siralamasi, tarih bicimi).
 # InvariantGlobalization kapali oldugu icin ICU kutuphaneleri imajda bulunmalidir.
@@ -59,16 +59,16 @@ RUN apt-get update \
     && apt-get install --no-install-recommends --yes curl \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /uygulama
-COPY --from=derleme /uygulama .
+WORKDIR /app
+COPY --from=build /app .
 
 # Gunluk dosyalari icin yazilabilir dizin (ADR-0009 §1).
-RUN mkdir -p /uygulama/logs
+RUN mkdir -p /app/logs
 
 # ROOT OLMAYAN KULLANICI.
 # Konteyner icinde root calismak, bir guvenlik acigi durumunda saldirganin
 # elindeki yetkiyi buyutur. .NET imajlari "app" kullanicisiyla gelir.
-RUN chown -R app:app /uygulama
+RUN chown -R app:app /app
 USER app
 
 EXPOSE 8080

@@ -15,7 +15,7 @@
 #   - Sir uretmez/degistirmez. ".env.uat" sunucuda bir kez olusturulur ve
 #     dokunulmaz (KR-038). Ayrinti: docs/33061/TEC.10-gecis/uat-ortami-kurulum-runbook.md
 #
-# Sir dosyasinin yeri: "<dizin>/gizli/.env.uat" - KAYNAK AGACININ DISINDA.
+# Sir dosyasinin yeri: "<dizin>/secrets/.env.uat" - KAYNAK AGACININ DISINDA.
 #
 # Neden disarida? Aktarim adimi "<dizin>/docker" dizinini silip yeniden olusturur.
 # Dosya orada dururken her dagitim, ihtiyac duydugu sirri KENDI ELIYLE siliyordu;
@@ -26,7 +26,7 @@ set -euo pipefail
 
 SERVER="${1:-root@192.168.3.202}"
 APP_DIR="/opt/dsg-hrms"
-SECRETS_FILE="/opt/dsg-hrms/gizli/.env.uat"
+SECRETS_FILE="/opt/dsg-hrms/secrets/.env.uat"
 DOMAIN="insankaynaklaritest.duzen.com.tr"
 # Adres, sunucuda sertifika olup olmamasina gore belirlenir (asagida).
 BASE_URL="http://${DOMAIN}"

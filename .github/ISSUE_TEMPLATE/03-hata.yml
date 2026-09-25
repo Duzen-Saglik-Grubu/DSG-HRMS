@@ -11,7 +11,7 @@ body:
         yeterlidir.
 
   - type: textarea
-    id: ozet
+    id: summary
     attributes:
       label: "Ne oldu?"
       description: "Beklenen davranış ne, gerçekleşen ne?"
@@ -22,7 +22,7 @@ body:
       required: true
 
   - type: textarea
-    id: adimlar
+    id: steps
     attributes:
       label: "Nasıl tekrarlanır?"
       value: |
@@ -33,7 +33,7 @@ body:
       required: true
 
   - type: input
-    id: traceid
+    id: trace_id
     attributes:
       label: "traceId"
       description: "Hata ekranında görünen izleme kimliği. Log ile eşleştirme bununla yapılır."
@@ -41,7 +41,7 @@ body:
       required: false
 
   - type: dropdown
-    id: ortam
+    id: environment
     attributes:
       label: "Ortam"
       options:
@@ -52,7 +52,7 @@ body:
       required: true
 
   - type: dropdown
-    id: siddet
+    id: severity
     attributes:
       label: "Şiddet"
       options:
@@ -64,7 +64,7 @@ body:
       required: true
 
   - type: input
-    id: surum
+    id: version
     attributes:
       label: "Sürüm"
       placeholder: "v0.3.1"
@@ -72,7 +72,7 @@ body:
       required: false
 
   - type: textarea
-    id: ek
+    id: attachments
     attributes:
       label: "Ek bilgi"
       description: "Tarayıcı, ekran görüntüsü (maskeli), log kesiti."

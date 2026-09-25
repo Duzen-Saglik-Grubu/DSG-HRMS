@@ -50,14 +50,14 @@ services:
       # Baglanti dizesi ORTAM DEGISKENINDEN gelir; imajda veya depoda yer almaz
       # (ADR-0008, KR-038).
       Database__Hrms: 'Host=postgres;Port=5432;Database=${POSTGRES_DB:-dsg_hrms};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}'
-      ApplicationLogging__FilePath: '/uygulama/logs/dsg-hrms-.json'
+      ApplicationLogging__FilePath: '/app/logs/dsg-hrms-.json'
       Observability__OtlpEndpoint: ${OTLP_ENDPOINT:-}
     ports:
       - '${API_PORT:-5199}:8080'
     volumes:
       # Gunlukler konteyner disinda kalir; konteyner yeniden olusturuldugunda
       # kaybolmaz.
-      - api-gunlukleri:/uygulama/logs
+      - api-gunlukleri:/app/logs
     depends_on:
       postgres:
         # API, veritabani HAZIR OLMADAN baslamaz. Aksi hâlde ilk acilista

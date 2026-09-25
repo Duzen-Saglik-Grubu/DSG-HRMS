@@ -7,28 +7,28 @@
 #
 # Kurulum:  git config core.hooksPath .githooks
 
-MESAJ_DOSYASI="$1"
-ILK_SATIR=$(head -n1 "$MESAJ_DOSYASI")
+MESSAGE_FILE="$1"
+SUBJECT=$(head -n1 "$MESSAGE_FILE")
 
-KIRMIZI='\033[0;31m'
-NORMAL='\033[0m'
+RED='\033[0;31m'
+RESET='\033[0m'
 
 # Birlestirme ve geri alma commit'leri muaf
-case "$ILK_SATIR" in
+case "$SUBJECT" in
     "Merge "*|"Revert "*|"fixup!"*|"squash!"*) exit 0 ;;
 esac
 
 # <tur>(<kapsam>)!: <ozet>
-DESEN='^(feat|fix|docs|test|refactor|perf|build|ci|chore)(\([a-z0-9.-]+\))?!?: .+$'
+PATTERN='^(feat|fix|docs|test|refactor|perf|build|ci|chore)(\([a-z0-9.-]+\))?!?: .+$'
 
-if ! printf '%s' "$ILK_SATIR" | grep -Eq "$DESEN"; then
-    printf "%b" "${KIRMIZI}"
+if ! printf '%s' "$SUBJECT" | grep -Eq "$PATTERN"; then
+    printf "%b" "${RED}"
     echo "======================================================================"
     echo " Commit mesaji bicimi hatali."
     echo "======================================================================"
-    printf "%b" "${NORMAL}"
+    printf "%b" "${RESET}"
     echo ""
-    echo " Girilen : $ILK_SATIR"
+    echo " Girilen : $SUBJECT"
     echo ""
     echo " Beklenen: <tur>(<kapsam>): <ozet>"
     echo ""
@@ -41,11 +41,11 @@ if ! printf '%s' "$ILK_SATIR" | grep -Eq "$DESEN"; then
 fi
 
 # Ozet satiri uzunlugu
-UZUNLUK=$(printf '%s' "$ILK_SATIR" | wc -m | tr -d ' ')
-if [ "$UZUNLUK" -gt 72 ]; then
-    printf "%b" "${KIRMIZI}"
-    echo " Ozet satiri $UZUNLUK karakter; en fazla 72 olmali."
-    printf "%b" "${NORMAL}"
+LENGTH=$(printf '%s' "$SUBJECT" | wc -m | tr -d ' ')
+if [ "$LENGTH" -gt 72 ]; then
+    printf "%b" "${RED}"
+    echo " Ozet satiri $LENGTH karakter; en fazla 72 olmali."
+    printf "%b" "${RESET}"
     echo " Ayrintiyi govde bolumune yazin."
     exit 1
 fi

@@ -10,14 +10,14 @@ body:
         eklenmez**; bu issue ile kayıt altına alınır ve önceliklendirilir (`R-04`).
 
   - type: textarea
-    id: talep
+    id: request
     attributes:
       label: "Ne değişsin?"
     validations:
       required: true
 
   - type: textarea
-    id: gerekce
+    id: rationale
     attributes:
       label: "Neden?"
       description: "Talebin gerekçesi. Hangi ihtiyaç karşılanmıyor?"
@@ -25,7 +25,7 @@ body:
       required: true
 
   - type: input
-    id: etkilenen
+    id: affected_items
     attributes:
       label: "Etkilenen kayıt"
       description: "Hangi gereksinim, karar veya modül etkileniyor?"
@@ -34,7 +34,7 @@ body:
       required: true
 
   - type: dropdown
-    id: etki
+    id: impact
     attributes:
       label: "Tahmini etki"
       options:
@@ -45,7 +45,7 @@ body:
       required: true
 
   - type: input
-    id: talepeden
+    id: requested_by
     attributes:
       label: "Talep eden"
       placeholder: "İK Birimi — 2026-10-02 görüşmesi"
@@ -53,7 +53,7 @@ body:
       required: true
 
   - type: textarea
-    id: karar
+    id: decision
     attributes:
       label: "Karar (değerlendirme sonrası doldurulur)"
       description: "Kabul / Ret / Ertelendi + gerekçe + karar defteri kimliği (KR-nnn)."

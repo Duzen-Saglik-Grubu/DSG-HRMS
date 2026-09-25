@@ -25,7 +25,7 @@
 set -uo pipefail
 
 RECORD_NAME="_acme-challenge.${CERTBOT_DOMAIN}"
-STATUS_FILE=/opt/acme/beklenen-kayit.txt
+STATUS_FILE=/opt/acme/expected-record.txt
 TIMEOUT_SECONDS=43200   # 12 saat - kayit ayri bir ekipten geciyor
 POLL_INTERVAL=30
 

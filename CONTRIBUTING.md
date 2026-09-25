@@ -103,6 +103,8 @@ Türkçe karakter ve boşluk kullanılmaz.
 | Kabuk betiği değişkenleri ve fonksiyonları, ortam değişkeni adları | **İngilizce** (`DOMAIN`, `TLS_ENABLED`) |
 | İş akışı (`.github/workflows`) iş kimlikleri, matris anahtarları, satır içi betik tanımlayıcıları | **İngilizce** |
 | Çeviri (i18n) anahtarları | **İngilizce** (`error.notFound`) — değerleri Türkçe |
+| Dockerfile aşama adları, konteyner içi yollar, compose anahtarları, HTTP uç noktası yolları | **İngilizce** (`AS build`, `/app`, `/nginx-health`) |
+| Issue şablonu alan kimlikleri (`id:`) | **İngilizce** — ekranda görünen etiketler Türkçe |
 | **Kod içi yorumlar** | **Türkçe** |
 | **XML belgeleri** (`<summary>`, `<remarks>`) | **Türkçe** |
 | Hata mesajları (kullanıcıya görünen) | **Türkçe** |
@@ -496,3 +498,4 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 | 2026-09-10 | 0.5 | §5 milestone zorunluluğu ve `Closes`/`Refs` ayrımı eklendi (düzeltici faaliyet #17) — o gün §5.1, bugün §5.2 | Bilgi İşlem |
 | 2026-09-17 | 0.6 | §5.1 **PR başlığı** kuralı eklendi; alt bölümler yeniden numaralandı (düzeltici faaliyet #44) | Bilgi İşlem |
 | 2026-09-25 | 0.7 | §3.2 kodlama dilinin kabuk betiklerini, iş akışlarını ve çeviri anahtarlarını da kapsadığı açıkça yazıldı; kapsam dışı olanlar tanımlandı (düzeltici faaliyet #66) | Bilgi İşlem |
+| 2026-09-25 | 0.8 | §3.2 tablosuna Dockerfile, compose, uç nokta yolları ve issue şablonu alan kimlikleri eklendi (düzeltici faaliyet #66) | Bilgi İşlem |

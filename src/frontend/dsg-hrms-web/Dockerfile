@@ -4,8 +4,8 @@
 # Nihai imajda yalnizca nginx ve uretilmis dosyalar bulunur.
 
 # ---------- 1. Asama: derleme ----------
-FROM node:22-alpine AS derleme
-WORKDIR /kaynak
+FROM node:22-alpine AS build
+WORKDIR /src
 
 # "npm ci" package-lock.json'a birebir uyar; imaj her derlemede AYNI surumleri
 # icerir. "npm install" surum kaydirmasi yapabilirdi.
@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build
 
 # ---------- 2. Asama: sunum ----------
-FROM nginx:1.29-alpine AS calisma
+FROM nginx:1.29-alpine AS runtime
 
 # Taban imajdaki paketler guncellenir.
 #
@@ -28,7 +28,7 @@ FROM nginx:1.29-alpine AS calisma
 # birakir; bu satir CI kalite kapisinin (ADR-0011 §6) gereğidir.
 RUN apk upgrade --no-cache
 
-COPY --from=derleme /kaynak/dist /usr/share/nginx/html
+COPY --from=build /src/dist /usr/share/nginx/html
 
 # Iki yapilandirma da imaja girer; hangisinin kullanilacagina acilista karar
 # verilir (nginx/secim.sh). Boylece gelistirme ve uretim AYNI imaji kullanir.
@@ -49,4 +49,4 @@ USER nginx
 EXPOSE 8080 8443
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://127.0.0.1:8080/nginx-saglik || exit 1
+    CMD wget --quiet --tries=1 --spider http://127.0.0.1:8080/nginx-health || exit 1
