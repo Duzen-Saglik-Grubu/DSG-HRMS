@@ -35,7 +35,7 @@ services:
       - '127.0.0.1:${POSTGRES_PORT:-5434}:5432'
     volumes:
       # AYRI hacim: UAT verisi gelistirme verisinden tamamen bagimsizdir.
-      - uat-postgres-verisi:/var/lib/postgresql/data
+      - uat-postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-dsg_hrms_uat}']
       interval: 5s
@@ -62,7 +62,7 @@ services:
       # erisir. Onek burada sabittir (bkz. postgres).
       - '127.0.0.1:${API_PORT:-5299}:8080'
     volumes:
-      - uat-api-gunlukleri:/app/logs
+      - uat-api-logs:/app/logs
     depends_on:
       postgres:
         condition: service_healthy
@@ -90,5 +90,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  uat-postgres-verisi:
-  uat-api-gunlukleri:
+  uat-postgres-data:
+  uat-api-logs:
