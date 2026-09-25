@@ -30,7 +30,7 @@ services:
       # icin disariya 5433 acilir.
       - '${POSTGRES_PORT:-5433}:5432'
     volumes:
-      - postgres-verisi:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-dsg_hrms}']
       interval: 5s
@@ -57,7 +57,7 @@ services:
     volumes:
       # Gunlukler konteyner disinda kalir; konteyner yeniden olusturuldugunda
       # kaybolmaz.
-      - api-gunlukleri:/app/logs
+      - api-logs:/app/logs
     depends_on:
       postgres:
         # API, veritabani HAZIR OLMADAN baslamaz. Aksi hâlde ilk acilista
@@ -84,5 +84,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres-verisi:
-  api-gunlukleri:
+  postgres-data:
+  api-logs:

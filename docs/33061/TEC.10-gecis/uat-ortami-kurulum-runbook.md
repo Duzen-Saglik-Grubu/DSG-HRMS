@@ -319,3 +319,4 @@ bu cezanın ağırlığı kabul edilemez. HSTS, yenileme otomatikleştiğinde a�
 | 2026-09-15 | 0.1 | İlk oluşturma — UAT sunucusu kurulumu ve dağıtım adımları | Bilgi İşlem |
 | 2026-09-17 | 0.2 | TLS devreye alındı (§7): Let's Encrypt sertifikası, elle yenileme yordamı, doğrulama. Ortam dosyası `gizli/` altına taşındı — dağıtım onu siliyordu. `127.0.0.1:` öneki compose dosyasına sabitlendi | Bilgi İşlem |
 | 2026-09-25 | 0.3 | Sunucuya bağlı adlar İngilizceye çevrildi (`KR-058`, düzeltici faaliyet #66): `gizli/` → `secrets/`, `TLS_DIZINI` → `TLS_DIR`, `beklenen-kayit.txt` → `expected-record.txt`. Sunucu tarafı aynı gün uygulandı | Bilgi İşlem |
+| 2026-09-25 | 0.4 | Volume adları İngilizceye çevrildi: `uat-postgres-verisi` → `uat-postgres-data`, `uat-api-gunlukleri` → `uat-api-logs` (`KR-058`, #66). Veri kopyalanarak taşındı (sağlama değerleri ve satır sayıları eşit); eski volume'ler yedek olarak bırakıldı | Bilgi İşlem |
