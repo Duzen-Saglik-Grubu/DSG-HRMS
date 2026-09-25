@@ -53,7 +53,7 @@ export function ConfirmDialog({
   const { t } = useTranslation();
   const [islemde, setIslemde] = useState(false);
 
-  const onayla = async () => {
+  const handleConfirm = async () => {
     setIslemde(true);
 
     try {
@@ -81,24 +81,24 @@ export function ConfirmDialog({
           // Renk TEK BASINA anlam tasimaz (ADR-0015 §7): kirmizi dugmenin yaninda
           // metinle de uyarilir.
           <Alert severity="warning" sx={{ mt: 2 }}>
-            {t('onay.geriAlinamaz')}
+            {t('confirm.irreversible')}
           </Alert>
         ) : null}
       </DialogContent>
 
       <DialogActions>
         <Button onClick={onCancel} disabled={islemde}>
-          {cancelLabel ?? t('onay.vazgec')}
+          {cancelLabel ?? t('confirm.cancel')}
         </Button>
 
         <Button
-          onClick={() => void onayla()}
+          onClick={() => void handleConfirm()}
           color={destructive ? 'error' : 'primary'}
           variant="contained"
           disabled={islemde}
           startIcon={islemde ? <CircularProgress size={16} color="inherit" /> : undefined}
         >
-          {confirmLabel ?? t('onay.onayla')}
+          {confirmLabel ?? t('confirm.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

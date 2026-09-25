@@ -35,18 +35,18 @@ describe('ErrorState', () => {
 
   it('kullaniciya yapabilecegi bir eylem sunar', async () => {
     // "Bir hata olustu" deyip birakmak kullaniciyi caresiz birakir (ADR-0015 §6).
-    const tekrarDene = vi.fn();
+    const retryButton = vi.fn();
 
     render(
       <ErrorState
         error={new ApiError({ message: 'Sunucuya ulasilamadi.', isNetworkError: true })}
-        onRetry={tekrarDene}
+        onRetry={retryButton}
       />,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Tekrar dene' }));
 
-    expect(tekrarDene).toHaveBeenCalledOnce();
+    expect(retryButton).toHaveBeenCalledOnce();
   });
 
   it('yeniden deneme yoksa dugme gostermez', () => {

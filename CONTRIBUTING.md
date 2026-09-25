@@ -1,6 +1,6 @@
 # Katkı Rehberi
 
-**Son güncelleme:** 2026-09-10
+**Son güncelleme:** 2026-09-25
 **İlgili süreçler:** TEC.7 (Gerçekleştirme), TEC.9 (Doğrulama), MAN.5 (Konfigürasyon Yönetimi), MAN.8 (Kalite Güvence)
 
 Bu belge, depoda çalışma kurallarını tanımlar. Kurallar aynı zamanda
@@ -100,6 +100,9 @@ Türkçe karakter ve boşluk kullanılmaz.
 | Veritabanı tablo ve kolon adları | **İngilizce** (`snake_case`) |
 | Yapılandırma anahtarları | **İngilizce** (`Database:Hrms`) |
 | Test metodu adları | **İngilizce** |
+| Kabuk betiği değişkenleri ve fonksiyonları, ortam değişkeni adları | **İngilizce** (`DOMAIN`, `TLS_ENABLED`) |
+| İş akışı (`.github/workflows`) iş kimlikleri, matris anahtarları, satır içi betik tanımlayıcıları | **İngilizce** |
+| Çeviri (i18n) anahtarları | **İngilizce** (`error.notFound`) — değerleri Türkçe |
 | **Kod içi yorumlar** | **Türkçe** |
 | **XML belgeleri** (`<summary>`, `<remarks>`) | **Türkçe** |
 | Hata mesajları (kullanıcıya görünen) | **Türkçe** |
@@ -114,6 +117,18 @@ zaten İngilizcedir.
 
 **Yorumların Türkçe olması bilinçlidir.** Yorum, kodun *neden* öyle yazıldığını
 anlatır; bu açıklamanın ekibin ana dilinde olması anlaşılırlığı artırır.
+
+**Kural yalnızca C# ve TypeScript için değildir.** CI betikleri, iş akışlarının
+içindeki betikler, kabuk betikleri ve Dockerfile'lar da koddur. Bu dosyaların
+"altyapı yapılandırması" gibi okunup kuralın dışında kalması; betiklerde, iş
+akışlarında, ön yüzde ve çeviri anahtarlarında farklı tarihlerde tekrarlanan bir
+uygunsuzluk üretti (düzeltici faaliyet #66).
+
+**Kapsam dışı olanlar:**
+- **Dosya adları.** `baslik-bicimi-testi.mjs` gibi adlar belgelerde ve runbook'ta
+  atıf alır; KR-058 dosya adlarını saymaz.
+- **Belge klasörleri** (`docs/` altı). Belgeler Türkçedir.
+- **Kullanıcıya görünen değerler:** çeviri değerleri, hata iletileri, betik çıktıları.
 
 ```csharp
 /// <summary>
@@ -480,3 +495,4 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 | 2026-09-10 | 0.4 | §3.5 hata fırlatma kuralları eklendi; §7 kontrol listesi genişletildi | Bilgi İşlem |
 | 2026-09-10 | 0.5 | §5 milestone zorunluluğu ve `Closes`/`Refs` ayrımı eklendi (düzeltici faaliyet #17) — o gün §5.1, bugün §5.2 | Bilgi İşlem |
 | 2026-09-17 | 0.6 | §5.1 **PR başlığı** kuralı eklendi; alt bölümler yeniden numaralandı (düzeltici faaliyet #44) | Bilgi İşlem |
+| 2026-09-25 | 0.7 | §3.2 kodlama dilinin kabuk betiklerini, iş akışlarını ve çeviri anahtarlarını da kapsadığı açıkça yazıldı; kapsam dışı olanlar tanımlandı (düzeltici faaliyet #66) | Bilgi İşlem |

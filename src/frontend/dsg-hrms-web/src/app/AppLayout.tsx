@@ -16,9 +16,9 @@ export function AppLayout() {
       <AppBar position="static" color="primary">
         <Toolbar>
           <Typography variant="h6" component="h1" sx={{ flexGrow: 1 }}>
-            {t('uygulama.ad')}
+            {t('app.name')}
           </Typography>
-          <Typography variant="body2">{t('uygulama.kurum')}</Typography>
+          <Typography variant="body2">{t('app.organization')}</Typography>
         </Toolbar>
       </AppBar>
 

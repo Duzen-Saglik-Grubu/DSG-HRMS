@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient } from '@tanstack/react-query';
 import { AppProviders } from '@/app/AppProviders';
 import { HomePage } from '../HomePage';
-import * as saglikApi from '@/shared/api/health';
+import * as healthApi from '@/shared/api/health';
 
 /**
  * Ana sayfanin uc durumu da dogrulanir: yukleniyor, basarili, hatali.
@@ -30,7 +30,7 @@ describe('HomePage', () => {
   });
 
   it('yuklenirken bos ekran degil, durum bilgisi gosterir', () => {
-    vi.spyOn(saglikApi, 'fetchHealth').mockReturnValue(new Promise(() => undefined));
+    vi.spyOn(healthApi, 'fetchHealth').mockReturnValue(new Promise(() => undefined));
 
     renderHomePage();
 
@@ -38,7 +38,7 @@ describe('HomePage', () => {
   });
 
   it('saglik kontrollerini durumlariyla listeler', async () => {
-    vi.spyOn(saglikApi, 'fetchHealth').mockResolvedValue({
+    vi.spyOn(healthApi, 'fetchHealth').mockResolvedValue({
       status: 'Healthy',
       totalDurationMs: 12.3,
       checks: [{ name: 'postgresql', status: 'Healthy', durationMs: 11.1 }],
@@ -54,7 +54,7 @@ describe('HomePage', () => {
   });
 
   it('hata durumunda takip numarasini gosterir', async () => {
-    vi.spyOn(saglikApi, 'fetchHealth').mockRejectedValue({
+    vi.spyOn(healthApi, 'fetchHealth').mockRejectedValue({
       message: 'Sunucuya ulaşılamadı.',
       traceId: 'DESTEK-2026-0042',
       isNetworkError: true,

@@ -65,18 +65,18 @@ export function DataTable<TRow>({
 }: DataTableProps<TRow>) {
   const { t } = useTranslation();
 
-  const siralamayiDegistir = (field: string) => {
-    const ayniAlan = request.sort === field;
-    const yeniYon: SortOrder = ayniAlan && request.order === 'asc' ? 'desc' : 'asc';
+  const toggleSort = (field: string) => {
+    const isSameField = request.sort === field;
+    const nextOrder: SortOrder = isSameField && request.order === 'asc' ? 'desc' : 'asc';
 
     // Siralama degisince ilk sayfaya donulur: kullanici 7. sayfadayken siralama
     // degistirirse, o sayfadaki kayitlar tamamen baska kayitlar olurdu.
-    onRequestChange({ ...request, sort: field, order: yeniYon, page: 1 });
+    onRequestChange({ ...request, sort: field, order: nextOrder, page: 1 });
   };
 
-  const bosMu = !loading && rows.length === 0;
+  const isEmpty = !loading && rows.length === 0;
 
-  if (bosMu && empty) {
+  if (isEmpty && empty) {
     return <>{empty}</>;
   }
 
@@ -99,7 +99,7 @@ export function DataTable<TRow>({
                     <TableSortLabel
                       active={request.sort === column.field}
                       direction={request.sort === column.field ? (request.order ?? 'asc') : 'asc'}
-                      onClick={() => siralamayiDegistir(column.field)}
+                      onClick={() => toggleSort(column.field)}
                     >
                       {column.header}
                     </TableSortLabel>
@@ -132,10 +132,10 @@ export function DataTable<TRow>({
                   </TableRow>
                 ))}
 
-            {bosMu ? (
+            {isEmpty ? (
               <TableRow>
                 <TableCell colSpan={columns.length} align="center" sx={{ py: 4 }}>
-                  {t('durum.bosListe')}
+                  {t('status.emptyList')}
                 </TableCell>
               </TableRow>
             ) : null}
@@ -154,8 +154,8 @@ export function DataTable<TRow>({
         onRowsPerPageChange={(event) =>
           onRequestChange({ ...request, pageSize: Number(event.target.value), page: 1 })
         }
-        labelRowsPerPage={t('tablo.sayfaBasinaKayit')}
-        labelDisplayedRows={({ from, to, count }) => t('tablo.kayitAraligi', { from, to, count })}
+        labelRowsPerPage={t('table.rowsPerPage')}
+        labelDisplayedRows={({ from, to, count }) => t('table.rowRange', { from, to, count })}
       />
     </Paper>
   );

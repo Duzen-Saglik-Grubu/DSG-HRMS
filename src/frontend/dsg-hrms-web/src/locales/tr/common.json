@@ -1,49 +1,49 @@
 {
-  "uygulama": {
-    "ad": "DSG-HRMS",
-    "kurum": "Düzen Sağlık Grubu",
-    "aciklama": "İnsan Kaynakları Yönetim Sistemi"
+  "app": {
+    "name": "DSG-HRMS",
+    "organization": "Düzen Sağlık Grubu",
+    "description": "İnsan Kaynakları Yönetim Sistemi"
   },
-  "gezinme": {
-    "anaSayfa": "Ana Sayfa",
-    "menuAc": "Menüyü aç"
+  "nav": {
+    "home": "Ana Sayfa",
+    "openMenu": "Menüyü aç"
   },
-  "durum": {
-    "yukleniyor": "Yükleniyor…",
-    "hata": "Bir sorun oluştu",
-    "bosListe": "Henüz kayıt yok"
+  "status": {
+    "loading": "Yükleniyor…",
+    "error": "Bir sorun oluştu",
+    "emptyList": "Henüz kayıt yok"
   },
-  "hata": {
-    "baslik": "İşlem tamamlanamadı",
-    "genel": "Beklenmeyen bir sorun oluştu. Lütfen tekrar deneyin.",
-    "ag": "Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.",
-    "yetki": "Bu işlem için yetkiniz bulunmuyor.",
-    "bulunamadi": "Aradığınız kayıt bulunamadı.",
-    "cakisma": "Bu kayıt siz görüntülerken başkası tarafından güncellendi. Sayfayı yenileyip tekrar deneyin.",
-    "takipNumarasi": "Takip numarası",
-    "takipAciklama": "Destek talebinde bu numarayı iletin.",
-    "tekrarDene": "Tekrar dene",
-    "sayfaBulunamadi": "Sayfa bulunamadı",
-    "sayfaBulunamadiAciklama": "Aradığınız sayfa taşınmış veya hiç var olmamış olabilir.",
-    "anaSayfayaDon": "Ana sayfaya dön"
+  "error": {
+    "title": "İşlem tamamlanamadı",
+    "generic": "Beklenmeyen bir sorun oluştu. Lütfen tekrar deneyin.",
+    "network": "Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.",
+    "forbidden": "Bu işlem için yetkiniz bulunmuyor.",
+    "notFound": "Aradığınız kayıt bulunamadı.",
+    "conflict": "Bu kayıt siz görüntülerken başkası tarafından güncellendi. Sayfayı yenileyip tekrar deneyin.",
+    "traceId": "Takip numarası",
+    "traceHint": "Destek talebinde bu numarayı iletin.",
+    "retry": "Tekrar dene",
+    "pageNotFound": "Sayfa bulunamadı",
+    "pageNotFoundHint": "Aradığınız sayfa taşınmış veya hiç var olmamış olabilir.",
+    "backToHome": "Ana sayfaya dön"
   },
-  "saglik": {
-    "baslik": "Sistem durumu",
-    "kontrolEdiliyor": "Kontrol ediliyor…",
-    "calisiyor": "Sistem çalışıyor",
-    "sorunVar": "Sisteme ulaşılamıyor"
+  "health": {
+    "title": "Sistem durumu",
+    "checking": "Kontrol ediliyor…",
+    "healthy": "Sistem çalışıyor",
+    "unhealthy": "Sisteme ulaşılamıyor"
   },
-  "onay": {
-    "onayla": "Onayla",
-    "vazgec": "Vazgeç",
-    "geriAlinamaz": "Bu işlem geri alınamaz."
+  "confirm": {
+    "confirm": "Onayla",
+    "cancel": "Vazgeç",
+    "irreversible": "Bu işlem geri alınamaz."
   },
-  "tablo": {
-    "sayfaBasinaKayit": "Sayfa başına kayıt:",
-    "kayitAraligi": "{{count}} kayıttan {{from}}–{{to}} arası"
+  "table": {
+    "rowsPerPage": "Sayfa başına kayıt:",
+    "rowRange": "{{count}} kayıttan {{from}}–{{to}} arası"
   },
-  "tarih": {
-    "baslangic": "Başlangıç tarihi",
-    "bitis": "Bitiş tarihi"
+  "date": {
+    "start": "Başlangıç tarihi",
+    "end": "Bitiş tarihi"
   }
 }

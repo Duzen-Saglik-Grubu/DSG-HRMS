@@ -13,13 +13,13 @@ export function NotFoundPage() {
   return (
     <Stack spacing={2} sx={{ alignItems: 'flex-start' }}>
       <Typography variant="h5" component="h2">
-        {t('hata.sayfaBulunamadi')}
+        {t('error.pageNotFound')}
       </Typography>
       <Typography variant="body1" color="text.secondary">
-        {t('hata.sayfaBulunamadiAciklama')}
+        {t('error.pageNotFoundHint')}
       </Typography>
       <Button component={Link} to="/" variant="contained">
-        {t('hata.anaSayfayaDon')}
+        {t('error.backToHome')}
       </Button>
     </Stack>
   );

@@ -23,7 +23,7 @@ permissions:
   contents: read
 
 jobs:
-  sozlesme:
+  api-contract:
     name: OpenAPI belgesi guncel mi
     runs-on: ubuntu-latest
 
@@ -31,7 +31,7 @@ jobs:
       # Belge uretimi uygulamayi acar; acilis zorunlu yapilandirmayi denetler
       # (ADR-0008 §4). Bu tasarim zamani degeri gercek bir veritabanina
       # baglanmaz, yalnizca dogrulamayi gecer.
-      Database__Hrms: 'Host=openapi-uretimi;Database=dsg_hrms;Username=openapi;Password=openapi'
+      Database__Hrms: 'Host=openapi-generation;Database=dsg_hrms;Username=openapi;Password=openapi'
 
     steps:
       - name: Depoyu al

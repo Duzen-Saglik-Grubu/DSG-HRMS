@@ -27,7 +27,7 @@ export function EmptyState({ title, description, action, icon }: EmptyStateProps
       <Stack spacing={1.5} sx={{ alignItems: 'center', textAlign: 'center' }}>
         {icon ? <Box sx={{ color: 'text.disabled' }}>{icon}</Box> : null}
 
-        <Typography variant="subtitle1">{title ?? t('durum.bosListe')}</Typography>
+        <Typography variant="subtitle1">{title ?? t('status.emptyList')}</Typography>
 
         {description ? (
           <Typography variant="body2" color="text.secondary">

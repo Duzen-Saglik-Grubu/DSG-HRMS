@@ -2,16 +2,16 @@ import { readFileSync } from 'node:fs';
 
 // Regex, is akisi dosyasindan AYNEN okunur. Kopyalayip yeniden yazmak, sinanan
 // ifadenin calisandan sessizce ayrismasina yol acardi.
-const y = readFileSync('.github/workflows/pr-izlenebilirlik-denetimi.yml', 'utf8');
-const satirlar = y.split('\n');
-const turler = satirlar.find((s) => s.includes('const TURLER ='));
-const basi = satirlar.findIndex((s) => s.includes('const BASLIK_BICIMI ='));
-const regex = satirlar.slice(basi, basi + 2).join('\n');
+const workflowText = readFileSync('.github/workflows/pr-izlenebilirlik-denetimi.yml', 'utf8');
+const lines = workflowText.split('\n');
+const typesLine = lines.find((l) => l.includes('const TYPES ='));
+const patternStart = lines.findIndex((l) => l.includes('const TITLE_PATTERN ='));
+const patternLines = lines.slice(patternStart, patternStart + 2).join('\n');
 
-const kod = (turler + '\n' + regex).replace(/^\s+/gm, '') + '\nreturn BASLIK_BICIMI;';
-const BASLIK_BICIMI = new Function(kod)();
+const source = (typesLine + '\n' + patternLines).replace(/^\s+/gm, '') + '\nreturn TITLE_PATTERN;';
+const TITLE_PATTERN = new Function(source)();
 
-const ornekler = [
+const cases = [
   ['feat(uat): TLS (HTTPS) devreye alındı', true],
   ['fix(frontend): izleme kimliği güvenli olmayan bağlamda da üretiliyor', true],
   ['ci(github): PR izlenebilirlik denetimi', true],
@@ -27,12 +27,12 @@ const ornekler = [
   ['yenilik(uat): gecersiz tur', false],
 ];
 
-let hata = 0;
-for (const [baslik, beklenen] of ornekler) {
-  const sonuc = BASLIK_BICIMI.test(baslik);
-  const uygun = sonuc === beklenen;
-  if (!uygun) hata++;
-  console.log(`  ${uygun ? 'OK    ' : 'YANLIS'} ${sonuc ? 'gecti' : 'dustu'}  ${JSON.stringify(baslik)}`);
+let failures = 0;
+for (const [title, expected] of cases) {
+  const actual = TITLE_PATTERN.test(title);
+  const ok = actual === expected;
+  if (!ok) failures++;
+  console.log(`  ${ok ? 'OK    ' : 'YANLIS'} ${actual ? 'gecti' : 'dustu'}  ${JSON.stringify(title)}`);
 }
-console.log(hata === 0 ? '\nTum ornekler beklendigi gibi.' : `\n${hata} ornek beklenenden farkli!`);
-process.exit(hata ? 1 : 0);
+console.log(failures === 0 ? '\nTum ornekler beklendigi gibi.' : `\n${failures} ornek beklenenden farkli!`);
+process.exit(failures ? 1 : 0);

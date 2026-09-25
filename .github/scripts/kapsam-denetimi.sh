@@ -10,53 +10,53 @@
 
 set -euo pipefail
 
-rapor="${1:?Cobertura raporu yolu verilmedi}"
+report="${1:?Cobertura raporu yolu verilmedi}"
 
-GENEL_ESIK=75
-DOMAIN_ESIK=90
+OVERALL_THRESHOLD=75
+DOMAIN_THRESHOLD=90
 
-if [[ ! -f "$rapor" ]]; then
-  echo "::error::Kapsam raporu bulunamadi: $rapor"
+if [[ ! -f "$report" ]]; then
+  echo "::error::Kapsam raporu bulunamadi: $report"
   exit 1
 fi
 
 # Cobertura 'line-rate' degeri 0-1 arasindadir; yuzdeye cevrilir.
-oran_yuzdeye() {
-  awk -v deger="$1" 'BEGIN { printf "%.1f", deger * 100 }'
+rate_to_percent() {
+  awk -v rate="$1" 'BEGIN { printf "%.1f", rate * 100 }'
 }
 
-genel_oran=$(grep -m1 -o 'line-rate="[0-9.]*"' "$rapor" | head -1 | sed 's/line-rate="//; s/"//')
-genel=$(oran_yuzdeye "$genel_oran")
+overall_rate=$(grep -m1 -o 'line-rate="[0-9.]*"' "$report" | head -1 | sed 's/line-rate="//; s/"//')
+overall=$(rate_to_percent "$overall_rate")
 
-echo "Genel kapsam       : %${genel} (esik: %${GENEL_ESIK})"
+echo "Genel kapsam       : %${overall} (esik: %${OVERALL_THRESHOLD})"
 
-basarisiz=0
+failed=0
 
-if awk -v g="$genel" -v e="$GENEL_ESIK" 'BEGIN { exit !(g < e) }'; then
-  echo "::error::Genel kod kapsami esigin altinda: %${genel} < %${GENEL_ESIK}"
-  basarisiz=1
+if awk -v o="$overall" -v t="$OVERALL_THRESHOLD" 'BEGIN { exit !(o < t) }'; then
+  echo "::error::Genel kod kapsami esigin altinda: %${overall} < %${OVERALL_THRESHOLD}"
+  failed=1
 fi
 
 # Domain katmani ayri esige tabidir: is kurallari orada yasar ve hatalari
 # en pahali olan kod parcasidir.
-domain_oran=$(grep -o '<package name="Dsg.Hrms.Domain" line-rate="[0-9.]*"' "$rapor" \
+domain_rate=$(grep -o '<package name="Dsg.Hrms.Domain" line-rate="[0-9.]*"' "$report" \
   | head -1 | sed 's/.*line-rate="//; s/"//' || true)
 
-if [[ -z "$domain_oran" ]]; then
+if [[ -z "$domain_rate" ]]; then
   # Domain su an yalnizca otomatik ozelliklerden olusuyor; olculecek satir yok.
   # Ilk is kurali eklendiginde bu dal kendiliginden devre disi kalir.
   echo "Domain kapsami     : olculecek kod yok (atlandi)"
 else
-  domain=$(oran_yuzdeye "$domain_oran")
-  echo "Domain kapsami     : %${domain} (esik: %${DOMAIN_ESIK})"
+  domain=$(rate_to_percent "$domain_rate")
+  echo "Domain kapsami     : %${domain} (esik: %${DOMAIN_THRESHOLD})"
 
-  if awk -v d="$domain" -v e="$DOMAIN_ESIK" 'BEGIN { exit !(d < e) }'; then
-    echo "::error::Domain kod kapsami esigin altinda: %${domain} < %${DOMAIN_ESIK}"
-    basarisiz=1
+  if awk -v d="$domain" -v t="$DOMAIN_THRESHOLD" 'BEGIN { exit !(d < t) }'; then
+    echo "::error::Domain kod kapsami esigin altinda: %${domain} < %${DOMAIN_THRESHOLD}"
+    failed=1
   fi
 fi
 
-if [[ "$basarisiz" -ne 0 ]]; then
+if [[ "$failed" -ne 0 ]]; then
   echo ''
   echo 'Kapsam kapisi UYARI DEGIL, ENGELDIR (ADR-0011 §6).'
   echo 'Eksik testleri yazin; esigi dusurmek icin gerekce ve duzeltici faaliyet gerekir.'
