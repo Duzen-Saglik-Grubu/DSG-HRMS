@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { ConfirmDialog } from '../ConfirmDialog';
 
 describe('ConfirmDialog', () => {
-  const varsayilan = {
+  const defaultProps = {
     open: true,
     title: 'İzin talebini sil',
     description: "Ahmet Yılmaz'ın 12-16 Eylül tarihli izin talebi silinecek.",
@@ -15,7 +15,7 @@ describe('ConfirmDialog', () => {
   it('neyin etkilenecegini acikca yazar', () => {
     // "Emin misiniz?" tek basina yetersizdir; kullanici hangi kaydi sildigini
     // hatirlamayabilir (ADR-0015 §6).
-    render(<ConfirmDialog {...varsayilan} />);
+    render(<ConfirmDialog {...defaultProps} />);
 
     expect(
       screen.getByText("Ahmet Yılmaz'ın 12-16 Eylül tarihli izin talebi silinecek."),
@@ -24,53 +24,53 @@ describe('ConfirmDialog', () => {
 
   it('yikici islemde metinle de uyarir', () => {
     // Renk TEK BASINA anlam tasimaz (ADR-0015 §7).
-    render(<ConfirmDialog {...varsayilan} destructive />);
+    render(<ConfirmDialog {...defaultProps} destructive />);
 
     expect(screen.getByText('Bu işlem geri alınamaz.')).toBeInTheDocument();
   });
 
   it('yikici olmayan islemde ek uyari gostermez', () => {
-    render(<ConfirmDialog {...varsayilan} />);
+    render(<ConfirmDialog {...defaultProps} />);
 
     expect(screen.queryByText('Bu işlem geri alınamaz.')).not.toBeInTheDocument();
   });
 
   it('onay ve vazgecme eylemlerini bildirir', async () => {
-    const onayla = vi.fn();
-    const vazgec = vi.fn();
+    const confirmButton = vi.fn();
+    const cancelButton = vi.fn();
 
-    render(<ConfirmDialog {...varsayilan} onConfirm={onayla} onCancel={vazgec} />);
+    render(<ConfirmDialog {...defaultProps} onConfirm={confirmButton} onCancel={cancelButton} />);
 
     await userEvent.click(screen.getByRole('button', { name: 'Onayla' }));
-    expect(onayla).toHaveBeenCalledOnce();
+    expect(confirmButton).toHaveBeenCalledOnce();
 
     await userEvent.click(screen.getByRole('button', { name: 'Vazgeç' }));
-    expect(vazgec).toHaveBeenCalledOnce();
+    expect(cancelButton).toHaveBeenCalledOnce();
   });
 
   it('islem surerken cift gonderimi engeller', async () => {
     // Kullanici yavas bir istekte dugmeye iki kez basarsa, kayit iki kez
     // silinmeye calisilirdi (ADR-0015 §4).
-    let tamamla: () => void = () => undefined;
-    const onayla = vi.fn(() => new Promise<void>((resolve) => (tamamla = resolve)));
+    let complete: () => void = () => undefined;
+    const confirmButton = vi.fn(() => new Promise<void>((resolve) => (complete = resolve)));
 
-    render(<ConfirmDialog {...varsayilan} onConfirm={onayla} />);
+    render(<ConfirmDialog {...defaultProps} onConfirm={confirmButton} />);
 
-    const dugme = screen.getByRole('button', { name: 'Onayla' });
-    await userEvent.click(dugme);
+    const button = screen.getByRole('button', { name: 'Onayla' });
+    await userEvent.click(button);
 
-    expect(dugme).toBeDisabled();
+    expect(button).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Vazgeç' })).toBeDisabled();
 
-    tamamla();
+    complete();
   });
 
   it('erisilebilir baslik ve aciklama baglar', () => {
-    render(<ConfirmDialog {...varsayilan} />);
+    render(<ConfirmDialog {...defaultProps} />);
 
-    const pencere = screen.getByRole('dialog');
-    expect(pencere).toHaveAccessibleName('İzin talebini sil');
-    expect(pencere).toHaveAccessibleDescription(
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveAccessibleName('İzin talebini sil');
+    expect(dialog).toHaveAccessibleDescription(
       "Ahmet Yılmaz'ın 12-16 Eylül tarihli izin talebi silinecek.",
     );
   });

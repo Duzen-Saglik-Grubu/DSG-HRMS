@@ -8,10 +8,10 @@ import { DateRangeField } from '../DateRangeField';
  * bir "group" render eder; testler bu yapiya gore yazilir.
  */
 describe('DateRangeField', () => {
-  const bosDeger = { start: null, end: null };
+  const emptyValue = { start: null, end: null };
 
   it('Turkce etiketlerle iki tarih alani sunar', () => {
-    renderWithProviders(<DateRangeField value={bosDeger} onChange={vi.fn()} />);
+    renderWithProviders(<DateRangeField value={emptyValue} onChange={vi.fn()} />);
 
     // Etiket ZORUNLUDUR; yalnizca yer tutucu kullanilmaz (ADR-0015 §7).
     expect(screen.getByRole('group', { name: 'Başlangıç tarihi' })).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe('DateRangeField', () => {
   it('ozel etiketler verilebilir', () => {
     renderWithProviders(
       <DateRangeField
-        value={bosDeger}
+        value={emptyValue}
         onChange={vi.fn()}
         startLabel="İşe giriş tarihi"
         endLabel="Çıkış tarihi"
@@ -50,7 +50,7 @@ describe('DateRangeField', () => {
     // Alan bazli hatalar dogrudan ilgili alana baglanir (ADR-0010 §8).
     renderWithProviders(
       <DateRangeField
-        value={bosDeger}
+        value={emptyValue}
         onChange={vi.fn()}
         error="Başlangıç tarihi geçmiş bir tarih olamaz."
       />,
@@ -60,12 +60,12 @@ describe('DateRangeField', () => {
   });
 
   it('devre disi birakilabilir', () => {
-    renderWithProviders(<DateRangeField value={bosDeger} onChange={vi.fn()} disabled />);
+    renderWithProviders(<DateRangeField value={emptyValue} onChange={vi.fn()} disabled />);
 
     // Devre disi alanda takvim dugmesi de kullanilamaz olmalidir; aksi hâlde
     // kullanici acilan takvimden secim yapip hicbir sey olmadigini gorurdu.
-    for (const dugme of screen.getAllByRole('button')) {
-      expect(dugme).toBeDisabled();
+    for (const button of screen.getAllByRole('button')) {
+      expect(button).toBeDisabled();
     }
   });
 });

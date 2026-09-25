@@ -24,41 +24,41 @@
 
 set -uo pipefail
 
-KAYIT="_acme-challenge.${CERTBOT_DOMAIN}"
-DURUM_DOSYASI=/opt/acme/beklenen-kayit.txt
-BEKLEME_SANIYE=43200   # 12 saat - kayit ayri bir ekipten geciyor
-ARALIK=30
+RECORD_NAME="_acme-challenge.${CERTBOT_DOMAIN}"
+STATUS_FILE=/opt/acme/beklenen-kayit.txt
+TIMEOUT_SECONDS=43200   # 12 saat - kayit ayri bir ekipten geciyor
+POLL_INTERVAL=30
 
 mkdir -p /opt/acme
 
 {
-  echo "Ad   : ${KAYIT}"
+  echo "Ad   : ${RECORD_NAME}"
   echo "Tur  : TXT"
   echo "Deger: ${CERTBOT_VALIDATION}"
-} > "$DURUM_DOSYASI"
+} > "$STATUS_FILE"
 
 echo "[acme] DNS kaydi bekleniyor:"
-cat "$DURUM_DOSYASI"
+cat "$STATUS_FILE"
 
 # Tek bir cozucude kayit var mi? 0 = var, 1 = yok.
-sorgula() {
-  local adres="$1"
-  local yanit
-  yanit=$(curl -s --max-time 10 -H 'accept: application/dns-json' "$adres" || true)
-  printf '%s' "$yanit" | grep -q "$CERTBOT_VALIDATION"
+query_resolver() {
+  local url="$1"
+  local response
+  response=$(curl -s --max-time 10 -H 'accept: application/dns-json' "$url" || true)
+  printf '%s' "$response" | grep -q "$CERTBOT_VALIDATION"
 }
 
-gecen=0
+elapsed=0
 
-while [ "$gecen" -lt "$BEKLEME_SANIYE" ]; do
-  cloudflare=hayir
-  google=hayir
+while [ "$elapsed" -lt "$TIMEOUT_SECONDS" ]; do
+  cloudflare=false
+  google=false
 
-  sorgula "https://cloudflare-dns.com/dns-query?name=${KAYIT}&type=TXT" && cloudflare=evet
-  sorgula "https://dns.google/resolve?name=${KAYIT}&type=TXT"           && google=evet
+  query_resolver "https://cloudflare-dns.com/dns-query?name=${RECORD_NAME}&type=TXT" && cloudflare=true
+  query_resolver "https://dns.google/resolve?name=${RECORD_NAME}&type=TXT"           && google=true
 
-  if [ "$cloudflare" = evet ] && [ "$google" = evet ]; then
-    echo "[acme] Kayit her iki cozucude de gorundu (${gecen} saniye sonra)."
+  if [ "$cloudflare" = true ] && [ "$google" = true ]; then
+    echo "[acme] Kayit her iki cozucude de gorundu (${elapsed} saniye sonra)."
     echo "[acme] Yayilmanin tamamlanmasi icin 60 saniye bekleniyor."
     sleep 60
     exit 0
@@ -68,13 +68,13 @@ while [ "$gecen" -lt "$BEKLEME_SANIYE" ]; do
   # gelirse sunucular arasi TUTARSIZLIK vardir (seri numarasi artirilmadigi icin
   # bolge aktarimi yapilmamis olabilir). Kayda gecirilir ki tani kolay olsun.
   if [ "$cloudflare" != "$google" ]; then
-    echo "[acme] UYARI (${gecen}. saniye): cozuculer AYRISIYOR - cloudflare=${cloudflare} google=${google}."
+    echo "[acme] UYARI (${elapsed}. saniye): cozuculer AYRISIYOR - cloudflare=${cloudflare} google=${google}."
     echo "[acme] Kayit yetkili sunuculardan yalnizca birinde olabilir; SOA seri numarasi artirilmali."
   fi
 
-  sleep "$ARALIK"
-  gecen=$((gecen + ARALIK))
+  sleep "$POLL_INTERVAL"
+  elapsed=$((elapsed + POLL_INTERVAL))
 done
 
-echo "[acme] ZAMAN ASIMI: TXT kaydi ${BEKLEME_SANIYE} saniye icinde iki cozucude birden gorunmedi." >&2
+echo "[acme] ZAMAN ASIMI: TXT kaydi ${TIMEOUT_SECONDS} saniye icinde iki cozucude birden gorunmedi." >&2
 exit 1

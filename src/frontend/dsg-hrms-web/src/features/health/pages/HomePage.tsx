@@ -25,22 +25,22 @@ export function HomePage() {
     <Stack spacing={3}>
       <Box>
         <Typography variant="h5" component="h2" gutterBottom>
-          {t('uygulama.aciklama')}
+          {t('app.description')}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {t('uygulama.kurum')}
+          {t('app.organization')}
         </Typography>
       </Box>
 
       <Paper sx={{ p: 3 }}>
         <Typography variant="h6" component="h3" gutterBottom>
-          {t('saglik.baslik')}
+          {t('health.title')}
         </Typography>
 
         {isPending ? (
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <CircularProgress size={20} />
-            <Typography variant="body2">{t('saglik.kontrolEdiliyor')}</Typography>
+            <Typography variant="body2">{t('health.checking')}</Typography>
           </Stack>
         ) : null}
 
@@ -50,7 +50,7 @@ export function HomePage() {
 
         {data ? (
           <Stack spacing={2}>
-            <Typography variant="body1">{t('saglik.calisiyor')}</Typography>
+            <Typography variant="body1">{t('health.healthy')}</Typography>
 
             <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }} useFlexGap>
               {data.checks.map((check) => (

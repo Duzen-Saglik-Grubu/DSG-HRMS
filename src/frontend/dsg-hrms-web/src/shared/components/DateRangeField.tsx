@@ -43,17 +43,17 @@ export function DateRangeField({
   //
   // "exactOptionalPropertyTypes" acik oldugu icin sinir yokken ozellik
   // "undefined" olarak DEGIL, hic verilmeyerek gecilir.
-  const ustSinir = value.end ? { maxDate: value.end } : {};
-  const altSinir = value.start ? { minDate: value.start } : {};
+  const startPickerLimits = value.end ? { maxDate: value.end } : {};
+  const endPickerLimits = value.start ? { minDate: value.start } : {};
 
   return (
     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
       <DatePicker
-        label={startLabel ?? t('tarih.baslangic')}
+        label={startLabel ?? t('date.start')}
         value={value.start}
-        onChange={(yeni) => onChange({ ...value, start: yeni })}
+        onChange={(date) => onChange({ ...value, start: date })}
         disabled={disabled}
-        {...ustSinir}
+        {...startPickerLimits}
         slotProps={{
           textField: {
             error: Boolean(error),
@@ -63,11 +63,11 @@ export function DateRangeField({
       />
 
       <DatePicker
-        label={endLabel ?? t('tarih.bitis')}
+        label={endLabel ?? t('date.end')}
         value={value.end}
-        onChange={(yeni) => onChange({ ...value, end: yeni })}
+        onChange={(date) => onChange({ ...value, end: date })}
         disabled={disabled}
-        {...altSinir}
+        {...endPickerLimits}
         slotProps={{
           textField: {
             error: Boolean(error),

@@ -6,34 +6,34 @@ import { DataTable, type DataTableColumn } from '../DataTable';
 import { EmptyState } from '../EmptyState';
 import type { PageRequest } from '@/shared/api/paging';
 
-interface Personel {
+interface Employee {
   id: string;
-  adSoyad: string;
-  birim: string | null;
+  fullName: string;
+  department: string | null;
 }
 
-const sutunlar: DataTableColumn<Personel>[] = [
-  { field: 'adSoyad', header: 'Ad Soyad', sortable: true },
-  { field: 'birim', header: 'Birim' },
+const columns: DataTableColumn<Employee>[] = [
+  { field: 'fullName', header: 'Ad Soyad', sortable: true },
+  { field: 'department', header: 'Birim' },
 ];
 
-const satirlar: Personel[] = [
-  { id: '1', adSoyad: 'Ahmet Yılmaz', birim: 'Biyokimya' },
-  { id: '2', adSoyad: 'Ayşe Demir', birim: null },
+const rows: Employee[] = [
+  { id: '1', fullName: 'Ahmet Yılmaz', department: 'Biyokimya' },
+  { id: '2', fullName: 'Ayşe Demir', department: null },
 ];
 
-const istek: PageRequest = { page: 1, pageSize: 25 };
+const request: PageRequest = { page: 1, pageSize: 25 };
 
-function renderTable(props: Partial<Parameters<typeof DataTable<Personel>>[0]> = {}) {
+function renderTable(props: Partial<Parameters<typeof DataTable<Employee>>[0]> = {}) {
   const onRequestChange = vi.fn();
 
   renderWithProviders(
-    <DataTable<Personel>
-      columns={sutunlar}
-      rows={satirlar}
+    <DataTable<Employee>
+      columns={columns}
+      rows={rows}
       rowKey={(row) => row.id}
       totalCount={2}
-      request={istek}
+      request={request}
       onRequestChange={onRequestChange}
       {...props}
     />,
@@ -68,20 +68,20 @@ describe('DataTable', () => {
     expect(onRequestChange).toHaveBeenCalledWith({
       page: 1,
       pageSize: 25,
-      sort: 'adSoyad',
+      sort: 'fullName',
       order: 'asc',
     });
   });
 
   it('ayni sutuna tekrar tiklandiginda yonu cevirir', async () => {
     const { onRequestChange } = renderTable({
-      request: { page: 1, pageSize: 25, sort: 'adSoyad', order: 'asc' },
+      request: { page: 1, pageSize: 25, sort: 'fullName', order: 'asc' },
     });
 
     await userEvent.click(screen.getByRole('button', { name: /Ad Soyad/ }));
 
     expect(onRequestChange).toHaveBeenCalledWith(
-      expect.objectContaining({ sort: 'adSoyad', order: 'desc' }),
+      expect.objectContaining({ sort: 'fullName', order: 'desc' }),
     );
   });
 

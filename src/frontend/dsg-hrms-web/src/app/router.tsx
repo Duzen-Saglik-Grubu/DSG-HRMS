@@ -8,9 +8,9 @@ import { RouteFallback } from './pages/RouteFallback';
 // yalnizca acildiginda indirilir. Modul sayisi 35'e ciktiginda bunun etkisi
 // belirginlesir; sonradan eklemek ise tum rotalari elden gecirmeyi gerektirirdi.
 const HomePage = lazy(async () => {
-  const modul = await import('@/features/health/pages/HomePage');
+  const page = await import('@/features/health/pages/HomePage');
 
-  return { default: modul.HomePage };
+  return { default: page.HomePage };
 });
 
 export const router = createBrowserRouter([

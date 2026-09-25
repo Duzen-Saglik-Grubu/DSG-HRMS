@@ -21,7 +21,7 @@ permissions:
   pull-requests: read
 
 jobs:
-  izlenebilirlik:
+  traceability:
     name: Baslik, milestone ve issue baglantisi
     runs-on: ubuntu-latest
 
@@ -63,7 +63,7 @@ jobs:
             });
 
             const body = pr.body || '';
-            const eksikler = [];
+            const problems = [];
 
             // --- 1. Baslik bicimi ---
             //
@@ -74,29 +74,29 @@ jobs:
             // bakar. Denetlenebilecek tek yer burasidir.
             //
             // Turler CONTRIBUTING.md §4 ile ayni listedir.
-            const TURLER = 'feat|fix|docs|test|refactor|perf|build|ci|chore';
-            const BASLIK_BICIMI = new RegExp(
-              '^(' + TURLER + ')(\\([a-z0-9._-]+\\))?!?: .+');
-            const baslik = pr.title || '';
+            const TYPES = 'feat|fix|docs|test|refactor|perf|build|ci|chore';
+            const TITLE_PATTERN = new RegExp(
+              '^(' + TYPES + ')(\\([a-z0-9._-]+\\))?!?: .+');
+            const title = pr.title || '';
 
-            if (!BASLIK_BICIMI.test(baslik)) {
+            if (!TITLE_PATTERN.test(title)) {
               // Issue bicimi en sik yapilan hatadir; ayrica soylenir ki
               // gelistirici neyi duzeltecegini aramak zorunda kalmasin.
-              const issueBicimi = /^\s*\[[^\]]+\]/.test(baslik);
+              const looksLikeIssueTitle = /^\s*\[[^\]]+\]/.test(title);
 
-              eksikler.push(
-                'Baslik Conventional Commits bicimine uymuyor: "' + baslik + '"' +
-                (issueBicimi
+              problems.push(
+                'Baslik Conventional Commits bicimine uymuyor: "' + title + '"' +
+                (looksLikeIssueTitle
                   ? '\n    Bu bir ISSUE basligi bicimidir ("[GOREV] ..."); PR\'larda kullanilmaz.'
                   : '') +
                 '\n    Beklenen: <tur>(<kapsam>): <ozet>' +
                 '\n    Ornek:    feat(uat): TLS devreye alindi' +
-                '\n    Turler:   ' + TURLER.split('|').join(', '));
+                '\n    Turler:   ' + TYPES.split('|').join(', '));
             }
 
             // --- 2. Milestone ---
             if (!pr.milestone) {
-              eksikler.push(
+              problems.push(
                 'Milestone atanmamis. PR, isin ait oldugu WBS kalemine karsilik gelen ' +
                 'milestone\'a baglanmalidir (A0/A1/A2/A3/A4+/AS veya surec isleri icin SK); ' +
                 'asama planlamasi ve ilerleme olcumu buna dayanir.');
@@ -106,30 +106,30 @@ jobs:
             // "Closes #42" issue'yu kapatir ve resmi baglantiyi uretir.
             // "Refs #42" yalnizca metinsel bagdir; gereksinim issue'lari icin
             // kullanilir (modul kabul edilene kadar acik kalirlar).
-            const kapatma = /\b(clos(e[sd]?)|fix(e[sd]?)?|resolv(e[sd]?))\s+#\d+/i.test(body);
-            const referans = /\brefs?\s+#\d+/i.test(body);
+            const hasClosingRef = /\b(clos(e[sd]?)|fix(e[sd]?)?|resolv(e[sd]?))\s+#\d+/i.test(body);
+            const hasPlainRef = /\brefs?\s+#\d+/i.test(body);
 
-            if (!kapatma && !referans) {
-              eksikler.push(
+            if (!hasClosingRef && !hasPlainRef) {
+              problems.push(
                 'Issue baglantisi yok. Govdede "Closes #42" (gorev/hata) veya ' +
                 '"Refs #42" (gereksinim) bulunmalidir.');
             }
 
             // --- 4. Sablonun doldurulmus olmasi ---
             if (/^Closes #\s*$/m.test(body)) {
-              eksikler.push(
+              problems.push(
                 'PR sablonundaki "Closes #" satiri doldurulmamis.');
             }
 
-            if (eksikler.length > 0) {
+            if (problems.length > 0) {
               core.setFailed(
                 'PR izlenebilirlik denetimi basarisiz:\n' +
-                eksikler.map(e => `  - ${e}`).join('\n') +
+                problems.map(e => `  - ${e}`).join('\n') +
                 '\n\nAyrinti: CONTRIBUTING.md §5');
               return;
             }
 
             core.info('Izlenebilirlik denetimi gecti.');
-            core.info(`Baslik: ${baslik}`);
+            core.info(`Baslik: ${title}`);
             core.info(`Milestone: ${pr.milestone.title}`);
-            core.info(`Issue baglantisi: ${kapatma ? 'Closes/Fixes' : 'Refs'}`);
+            core.info(`Issue baglantisi: ${hasClosingRef ? 'Closes/Fixes' : 'Refs'}`);

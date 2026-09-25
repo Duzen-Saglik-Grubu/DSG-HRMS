@@ -20,7 +20,7 @@ permissions:
   pull-requests: read
 
 jobs:
-  denetim:
+  audit:
     name: main dalina gelen commit'leri denetle
     runs-on: ubuntu-latest
     steps:
@@ -30,17 +30,17 @@ jobs:
           script: |
             const sha = context.sha;
 
-            const { data: prler } =
+            const { data: prs } =
               await github.rest.repos.listPullRequestsAssociatedWithCommit({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 commit_sha: sha,
               });
 
-            const birlestirilmis = prler.filter(pr => pr.merged_at !== null);
+            const mergedPrs = prs.filter(pr => pr.merged_at !== null);
 
-            if (birlestirilmis.length > 0) {
-              const pr = birlestirilmis[0];
+            if (mergedPrs.length > 0) {
+              const pr = mergedPrs[0];
               core.info(`UYGUN: commit ${sha.substring(0,7)} #${pr.number} ile geldi.`);
               return;
             }
@@ -56,13 +56,13 @@ jobs:
               return;
             }
 
-            const yazar  = commit.commit.author.name;
-            const mesaj  = commit.commit.message.split('\n')[0];
-            const tarih  = commit.commit.author.date;
-            const kisaSha = sha.substring(0, 7);
+            const author   = commit.commit.author.name;
+            const subject  = commit.commit.message.split('\n')[0];
+            const date     = commit.commit.author.date;
+            const shortSha = sha.substring(0, 7);
 
-            const baslik = `[DÜZELTİCİ] main dalına PR olmadan commit geldi (${kisaSha})`;
-            const govde = [
+            const issueTitle = `[DÜZELTİCİ] main dalına PR olmadan commit geldi (${shortSha})`;
+            const issueBody = [
               '## Tespit edilen uygunsuzluk',
               '',
               `\`main\` dalına Pull Request kullanılmadan doğrudan bir commit gönderilmiştir.`,
@@ -71,9 +71,9 @@ jobs:
               '| Alan | Değer |',
               '|---|---|',
               `| Commit | ${sha} |`,
-              `| Mesaj | ${mesaj} |`,
-              `| Yazar | ${yazar} |`,
-              `| Tarih | ${tarih} |`,
+              `| Mesaj | ${subject} |`,
+              `| Yazar | ${author} |`,
+              `| Tarih | ${date} |`,
               '',
               '## Tespit kaynağı',
               '',
@@ -98,11 +98,11 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: baslik,
-              body: govde,
+              title: issueTitle,
+              body: issueBody,
               labels: ['tur:duzeltici-faaliyet', 'surec:MAN.5', 'oncelik:yuksek'],
             });
 
             core.setFailed(
-              `main dalına PR olmadan commit geldi: ${kisaSha}. Düzeltici faaliyet issue'su açıldı.`
+              `main dalına PR olmadan commit geldi: ${shortSha}. Düzeltici faaliyet issue'su açıldı.`
             );

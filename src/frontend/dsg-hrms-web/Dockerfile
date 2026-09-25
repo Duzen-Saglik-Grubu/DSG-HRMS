@@ -32,7 +32,7 @@ COPY --from=derleme /kaynak/dist /usr/share/nginx/html
 
 # Iki yapilandirma da imaja girer; hangisinin kullanilacagina acilista karar
 # verilir (nginx/secim.sh). Boylece gelistirme ve uretim AYNI imaji kullanir.
-COPY nginx/http.conf nginx/tls.conf /etc/nginx/sablon/
+COPY nginx/http.conf nginx/tls.conf /etc/nginx/variants/
 COPY nginx/guvenlik-basliklari.conf /etc/nginx/guvenlik-basliklari.conf
 COPY nginx/secim.sh /docker-entrypoint.d/40-yapilandirma-secimi.sh
 

@@ -8,16 +8,16 @@
 
 set -eu
 
-SERTIFIKA=/etc/nginx/tls/fullchain.pem
-ANAHTAR=/etc/nginx/tls/privkey.pem
-HEDEF=/etc/nginx/conf.d/default.conf
+CERT_FILE=/etc/nginx/tls/fullchain.pem
+KEY_FILE=/etc/nginx/tls/privkey.pem
+TARGET_CONF=/etc/nginx/conf.d/default.conf
 
 # Icerik ">" ile yazilir, "cp" ile degil: taban imajda default.conf zaten vardir
 # ve busybox "cp" uzerine yazmak yerine hata verir.
-if [ -r "$SERTIFIKA" ] && [ -r "$ANAHTAR" ]; then
+if [ -r "$CERT_FILE" ] && [ -r "$KEY_FILE" ]; then
     echo "[nginx] Sertifika bulundu - TLS etkin."
-    cat /etc/nginx/sablon/tls.conf > "$HEDEF"
+    cat /etc/nginx/variants/tls.conf > "$TARGET_CONF"
 else
     echo "[nginx] Sertifika yok - duz HTTP ile calisiliyor."
-    cat /etc/nginx/sablon/http.conf > "$HEDEF"
+    cat /etc/nginx/variants/http.conf > "$TARGET_CONF"
 fi

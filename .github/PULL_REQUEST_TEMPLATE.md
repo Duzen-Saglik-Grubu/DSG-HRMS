@@ -35,7 +35,7 @@ Closes #
 <!-- Uygulanmayan maddeyi işaretlemeyin ve "Notlar" bölümünde gerekçesini yazın. -->
 
 **Kod ve test**
-- [ ] Kodlama standartlarına uygun
+- [ ] Kodlama standartlarına uygun — tanımlayıcılar İngilizce, yorumlar Türkçe; **betikler ve iş akışları dâhil** (CONTRIBUTING §3.2)
 - [ ] Birim testleri yazıldı; kapsam eşikleri sağlanıyor (genel %75, Domain %90)
 - [ ] Entegrasyon testleri yazıldı (Testcontainers — gerçek PostgreSQL)
 - [ ] **Yetki sızıntısı testi** yazıldı (kapsam dışı kayıt `404` dönüyor)

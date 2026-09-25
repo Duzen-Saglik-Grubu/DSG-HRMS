@@ -39,10 +39,10 @@ function createCorrelationId(): string {
     return crypto.randomUUID().replaceAll('-', '');
   }
 
-  const baytlar = new Uint8Array(16);
-  crypto.getRandomValues(baytlar);
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
 
-  return Array.from(baytlar, (bayt) => bayt.toString(16).padStart(2, '0')).join('');
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
 apiClient.interceptors.request.use((config) => {
@@ -62,7 +62,7 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error: unknown) => {
     if (!(error instanceof AxiosError)) {
-      return Promise.reject(toApiError(undefined, undefined, i18n.t('hata.genel')));
+      return Promise.reject(toApiError(undefined, undefined, i18n.t('error.generic')));
     }
 
     const status = error.response?.status;
@@ -70,7 +70,7 @@ apiClient.interceptors.response.use(
     // Sunucuya hic ulasilamadi. Kullaniciya "bir hata olustu" demek yerine ne
     // yapacagini soyleriz (ADR-0015 §6).
     if (status === undefined) {
-      return Promise.reject(toApiError(undefined, undefined, i18n.t('hata.ag')));
+      return Promise.reject(toApiError(undefined, undefined, i18n.t('error.network')));
     }
 
     return Promise.reject(toApiError(error.response?.data, status, defaultMessageFor(status)));
@@ -83,12 +83,12 @@ apiClient.interceptors.response.use(
 function defaultMessageFor(status: number): string {
   switch (status) {
     case 403:
-      return i18n.t('hata.yetki');
+      return i18n.t('error.forbidden');
     case 404:
-      return i18n.t('hata.bulunamadi');
+      return i18n.t('error.notFound');
     case 409:
-      return i18n.t('hata.cakisma');
+      return i18n.t('error.conflict');
     default:
-      return i18n.t('hata.genel');
+      return i18n.t('error.generic');
   }
 }

@@ -27,22 +27,22 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
       action={
         onRetry ? (
           <Button color="inherit" size="small" onClick={onRetry}>
-            {t('hata.tekrarDene')}
+            {t('error.retry')}
           </Button>
         ) : undefined
       }
     >
-      <AlertTitle>{t('hata.baslik')}</AlertTitle>
+      <AlertTitle>{t('error.title')}</AlertTitle>
 
       <Typography variant="body2">{error.message}</Typography>
 
       {error.traceId ? (
         <Box sx={{ mt: 1 }}>
           <Typography variant="caption" component="div" color="text.secondary">
-            {t('hata.takipAciklama')}
+            {t('error.traceHint')}
           </Typography>
           <Typography variant="caption" component="code" sx={{ fontFamily: 'monospace' }}>
-            {t('hata.takipNumarasi')}: {error.traceId}
+            {t('error.traceId')}: {error.traceId}
           </Typography>
         </Box>
       ) : null}
