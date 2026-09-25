@@ -4,7 +4,7 @@ title: "[GÖREV] "
 labels: ["tur:gelistirme"]
 body:
   - type: dropdown
-    id: tur
+    id: type
     attributes:
       label: "İş türü"
       options:
@@ -26,14 +26,14 @@ body:
       required: false
 
   - type: textarea
-    id: aciklama
+    id: description
     attributes:
       label: "Ne yapılacak?"
     validations:
       required: true
 
   - type: textarea
-    id: neden
+    id: rationale
     attributes:
       label: "Neden?"
       description: "Hangi gereksinimi, kararı veya riski karşılıyor? (REQ-…, KR-…, R-…)"
@@ -41,7 +41,7 @@ body:
       required: true
 
   - type: textarea
-    id: kabul
+    id: acceptance
     attributes:
       label: "Tamamlanma kriterleri"
       description: "Bu iş ne zaman bitmiş sayılır?"
@@ -52,7 +52,7 @@ body:
       required: true
 
   - type: input
-    id: onkosul
+    id: prerequisites
     attributes:
       label: "Ön koşullar"
       description: "Bağımlı olduğu issue veya modüller."
@@ -61,7 +61,7 @@ body:
       required: false
 
   - type: dropdown
-    id: surec
+    id: process
     attributes:
       label: "İlgili 33061 süreci"
       description: "Bu işin kanıt ürettiği süreç. İzlenebilirlik matrisi için gereklidir."

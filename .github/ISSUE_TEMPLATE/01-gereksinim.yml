@@ -11,7 +11,7 @@ body:
         Toplantının tamamı ayrıca `docs/33061/TEC.2-.../kayitlar/` altına yazılır.
 
   - type: input
-    id: kimlik
+    id: requirement_id
     attributes:
       label: "Gereksinim kimliği"
       description: "PG-<MODÜL>-<no> biçiminde. Henüz atanmadıysa boş bırakın."
@@ -20,7 +20,7 @@ body:
       required: false
 
   - type: dropdown
-    id: modul
+    id: module
     attributes:
       label: "Modül"
       options:
@@ -64,7 +64,7 @@ body:
       required: true
 
   - type: textarea
-    id: ihtiyac
+    id: need
     attributes:
       label: "İhtiyaç"
       description: "Kullanıcı gözünden ne isteniyor?"
@@ -75,7 +75,7 @@ body:
       required: true
 
   - type: textarea
-    id: kurallar
+    id: rules
     attributes:
       label: "İş kuralları"
       description: "Geçerli kurallar, sınırlar, istisnalar. Madde madde yazın."
@@ -83,7 +83,7 @@ body:
       required: true
 
   - type: textarea
-    id: kabul
+    id: acceptance
     attributes:
       label: "Kabul kriterleri"
       description: "Bu gereksinimin karşılandığı nasıl doğrulanacak? Ölçülebilir yazın."
@@ -95,7 +95,7 @@ body:
       required: true
 
   - type: input
-    id: kaynak
+    id: source
     attributes:
       label: "Kaynak"
       description: "Gereksinimi kim verdi ve hangi toplantıda?"
@@ -104,7 +104,7 @@ body:
       required: true
 
   - type: textarea
-    id: notlar
+    id: notes
     attributes:
       label: "Notlar ve açık sorular"
       description: "Netleşmemiş noktalar, bağımlılıklar, ilgili kararlar (KR-nnn)."

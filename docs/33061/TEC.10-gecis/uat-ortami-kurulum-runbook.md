@@ -1,7 +1,7 @@
 # UAT Ortamı — Kurulum ve Dağıtım Runbook'u
 
 **Belge kimliği:** TEC.10-RB-001
-**Son güncelleme:** 2026-09-15
+**Son güncelleme:** 2026-09-25
 **İlgili süreçler:** TEC.10 (Geçiş), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-024`, `KR-038`, `KR-065`
 
@@ -17,7 +17,7 @@
 |---|---|
 | **Sunucu** | `192.168.3.202` — Ubuntu 26.04 LTS · 2 çekirdek · 7,3 GB RAM · 87 GB disk |
 | **Adres** | **https://insankaynaklaritest.duzen.com.tr** — HTTP, HTTPS'e yönlendirilir |
-| **Uygulama dizini** | `/opt/dsg-hrms` (sırlar: `/opt/dsg-hrms/gizli/`, sertifika: `/opt/dsg-hrms/tls/`) |
+| **Uygulama dizini** | `/opt/dsg-hrms` (sırlar: `/opt/dsg-hrms/secrets/`, sertifika: `/opt/dsg-hrms/tls/`) |
 | **Erişim** | SSH anahtarı (`dsg-hrms-uat-deploy`) |
 | **Amaç** | İK kabul testi (`KR-024`) — **gerçek veri değil**, maskelenmiş kopya |
 | **Sertifika** | Let's Encrypt · **bitiş 16.12.2026** · yenileme **elle** (`KR-067`, `R-18`) |
@@ -61,7 +61,7 @@ systemctl is-enabled docker   # "enabled" dönmeli: sunucu yeniden başlarsa yı
 
 **Parola sunucuda üretilir; hiçbir yere yazılmaz, depoya girmez** (`KR-038`).
 
-Dosya **kaynak ağacının dışında**, `/opt/dsg-hrms/gizli/` altında durur.
+Dosya **kaynak ağacının dışında**, `/opt/dsg-hrms/secrets/` altında durur.
 
 > **Neden dışarıda?** Dağıtım betiği `/opt/dsg-hrms/docker` dizinini **silip yeniden
 > oluşturur**. Dosya orada dururken her dağıtım, ihtiyaç duyduğu sırrı kendi eliyle
@@ -70,10 +70,10 @@ Dosya **kaynak ağacının dışında**, `/opt/dsg-hrms/gizli/` altında durur.
 > sildiği ağacın içinde yaşamamalıdır.**
 
 ```bash
-mkdir -p /opt/dsg-hrms/gizli && chmod 700 /opt/dsg-hrms/gizli
+mkdir -p /opt/dsg-hrms/secrets && chmod 700 /opt/dsg-hrms/secrets
 PAROLA=$(openssl rand -base64 30 | tr -d "/+=" | head -c 32)
 
-cat > /opt/dsg-hrms/gizli/.env.uat <<SON
+cat > /opt/dsg-hrms/secrets/.env.uat <<SON
 POSTGRES_DB=dsg_hrms_uat
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=$PAROLA
@@ -82,11 +82,11 @@ API_PORT=5299
 WEB_PORT=80
 API_IMAGE=dsg-hrms-api:uat
 WEB_IMAGE=dsg-hrms-web:uat
-TLS_DIZINI=/opt/dsg-hrms/tls
+TLS_DIR=/opt/dsg-hrms/tls
 WEB_TLS_PORT=443
 SON
 
-chmod 600 /opt/dsg-hrms/gizli/.env.uat
+chmod 600 /opt/dsg-hrms/secrets/.env.uat
 ```
 
 > **Port değerlerine `127.0.0.1:` öneki YAZILMAZ.** Önek artık `compose.uat.yml`
@@ -110,7 +110,7 @@ tar czf - --exclude=node_modules --exclude=bin --exclude=obj --exclude=dist \
 ```
 
 > **Bu adım `docker/` dizinini SİLER.** Bu yüzden ortam dosyası oraya konmaz;
-> `/opt/dsg-hrms/gizli/.env.uat` altında, aktarımın dokunmadığı bir yerde durur
+> `/opt/dsg-hrms/secrets/.env.uat` altında, aktarımın dokunmadığı bir yerde durur
 > (bkz. §2.2). Belgenin önceki sürümü "`.env.uat` silinmez" diyordu; bu **yanlıştı**
 > ve 17.09.2026'da dağıtım sırrı kendi eliyle sildi.
 
@@ -153,7 +153,7 @@ docker exec -i dsg-hrms-uat-postgres \
 
 ```bash
 cd /opt/dsg-hrms/docker
-docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/gizli/.env.uat up -d
+docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/secrets/.env.uat up -d
 ```
 
 ---
@@ -189,10 +189,10 @@ curl -s -o /dev/null -w "%{http_code}\n" --max-time 5 http://192.168.3.202:5299/
 
 | İş | Komut |
 |---|---|
-| Durum | `docker ps` · `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/gizli/.env.uat ps` |
-| Günlükler | `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/gizli/.env.uat logs -f api` |
-| Yeniden başlat | `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/gizli/.env.uat restart` |
-| Durdur | `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/gizli/.env.uat down` |
+| Durum | `docker ps` · `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/secrets/.env.uat ps` |
+| Günlükler | `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/secrets/.env.uat logs -f api` |
+| Yeniden başlat | `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/secrets/.env.uat restart` |
+| Durdur | `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/secrets/.env.uat down` |
 | **Veriyi de sil** | `... down -v` — **UAT verisi gider**, İK'ya haber verilmeden yapılmaz |
 
 **Yedek:** UAT verisi maskelenmiş test verisidir; düzenli yedeklenmez. İK kabul testi
@@ -258,7 +258,7 @@ bu nedenle **kapatılmıştır** — açık bırakılsaydı certbot günde iki k
    setsid nohup certbot certonly --manual --preferred-challenges dns      --manual-auth-hook /opt/acme/hook.sh      --agree-tos --no-eff-email --register-unsafely-without-email --non-interactive      --domain insankaynaklaritest.duzen.com.tr      > /opt/acme/certbot.log 2>&1 < /dev/null &
    ```
 
-2. Beklenen değer okunur: `cat /opt/acme/beklenen-kayit.txt`
+2. Beklenen değer okunur: `cat /opt/acme/expected-record.txt`
 
 3. TXT kaydı **HER İKİ yetkili sunucuya birden** eklenir:
    **`ankara.duzen.com.tr` (212.57.13.19)** ve **`cayyolu.duzen.com.tr` (212.156.67.66)**.
@@ -318,3 +318,4 @@ bu cezanın ağırlığı kabul edilemez. HSTS, yenileme otomatikleştiğinde a�
 |---|---|---|---|
 | 2026-09-15 | 0.1 | İlk oluşturma — UAT sunucusu kurulumu ve dağıtım adımları | Bilgi İşlem |
 | 2026-09-17 | 0.2 | TLS devreye alındı (§7): Let's Encrypt sertifikası, elle yenileme yordamı, doğrulama. Ortam dosyası `gizli/` altına taşındı — dağıtım onu siliyordu. `127.0.0.1:` öneki compose dosyasına sabitlendi | Bilgi İşlem |
+| 2026-09-25 | 0.3 | Sunucuya bağlı adlar İngilizceye çevrildi (`KR-058`, düzeltici faaliyet #66): `gizli/` → `secrets/`, `TLS_DIZINI` → `TLS_DIR`, `beklenen-kayit.txt` → `expected-record.txt`. Sunucu tarafı aynı gün uygulandı | Bilgi İşlem |

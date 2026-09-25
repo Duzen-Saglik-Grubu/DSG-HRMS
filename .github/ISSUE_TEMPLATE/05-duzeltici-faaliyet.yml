@@ -11,7 +11,7 @@ body:
         Uygunsuzluk gizlenmez, kaydedilir ve kapatılır.
 
   - type: textarea
-    id: tespit
+    id: finding
     attributes:
       label: "Tespit edilen uygunsuzluk"
       description: "Ne, ne zaman, nerede tespit edildi?"
@@ -19,7 +19,7 @@ body:
       required: true
 
   - type: dropdown
-    id: kaynak
+    id: detection_source
     attributes:
       label: "Tespit kaynağı"
       options:
@@ -35,7 +35,7 @@ body:
       required: true
 
   - type: textarea
-    id: etki
+    id: impact
     attributes:
       label: "Etkisi"
       description: "Bu uygunsuzluk neye yol açıyor veya açabilir?"
@@ -43,7 +43,7 @@ body:
       required: true
 
   - type: textarea
-    id: kokneden
+    id: root_cause
     attributes:
       label: "Kök neden"
       description: "Neden oluştu? Belirtiyi değil, nedeni yazın."
@@ -51,7 +51,7 @@ body:
       required: true
 
   - type: textarea
-    id: duzeltme
+    id: corrective_action
     attributes:
       label: "Düzeltici faaliyet"
       description: "Sorunu gidermek için ne yapılacak?"
@@ -59,7 +59,7 @@ body:
       required: true
 
   - type: textarea
-    id: onleyici
+    id: preventive_action
     attributes:
       label: "Önleyici faaliyet"
       description: "Tekrarlanmaması için ne yapılacak? (kural, otomatik denetim, kontrol listesi maddesi)"
@@ -67,7 +67,7 @@ body:
       required: false
 
   - type: input
-    id: ilgili
+    id: related_records
     attributes:
       label: "İlgili kayıt"
       description: "Risk, karar veya süreç bağlantısı."
