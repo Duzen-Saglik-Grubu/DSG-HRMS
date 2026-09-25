@@ -68,6 +68,12 @@ public static class MaskRules
             ["EmailAddress"] = new(MaskAction.Mask, PersonalDataKind.Email),
             ["Iban"] = new(MaskAction.Mask, PersonalDataKind.Iban),
 
+            // Dogum tarihi uyelikte TCKN ile birlikte KIMLIK DOGRULAMA unsurudur
+            // (SYG-KMLK-013). Ikisi ayni kayitta acik gorunurse denetim izini okuyan
+            // biri baskasi adina uyelik baslatabilir. Kismi gosterimin anlamli bir
+            // bicimi olmadigi icin tamamen maskelenir.
+            ["BirthDate"] = new(MaskAction.Mask, PersonalDataKind.Unspecified),
+
             // --- Sir: hic yazilmaz ---
             ["Password"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
             ["PasswordHash"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),

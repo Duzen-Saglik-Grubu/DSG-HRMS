@@ -88,6 +88,21 @@ public sealed class MaskRulesTests
     }
 
     [Fact]
+    public void Birth_date_is_masked_completely_because_it_is_an_authentication_factor()
+    {
+        // Uyelikte TCKN + dogum tarihi birlikte kimlik dogrular (SYG-KMLK-013).
+        // Denetim izinde ikisinin birden acik gorunmesi, baskasi adina uyelik
+        // baslatmaya yeterli bilgiyi verirdi.
+        var decision = MaskRules.ForName("BirthDate");
+
+        decision.Action.ShouldBe(MaskAction.Mask);
+        var masked = MaskRules.Apply(decision, "1985-04-12");
+        masked.ShouldNotBeNull();
+        masked.ShouldNotContain("1985");
+        masked.ShouldNotContain("04-12");
+    }
+
+    [Fact]
     public void Ordinary_names_are_not_caught_by_the_name_based_rule()
     {
         DecisionFor<UnmarkedSample>(nameof(UnmarkedSample.DepartmentName))
