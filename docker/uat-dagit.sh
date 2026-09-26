@@ -49,7 +49,10 @@ tar czf - \
   | ssh "$SERVER" "rm -rf $APP_DIR/src $APP_DIR/docker && mkdir -p $APP_DIR && tar xzf - -C $APP_DIR"
 
 info 'Sema betigi uretiliyor'
+# --context: projede ikinci bir baglam (LogoDbContext) vardir; LOGO semasi
+# HRMS tarafindan YONETILMEZ, yalnizca okunur.
 dotnet ef migrations script --idempotent \
+  --context HrmsDbContext \
   --project src/backend/Dsg.Hrms.Infrastructure \
   --startup-project src/backend/Dsg.Hrms.Api \
   --output /tmp/dsg-sema.sql

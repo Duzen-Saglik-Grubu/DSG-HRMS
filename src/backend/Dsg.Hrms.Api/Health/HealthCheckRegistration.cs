@@ -27,6 +27,9 @@ public static class HealthCheckRegistration
     /// <summary>Bagimlilik yoklayan kontrollerin etiketi.</summary>
     public const string ReadyTag = "ready";
 
+    /// <summary>LOGO senkronizasyonu sagligi; hazir olma denetiminden AYRIDIR (SYG-KMLK-011).</summary>
+    public const string SyncTag = "sync";
+
     /// <summary>Saglik kontrollerini kaydeder.</summary>
     public static IServiceCollection AddHrmsHealthChecks(
         this IServiceCollection services,
@@ -44,7 +47,8 @@ public static class HealthCheckRegistration
                 name: "postgresql",
                 failureStatus: HealthStatus.Unhealthy,
                 tags: [ReadyTag],
-                timeout: TimeSpan.FromSeconds(5));
+                timeout: TimeSpan.FromSeconds(5))
+            .AddCheck<PersonnelSyncHealthCheck>("personnel-sync", tags: [SyncTag]);
 
         return services;
     }
@@ -65,6 +69,13 @@ public static class HealthCheckRegistration
         app.MapHealthChecks("/health/ready", new HealthCheckOptions
         {
             Predicate = registration => registration.Tags.Contains(ReadyTag),
+            ResponseWriter = WriteResponseAsync,
+        });
+
+        // Senkronizasyon: LOGO senkronizasyonunun son durumu (SYG-KMLK-010).
+        app.MapHealthChecks("/health/sync", new HealthCheckOptions
+        {
+            Predicate = registration => registration.Tags.Contains(SyncTag),
             ResponseWriter = WriteResponseAsync,
         });
 

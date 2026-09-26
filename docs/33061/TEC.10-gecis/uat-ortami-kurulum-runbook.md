@@ -1,7 +1,7 @@
 # UAT Ortamı — Kurulum ve Dağıtım Runbook'u
 
 **Belge kimliği:** TEC.10-RB-001
-**Son güncelleme:** 2026-09-25
+**Son güncelleme:** 2026-09-26
 **İlgili süreçler:** TEC.10 (Geçiş), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-024`, `KR-038`, `KR-065`
 
@@ -134,7 +134,7 @@ SQL betiğiyle uygulanır. Betik daha önce uygulanmış migration'ları atlar, 
 ```bash
 # Geliştirici makinesinde:
 cd src/backend
-dotnet ef migrations script --idempotent \
+dotnet ef migrations script --idempotent --context HrmsDbContext \
   --project Dsg.Hrms.Infrastructure --startup-project Dsg.Hrms.Api \
   --output /tmp/sema.sql
 scp /tmp/sema.sql root@192.168.3.202:/opt/dsg-hrms/sema.sql
@@ -312,6 +312,47 @@ bu cezanın ağırlığı kabul edilemez. HSTS, yenileme otomatikleştiğinde a�
 
 ---
 
+## 8. LOGO personel senkronizasyonu
+
+API, LOGO'dan personel verisini 15 dakikada bir okur (`KR-007`, ADR-0003). Bağlantı
+tanımlı değilse senkronizasyon **devre dışı** kalır ve sistem çalışmaya devam eder.
+
+### 8.1 Etkinleştirme
+
+Sır dosyasına (`/opt/dsg-hrms/secrets/.env.uat`) **salt-okunur** oturumun bağlantı
+dizesi eklenir:
+
+```bash
+LOGO_CONNECTION_STRING=Server=<logo-sunucusu>;Database=BORDRO;User Id=hrms_logo_reader;Password=...;TrustServerCertificate=true;ApplicationIntent=ReadOnly
+```
+
+Oturum `docker/logo/salt-okunur-oturum.sql` ile oluşturulmuş olmalıdır (`KR-004`).
+**Yazma yetkili bir oturum kullanılmaz.** Kullanılırsa senkronizasyon bunu her
+çalışmadan önce tespit eder, çalışmayı reddeder ve kritik düzeyde günlüğe yazar.
+
+Değişiklikten sonra yığın yeniden başlatılır (§5) veya dağıtım yapılır (§3).
+
+### 8.2 Doğrulama
+
+```bash
+curl -s https://insankaynaklaritest.duzen.com.tr/health/sync
+```
+
+| `status` | Anlamı |
+|---|---|
+| `Healthy` | Son çalışma başarılı ve güncel; ya da bağlantı bilinçli olarak tanımlı değil |
+| `Degraded` | Henüz çalışma yok ya da son başarılı çalışma 45 dakikadan eski |
+| `Unhealthy` | Son çalışma başarısız; neden API günlüğündedir |
+
+Bu uç nokta `/health/ready`'den **ayrıdır**: LOGO kesintisi HRMS'i "hazır değil"
+göstermez, çünkü sistem son anlık görüntüyle çalışmaya devam eder (SYG-KMLK-011).
+
+Çalışma geçmişi ve veri kalitesi uyarıları `personnel.sync_run` ve
+`personnel.sync_warning` tablolarındadır. Uyarılar kişisel veri içermez; kartlar sicil
+koduyla tanımlanır.
+
+---
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
@@ -320,3 +361,4 @@ bu cezanın ağırlığı kabul edilemez. HSTS, yenileme otomatikleştiğinde a�
 | 2026-09-17 | 0.2 | TLS devreye alındı (§7): Let's Encrypt sertifikası, elle yenileme yordamı, doğrulama. Ortam dosyası `gizli/` altına taşındı — dağıtım onu siliyordu. `127.0.0.1:` öneki compose dosyasına sabitlendi | Bilgi İşlem |
 | 2026-09-25 | 0.3 | Sunucuya bağlı adlar İngilizceye çevrildi (`KR-058`, düzeltici faaliyet #66): `gizli/` → `secrets/`, `TLS_DIZINI` → `TLS_DIR`, `beklenen-kayit.txt` → `expected-record.txt`. Sunucu tarafı aynı gün uygulandı | Bilgi İşlem |
 | 2026-09-25 | 0.4 | Volume adları İngilizceye çevrildi: `uat-postgres-verisi` → `uat-postgres-data`, `uat-api-gunlukleri` → `uat-api-logs` (`KR-058`, #66). Veri kopyalanarak taşındı (sağlama değerleri ve satır sayıları eşit); eski volume'ler yedek olarak bırakıldı | Bilgi İşlem |
+| 2026-09-26 | 0.5 | §8 LOGO personel senkronizasyonu (etkinleştirme, `/health/sync`); §3.3 `dotnet ef` komutuna `--context HrmsDbContext` eklendi (#74) | Bilgi İşlem |

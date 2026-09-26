@@ -92,6 +92,7 @@
     <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
     <!-- Gercek PostgreSQL ile entegrasyon testi - ADR-0011 §3 -->
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.15.0" />
+    <PackageVersion Include="Testcontainers.MsSql" Version="4.15.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.11" />
   </ItemGroup>
 

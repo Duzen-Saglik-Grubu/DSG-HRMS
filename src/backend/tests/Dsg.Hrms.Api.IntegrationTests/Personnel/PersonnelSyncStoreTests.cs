@@ -6,6 +6,7 @@ using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Domain.Personnel.Sync;
 using Dsg.Hrms.Infrastructure.Data;
 using Dsg.Hrms.Infrastructure.Data.Interceptors;
+using Dsg.Hrms.Infrastructure.Logo;
 using Dsg.Hrms.Infrastructure.Personnel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -179,6 +180,38 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         changes.ShouldNotContain("5321234567");
         changes.ShouldNotContain("1985-04-12");
         entry.Operation.ShouldBe(AuditOperation.Insert);
+    }
+
+    // ------------------------------------------------------------------ durum (SYG-KMLK-010)
+
+    [Fact]
+    public async Task Status_reports_nothing_before_the_first_run()
+    {
+        await using var context = Read();
+        var status = new PersonnelSyncStatus(context, new LogoOptions { ConnectionString = "Server=logo" });
+
+        status.IsEnabled.ShouldBeTrue();
+        (await status.GetLastRunAsync(CancellationToken.None)).ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task Status_reports_the_latest_run()
+    {
+        await SyncAsync(Card("00001", NationalId(1)));
+        _source.GetAllAsync(Arg.Any<CancellationToken>()).ThrowsAsync(new LogoUnavailableException());
+        await using (var store = CreateStore())
+        {
+            await new PersonnelSyncService(_source, store, _clock, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance)
+                .RunAsync(SyncTrigger.Scheduled, CancellationToken.None);
+        }
+
+        await using var context = Read();
+        var last = await new PersonnelSyncStatus(context, new LogoOptions()).GetLastRunAsync(CancellationToken.None);
+
+        last.ShouldNotBeNull();
+        last.Status.ShouldBe(SyncStatus.Failed);
+        last.FailureReason.ShouldBe(SyncFailureReason.SourceUnavailable);
+        new PersonnelSyncStatus(context, new LogoOptions()).IsEnabled.ShouldBeFalse();
     }
 
     // ------------------------------------------------------------------ kilit

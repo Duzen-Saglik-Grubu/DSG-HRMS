@@ -1,6 +1,6 @@
 # Katkı Rehberi
 
-**Son güncelleme:** 2026-09-25
+**Son güncelleme:** 2026-09-26
 **İlgili süreçler:** TEC.7 (Gerçekleştirme), TEC.9 (Doğrulama), MAN.5 (Konfigürasyon Yönetimi), MAN.8 (Kalite Güvence)
 
 Bu belge, depoda çalışma kurallarını tanımlar. Kurallar aynı zamanda
@@ -131,6 +131,11 @@ uygunsuzluk üretti (düzeltici faaliyet #66).
   atıf alır; KR-058 dosya adlarını saymaz.
 - **Belge klasörleri** (`docs/` altı). Belgeler Türkçedir.
 - **Kullanıcıya görünen değerler:** çeviri değerleri, hata iletileri, betik çıktıları.
+- **Uygulanmış migration adları** (`20260910145923_DenetimIzi`, `20260910183314_ErisimKaydi`).
+  Migration kimliği veritabanındaki `__ef_migrations_history` tablosunda saklanır; ad
+  değişirse EF migration'ı uygulanmamış sanıp yeniden çalıştırmaya kalkar ve dağıtım
+  bozulur. **Yeni** migration'lar İngilizce adlandırılır (`PersonnelAndOrganization`).
+  Karar: 26.09.2026, PR #75 incelemesi.
 
 ```csharp
 /// <summary>
@@ -500,3 +505,4 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 | 2026-09-25 | 0.7 | §3.2 kodlama dilinin kabuk betiklerini, iş akışlarını ve çeviri anahtarlarını da kapsadığı açıkça yazıldı; kapsam dışı olanlar tanımlandı (düzeltici faaliyet #66) | Bilgi İşlem |
 | 2026-09-25 | 0.8 | §3.2 tablosuna Dockerfile, compose, uç nokta yolları ve issue şablonu alan kimlikleri eklendi (düzeltici faaliyet #66) | Bilgi İşlem |
 | 2026-09-25 | 0.9 | §3 dal adı kuralının CI'da denetlendiği yazıldı (düzeltici faaliyet #67) | Bilgi İşlem |
+| 2026-09-26 | 1.0 | §3.2 kapsam dışına "uygulanmış migration adları" istisnası eklendi (PR #75 incelemesi) | Bilgi İşlem |

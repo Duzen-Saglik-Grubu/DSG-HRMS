@@ -56,6 +56,9 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       Database__Hrms: 'Host=postgres;Port=5432;Database=${POSTGRES_DB:-dsg_hrms_uat};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}'
       ApplicationLogging__FilePath: '/app/logs/dsg-hrms-.json'
+      # LOGO salt-okunur oturumu (KR-004). Bos birakilirsa personel senkronizasyonu
+      # DEVRE DISI kalir ve uygulama calismaya devam eder. Deger sir dosyasinda durur.
+      Logo__ConnectionString: ${LOGO_CONNECTION_STRING:-}
       ApplicationLogging__MinimumLevel: Information
     ports:
       # API disari ACILMAZ; tarayici ona web konteynerinin vekili uzerinden

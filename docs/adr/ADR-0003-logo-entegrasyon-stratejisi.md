@@ -37,6 +37,20 @@ taahhüt değil, **uygulanmış bir kontroldür**:
 - Ek olarak, uygulama tarafında LOGO için kullanılan `DbContext`
   **`SaveChanges` çağrısında istisna fırlatacaktır** ve varsayılan olarak `NoTracking`
   çalışacaktır — ikinci bir kilit.
+- **Üçüncü kilit (2026-09-26):** Senkronizasyon **her çalışmadan önce** oturumun yazma
+  yetkisi olmadığını `HAS_PERMS_BY_NAME` ile denetler; bu denetim hiçbir şey yazmaz.
+  Yazma yetkisi görürse çalışmayı reddeder ve kritik düzeyde günlüğe yazar. `DENY` bir
+  gün yanlışlıkla kaldırılırsa uygulama bunu fark eder.
+
+**Kanıt:** Salt-okunur oturumu oluşturan betik depodadır
+(`docker/logo/salt-okunur-oturum.sql`). CI, bu betiğin **kendisini** SQL Server
+Express üzerinde çalıştırıp yazma denemelerinin veritabanı tarafından reddedildiğini
+her PR'da doğrular (`LogoReadOnlyAccessTests`, SYG-KMLK-003). Yetki denetiminin
+gerçekten yetki tespit edebildiği, yazma yetkili bir kontrol oturumuyla ayrıca sınanır.
+
+**Araç notu:** Projede iki `DbContext` bulunduğundan `dotnet ef` komutlarına
+`--context HrmsDbContext` verilir. LOGO şeması HRMS tarafından yönetilmez; LOGO
+bağlamı için migration üretilmez.
 
 ### 2. Yalıtım: tek bir bileşen, tek bir arayüz
 
@@ -161,3 +175,4 @@ değişir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-09-26 | 0.2 | §1 üçüncü kilit (her çalışmadan önce yetki denetimi), CI kanıtı ve `--context` notu eklendi (#74) | Bilgi İşlem |
