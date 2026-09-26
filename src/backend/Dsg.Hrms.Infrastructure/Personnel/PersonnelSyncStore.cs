@@ -1,4 +1,5 @@
 using Dsg.Hrms.Application.Personnel.Sync;
+using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Organization;
 using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Domain.Personnel.Sync;
@@ -127,8 +128,9 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
             var companies = await context.Set<Company>().ToListAsync(cancellationToken).ConfigureAwait(false);
             var persons = await context.Set<Person>().ToListAsync(cancellationToken).ConfigureAwait(false);
             var employments = await context.Set<Employment>().ToListAsync(cancellationToken).ConfigureAwait(false);
+            var accounts = await context.Set<UserAccount>().ToListAsync(cancellationToken).ConfigureAwait(false);
 
-            return new PersonnelSnapshot(companies, persons, employments);
+            return new PersonnelSnapshot(companies, persons, employments) { Accounts = accounts };
         }
 
         public void Add(IEnumerable<Company> companies, IEnumerable<Person> persons, IEnumerable<Employment> employments)

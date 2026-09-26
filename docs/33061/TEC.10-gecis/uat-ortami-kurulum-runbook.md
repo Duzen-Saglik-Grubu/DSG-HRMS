@@ -357,6 +357,35 @@ göstermez, çünkü sistem son anlık görüntüyle çalışmaya devam eder (SY
 `personnel.sync_warning` tablolarındadır. Uyarılar kişisel veri içermez; kartlar sicil
 koduyla tanımlanır.
 
+Periyot `PRM-ENT-07` parametresidir (varsayılan 15 dakika); yapılandırmadaki
+`PersonnelSync:IntervalMinutes` yalnızca veritabanında değer yoksa kullanılır.
+"Eski" eşiği periyodun üç katıdır.
+
+---
+
+## 9. Sistem parametreleri ve sırlar
+
+T3 parametreleri `settings.system_parameter` tablosundadır (SYG-KMLK-075). Satırı
+olmayan parametre sırasıyla sır dosyasındaki değerle veya katalog varsayılanıyla
+çalışır. Değişiklik yeniden başlatma gerektirmez; en geç 1 dakikada etkili olur.
+
+### 9.1 Şifreleme anahtarı (bir kez)
+
+SMTP ve NetGSM parolalarının parametre ekranından girilebilmesi için sır dosyasına
+şifreleme anahtarı eklenir (`KR-081`, ADR-0008 §7):
+
+```bash
+# Anahtar ekrana YAZDIRILMADAN doğrudan sır dosyasına eklenir.
+printf "PARAMETER_PROTECTION_KEY='%s'
+" "$(openssl rand -base64 32)" >> /opt/dsg-hrms/secrets/.env.uat
+chmod 600 /opt/dsg-hrms/secrets/.env.uat
+```
+
+Anahtarın bir kopyası veritabanı yedeğinden **ayrı** bir yerde saklanır. Anahtar
+kaybolursa veritabanındaki sır parametreler çözülemez ve ekrandan yeniden girilmeleri
+gerekir. Anahtar tanımlı değilse uygulama çalışır; sırlar yalnızca sır dosyasından
+okunur.
+
 ---
 
 ## Değişiklik Geçmişi
@@ -370,3 +399,4 @@ koduyla tanımlanır.
 | 2026-09-26 | 0.5 | §8 LOGO personel senkronizasyonu (etkinleştirme, `/health/sync`); §3.3 `dotnet ef` komutuna `--context HrmsDbContext` eklendi (#74) | Bilgi İşlem |
 | 2026-09-26 | 0.6 | §8.1: sır dosyasında LOGO bağlantı dizesi tek tırnak içinde yazılır (#79) | Bilgi İşlem |
 | 2026-09-26 | 0.7 | Betik ve dosya adları İngilizce: `deploy-uat.sh`, `renew-tls.sh` (sunucuda `dsg-renew-tls.sh`), `acme-dns-hook.sh`, `read-only-login.sql`, `.env.uat.example` (#81) | Bilgi İşlem |
+| 2026-09-26 | 0.8 | §9 sistem parametreleri ve sır parametre şifreleme anahtarı; §8.2 periyot parametreden (#83) | Bilgi İşlem |

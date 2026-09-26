@@ -1,4 +1,5 @@
 using System.Globalization;
+using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Organization;
 using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Domain.Personnel.Sync;
@@ -23,6 +24,12 @@ namespace Dsg.Hrms.Application.Personnel.Sync;
 /// farkli e-posta, 2 kisinin farkli dogum tarihi vardi; IK ayni gun LOGO'da duzeltti ve
 /// ikinci olcumde aktif personelde celiski kalmadi.
 /// </para>
+/// <para>
+/// <b>Hesap yasam dongusu (SYG-KMLK-054, 056):</b> istihdamlar uygulandiktan sonra her
+/// hesap icin kisinin aktif istihdami olup olmadigina bakilir. Hic yoksa hesap
+/// pasiflesir (<c>PRM-HSP-02</c> aciksa); istihdam bitimiyle pasiflesmis bir hesabin
+/// kisisinde yeniden aktif istihdam varsa ayni hesap aktiflesir.
+/// </para>
 /// </remarks>
 public sealed class PersonnelSynchronizer
 {
@@ -36,10 +43,17 @@ public sealed class PersonnelSynchronizer
     }
 
     /// <summary>Kaynak kartlari mevcut duruma uygular.</summary>
+    /// <param name="records">LOGO kartlari.</param>
+    /// <param name="snapshot">HRMS'teki mevcut durum.</param>
+    /// <param name="today">Senkronizasyon gunu.</param>
+    /// <param name="autoDeactivateAccounts">
+    /// Istihdami biten kisinin hesabi pasiflesir mi (<c>PRM-HSP-02</c>, varsayilan acik).
+    /// </param>
     public SyncOutcome Synchronize(
         IReadOnlyList<LogoPersonnelRecord> records,
         PersonnelSnapshot snapshot,
-        DateOnly today)
+        DateOnly today,
+        bool autoDeactivateAccounts = true)
     {
         ArgumentNullException.ThrowIfNull(records);
         ArgumentNullException.ThrowIfNull(snapshot);
@@ -68,6 +82,7 @@ public sealed class PersonnelSynchronizer
         }
 
         ReportMissingFromSource(records, context);
+        ApplyAccountLifecycle(snapshot.Accounts, autoDeactivateAccounts, context);
 
         var counts = new SyncCounts(
             RecordsRead: records.Count,
@@ -77,7 +92,9 @@ public sealed class PersonnelSynchronizer
             EmploymentsCreated: context.NewEmployments.Count,
             EmploymentsUpdated: context.EmploymentsUpdated,
             EmploymentsDeactivated: context.EmploymentsDeactivated,
-            CompaniesChanged: context.NewCompanies.Count + context.CompaniesRenamed);
+            CompaniesChanged: context.NewCompanies.Count + context.CompaniesRenamed,
+            AccountsDeactivated: context.AccountsDeactivated,
+            AccountsReactivated: context.AccountsReactivated);
 
         return new SyncOutcome(
             counts,
@@ -343,6 +360,59 @@ public sealed class PersonnelSynchronizer
         }
     }
 
+    // ------------------------------------------------------------------ hesap
+
+    private static void ApplyAccountLifecycle(
+        IReadOnlyList<UserAccount> accounts,
+        bool autoDeactivate,
+        Context context)
+    {
+        if (accounts.Count == 0)
+        {
+            return;
+        }
+
+        // Aktiflik, TUM istihdamlar uzerinden hesaplanir: bu calismada kaynaktan gelmeyen
+        // (karti silinmis) istihdam da degistirilmeden kaldigi haliyle sayilir. Kisi
+        // istihdamin gezinme ozelliginden alinir; kimlik (PersonId) degil. TCKN duzeltmesiyle
+        // baska kisiye tasinan istihdamin kimligi kayda kadar eski kalir.
+        var personsWithActiveEmployment = context.EmploymentsByCode.Values
+            .Where(e => e.IsActive)
+            .Select(e => e.Person)
+            .ToHashSet();
+
+        var personsById = context.PersonsByNationalId.Values
+            .Where(p => p.Id != 0)
+            .ToDictionary(p => p.Id);
+
+        foreach (var account in accounts)
+        {
+            if (!personsById.TryGetValue(account.PersonId, out var person))
+            {
+                // Yabanci anahtar nedeniyle olamaz; olursa hesaba dokunulmaz.
+                continue;
+            }
+
+            if (personsWithActiveEmployment.Contains(person))
+            {
+                if (account.ReactivateForNewEmployment())
+                {
+                    context.AccountsReactivated++;
+                }
+            }
+            else if (autoDeactivate)
+            {
+                // Sayac yalnizca aktiften pasife gecisi sayar; elle pasif bir hesabin
+                // nedeninin "istihdam bitti"ye donmesi pasiflesme degildir.
+                var wasActive = account.Status == AccountStatus.Active;
+                if (account.DeactivateForEmploymentEnd() && wasActive)
+                {
+                    context.AccountsDeactivated++;
+                }
+            }
+        }
+    }
+
     // ------------------------------------------------------------------ ic tipler
 
     private sealed record Card(
@@ -400,6 +470,10 @@ public sealed class PersonnelSynchronizer
         public int EmploymentsUpdated { get; set; }
 
         public int EmploymentsDeactivated { get; set; }
+
+        public int AccountsDeactivated { get; set; }
+
+        public int AccountsReactivated { get; set; }
 
         public void Warn(SyncWarningCode code, string registryCode, string detail) =>
             Warnings.Add(PersonnelSyncWarning.Create(code, registryCode, detail));

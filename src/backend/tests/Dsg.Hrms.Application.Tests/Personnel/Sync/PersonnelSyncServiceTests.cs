@@ -1,5 +1,6 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Personnel.Sync;
+using Dsg.Hrms.Application.Tests.Settings;
 using Dsg.Hrms.Domain.Personnel.Sync;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
@@ -17,6 +18,7 @@ public sealed class PersonnelSyncServiceTests
     private readonly IPersonnelSyncStore _store = Substitute.For<IPersonnelSyncStore>();
     private readonly IPersonnelSyncSession _session = Substitute.For<IPersonnelSyncSession>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly FakeSystemParameters _parameters = new();
     private readonly List<(SyncStatus Status, SyncFailureReason? Reason)> _savedRuns = [];
 
     public PersonnelSyncServiceTests()
@@ -36,7 +38,7 @@ public sealed class PersonnelSyncServiceTests
     }
 
     private PersonnelSyncService CreateService() =>
-        new(_source, _store, _clock, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance);
+        new(_source, _store, _clock, _parameters, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance);
 
     [Fact]
     public async Task Successful_run_applies_changes_and_records_the_run()

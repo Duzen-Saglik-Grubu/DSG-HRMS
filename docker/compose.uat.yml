@@ -59,6 +59,10 @@ services:
       # LOGO salt-okunur oturumu (KR-004). Bos birakilirsa personel senkronizasyonu
       # DEVRE DISI kalir ve uygulama calismaya devam eder. Deger sir dosyasinda durur.
       Logo__ConnectionString: ${LOGO_CONNECTION_STRING:-}
+      # Sir parametrelerin (SMTP ve NetGSM parolalari) sifreleme anahtari
+      # (SYG-KMLK-075). Bos birakilirsa sirlar ekrandan girilemez, yalnizca ortam
+      # degiskeninden okunur. Deger sir dosyasinda durur; veritabaninda DEGIL.
+      ParameterProtection__Key: ${PARAMETER_PROTECTION_KEY:-}
       ApplicationLogging__MinimumLevel: Information
     ports:
       # API disari ACILMAZ; tarayici ona web konteynerinin vekili uzerinden

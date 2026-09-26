@@ -1,14 +1,19 @@
 using System.Globalization;
+using Dsg.Hrms.Api.IntegrationTests.Settings;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Personnel.Sync;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Audit;
+using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Domain.Personnel.Sync;
 using Dsg.Hrms.Infrastructure.Data;
 using Dsg.Hrms.Infrastructure.Data.Interceptors;
 using Dsg.Hrms.Infrastructure.Logo;
 using Dsg.Hrms.Infrastructure.Personnel;
+using Dsg.Hrms.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Npgsql;
 using NSubstitute;
@@ -47,6 +52,8 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
     private readonly ILogoPersonnelSource _source = Substitute.For<ILogoPersonnelSource>();
 
     private DbContextOptions<HrmsDbContext> _options = null!;
+    private SystemParameters _parameters = null!;
+    private ServiceProvider _provider = null!;
 
     public async Task InitializeAsync()
     {
@@ -71,11 +78,18 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         await using var context = new HrmsDbContext(_options);
         await context.Database.MigrateAsync();
 
+        (_parameters, _provider) = ParameterStoreFactory.Create(_options, _clock);
+
         _source.VerifyReadOnlyAccessAsync(Arg.Any<CancellationToken>()).Returns(new LogoAccessCheckResult(true, []));
         _source.VerifySchemaAsync(Arg.Any<CancellationToken>()).Returns(new LogoSchemaCheckResult(true, []));
     }
 
-    public async Task DisposeAsync() => await _container.DisposeAsync();
+    public async Task DisposeAsync()
+    {
+        _parameters.Dispose();
+        await _provider.DisposeAsync();
+        await _container.DisposeAsync();
+    }
 
     private PersonnelSyncStore CreateStore() => new(_options, new Factory(_options));
 
@@ -85,7 +99,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
 
         await using var store = CreateStore();
         var service = new PersonnelSyncService(
-            _source, store, _clock, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance);
+            _source, store, _clock, _parameters, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance);
 
         return await service.RunAsync(SyncTrigger.Scheduled, CancellationToken.None);
     }
@@ -201,7 +215,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         _source.GetAllAsync(Arg.Any<CancellationToken>()).ThrowsAsync(new LogoUnavailableException());
         await using (var store = CreateStore())
         {
-            await new PersonnelSyncService(_source, store, _clock, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance)
+            await new PersonnelSyncService(_source, store, _clock, _parameters, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance)
                 .RunAsync(SyncTrigger.Scheduled, CancellationToken.None);
         }
 
@@ -274,7 +288,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         await using (var store = CreateStore())
         {
             var service = new PersonnelSyncService(
-                _source, store, _clock, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance);
+                _source, store, _clock, _parameters, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance);
             (await service.RunAsync(SyncTrigger.Scheduled, CancellationToken.None)).Status.ShouldBe(SyncStatus.Failed);
         }
 
@@ -310,6 +324,103 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
             $"INSERT INTO personnel.person (national_id, first_name, last_name, birth_date, email, is_email_shared, created_at, public_id) VALUES ({NationalId(1)}, 'A', 'B', DATE '1990-01-01', 'A@DUZEN.COM.TR', false, now(), gen_random_uuid())"));
 
         ex.ConstraintName.ShouldBe("ck_person_email_lowercase");
+    }
+
+    // ------------------------------------------------------------------ hesaplar (SYG-KMLK-021, 054, 056, 058)
+
+    private async Task<UserAccount> CreateAccountAsync(string nationalId)
+    {
+        await using var context = Read();
+        var person = await context.Set<Person>().SingleAsync(p => p.NationalId == nationalId);
+        var account = UserAccount.Create(person.Id);
+        context.Add(account);
+        await context.SaveChangesAsync();
+        return account;
+    }
+
+    [Fact]
+    public async Task Sync_deactivates_the_account_of_a_departed_person_and_audits_it()
+    {
+        await SyncAsync(Card("00001", NationalId(1)), Card("00002", NationalId(2)));
+        var account = await CreateAccountAsync(NationalId(1));
+
+        await SyncAsync(Card("00001", NationalId(1), terminationDate: Today.AddDays(-1)), Card("00002", NationalId(2)));
+
+        await using var context = Read();
+        var stored = await context.Set<UserAccount>().SingleAsync();
+        stored.Status.ShouldBe(AccountStatus.Passive);
+        stored.StatusReason.ShouldBe(AccountStatusReason.EmploymentEnded);
+        stored.SecurityStamp.ShouldNotBe(account.SecurityStamp);
+
+        var run = await context.Set<PersonnelSyncRun>().OrderByDescending(r => r.Id).FirstAsync();
+        run.AccountsDeactivated.ShouldBe(1);
+
+        // SYG-KMLK-058: onceki ve sonraki durum denetim izinde; guvenlik damgasi degil.
+        var entry = await context.ChangeLog.SingleAsync(e => e.EntityName == nameof(UserAccount) && e.Operation == AuditOperation.Update);
+        var changes = entry.Changes;
+        changes.ShouldContain("Status");
+        changes.ShouldContain("SecurityStamp");
+        changes.ShouldNotContain(account.SecurityStamp.ToString());
+        changes.ShouldNotContain(stored.SecurityStamp.ToString());
+    }
+
+    [Fact]
+    public async Task Sync_reactivates_the_same_account_when_the_person_is_rehired()
+    {
+        await SyncAsync(Card("00001", NationalId(1)));
+        await CreateAccountAsync(NationalId(1));
+        await SyncAsync(Card("00001", NationalId(1), terminationDate: Today.AddDays(-30)));
+
+        await SyncAsync(Card("00001", NationalId(1), logoRef: 1, terminationDate: Today.AddDays(-30)), Card("00005", NationalId(1), logoRef: 5));
+
+        await using var context = Read();
+        var stored = await context.Set<UserAccount>().SingleAsync();
+        stored.Status.ShouldBe(AccountStatus.Active);
+        stored.StatusReason.ShouldBe(AccountStatusReason.NewEmployment);
+        (await context.Set<PersonnelSyncRun>().OrderByDescending(r => r.Id).FirstAsync()).AccountsReactivated.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Auto_deactivation_parameter_is_read_from_the_database()
+    {
+        // PRM-HSP-02 ekrandan kapatildiginda sonraki calisma hesabi pasiflestirmez.
+        await SyncAsync(Card("00001", NationalId(1)));
+        await CreateAccountAsync(NationalId(1));
+        await using (var context = Read())
+        {
+            await new SystemParameterEditor(context, _parameters, new AesGcmSecretProtector(new SecretProtectionOptions()))
+                .UpdateAsync(ParameterCatalog.AutoDeactivateOnEmploymentEnd.Key, "false", CancellationToken.None);
+        }
+
+        await SyncAsync(Card("00001", NationalId(1), terminationDate: Today.AddDays(-1)));
+
+        await using var check = Read();
+        (await check.Set<UserAccount>().SingleAsync()).Status.ShouldBe(AccountStatus.Active);
+    }
+
+    [Fact]
+    public async Task Database_allows_only_one_account_per_person()
+    {
+        // SYG-KMLK-021: ikinci hesap uygulama atlatilsa bile olusturulamaz.
+        await SyncAsync(Card("00001", NationalId(1)));
+        await CreateAccountAsync(NationalId(1));
+
+        var ex = await Should.ThrowAsync<DbUpdateException>(() => CreateAccountAsync(NationalId(1)));
+
+        ex.InnerException.ShouldBeOfType<PostgresException>().ConstraintName.ShouldBe("ix_user_account_person_id");
+    }
+
+    [Fact]
+    public async Task Database_rejects_a_manual_status_change_without_a_reason()
+    {
+        await SyncAsync(Card("00001", NationalId(1)));
+        await CreateAccountAsync(NationalId(1));
+        await using var context = Read();
+
+        var ex = await Should.ThrowAsync<PostgresException>(() => context.Database.ExecuteSqlAsync(
+            $"UPDATE identity.user_account SET status = 2, status_reason = 3, status_note = '  '"));
+
+        ex.ConstraintName.ShouldBe("ck_user_account_manual_note");
     }
 
     // ------------------------------------------------------------------ yardimcilar

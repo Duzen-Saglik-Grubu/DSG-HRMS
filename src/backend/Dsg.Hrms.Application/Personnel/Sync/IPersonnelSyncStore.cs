@@ -1,3 +1,4 @@
+using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Organization;
 using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Domain.Personnel.Sync;
@@ -38,7 +39,7 @@ public interface IPersonnelSyncStore
 /// <summary>Tek bir senkronizasyonun veritabani oturumu.</summary>
 public interface IPersonnelSyncSession : IAsyncDisposable
 {
-    /// <summary>HRMS'teki mevcut firma, kisi ve istihdamlari degisiklik izlemeyle yukler.</summary>
+    /// <summary>HRMS'teki mevcut firma, kisi, istihdam ve hesaplari degisiklik izlemeyle yukler.</summary>
     Task<PersonnelSnapshot> LoadAsync(CancellationToken cancellationToken);
 
     /// <summary>Yeni varliklari oturuma ekler.</summary>
@@ -56,7 +57,11 @@ public interface IPersonnelSyncSession : IAsyncDisposable
 public sealed record PersonnelSnapshot(
     IReadOnlyList<Company> Companies,
     IReadOnlyList<Person> Persons,
-    IReadOnlyList<Employment> Employments);
+    IReadOnlyList<Employment> Employments)
+{
+    /// <summary>Kullanici hesaplari (SYG-KMLK-054, 056).</summary>
+    public IReadOnlyList<UserAccount> Accounts { get; init; } = [];
+}
 
 /// <summary>Senkronizasyon sonucu HRMS veritabanina yazilamadiginda firlatilir.</summary>
 public sealed class SyncPersistenceException : Exception

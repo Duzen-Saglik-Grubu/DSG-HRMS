@@ -334,6 +334,7 @@ yazılıdır; kapanmamış olanlar ⏳ ile işaretlidir.
 | AN-15 | REQ-KMLK-034 "en geç bir sonraki senkronizasyonda" der; süre periyoda bağlıdır. | Varsayılan periyotla (`PRM-ENT-07`, 15 dk) en geç 15 dakika + çalışma süresi (SYG-KMLK-004, 054). | ✅ |
 | AN-17 | **Canlı doğrulamada bulundu (26.09.2026):** Bir adres 3 kişiye tanımlıydı: 2'si ayrılmış, 1'i aktif. REQ-KMLK-009 ayrılmış personeli ayırt etmediği için aktif kişi e-postasıyla giriş yapamayacaktı. | Paylaşım tespitinde yalnızca aktif istihdamı olan kişiler sayılır: ayrılmış kişi üye olamaz ve giriş yapamaz, paylaşım riski doğurmaz (SYG-KMLK-008, `KR-079`, #77). İK ayrılanların kartındaki adresi sildi. | ✅ |
 | AN-18 | Kişinin kartları arasındaki ad/soyad farkı her zaman hata değildir: evlilik sonrası eşin soyadı veya iki soyad kullanılabilir (İK, 26.09.2026). | Aktif sicildeki ad esas alınır (esas kart kuralı). Uyarı yalnızca iki **aktif** kart arasında fark varsa üretilir (`KR-079`, #77). | ✅ |
+| AN-19 | REQ-KMLK-035 "yeniden işe girişte hesap aktifleşir", REQ-KMLK-036 "İK hesabı elle pasife alabilir" der. Senkronizasyon 15 dakikada bir çalıştığından, elle pasif hesabı her çalışmada aktifleştirseydi elle pasife alma anlamsız kalırdı. | Yalnızca istihdam bitimiyle pasifleşen hesap otomatik aktifleşir (SYG-KMLK-056). İstihdamı süren kişinin elle pasif hesabı ancak elle aktifleşir (SYG-KMLK-057). Elle pasif hesabın sahibi ayrılırsa neden "istihdam bitti"ye döner ve yeniden işe girişte hesap aktifleşir (`KR-080`, #83). | ✅ |
 | AN-16 | Denetim izi ve erişim kaydı saklama süreleri (`PRM-KVK-01`, `02`) karar bekliyor. | T3'ü engellemez: kayıtlar üretilir, silme işi karar verildiğinde eklenir. | ⏳ KVKK kararı bekliyor |
 
 **Paydaşa geri bildirim (BP3):** AN-01, onaylı bir kabul kriterinin (REQ-KMLK-004)
@@ -451,3 +452,4 @@ madde `İptal` notuyla kalır.
 | 2026-09-24 | 0.1 | İlk oluşturma — PG-KMLK'deki 56 onaylı gereksinimden türetildi | Bilgi İşlem |
 | 2026-09-25 | 0.2 | Önek `SG-` → `SYG-` (PR #65 incelemesi); AN-01 karara bağlandı (`KR-078`); SYG-KMLK-016'ya yönlendirme iletisi eklendi | Bilgi İşlem |
 | 2026-09-26 | 0.3 | SYG-KMLK-008: ortak adres tespitinde yalnızca aktif istihdamlı kişiler; AN-17, AN-18 eklendi (`KR-079`, #77) | Bilgi İşlem |
+| 2026-09-26 | 0.4 | AN-19 eklendi: elle pasife alma ile yeniden işe girişte aktifleşmenin birlikte uygulanması (`KR-080`, #83) | Bilgi İşlem |

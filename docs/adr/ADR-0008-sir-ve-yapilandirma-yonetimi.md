@@ -88,6 +88,22 @@ Doğrulanacak zorunlu ayarlar (örnek):
 | Kurumsal SMTP parolası | **Değiştirildi** (2026-09-05) |
 | NetGSM API IP kısıtlaması | Uygulanmayacak (`KR-044`). Erişim bilgileri tek koruma katmanıdır; bu ADR'deki kurallar bu nedenle daha kritiktir |
 
+### 7. Parametre ekranından değiştirilebilen sırlar (`KR-081`)
+
+SMTP ve NetGSM parolaları hem sır hem sistem parametresidir (`PRM-ENT-02`,
+`PRM-ENT-06`): SYG-KMLK-075/076 bunların parametre ekranından değiştirilebilmesini
+ister. Bu iki ihtiyaç şöyle birleştirilir:
+
+| Kural | Uygulama |
+|---|---|
+| Değer veritabanında **şifreli** saklanır | AES-256-GCM; parametre kimliği ek doğrulanmış veri olarak bağlanır. Değer başka bir parametrenin satırına taşınırsa çözülmez |
+| Anahtar veritabanında **değil**, ortam değişkenindedir | `ParameterProtection__Key` (32 bayt, Base64; `openssl rand -base64 32`). Açılışta doğrulanır |
+| Ekrandan girilmemişse ortam değişkeni kullanılır | `Parameters__SmtpPassword`, `Parameters__NetGsmPassword`. İlk kurulum ekransız yapılabilir |
+| Değer geri okunamaz | Ekranda, API yanıtında ve denetim izinde görünmez; yalnızca "tanımlı" bilgisi döner (`KR-071`) |
+
+**Anahtar kaybı:** Veritabanındaki sır değerleri çözülemez; parametre ekranından
+yeniden girilmeleri gerekir. Anahtar, veritabanı yedeğiyle **aynı yerde** saklanmaz.
+
 ## Gerekçe
 
 - Sır sızıntısının en yaygın yolu, kaynak kod deposudur. Teknik kontrol (tarama +
@@ -135,3 +151,4 @@ geçilmesi yapılandırma sağlayıcısı eklemekten ibarettir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-09-26 | 0.2 | §7 parametre ekranından değiştirilebilen sırlar (`KR-081`, #83) | Bilgi İşlem |
