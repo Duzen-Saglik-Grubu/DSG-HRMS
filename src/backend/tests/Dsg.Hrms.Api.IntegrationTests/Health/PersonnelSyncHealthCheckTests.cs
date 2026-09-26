@@ -1,4 +1,5 @@
 using Dsg.Hrms.Api.Health;
+using Dsg.Hrms.Api.IntegrationTests.Settings;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Domain.Personnel.Sync;
@@ -24,7 +25,7 @@ public sealed class PersonnelSyncHealthCheckTests
     }
 
     private Task<HealthCheckResult> CheckAsync() =>
-        new PersonnelSyncHealthCheck(_status, _clock, new PersonnelSyncOptions { IntervalMinutes = 15 })
+        new PersonnelSyncHealthCheck(_status, _clock, new FakeSystemParameters())
             .CheckHealthAsync(new HealthCheckContext());
 
     private void LastRun(SyncStatus status, int minutesAgo, SyncFailureReason? reason = null) =>

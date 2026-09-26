@@ -1,5 +1,6 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Personnel.Sync;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Personnel.Sync;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
@@ -25,14 +26,14 @@ public sealed class PersonnelSyncHealthCheck : IHealthCheck
 {
     private readonly IPersonnelSyncStatus _status;
     private readonly IDateTimeProvider _clock;
-    private readonly PersonnelSyncOptions _options;
+    private readonly ISystemParameters _parameters;
 
     /// <summary>Yeni ornek olusturur.</summary>
-    public PersonnelSyncHealthCheck(IPersonnelSyncStatus status, IDateTimeProvider clock, PersonnelSyncOptions options)
+    public PersonnelSyncHealthCheck(IPersonnelSyncStatus status, IDateTimeProvider clock, ISystemParameters parameters)
     {
         _status = status;
         _clock = clock;
-        _options = options;
+        _parameters = parameters;
     }
 
     /// <inheritdoc />
@@ -56,7 +57,10 @@ public sealed class PersonnelSyncHealthCheck : IHealthCheck
 
         // Uc periyot: tek bir gecikme veya uzun suren bir calisma alarm uretmesin,
         // ama bir saati asan sessizlik fark edilsin.
-        var staleAfter = TimeSpan.FromMinutes(_options.IntervalMinutes * 3);
+        var interval = await _parameters
+            .GetIntegerAsync(ParameterCatalog.SyncIntervalMinutes, cancellationToken)
+            .ConfigureAwait(false);
+        var staleAfter = TimeSpan.FromMinutes(interval * 3);
         var reference = last.FinishedAt ?? last.StartedAt;
 
         return _clock.UtcNow - reference > staleAfter

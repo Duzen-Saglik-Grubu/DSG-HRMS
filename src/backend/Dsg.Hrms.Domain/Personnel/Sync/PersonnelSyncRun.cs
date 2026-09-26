@@ -69,6 +69,12 @@ public sealed class PersonnelSyncRun
     /// <summary>Olusturulan veya guncellenen firma sayisi.</summary>
     public int CompaniesChanged { get; private set; }
 
+    /// <summary>Istihdami bittigi icin pasiflesen hesap sayisi (SYG-KMLK-054).</summary>
+    public int AccountsDeactivated { get; private set; }
+
+    /// <summary>Yeni istihdamla yeniden aktiflesen hesap sayisi (SYG-KMLK-056).</summary>
+    public int AccountsReactivated { get; private set; }
+
     /// <summary>Uretilen veri kalitesi uyarisi sayisi.</summary>
     public int WarningCount { get; private set; }
 
@@ -103,6 +109,8 @@ public sealed class PersonnelSyncRun
         EmploymentsUpdated = counts.EmploymentsUpdated;
         EmploymentsDeactivated = counts.EmploymentsDeactivated;
         CompaniesChanged = counts.CompaniesChanged;
+        AccountsDeactivated = counts.AccountsDeactivated;
+        AccountsReactivated = counts.AccountsReactivated;
         WarningCount = _warnings.Count;
 
         Status = _warnings.Count == 0 ? SyncStatus.Succeeded : SyncStatus.CompletedWithWarnings;
@@ -138,7 +146,9 @@ public sealed record SyncCounts(
     int EmploymentsCreated,
     int EmploymentsUpdated,
     int EmploymentsDeactivated,
-    int CompaniesChanged);
+    int CompaniesChanged,
+    int AccountsDeactivated = 0,
+    int AccountsReactivated = 0);
 
 /// <summary>Senkronizasyonu baslatan etken.</summary>
 public enum SyncTrigger

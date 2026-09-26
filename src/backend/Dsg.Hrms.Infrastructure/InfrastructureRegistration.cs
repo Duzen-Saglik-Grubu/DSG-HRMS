@@ -1,12 +1,14 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
 using Dsg.Hrms.Application.Personnel.Sync;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Infrastructure.Audit;
 using Dsg.Hrms.Infrastructure.Configuration;
 using Dsg.Hrms.Infrastructure.Data;
 using Dsg.Hrms.Infrastructure.Data.Interceptors;
 using Dsg.Hrms.Infrastructure.Logo;
 using Dsg.Hrms.Infrastructure.Personnel;
+using Dsg.Hrms.Infrastructure.Settings;
 using Dsg.Hrms.Infrastructure.Time;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -42,9 +44,24 @@ public static class InfrastructureRegistration
         services.AddScoped<IAccessLogger, AccessLogger>();
 
         AddDatabase(services, configuration, environment);
+        AddSystemParameters(services, configuration);
         AddPersonnelSync(services, configuration);
 
         return services;
+    }
+
+    private static void AddSystemParameters(IServiceCollection services, IConfiguration configuration)
+    {
+        // Yapilandirmadaki parametre degerleri ve sifreleme anahtari ACILISTA dogrulanir
+        // (ADR-0008 §4); gecersiz bir deger ilk kullanildigi anda degil simdi fark edilir.
+        SystemParameters.ValidateConfiguration(configuration);
+        var protection = OptionsRegistration.ReadAndValidate<SecretProtectionOptions>(
+            configuration, SecretProtectionOptions.SectionName);
+
+        services.AddSingleton<ISecretProtector>(new AesGcmSecretProtector(protection));
+        services.AddSingleton<SystemParameters>();
+        services.AddSingleton<ISystemParameters>(provider => provider.GetRequiredService<SystemParameters>());
+        services.AddScoped<ISystemParameterEditor, SystemParameterEditor>();
     }
 
     private static void AddPersonnelSync(IServiceCollection services, IConfiguration configuration)

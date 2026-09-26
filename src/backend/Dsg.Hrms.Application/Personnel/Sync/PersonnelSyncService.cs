@@ -1,4 +1,5 @@
 using Dsg.Hrms.Application.Common.Abstractions;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Personnel.Sync;
 using Microsoft.Extensions.Logging;
 
@@ -26,6 +27,7 @@ public sealed partial class PersonnelSyncService
     private readonly ILogoPersonnelSource _source;
     private readonly IPersonnelSyncStore _store;
     private readonly IDateTimeProvider _clock;
+    private readonly ISystemParameters _parameters;
     private readonly PersonnelSyncOptions _options;
     private readonly ILogger<PersonnelSyncService> _logger;
 
@@ -34,6 +36,7 @@ public sealed partial class PersonnelSyncService
         ILogoPersonnelSource source,
         IPersonnelSyncStore store,
         IDateTimeProvider clock,
+        ISystemParameters parameters,
         PersonnelSyncOptions options,
         ILogger<PersonnelSyncService> logger)
     {
@@ -42,6 +45,7 @@ public sealed partial class PersonnelSyncService
         _source = source;
         _store = store;
         _clock = clock;
+        _parameters = parameters;
         _options = options;
         _logger = logger;
     }
@@ -98,11 +102,15 @@ public sealed partial class PersonnelSyncService
                 return SyncFailureReason.SchemaDrift;
             }
 
+            var autoDeactivate = await _parameters
+                .GetBooleanAsync(ParameterCatalog.AutoDeactivateOnEmploymentEnd, cancellationToken)
+                .ConfigureAwait(false);
+
             var records = await _source.GetAllAsync(cancellationToken).ConfigureAwait(false);
             var snapshot = await session.LoadAsync(cancellationToken).ConfigureAwait(false);
 
             var outcome = new PersonnelSynchronizer(_options.ExcludedRegistryCodes)
-                .Synchronize(records, snapshot, _clock.Today);
+                .Synchronize(records, snapshot, _clock.Today, autoDeactivate);
 
             session.Add(outcome.NewCompanies, outcome.NewPersons, outcome.NewEmployments);
             await session.CommitAsync(cancellationToken).ConfigureAwait(false);

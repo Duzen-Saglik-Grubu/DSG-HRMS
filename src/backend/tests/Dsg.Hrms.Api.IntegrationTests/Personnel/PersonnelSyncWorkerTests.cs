@@ -1,5 +1,7 @@
+using Dsg.Hrms.Api.IntegrationTests.Settings;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Personnel.Sync;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Infrastructure.Logo;
 using Dsg.Hrms.Infrastructure.Personnel;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,13 +26,15 @@ public sealed class PersonnelSyncWorkerTests
         services.AddSingleton(_store);
         services.AddSingleton(Substitute.For<IDateTimeProvider>());
         services.AddSingleton(new PersonnelSyncOptions());
+        services.AddSingleton<ISystemParameters>(new FakeSystemParameters());
         services.AddSingleton(typeof(ILogger<>), typeof(NullLogger<>));
         services.AddScoped<PersonnelSyncService>();
         var provider = services.BuildServiceProvider();
 
         return new PersonnelSyncWorker(
             provider.GetRequiredService<IServiceScopeFactory>(),
-            new PersonnelSyncOptions { IntervalMinutes = 15 },
+            provider.GetRequiredService<ISystemParameters>(),
+            provider.GetRequiredService<IDateTimeProvider>(),
             new LogoOptions { ConnectionString = logoConfigured ? "Server=logo;Database=BORDRO" : null },
             NullLogger<PersonnelSyncWorker>.Instance);
     }

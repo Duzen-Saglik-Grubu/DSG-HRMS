@@ -88,6 +88,14 @@ public static class MaskRules
             ["ClientSecret"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
             ["ConnectionString"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
 
+            // Sifreli sir parametresi (SystemParameter). Sifreli bile olsa yazilmaz:
+            // denetim izinde yalnizca "degisti" gorunur (KR-071).
+            ["ProtectedValue"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
+
+            // Hesap guvenlik damgasi (UserAccount). Oturum jetonlari buna baglanir;
+            // denetim izini okuyan biri jeton uretimine yardimci bir deger gormemelidir.
+            ["SecurityStamp"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
+
             // Bildirim govdesi: icinde dogrulama kodu ve kisisel veri tasir (ADR-0009 §4).
             ["MessageBody"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
             ["SmsBody"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),

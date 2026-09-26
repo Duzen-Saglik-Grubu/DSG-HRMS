@@ -1,4 +1,6 @@
+using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Personnel.Sync;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Personnel.Sync;
 using Dsg.Hrms.Infrastructure.Logo;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +13,11 @@ namespace Dsg.Hrms.Infrastructure.Personnel;
 /// Periyodik LOGO senkronizasyonu (<c>KR-007</c>: 15 dakikada bir, SYG-KMLK-004).
 /// </summary>
 /// <remarks>
+/// <para>
+/// Periyot parametre deposundan okunur (<c>PRM-ENT-07</c>) ve beklerken dakikada bir
+/// yeniden okunur: yonetici periyodu 120 dakikadan 5 dakikaya indirdiginde yeni deger
+/// eski periyodun bitmesini beklemeden en gec 1 dakikada etkili olur (SYG-KMLK-075).
+/// </para>
 /// <para>
 /// Uygulama acilir acilmaz bir calisma yapar, sonra periyotla devam eder. Boylece
 /// yeniden baslatmadan sonra veri 15 dakika eski kalmaz.
@@ -25,20 +32,26 @@ namespace Dsg.Hrms.Infrastructure.Personnel;
 /// </remarks>
 public sealed partial class PersonnelSyncWorker : BackgroundService
 {
+    /// <summary>Periyot beklenirken parametrenin yeniden okunma araligi.</summary>
+    public static readonly TimeSpan PollInterval = TimeSpan.FromMinutes(1);
+
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly PersonnelSyncOptions _options;
+    private readonly ISystemParameters _parameters;
+    private readonly IDateTimeProvider _clock;
     private readonly LogoOptions _logo;
     private readonly ILogger<PersonnelSyncWorker> _logger;
 
     /// <summary>Yeni ornek olusturur.</summary>
     public PersonnelSyncWorker(
         IServiceScopeFactory scopeFactory,
-        PersonnelSyncOptions options,
+        ISystemParameters parameters,
+        IDateTimeProvider clock,
         LogoOptions logo,
         ILogger<PersonnelSyncWorker> logger)
     {
         _scopeFactory = scopeFactory;
-        _options = options;
+        _parameters = parameters;
+        _clock = clock;
         _logo = logo;
         _logger = logger;
     }
@@ -52,13 +65,57 @@ public sealed partial class PersonnelSyncWorker : BackgroundService
             return;
         }
 
-        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(_options.IntervalMinutes));
-
-        do
+        try
         {
-            await RunOnceAsync(stoppingToken).ConfigureAwait(false);
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                var startedAt = _clock.UtcNow;
+                await RunOnceAsync(stoppingToken).ConfigureAwait(false);
+                await WaitForNextRunAsync(startedAt, stoppingToken).ConfigureAwait(false);
+            }
         }
-        while (await timer.WaitForNextTickAsync(stoppingToken).ConfigureAwait(false));
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            // Uygulama kapaniyor.
+        }
+    }
+
+    private async Task WaitForNextRunAsync(DateTimeOffset startedAt, CancellationToken stoppingToken)
+    {
+        while (true)
+        {
+            var interval = await ReadIntervalAsync(stoppingToken).ConfigureAwait(false);
+            var remaining = startedAt + interval - _clock.UtcNow;
+
+            if (remaining <= TimeSpan.Zero)
+            {
+                return;
+            }
+
+            await Task.Delay(remaining < PollInterval ? remaining : PollInterval, stoppingToken).ConfigureAwait(false);
+        }
+    }
+
+    private async Task<TimeSpan> ReadIntervalAsync(CancellationToken stoppingToken)
+    {
+        try
+        {
+            var minutes = await _parameters
+                .GetIntegerAsync(ParameterCatalog.SyncIntervalMinutes, stoppingToken)
+                .ConfigureAwait(false);
+            return TimeSpan.FromMinutes(minutes);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            throw;
+        }
+#pragma warning disable CA1031 // Parametre okunamazsa (HRMS veritabani kapali) zamanlayici DURMAMALIDIR.
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            LogIntervalUnavailable(_logger, ex);
+            return TimeSpan.FromMinutes(int.Parse(ParameterCatalog.SyncIntervalMinutes.DefaultValue!, System.Globalization.CultureInfo.InvariantCulture));
+        }
     }
 
     private async Task RunOnceAsync(CancellationToken stoppingToken)
@@ -86,6 +143,10 @@ public sealed partial class PersonnelSyncWorker : BackgroundService
     [LoggerMessage(EventId = 3300, Level = LogLevel.Warning,
         Message = "LOGO baglantisi tanimli degil (Logo:ConnectionString); personel senkronizasyonu devre disi.")]
     private static partial void LogDisabled(ILogger logger);
+
+    [LoggerMessage(EventId = 3302, Level = LogLevel.Warning,
+        Message = "Senkronizasyon periyodu (PRM-ENT-07) okunamadi; varsayilan periyot kullaniliyor.")]
+    private static partial void LogIntervalUnavailable(ILogger logger, Exception exception);
 
     [LoggerMessage(EventId = 3301, Level = LogLevel.Error,
         Message = "Periyodik personel senkronizasyonu calistirilamadi; bir sonraki periyotta yeniden denenecek.")]
