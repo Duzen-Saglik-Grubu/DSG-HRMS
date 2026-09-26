@@ -323,8 +323,14 @@ Sır dosyasına (`/opt/dsg-hrms/secrets/.env.uat`) **salt-okunur** oturumun bağ
 dizesi eklenir:
 
 ```bash
-LOGO_CONNECTION_STRING=Server=<logo-sunucusu>;Database=BORDRO;User Id=hrms_logo_reader;Password=...;TrustServerCertificate=true;ApplicationIntent=ReadOnly
+LOGO_CONNECTION_STRING='Server=<logo-sunucusu>;Database=BORDRO;User Id=hrms_logo_reader;Password=...;TrustServerCertificate=true;ApplicationIntent=ReadOnly'
 ```
+
+> **Değer tek tırnak içinde yazılır.** Sır dosyasının iki okuyucusu vardır: Docker
+> Compose dosyayı düz metin olarak okur, dağıtım betiği ise şema adımında **kabuk
+> komutu olarak** okur (`. dosya`). Tırnaksız değerde kabuk noktalı virgüllerde satırı
+> böler ve `User Id=...` kısmını komut olarak çalıştırmaya kalkar (#79). Tek tırnak
+> iki okuyucuda da aynı değeri verir; parolada tek tırnak karakteri kullanılmamalıdır.
 
 Oturum `docker/logo/salt-okunur-oturum.sql` ile oluşturulmuş olmalıdır (`KR-004`).
 **Yazma yetkili bir oturum kullanılmaz.** Kullanılırsa senkronizasyon bunu her
@@ -362,3 +368,4 @@ koduyla tanımlanır.
 | 2026-09-25 | 0.3 | Sunucuya bağlı adlar İngilizceye çevrildi (`KR-058`, düzeltici faaliyet #66): `gizli/` → `secrets/`, `TLS_DIZINI` → `TLS_DIR`, `beklenen-kayit.txt` → `expected-record.txt`. Sunucu tarafı aynı gün uygulandı | Bilgi İşlem |
 | 2026-09-25 | 0.4 | Volume adları İngilizceye çevrildi: `uat-postgres-verisi` → `uat-postgres-data`, `uat-api-gunlukleri` → `uat-api-logs` (`KR-058`, #66). Veri kopyalanarak taşındı (sağlama değerleri ve satır sayıları eşit); eski volume'ler yedek olarak bırakıldı | Bilgi İşlem |
 | 2026-09-26 | 0.5 | §8 LOGO personel senkronizasyonu (etkinleştirme, `/health/sync`); §3.3 `dotnet ef` komutuna `--context HrmsDbContext` eklendi (#74) | Bilgi İşlem |
+| 2026-09-26 | 0.6 | §8.1: sır dosyasında LOGO bağlantı dizesi tek tırnak içinde yazılır (#79) | Bilgi İşlem |
