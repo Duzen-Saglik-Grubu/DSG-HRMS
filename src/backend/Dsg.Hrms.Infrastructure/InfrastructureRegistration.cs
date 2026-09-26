@@ -1,14 +1,17 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
+using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Infrastructure.Audit;
 using Dsg.Hrms.Infrastructure.Configuration;
 using Dsg.Hrms.Infrastructure.Data;
 using Dsg.Hrms.Infrastructure.Data.Interceptors;
+using Dsg.Hrms.Infrastructure.Personnel;
 using Dsg.Hrms.Infrastructure.Time;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace Dsg.Hrms.Infrastructure;
 
@@ -38,8 +41,19 @@ public static class InfrastructureRegistration
         services.AddScoped<IAccessLogger, AccessLogger>();
 
         AddDatabase(services, configuration, environment);
+        AddPersonnelSync(services, configuration);
 
         return services;
+    }
+
+    private static void AddPersonnelSync(IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddValidatedOptions<PersonnelSyncOptions>(configuration, PersonnelSyncOptions.SectionName);
+
+        // Uygulama katmani IOptions paketine bagimli degildir; secenek nesnesi dogrudan verilir.
+        services.AddSingleton(provider => provider.GetRequiredService<IOptions<PersonnelSyncOptions>>().Value);
+
+        services.AddScoped<IPersonnelSyncStore, PersonnelSyncStore>();
     }
 
     private static void AddDatabase(
