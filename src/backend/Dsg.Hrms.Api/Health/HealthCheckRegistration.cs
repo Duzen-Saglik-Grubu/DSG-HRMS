@@ -1,5 +1,7 @@
 using System.Text.Json;
 using Dsg.Hrms.Application.Common.Configuration;
+using Dsg.Hrms.Application.Notifications;
+using Dsg.Hrms.Domain.Notifications;
 using Dsg.Hrms.Infrastructure.Configuration;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -30,6 +32,9 @@ public static class HealthCheckRegistration
     /// <summary>LOGO senkronizasyonu sagligi; hazir olma denetiminden AYRIDIR (SYG-KMLK-011).</summary>
     public const string SyncTag = "sync";
 
+    /// <summary>E-posta ve SMS kanallarinin sagligi; hazir olma denetiminden AYRIDIR (#85).</summary>
+    public const string NotificationsTag = "notifications";
+
     /// <summary>Saglik kontrollerini kaydeder.</summary>
     public static IServiceCollection AddHrmsHealthChecks(
         this IServiceCollection services,
@@ -48,7 +53,9 @@ public static class HealthCheckRegistration
                 failureStatus: HealthStatus.Unhealthy,
                 tags: [ReadyTag],
                 timeout: TimeSpan.FromSeconds(5))
-            .AddCheck<PersonnelSyncHealthCheck>("personnel-sync", tags: [SyncTag]);
+            .AddCheck<PersonnelSyncHealthCheck>("personnel-sync", tags: [SyncTag])
+            .Add(ChannelCheck("email", NotificationChannel.Email))
+            .Add(ChannelCheck("sms", NotificationChannel.Sms));
 
         return services;
     }
@@ -79,8 +86,24 @@ public static class HealthCheckRegistration
             ResponseWriter = WriteResponseAsync,
         });
 
+        // Bildirim kanallari: SMTP kimlik dogrulamasi ve NetGSM bakiye/baslik sorgusu.
+        // Hicbir ileti gonderilmez.
+        app.MapHealthChecks("/health/notifications", new HealthCheckOptions
+        {
+            Predicate = registration => registration.Tags.Contains(NotificationsTag),
+            ResponseWriter = WriteResponseAsync,
+        });
+
         return app;
     }
+
+    private static Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckRegistration ChannelCheck(string name, NotificationChannel channel) =>
+        new(
+            name,
+            provider => new NotificationChannelHealthCheck(provider.GetRequiredService<INotificationChannelProbe>(), channel),
+            failureStatus: null,
+            tags: [NotificationsTag],
+            timeout: TimeSpan.FromSeconds(30));
 
     /// <summary>
     /// Saglik yanitini JSON olarak yazar.

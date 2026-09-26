@@ -386,6 +386,46 @@ kaybolursa veritabanındaki sır parametreler çözülemez ve ekrandan yeniden g
 gerekir. Anahtar tanımlı değilse uygulama çalışır; sırlar yalnızca sır dosyasından
 okunur.
 
+## 10. Doğrulama kodu ve ileti gönderimi
+
+### 10.1 Sır dosyasına eklenecekler (bir kez)
+
+```bash
+# Kod özet anahtarı (SYG-KMLK-025); ekrana yazdırılmadan eklenir.
+printf "IDENTITY_CODE_HASH_KEY='%s'
+" "$(openssl rand -base64 32)" >> /opt/dsg-hrms/secrets/.env.uat
+```
+
+SMTP ve NetGSM erişim bilgileri `SMTP_SERVER`, `SMTP_PASSWORD`, `NETGSM_USER_CODE`,
+`NETGSM_PASSWORD` değişkenleriyle, **tek tırnak içinde** eklenir (`.env.uat.example`).
+
+### 10.2 Gönderim kipi (`KR-083`)
+
+UAT **gerçek LOGO verisiyle** çalışır. `NOTIFICATIONS_DELIVERY_MODE=Send` gerçek personele
+kod gönderir ve UAT'de **kullanılmaz**.
+
+| Kip | Ne zaman |
+|---|---|
+| `LogOnly` (varsayılan) | Hiçbir ileti gitmez; gönderim kaydı `Suppressed` yazılır |
+| `AllowList` | Kabul testleri: `NOTIFICATIONS_ALLOWED_RECIPIENTS` yalnızca test yapanların kurumsal e-posta ve `5XXXXXXXXX` telefonları (virgülle) |
+
+### 10.3 Doğrulama
+
+```bash
+curl -s https://insankaynaklaritest.duzen.com.tr/health/notifications
+```
+
+Uç **hiçbir ileti göndermez**: SMTP'de oturum açıp kimlik doğrular, NetGSM'de bakiye ve
+gönderici adını sorgular. Sonuç 5 dakika önbellekte tutulur.
+
+| Durum | Anlamı |
+|---|---|
+| `Healthy` | Kimlik doğrulaması başarılı; ya da kanal bilinçli olarak tanımlı değil |
+| `Degraded` | Sunucuya ulaşılamadı |
+| `Unhealthy` | Parola, kullanıcı, gönderici adı veya **sunucu sertifikası** hatalı; hiç kimse kod alamaz |
+
+Gönderim kayıtları `notification.delivery` tablosundadır; içerik tutulmaz, alıcı maskelidir.
+
 ---
 
 ## Değişiklik Geçmişi
@@ -400,3 +440,4 @@ okunur.
 | 2026-09-26 | 0.6 | §8.1: sır dosyasında LOGO bağlantı dizesi tek tırnak içinde yazılır (#79) | Bilgi İşlem |
 | 2026-09-26 | 0.7 | Betik ve dosya adları İngilizce: `deploy-uat.sh`, `renew-tls.sh` (sunucuda `dsg-renew-tls.sh`), `acme-dns-hook.sh`, `read-only-login.sql`, `.env.uat.example` (#81) | Bilgi İşlem |
 | 2026-09-26 | 0.8 | §9 sistem parametreleri ve sır parametre şifreleme anahtarı; §8.2 periyot parametreden (#83) | Bilgi İşlem |
+| 2026-09-27 | 0.9 | §10 doğrulama kodu ve ileti gönderimi: özet anahtarı, gönderim kipleri, `/health/notifications` (#85) | Bilgi İşlem |

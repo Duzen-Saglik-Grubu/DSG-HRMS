@@ -83,6 +83,11 @@ public static class MaskRules
             ["AccessToken"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
             ["RefreshToken"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
             ["VerificationCode"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
+
+            // Dogrulama kodunun anahtarli ozeti (VerificationCode). Ozet de yazilmaz: anahtar
+            // ele gecerse 6 haneli kodun tum olasiliklari saniyeler icinde denenebilir.
+            ["CodeHash"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
+
             ["ApiKey"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
             ["Secret"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
             ["ClientSecret"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
