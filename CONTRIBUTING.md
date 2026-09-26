@@ -126,10 +126,13 @@ içindeki betikler, kabuk betikleri ve Dockerfile'lar da koddur. Bu dosyaların
 akışlarında, ön yüzde ve çeviri anahtarlarında farklı tarihlerde tekrarlanan bir
 uygunsuzluk üretti (düzeltici faaliyet #66).
 
+**Kod dosyalarının adları da İngilizcedir** (betikler, iş akışları, issue şablonları,
+Dockerfile'ın kopyaladığı dosyalar, örnek ortam dosyaları: `deploy-uat.sh`,
+`.env.example`). Bu kural başta bir istisnaydı; kod dosyasının içindeki her ad
+İngilizceyken adının Türkçe olması tutarsız görüldüğü için kaldırıldı (#81, 26.09.2026).
+
 **Kapsam dışı olanlar:**
-- **Dosya adları.** `baslik-bicimi-testi.mjs` gibi adlar belgelerde ve runbook'ta
-  atıf alır; KR-058 dosya adlarını saymaz.
-- **Belge klasörleri** (`docs/` altı). Belgeler Türkçedir.
+- **Belge dosyaları ve klasörleri** (`docs/` altı, `CONTRIBUTING.md` gibi). Belgeler Türkçedir.
 - **Kullanıcıya görünen değerler:** çeviri değerleri, hata iletileri, betik çıktıları.
 - **Uygulanmış migration adları** (`20260910145923_DenetimIzi`, `20260910183314_ErisimKaydi`).
   Migration kimliği veritabanındaki `__ef_migrations_history` tablosunda saklanır; ad
@@ -345,7 +348,7 @@ Conventional Commits'e uymayan bir commit olarak `main` geçmişine girer. Yerel
 Denetlenebilecek tek yer CI'dır.
 
 Başlık biçimi **CI tarafından denetlenir**
-([`pr-izlenebilirlik-denetimi.yml`](.github/workflows/pr-izlenebilirlik-denetimi.yml)).
+([`pr-traceability-check.yml`](.github/workflows/pr-traceability-check.yml)).
 
 > Bu kural #44 düzeltici faaliyetinin sonucudur. Kural yazılı olmadığı için 20 PR
 > boyunca yalnızca alışkanlıkla korunmuş, 21.'sinde kırılmıştı.
@@ -362,7 +365,7 @@ Başlık biçimi **CI tarafından denetlenir**
 > asılı kalır. Bu durum bir kez yaşandı (#17); artık CI denetimi ve bu tablo var.
 
 Her iki alan da **CI tarafından denetlenir**
-([`pr-izlenebilirlik-denetimi.yml`](.github/workflows/pr-izlenebilirlik-denetimi.yml)):
+([`pr-traceability-check.yml`](.github/workflows/pr-traceability-check.yml)):
 milestone veya issue bağlantısı eksikse kontrol başarısız olur.
 
 ### 5.3 Taslak (draft) PR
@@ -506,3 +509,4 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 | 2026-09-25 | 0.8 | §3.2 tablosuna Dockerfile, compose, uç nokta yolları ve issue şablonu alan kimlikleri eklendi (düzeltici faaliyet #66) | Bilgi İşlem |
 | 2026-09-25 | 0.9 | §3 dal adı kuralının CI'da denetlendiği yazıldı (düzeltici faaliyet #67) | Bilgi İşlem |
 | 2026-09-26 | 1.0 | §3.2 kapsam dışına "uygulanmış migration adları" istisnası eklendi (PR #75 incelemesi) | Bilgi İşlem |
+| 2026-09-26 | 1.1 | §3.2: kod dosyası adları istisnası kaldırıldı; kod dosyası adları da İngilizce (#81) | Bilgi İşlem |

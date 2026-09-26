@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
 
-// Dal adi kurali is akisi dosyasindan AYNEN okunur (bkz. baslik-bicimi-testi.mjs).
+// Dal adi kurali is akisi dosyasindan AYNEN okunur (bkz. title-format-test.mjs).
 // Orneklerin cogu depodaki GERCEK dal adlaridir: kurala uyanlar gecmeli, #67'de
 // tespit edilen 10 hatali dal dusmelidir. Boylece kural, gecmiste yakalamasi
 // gereken hatayi gercekten yakalayip yakalamadigina gore sinanir.
-const workflowText = readFileSync('.github/workflows/pr-izlenebilirlik-denetimi.yml', 'utf8');
+const workflowText = readFileSync('.github/workflows/pr-traceability-check.yml', 'utf8');
 const lines = workflowText.split('\n');
 const typesLine = lines.find((l) => l.includes('const BRANCH_TYPES ='));
 const patternStart = lines.findIndex((l) => l.includes('const BRANCH_PATTERN ='));

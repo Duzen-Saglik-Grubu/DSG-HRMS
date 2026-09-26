@@ -15,7 +15,7 @@ on:
     paths:
       - 'src/backend/**'
       - 'docs/api/**'
-      - '.github/workflows/api-sozlesme-denetimi.yml'
+      - '.github/workflows/api-contract-check.yml'
   push:
     branches: [main]
 

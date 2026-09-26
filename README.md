@@ -78,7 +78,7 @@ git config core.hooksPath .githooks
 
 ```bash
 cd docker
-cp .env.ornek .env          # bir kez — .env depoya GİRMEZ, parolayı değiştirin
+cp .env.example .env          # bir kez — .env depoya GİRMEZ, parolayı değiştirin
 docker compose up -d --build
 
 # Veritabanı şemasını oluştur
@@ -124,7 +124,7 @@ Kabul testi ortamı **ayrı sunucuda** çalışır (`KR-024`); geliştirme veris
 Dağıtım tek komutla yapılır:
 
 ```bash
-./docker/uat-dagit.sh
+./docker/deploy-uat.sh
 ```
 
 Betik kaynağı aktarır, imajları sunucuda derler, şemayı **idempotent** SQL betiğiyle

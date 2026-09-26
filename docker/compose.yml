@@ -2,7 +2,7 @@
 #
 # Calistirma:
 #   cd docker
-#   cp .env.ornek .env        (bir kez; .env DEPOYA GIRMEZ)
+#   cp .env.example .env        (bir kez; .env DEPOYA GIRMEZ)
 #   docker compose up -d --build
 #
 # Adresler:

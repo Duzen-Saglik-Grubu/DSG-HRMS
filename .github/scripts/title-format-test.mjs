@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 
 // Regex, is akisi dosyasindan AYNEN okunur. Kopyalayip yeniden yazmak, sinanan
 // ifadenin calisandan sessizce ayrismasina yol acardi.
-const workflowText = readFileSync('.github/workflows/pr-izlenebilirlik-denetimi.yml', 'utf8');
+const workflowText = readFileSync('.github/workflows/pr-traceability-check.yml', 'utf8');
 const lines = workflowText.split('\n');
 const typesLine = lines.find((l) => l.includes('const TYPES ='));
 const patternStart = lines.findIndex((l) => l.includes('const TITLE_PATTERN ='));

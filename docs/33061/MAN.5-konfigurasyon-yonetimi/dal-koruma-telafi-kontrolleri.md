@@ -78,7 +78,7 @@ uymasını denetler (`CONTRIBUTING.md` §4). Aynı zayıflıklar geçerlidir.
 
 ### 3.3 Tespit edici (sunucu tarafı) — CI denetimi
 
-`.github/workflows/dal-koruma-denetimi.yml`, `main` dalına gelen **her commit'i**
+`.github/workflows/branch-protection-check.yml`, `main` dalına gelen **her commit'i**
 denetler:
 
 1. Commit'in birleştirilmiş bir Pull Request ile gelip gelmediği kontrol edilir.

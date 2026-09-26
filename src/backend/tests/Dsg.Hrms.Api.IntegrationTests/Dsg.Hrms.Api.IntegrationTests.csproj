@@ -23,7 +23,7 @@
   <ItemGroup>
     <!-- LOGO test semasi ve uretimdeki salt-okunur oturum betigi; testler DOSYANIN KENDISINI calistirir. -->
     <None Include="Logo\logo-test-schema.sql" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\..\..\..\docker\logo\salt-okunur-oturum.sql" Link="Logo\salt-okunur-oturum.sql" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\..\..\docker\logo\read-only-login.sql" Link="Logo\read-only-login.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

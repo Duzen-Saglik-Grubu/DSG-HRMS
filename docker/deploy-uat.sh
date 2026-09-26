@@ -3,7 +3,7 @@
 # UAT dagitimi (TEC.10).
 #
 # Kullanim (depo kokunde):
-#   ./docker/uat-dagit.sh [sunucu]
+#   ./docker/deploy-uat.sh [sunucu]
 #
 # Ne yapar:
 #   1. Kaynagi sunucuya aktarir

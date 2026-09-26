@@ -229,7 +229,7 @@ Sertifika **Let's Encrypt**'ten, **DNS-01** doğrulamasıyla alınır (`KR-067`)
 seçilmesinin nedeni, sunucunun internete açılmasını gerektirmemesidir; sistem yalnızca
 kurum içinden erişilebilir kalır.
 
-nginx imajı **tek imaj, iki mod** çalışır (`nginx/secim.sh`): `/etc/nginx/tls` altında
+nginx imajı **tek imaj, iki mod** çalışır (`nginx/select-config.sh`): `/etc/nginx/tls` altında
 sertifika varsa TLS, yoksa düz HTTP. Böylece geliştirme ortamı sertifikasız çalışmaya
 devam ederken UAT ve üretim **aynı imajı** kullanır.
 
@@ -237,8 +237,8 @@ devam ederken UAT ve üretim **aynı imajı** kullanır.
 |---|---|
 | Certbot sertifikaları | `/etc/letsencrypt/live/insankaynaklaritest.duzen.com.tr/` |
 | Konteynerin okuduğu kopya | `/opt/dsg-hrms/tls/` (sahip UID 101 = konteyner içindeki `nginx`) |
-| Doğrulama kancası | `/opt/acme/hook.sh` — depoda: `docker/acme-dns-kancasi.sh` |
-| Dağıtım kancası | `/usr/local/sbin/dsg-tls-yenile.sh` — depoda: `docker/tls-yenile.sh` |
+| Doğrulama kancası | `/opt/acme/hook.sh` — depoda: `docker/acme-dns-hook.sh` |
+| Dağıtım kancası | `/usr/local/sbin/dsg-renew-tls.sh` — depoda: `docker/renew-tls.sh` |
 
 > Her iki kanca da **kaynak ağacının dışında** kurulur. Dağıtım `/opt/dsg-hrms/docker`
 > dizinini sildiği için, orada duran bir betik ilk dağıtımda kaybolurdu.
@@ -300,7 +300,7 @@ curl -s -o /dev/null -w 'durum=%{http_code} hedef=%{redirect_url}
 openssl x509 -in /opt/dsg-hrms/tls/fullchain.pem -noout -enddate
 ```
 
-`./docker/uat-dagit.sh` bu kontrolleri dağıtımın sonunda **kendisi yapar** ve
+`./docker/deploy-uat.sh` bu kontrolleri dağıtımın sonunda **kendisi yapar** ve
 başarısız olursa dağıtımı hata ile bitirir.
 
 ### 7.4 HSTS neden açık değil
@@ -332,7 +332,7 @@ LOGO_CONNECTION_STRING='Server=<logo-sunucusu>;Database=BORDRO;User Id=hrms_logo
 > böler ve `User Id=...` kısmını komut olarak çalıştırmaya kalkar (#79). Tek tırnak
 > iki okuyucuda da aynı değeri verir; parolada tek tırnak karakteri kullanılmamalıdır.
 
-Oturum `docker/logo/salt-okunur-oturum.sql` ile oluşturulmuş olmalıdır (`KR-004`).
+Oturum `docker/logo/read-only-login.sql` ile oluşturulmuş olmalıdır (`KR-004`).
 **Yazma yetkili bir oturum kullanılmaz.** Kullanılırsa senkronizasyon bunu her
 çalışmadan önce tespit eder, çalışmayı reddeder ve kritik düzeyde günlüğe yazar.
 
@@ -369,3 +369,4 @@ koduyla tanımlanır.
 | 2026-09-25 | 0.4 | Volume adları İngilizceye çevrildi: `uat-postgres-verisi` → `uat-postgres-data`, `uat-api-gunlukleri` → `uat-api-logs` (`KR-058`, #66). Veri kopyalanarak taşındı (sağlama değerleri ve satır sayıları eşit); eski volume'ler yedek olarak bırakıldı | Bilgi İşlem |
 | 2026-09-26 | 0.5 | §8 LOGO personel senkronizasyonu (etkinleştirme, `/health/sync`); §3.3 `dotnet ef` komutuna `--context HrmsDbContext` eklendi (#74) | Bilgi İşlem |
 | 2026-09-26 | 0.6 | §8.1: sır dosyasında LOGO bağlantı dizesi tek tırnak içinde yazılır (#79) | Bilgi İşlem |
+| 2026-09-26 | 0.7 | Betik ve dosya adları İngilizce: `deploy-uat.sh`, `renew-tls.sh` (sunucuda `dsg-renew-tls.sh`), `acme-dns-hook.sh`, `read-only-login.sql`, `.env.uat.example` (#81) | Bilgi İşlem |

@@ -77,7 +77,7 @@ jobs:
               '',
               '## Tespit kaynağı',
               '',
-              'Otomatik denetim — `dal-koruma-denetimi.yml`',
+              'Otomatik denetim — `branch-protection-check.yml`',
               '',
               '## Etkisi',
               '',

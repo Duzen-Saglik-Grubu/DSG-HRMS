@@ -43,7 +43,7 @@ taahhüt değil, **uygulanmış bir kontroldür**:
   gün yanlışlıkla kaldırılırsa uygulama bunu fark eder.
 
 **Kanıt:** Salt-okunur oturumu oluşturan betik depodadır
-(`docker/logo/salt-okunur-oturum.sql`). CI, bu betiğin **kendisini** SQL Server
+(`docker/logo/read-only-login.sql`). CI, bu betiğin **kendisini** SQL Server
 Express üzerinde çalıştırıp yazma denemelerinin veritabanı tarafından reddedildiğini
 her PR'da doğrular (`LogoReadOnlyAccessTests`, SYG-KMLK-003). Yetki denetiminin
 gerçekten yetki tespit edebildiği, yazma yetkili bir kontrol oturumuyla ayrıca sınanır.

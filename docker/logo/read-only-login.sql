@@ -14,7 +14,7 @@
 -- CALISTIRAN: LOGO veritabani yoneticisi (sysadmin). HRMS bu betigi CALISTIRMAZ.
 --
 -- KULLANIM (sqlcmd degiskenleri):
---   sqlcmd -S <sunucu> -E -i salt-okunur-oturum.sql ^
+--   sqlcmd -S <sunucu> -E -i read-only-login.sql ^
 --          -v LogoDatabase="BORDRO" ReaderLogin="hrms_logo_reader" ReaderPassword="..."
 --
 -- DOGRULAMA (hicbir sey yazmadan):
