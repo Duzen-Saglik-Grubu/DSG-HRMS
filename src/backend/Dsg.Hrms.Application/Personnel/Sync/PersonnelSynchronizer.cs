@@ -19,9 +19,9 @@ namespace Dsg.Hrms.Application.Personnel.Sync;
 /// <b>Birden fazla karti olan kisi:</b> kisinin adi, dogum tarihi ve iletisim bilgisi
 /// <b>esas kart</b>tan alinir: en guncel aktif istihdamin karti; aktif istihdam yoksa
 /// en guncel kart. Kartlar arasindaki celiski uyari uretir; IK LOGO'da duzeltir.
-/// 26.09.2026'da canli LOGO'ya karsi yapilan ilk calismada (bu motorun kurallariyla):
-/// 15 kisinin kartlari arasinda farkli e-posta, 3 kisinin farkli dogum tarihi, 7 kisinin
-/// farkli ad vardir; bunlarin sirasiyla 13, 2 ve 6'si aktif personeldir.
+/// 26.09.2026'daki ilk canli calismada aktif personelde 13 kisinin kartlari arasinda
+/// farkli e-posta, 2 kisinin farkli dogum tarihi vardi; IK ayni gun LOGO'da duzeltti ve
+/// ikinci olcumde aktif personelde celiski kalmadi.
 /// </para>
 /// </remarks>
 public sealed class PersonnelSynchronizer
@@ -232,22 +232,36 @@ public sealed class PersonnelSynchronizer
                     $"Kisinin kartlari arasinda farkli e-posta var; bu kart esas alindi. Diger sicil(ler): {others}.");
             }
 
-            if (cards.Select(c => $"{c.FirstName} {c.LastName}").Distinct(StringComparer.Ordinal).Count() > 1)
+            // Ad/soyad yalnizca AKTIF kartlar arasinda karsilastirilir (#77). Onceki
+            // sicille aktif sicil arasindaki soyad farki dogaldir: evlilikten sonra
+            // esin soyadi veya iki soyad birlikte kullanilabilir. Aktif sicildeki ad
+            // esas alinir (esas kart kurali). Iki aktif kart arasindaki fark ise
+            // gercek bir tutarsizliktir.
+            var activeCards = cards.Where(c => Employment.IsActiveOn(c.Record.TerminationDate, today)).ToList();
+            if (activeCards.Select(c => $"{c.FirstName} {c.LastName}").Distinct(StringComparer.Ordinal).Count() > 1)
             {
+                var otherActive = string.Join(", ", activeCards.Where(c => c != primary).Select(c => c.Record.RegistryCode).Order(StringComparer.Ordinal));
                 context.Warn(SyncWarningCode.ConflictingName, primary.Record.RegistryCode,
-                    $"Kisinin kartlari arasinda farkli ad veya soyad var; bu kart esas alindi. Diger sicil(ler): {others}.");
+                    $"Kisinin aktif kartlari arasinda farkli ad veya soyad var; bu kart esas alindi. Diger aktif sicil(ler): {otherActive}.");
             }
         }
 
-        return new PersonGroup(primary.NationalId, primary, cards);
+        var hasActiveEmployment = cards.Exists(c => Employment.IsActiveOn(c.Record.TerminationDate, today));
+        return new PersonGroup(primary.NationalId, primary, cards, hasActiveEmployment);
     }
 
     private static void MarkSharedEmails(List<PersonGroup> groups, Context context)
     {
         // Paylasilan adres, KISILER arasinda tespit edilir: ayni kisinin iki karti
         // ayni adresi tasiyabilir, bu paylasim degildir.
+        //
+        // Yalnizca AKTIF istihdami olan kisiler sayilir (#77). Paylasilan adresin
+        // riski, kodun baskasinin okuyabildigi bir kutuya gitmesi veya birinin
+        // baskasi adina uye olmasidir. Ayrilmis kisi uye olamaz ve giris yapamaz;
+        // ayni adresi tasimasi bu riski dogurmaz. Sayilsaydi, adresi yeniden verilen
+        // aktif personel e-postasiyla giris yapamazdi (26.09.2026, sicil 0001100).
         var shared = groups
-            .Where(g => g.Primary.Email is not null)
+            .Where(g => g.HasActiveEmployment && g.Primary.Email is not null)
             .GroupBy(g => g.Primary.Email!, StringComparer.Ordinal)
             .Where(g => g.Count() > 1)
             .SelectMany(g => g.Select(group => (group, count: g.Count())));
@@ -340,13 +354,15 @@ public sealed class PersonnelSynchronizer
         string? Email,
         string? MobilePhone);
 
-    private sealed class PersonGroup(string nationalId, Card primary, List<Card> cards)
+    private sealed class PersonGroup(string nationalId, Card primary, List<Card> cards, bool hasActiveEmployment)
     {
         public string NationalId { get; } = nationalId;
 
         public Card Primary { get; } = primary;
 
         public List<Card> Cards { get; } = cards;
+
+        public bool HasActiveEmployment { get; } = hasActiveEmployment;
 
         public bool IsEmailShared { get; set; }
     }

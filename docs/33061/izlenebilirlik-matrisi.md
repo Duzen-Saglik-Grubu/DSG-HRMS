@@ -140,7 +140,7 @@ gelecektir.
 | 6 | `REQ-KMLK-006` SMS seçilip kod ulaşmazsa kullanıcı aynı ekrandan e-posta kanalına geç… | SYG-KMLK-019 | — | — | — | — |
 | 7 | `REQ-KMLK-007` Kurumsal e-posta adresi bulunmayan personel için e-posta kanalı sunulm… | SYG-KMLK-017 | — | — | — | — |
 | 8 | `REQ-KMLK-008` Kurumsal alan adı dışındaki e-posta adreslerine (gmail, hotmail vb.) d… | SYG-KMLK-009, 017 | `ADR-0003` §5 | kısmen: SYG-009 (normalleştirme) · PR #75 | `ContactNormalizerTests`, `PersonnelSynchronizerTests` | — |
-| 9 | `REQ-KMLK-009` Aynı e-posta adresi birden fazla kişiye tanımlıysa o adrese doğrulama … | SYG-KMLK-008, 017 | `ADR-0003` §5 | kısmen: SYG-008 (paylaşılan adres işaretleme) · PR #75 | `PersonnelSynchronizerTests` | — |
+| 9 | `REQ-KMLK-009` Aynı e-posta adresi birden fazla kişiye tanımlıysa o adrese doğrulama … | SYG-KMLK-008, 017 | `ADR-0003` §5 | kısmen: SYG-008 (paylaşılan adres işaretleme; yalnızca aktif kişiler, `KR-079`) · PR #75, #78 | `PersonnelSynchronizerTests` | — |
 | 10 | `REQ-KMLK-010` Cep telefonu tanımlı olmayan personel için SMS kanalı sunulmaz. | SYG-KMLK-009, 017 | `ADR-0003` §5 | kısmen: SYG-009 (telefon doğrulama) · PR #75 | `ContactNormalizerTests`, `PersonnelSynchronizerTests` | — |
 | 11 | `REQ-KMLK-011` İK, personele tek kullanımlık parola bağlantısı gönderebilir; yalnızca LOGO'daki kurumsal e-postaya… | SYG-KMLK-030, 051, 052, 053, 073, 074 | — | — | — | — |
 | 12 | `REQ-KMLK-012` Kabul edilen kurumsal alan adları koda gömülmez; Sistem Yönetimi param… | SYG-KMLK-017, 075, 076 | — | — | — | — |
@@ -153,7 +153,7 @@ gelecektir.
 | 19 | `REQ-KMLK-019` Doğrulanan kod anında geçersiz kılınır (tek kullanımlık). | SYG-KMLK-027 | — | — | — | — |
 | 20 | `REQ-KMLK-020` Kod ekranında kalan süre görünür ve "kodu tekrar gönder" seçeneği bulu… | SYG-KMLK-028 | — | — | — | — |
 | 21 | `REQ-KMLK-021` SMS gönderimleri NetGSM standart servisi üzerinden, DUZEN başlığıyla y… | SYG-KMLK-029, 075, 079 | — | — | — | — |
-| 22 | `REQ-KMLK-022` Kullanıcı kurumsal e-posta adresi ve parolasıyla giriş yapar. | SYG-KMLK-008, 031, 077 | `ADR-0006` §8 | kısmen: SYG-008 (paylaşılan adres işaretleme) · PR #75 | `PersonnelSynchronizerTests` | — |
+| 22 | `REQ-KMLK-022` Kullanıcı kurumsal e-posta adresi ve parolasıyla giriş yapar. | SYG-KMLK-008, 031, 077 | `ADR-0006` §8 | kısmen: SYG-008 (paylaşılan adres işaretleme; yalnızca aktif kişiler, `KR-079`) · PR #75, #78 | `PersonnelSynchronizerTests` | — |
 | 23 | `REQ-KMLK-023` Hatalı girişte "kullanıcı adı veya parola hatalı" denir; hangisinin ya… | SYG-KMLK-032 | — | — | — | — |
 | 24 | `REQ-KMLK-024` 5 başarısız giriş denemesinden sonra hesap 15 dakika kilitlenir (param… | SYG-KMLK-033 | — | — | — | — |
 | 25 | `REQ-KMLK-025` Giriş sonrası ikinci doğrulama adımı (2FA) GELİŞTİRİLİR; varsayılan ol… | SYG-KMLK-034 | — | — | — | — |
@@ -217,3 +217,4 @@ dâhil edilmedi. **26.09.2026: zinciri PR #76 ile tamamlandı** (§4.1).
 | 2026-09-24 | 0.3 | Sistem gereksinimi kimliği `SYG-<MODÜL>-nnn`; §5 "Sistem gereksinimi" sütunu SYG-KMLK ile dolduruldu; LOGO kalemi T1 → T3 (`KR-077`) | Bilgi İşlem |
 | 2026-09-26 | 0.4 | §5: PR #75 ile 10 satırın tasarım, gerçekleştirme ve doğrulama sütunları dolduruldu (T3 ilk parça: kişi/istihdam modeli ve senkronizasyon motoru); kısmen karşılanan satırlar "kısmen" olarak işaretlendi | Bilgi İşlem |
 | 2026-09-26 | 0.5 | §4.1 LOGO salt-okunur kalemi kapandı (PR #76: CI'da yazma reddi kanıtı); §5 REQ-KMLK-003, 034, 040 satırları güncellendi | Bilgi İşlem |
+| 2026-09-26 | 0.6 | REQ-KMLK-009 ve 022 satırlarına PR #78 eklendi (`KR-079`) | Bilgi İşlem |

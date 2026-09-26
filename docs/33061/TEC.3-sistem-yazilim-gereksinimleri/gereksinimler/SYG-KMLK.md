@@ -4,7 +4,7 @@
 **Süreç:** TEC.3 — Sistem/Yazılım Gereksinimlerinin Tanımlanması
 **Modül:** T3 Kimlik Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-KMLK.md` (23.09.2026'da İK onaylı, 56 gereksinim)
-**Son güncelleme:** 2026-09-25
+**Son güncelleme:** 2026-09-26
 **Sahibi:** Bilgi İşlem
 
 > **Paydaş gereksinimi *ne* istendiğini söyler; bu belge sistemin bunu *hangi
@@ -158,7 +158,7 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 | **SYG-KMLK-005** | Her senkronizasyon çalışması kalıcı bir kayıt üretir: başlangıç ve bitiş zamanı, sonuç (başarılı / kısmen / başarısız), okunan, eklenen, güncellenen, pasifleşen ve uyarı üretilen kayıt sayıları. | İşlevsel | REQ-KMLK-034, REQ-KMLK-040 | Test | — |
 | **SYG-KMLK-006** | **T3 kapsamında senkronize edilen alanlar** yalnızca şunlardır — kişi: TCKN, ad, soyad, doğum tarihi, kurumsal e-posta, cep telefonu; istihdam: sicil numarası, firma, işe giriş tarihi, işten çıkış tarihi, aktiflik. Şube, birim, görev, fotoğraf ve diğer alanlar **T1 kapsamındadır** ve bu çalışmada senkronize edilmez. | Kısıt | REQ-KMLK-002, REQ-KMLK-003 | İnceleme | — |
 | **SYG-KMLK-007** | TCKN'si boş veya geçersiz olan LOGO kartı için kişi kaydı **oluşturulmaz**; kart, gerekçesiyle birlikte veri kalitesi uyarı listesine alınır. | İşlevsel | REQ-KMLK-013 | Test | — |
-| **SYG-KMLK-008** | Aynı kurumsal e-posta adresi birden fazla kişiye (farklı TCKN) tanımlıysa, bu kişilerin tümü uyarı listesine alınır ve bu adres **ne giriş kimliği ne doğrulama hedefi** olarak kullanılabilir. | İşlevsel | REQ-KMLK-009, REQ-KMLK-022 | Test | — |
+| **SYG-KMLK-008** | Aynı kurumsal e-posta adresi, **aktif istihdamı olan** birden fazla kişiye (farklı TCKN) tanımlıysa, bu kişilerin tümü uyarı listesine alınır ve bu adres **ne giriş kimliği ne doğrulama hedefi** olarak kullanılabilir. Ayrılmış personelin kartında kalan adres paylaşım sayılmaz (`KR-079`). | İşlevsel | REQ-KMLK-009, REQ-KMLK-022 | Test | — |
 | **SYG-KMLK-009** | E-posta ve telefon senkronizasyonda normalleştirilir. E-posta: baştaki ve sondaki boşluklar ile satır sonu karakterleri kaldırılır, küçük harfe çevrilir. Telefon: boşluk, CR/LF ve sekme karakterleri kaldırılır, baştaki `0` veya `90` atılır; sonuç 10 hane değilse veya `5` ile başlamıyorsa **geçersiz** sayılır ve uyarı üretilir. | İşlevsel | REQ-KMLK-008, REQ-KMLK-010 | Test | — |
 | **SYG-KMLK-010** | Senkronizasyon hatası sessiz kalmaz: hata kaydedilir, çalışma kaydı "başarısız" olarak işaretlenir ve sistem sağlığı uç noktası bunu gösterir. Sistem yöneticisi rolüne bildirim, Y1 Bildirim Merkezi devreye girdiğinde eklenir. | İşlevsel olmayan | REQ-KMLK-040 | Test | PRM-BLD-01 |
 | **SYG-KMLK-011** | LOGO erişilemez olduğunda sistem **çalışmaya devam eder**; üyelik eşleştirmesi ve hesap işlemleri son başarılı anlık görüntüye göre yapılır. | İşlevsel olmayan | REQ-KMLK-003 | Test | — |
@@ -332,6 +332,8 @@ yazılıdır; kapanmamış olanlar ⏳ ile işaretlidir.
 | AN-13 | REQ-KMLK-029 listenin kaynağını ve büyüklüğünü söylemez. | En az 100.000 kayıtlı, açık lisanslı liste + kuruma özgü sözcükler (SYG-KMLK-045). Lisans `KR-025`'e göre denetlenir. | ✅ |
 | AN-14 | REQ-KMLK-044 "telefon ve tablet" ölçülebilir değil. | 360 piksel genişlikten itibaren yatay kaydırmasız (SYG-KMLK-065). | ✅ |
 | AN-15 | REQ-KMLK-034 "en geç bir sonraki senkronizasyonda" der; süre periyoda bağlıdır. | Varsayılan periyotla (`PRM-ENT-07`, 15 dk) en geç 15 dakika + çalışma süresi (SYG-KMLK-004, 054). | ✅ |
+| AN-17 | **Canlı doğrulamada bulundu (26.09.2026):** Bir adres 3 kişiye tanımlıydı: 2'si ayrılmış, 1'i aktif. REQ-KMLK-009 ayrılmış personeli ayırt etmediği için aktif kişi e-postasıyla giriş yapamayacaktı. | Paylaşım tespitinde yalnızca aktif istihdamı olan kişiler sayılır: ayrılmış kişi üye olamaz ve giriş yapamaz, paylaşım riski doğurmaz (SYG-KMLK-008, `KR-079`, #77). İK ayrılanların kartındaki adresi sildi. | ✅ |
+| AN-18 | Kişinin kartları arasındaki ad/soyad farkı her zaman hata değildir: evlilik sonrası eşin soyadı veya iki soyad kullanılabilir (İK, 26.09.2026). | Aktif sicildeki ad esas alınır (esas kart kuralı). Uyarı yalnızca iki **aktif** kart arasında fark varsa üretilir (`KR-079`, #77). | ✅ |
 | AN-16 | Denetim izi ve erişim kaydı saklama süreleri (`PRM-KVK-01`, `02`) karar bekliyor. | T3'ü engellemez: kayıtlar üretilir, silme işi karar verildiğinde eklenir. | ⏳ KVKK kararı bekliyor |
 
 **Paydaşa geri bildirim (BP3):** AN-01, onaylı bir kabul kriterinin (REQ-KMLK-004)
@@ -448,3 +450,4 @@ madde `İptal` notuyla kalır.
 |---|---|---|---|
 | 2026-09-24 | 0.1 | İlk oluşturma — PG-KMLK'deki 56 onaylı gereksinimden türetildi | Bilgi İşlem |
 | 2026-09-25 | 0.2 | Önek `SG-` → `SYG-` (PR #65 incelemesi); AN-01 karara bağlandı (`KR-078`); SYG-KMLK-016'ya yönlendirme iletisi eklendi | Bilgi İşlem |
+| 2026-09-26 | 0.3 | SYG-KMLK-008: ortak adres tespitinde yalnızca aktif istihdamlı kişiler; AN-17, AN-18 eklendi (`KR-079`, #77) | Bilgi İşlem |
