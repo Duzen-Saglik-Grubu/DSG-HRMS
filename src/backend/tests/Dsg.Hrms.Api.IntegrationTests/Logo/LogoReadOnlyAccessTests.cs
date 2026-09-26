@@ -14,7 +14,7 @@ namespace Dsg.Hrms.Api.IntegrationTests.Logo;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Salt-okunur oturum, depodaki <c>docker/logo/salt-okunur-oturum.sql</c> betiginin
+/// Salt-okunur oturum, depodaki <c>docker/logo/read-only-login.sql</c> betiginin
 /// KENDISI calistirilarak olusturulur. Boylece sinanan sey, uretimde kullanilan
 /// betiktir; bir kopyasi degil.
 /// </para>
@@ -57,7 +57,7 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
         await SeedAsync();
 
         // URETIMDEKI betik, degiskenleri doldurularak calistirilir.
-        var script = (await File.ReadAllTextAsync(TestFile("salt-okunur-oturum.sql")))
+        var script = (await File.ReadAllTextAsync(TestFile("read-only-login.sql")))
             .Replace("$(LogoDatabase)", Database, StringComparison.Ordinal)
             .Replace("$(ReaderLogin)", ReaderLogin, StringComparison.Ordinal)
             .Replace("$(ReaderPassword)", ReaderPassword, StringComparison.Ordinal);

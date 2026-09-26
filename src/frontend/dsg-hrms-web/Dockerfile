@@ -31,16 +31,16 @@ RUN apk upgrade --no-cache
 COPY --from=build /src/dist /usr/share/nginx/html
 
 # Iki yapilandirma da imaja girer; hangisinin kullanilacagina acilista karar
-# verilir (nginx/secim.sh). Boylece gelistirme ve uretim AYNI imaji kullanir.
+# verilir (nginx/select-config.sh). Boylece gelistirme ve uretim AYNI imaji kullanir.
 COPY nginx/http.conf nginx/tls.conf /etc/nginx/variants/
-COPY nginx/guvenlik-basliklari.conf /etc/nginx/guvenlik-basliklari.conf
-COPY nginx/secim.sh /docker-entrypoint.d/40-yapilandirma-secimi.sh
+COPY nginx/security-headers.conf /etc/nginx/security-headers.conf
+COPY nginx/select-config.sh /docker-entrypoint.d/40-select-config.sh
 
 # nginx imaji root olmayan bir kullaniciyla gelir; onu kullaniriz.
 # Calisma dizinlerinin sahipligi degistirilerek 8080 portunda (ayricaliksiz
 # port) dinlemesi saglanir.
 RUN touch /var/run/nginx.pid \
-    && chmod +x /docker-entrypoint.d/40-yapilandirma-secimi.sh \
+    && chmod +x /docker-entrypoint.d/40-select-config.sh \
     && chown -R nginx:nginx /var/run/nginx.pid /var/cache/nginx /usr/share/nginx/html \
     && chown -R nginx:nginx /etc/nginx/conf.d
 

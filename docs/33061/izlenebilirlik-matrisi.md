@@ -102,7 +102,7 @@ halka `—` ile, uygulanmayan bir halka `yok (gerekçe)` ile işaretlenir.
 | 5 | `KR-063` Sağlık kontrollerinin ayrımı | — | `ADR-0011` | `/health/live`, `/health/ready` · PR #22 | `HealthCheckTests.cs`, `PersonalDataScrubbingProcessorTests.cs` | — |
 | 6 | `ADR-0002` Katman bağımlılık kuralları | — | `ADR-0002` | Katman projeleri · PR #8 | `LayerDependencyTests.cs` (NetArchTest) | — |
 | 7 | `ADR-0004` Veritabanı adlandırma standartları | — | `ADR-0004` | EF yapılandırması · PR #8 | `DatabaseConventionTests.cs` | — |
-| 8 | `KR-067` UAT ve üretimde TLS zorunlu | — | Runbook §7 | `nginx/tls.conf`, `tls-yenile.sh` · PR #43 | Dağıtım betiğinin doğrulaması (`uat-dagit.sh`) + elle ölçüm | — |
+| 8 | `KR-067` UAT ve üretimde TLS zorunlu | — | Runbook §7 | `nginx/tls.conf`, `renew-tls.sh` · PR #43 | Dağıtım betiğinin doğrulaması (`deploy-uat.sh`) + elle ölçüm | — |
 
 **Kabul sütunu neden boş?** TEC.11 geçerleme, **kabul edilecek bir modül** gerektirir.
 A1 teknik iskelettir; İK kabulüne sunulan bir işlev üretmedi. İlk kabul T3 ile
@@ -112,7 +112,7 @@ gelecektir.
 
 | Kaynak | Eksik halka | Neden |
 |---|---|---|
-| ~~`KR-003`, `KR-004` LOGO salt-okunur~~ | ~~Kod ve test~~ | ✅ **Kapandı (PR #76, 26.09.2026).** Oturum betiği depoda (`docker/logo/salt-okunur-oturum.sql`); CI bu betiğin kendisini SQL Server Express'te çalıştırıp yazma denemelerinin reddedildiğini her PR'da doğruluyor (`LogoReadOnlyAccessTests`). Üretimde senkronizasyon her çalışmadan önce yetkiyi hiçbir şey yazmadan denetliyor. Zincir: `KR-003` → `ADR-0003` §1 → `Infrastructure/Logo/` · PR #76 → `LogoReadOnlyAccessTests` |
+| ~~`KR-003`, `KR-004` LOGO salt-okunur~~ | ~~Kod ve test~~ | ✅ **Kapandı (PR #76, 26.09.2026).** Oturum betiği depoda (`docker/logo/read-only-login.sql`); CI bu betiğin kendisini SQL Server Express'te çalıştırıp yazma denemelerinin reddedildiğini her PR'da doğruluyor (`LogoReadOnlyAccessTests`). Üretimde senkronizasyon her çalışmadan önce yetkiyi hiçbir şey yazmadan denetliyor. Zincir: `KR-003` → `ADR-0003` §1 → `Infrastructure/Logo/` · PR #76 → `LogoReadOnlyAccessTests` |
 | `KR-056` Bildirim istisnası (#3) | Tasarım sonrası tüm halkalar | Y1 Bildirim Merkezi'nde uygulanacak (A3) |
 | `KR-068` Modül başlangıç koşulu | Kod/test | Süreç kuralı; kodda karşılığı yok — `yok (süreç kuralı)` |
 

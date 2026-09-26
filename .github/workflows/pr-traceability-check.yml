@@ -38,16 +38,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Baslik kuralini sina
-        run: node .github/scripts/baslik-bicimi-testi.mjs
+        run: node .github/scripts/title-format-test.mjs
 
       - name: Dal adi kuralini sina
-        run: node .github/scripts/dal-adi-testi.mjs
+        run: node .github/scripts/branch-name-test.mjs
 
       # Gereksinim zinciri: paydas gereksinimi -> sistem gereksinimi -> matris.
       # Ayni esleme uc yerde duruyor (SYG §4, SYG §8, izlenebilirlik matrisi); elle
       # tutulan kopyalar ilk degisiklikte ayrilir. Betik once kendini sinar.
       - name: Gereksinim izlenebilirligini denetle
-        run: node .github/scripts/gereksinim-izlenebilirlik-denetimi.mjs
+        run: node .github/scripts/requirement-traceability-check.mjs
 
       - name: Denetle
         uses: actions/github-script@v7

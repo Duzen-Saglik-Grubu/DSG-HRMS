@@ -6,7 +6,7 @@
 # kapsamli iyi testten kotudur; testin NEYI dogruladigina kod incelemesinde
 # bakilir. Bu betik yalnizca tabanin altina dusulmedigini garanti eder.
 #
-# Kullanim: kapsam-denetimi.sh <cobertura.xml>
+# Kullanim: coverage-check.sh <cobertura.xml>
 
 set -euo pipefail
 

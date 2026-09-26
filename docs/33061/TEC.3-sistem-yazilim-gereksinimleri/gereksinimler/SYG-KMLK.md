@@ -362,7 +362,7 @@ değiştirmez, yalnızca belirsiz kalan noktayı tek anlama indirir.
 ## 8. İzlenebilirlik (TEC.3 çıktısı f)
 
 Aşağıdaki tablo §4'ün **tersidir**: paydaş gereksiniminden sistem gereksinimine.
-`.github/scripts/gereksinim-izlenebilirlik-denetimi.mjs` her PR'da şunları denetler;
+`.github/scripts/requirement-traceability-check.mjs` her PR'da şunları denetler;
 biri bozulursa PR birleştirilemez:
 
 - Her paydaş gereksinimi en az bir sistem gereksinimine bağlı (bu çıktının kendisi).

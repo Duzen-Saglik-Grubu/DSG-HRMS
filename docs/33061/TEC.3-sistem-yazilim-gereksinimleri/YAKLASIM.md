@@ -127,7 +127,7 @@ madde CI'da otomatik test olmadan tamamlanmış sayılmaz.
 | Sürüm | Her belge Git'te; değişiklik **Pull Request** ile yapılır |
 | Onay | En az bir gözden geçiren onayı (CONTRIBUTING §5) |
 | Kimlik | `SYG-<MODÜL>-<no>`; numara yeniden kullanılmaz |
-| **Kapsama** | **Otomatik:** `.github/scripts/gereksinim-izlenebilirlik-denetimi.mjs`, PR izlenebilirlik denetimi içinde her PR'da çalışır |
+| **Kapsama** | **Otomatik:** `.github/scripts/requirement-traceability-check.mjs`, PR izlenebilirlik denetimi içinde her PR'da çalışır |
 | Değişiklik | Paydaş gereksiniminin anlamını değiştiren sistem gereksinimi değişikliği önce `tur:degisiklik-talebi` issue'su ve İK onayı gerektirir |
 | Tarih ve sahip | Her belgede "Son güncelleme" ve değişiklik geçmişi |
 

@@ -26,6 +26,6 @@ regexes = [
 paths = [
   # Belge uretimi ve migration denetiminde kullanilan tasarim zamani baglanti
   # dizeleri: gercek bir veritabanina baglanmazlar (ADR-0008).
-  '''\.github/workflows/api-sozlesme-denetimi\.yml''',
+  '''\.github/workflows/api-contract-check\.yml''',
   '''\.github/workflows/ci\.yml''',
 ]

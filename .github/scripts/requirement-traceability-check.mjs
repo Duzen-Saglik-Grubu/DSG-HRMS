@@ -14,7 +14,7 @@
 // gibi yapılır ve denetimin bunu yakalaması beklenir. Hiçbir satırı eşleştiremeyen
 // bozuk bir ifade her şeyi geçirir; kapı çalışıyor görünürken hiçbir şey denetlemez.
 //
-// Kullanım: node .github/scripts/gereksinim-izlenebilirlik-denetimi.mjs
+// Kullanım: node .github/scripts/requirement-traceability-check.mjs
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
