@@ -103,6 +103,58 @@ public sealed class LayerDependencyTests
     }
 
     // ------------------------------------------------------------------
+    // Kural 4b: LOGO yalitimi (ADR-0003 §2, KR-003).
+    // ------------------------------------------------------------------
+
+    private const string LogoNamespace = "Dsg.Hrms.Infrastructure.Logo";
+
+    /// <summary>LOGO'ya erisim saglayan tipler; yalnizca Logo klasorunde kullanilabilir.</summary>
+    private static readonly string[] LogoAccessTypes =
+    [
+        "Microsoft.Data.SqlClient",
+        "Dsg.Hrms.Infrastructure.Logo.LogoDbContext",
+        "Dsg.Hrms.Infrastructure.Logo.LogoPersonnelSource",
+    ];
+
+    [Fact]
+    public void Logo_access_stays_inside_the_logo_folder()
+    {
+        // LOGO'ya erisen tum kod tek klasorde toplanir; baska bir sinif LOGO baglamini
+        // dogrudan kullanirsa salt-okunur kilitler (yetki denetimi, sema denetimi)
+        // atlanabilirdi. Kayit noktasi (InfrastructureRegistration) istisnadir.
+        var result = Types.InAssembly(InfrastructureAssembly)
+            .That().DoNotResideInNamespace(LogoNamespace)
+            .And().DoNotHaveName("InfrastructureRegistration")
+            .ShouldNot().HaveDependencyOnAny(LogoAccessTypes)
+            .GetResult();
+
+        ViolationMessage(result, "LOGO'ya yalnizca Infrastructure/Logo altindan erisilir (ADR-0003 §2).")
+            .ShouldBeNull();
+    }
+
+    [Fact]
+    public void Logo_isolation_rule_is_not_vacuous()
+    {
+        // Pozitif kontrol: kural gercek bir bagimliligi taniyor. Tanimasaydi yukaridaki
+        // test hicbir seyi denetlemeden gecerdi.
+        Types.InAssembly(InfrastructureAssembly)
+            .That().HaveName("LogoPersonnelSource")
+            .Should().HaveDependencyOn("Dsg.Hrms.Infrastructure.Logo.LogoDbContext")
+            .GetResult().IsSuccessful.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Api_does_not_touch_logo()
+    {
+        var result = Types.InAssembly(typeof(Program).Assembly)
+            .ShouldNot().HaveDependencyOnAny([LogoNamespace, "Microsoft.Data.SqlClient"])
+            .GetResult();
+
+        ViolationMessage(result, "Api katmani LOGO'ya erismez; senkronizasyon durumu IPersonnelSyncStatus ile okunur.")
+            .ShouldBeNull();
+    }
+
+    // ------------------------------------------------------------------
     // Kural 5: Modul yalitimi.
     // ------------------------------------------------------------------
 

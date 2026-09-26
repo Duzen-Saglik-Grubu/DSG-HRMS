@@ -182,7 +182,10 @@ jobs:
       # kullanicinin ilk isleminde ortaya cikardi.
       - name: Bekleyen model degisikligi denetimi
         run: |
+          # --context: projede ikinci bir baglam (LogoDbContext, salt okunur) vardir;
+          # migration yalnizca HRMS baglamina aittir.
           dotnet ef migrations has-pending-model-changes \
+            --context HrmsDbContext \
             --project src/backend/Dsg.Hrms.Infrastructure \
             --startup-project src/backend/Dsg.Hrms.Api
 

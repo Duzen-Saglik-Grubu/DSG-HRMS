@@ -75,6 +75,28 @@ public sealed class HealthCheckTests : IAsyncLifetime
     }
 
     // ------------------------------------------------------------------
+    // Senkronizasyon — hazir olmadan AYRI (SYG-KMLK-010, 011)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public async Task Sync_endpoint_reports_the_personnel_sync_and_readiness_does_not()
+    {
+        using var client = _factory.CreateClient();
+
+        var sync = await client.GetFromJsonAsync<JsonElement>(new Uri("/health/sync", UriKind.Relative));
+        var ready = await client.GetFromJsonAsync<JsonElement>(new Uri("/health/ready", UriKind.Relative));
+
+        // Testte LOGO tanimli degil: senkronizasyon bilincli olarak devre disi ve saglikli.
+        sync.GetProperty("checks").EnumerateArray().Single().GetProperty("name").GetString().ShouldBe("personnel-sync");
+        sync.GetProperty("status").GetString().ShouldBe("Healthy");
+
+        // LOGO kesintisi HRMS'in "hazir" durumunu etkilememelidir.
+        ready.GetProperty("checks").EnumerateArray()
+            .Select(c => c.GetProperty("name").GetString())
+            .ShouldNotContain("personnel-sync");
+    }
+
+    // ------------------------------------------------------------------
     // Hazir olma — bagimliligi gercekten yoklar
     // ------------------------------------------------------------------
 

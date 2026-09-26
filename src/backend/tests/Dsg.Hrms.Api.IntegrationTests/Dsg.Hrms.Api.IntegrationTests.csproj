@@ -13,9 +13,17 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Testcontainers.PostgreSql" />
+    <!-- LOGO testleri: SQL Server EXPRESS surumu (ucretsiz, kosulsuz; KR-025). -->
+    <PackageReference Include="Testcontainers.MsSql" />
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="EFCore.NamingConventions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- LOGO test semasi ve uretimdeki salt-okunur oturum betigi; testler DOSYANIN KENDISINI calistirir. -->
+    <None Include="Logo\logo-test-schema.sql" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\..\..\docker\logo\salt-okunur-oturum.sql" Link="Logo\salt-okunur-oturum.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

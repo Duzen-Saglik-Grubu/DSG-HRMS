@@ -5,6 +5,7 @@ using Dsg.Hrms.Infrastructure.Audit;
 using Dsg.Hrms.Infrastructure.Configuration;
 using Dsg.Hrms.Infrastructure.Data;
 using Dsg.Hrms.Infrastructure.Data.Interceptors;
+using Dsg.Hrms.Infrastructure.Logo;
 using Dsg.Hrms.Infrastructure.Personnel;
 using Dsg.Hrms.Infrastructure.Time;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +55,46 @@ public static class InfrastructureRegistration
         services.AddSingleton(provider => provider.GetRequiredService<IOptions<PersonnelSyncOptions>>().Value);
 
         services.AddScoped<IPersonnelSyncStore, PersonnelSyncStore>();
+        services.AddScoped<IPersonnelSyncStatus, PersonnelSyncStatus>();
+        services.AddScoped<PersonnelSyncService>();
+
+        AddLogo(services, configuration);
+
+        services.AddHostedService<PersonnelSyncWorker>();
+    }
+
+    private static void AddLogo(IServiceCollection services, IConfiguration configuration)
+    {
+        var logo = OptionsRegistration.ReadAndValidate<LogoOptions>(configuration, LogoOptions.SectionName);
+        services.AddSingleton(logo);
+
+        // LOGO erisimi YALNIZCA bu baglam ve LogoPersonnelSource uzerinden yapilir
+        // (ADR-0003 §2). Mimari testi, Logo klasoru disinda SQL Server bagimliligi
+        // olmadigini denetler.
+        services.AddDbContext<LogoDbContext>(builder =>
+        {
+            void ConfigureSqlServer(Microsoft.EntityFrameworkCore.Infrastructure.SqlServerDbContextOptionsBuilder sql)
+            {
+                sql.CommandTimeout(logo.CommandTimeoutSeconds);
+
+                // Yalnizca okuma yapildigi icin gecici hatalarda yeniden deneme guvenlidir.
+                sql.EnableRetryOnFailure(3);
+            }
+
+            // Baglanti tanimli degilse baglam kurulur ama KULLANILMAZ: zamanlayici
+            // calismaz. Bos dizeyle kurmak yerine dizesiz kurulur ki yanlislikla
+            // kullanilirsa anlasilir bir hata versin.
+            if (logo.IsConfigured)
+            {
+                builder.UseSqlServer(logo.ConnectionString, ConfigureSqlServer);
+            }
+            else
+            {
+                builder.UseSqlServer(ConfigureSqlServer);
+            }
+        });
+
+        services.AddScoped<ILogoPersonnelSource, LogoPersonnelSource>();
     }
 
     private static void AddDatabase(

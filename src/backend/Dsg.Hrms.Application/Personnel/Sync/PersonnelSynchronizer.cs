@@ -19,8 +19,9 @@ namespace Dsg.Hrms.Application.Personnel.Sync;
 /// <b>Birden fazla karti olan kisi:</b> kisinin adi, dogum tarihi ve iletisim bilgisi
 /// <b>esas kart</b>tan alinir: en guncel aktif istihdamin karti; aktif istihdam yoksa
 /// en guncel kart. Kartlar arasindaki celiski uyari uretir; IK LOGO'da duzeltir.
-/// 26.09.2026 olcumunde 19 kisinin kartlari arasinda farkli e-posta, 3 kisinin farkli
-/// dogum tarihi vardir.
+/// 26.09.2026'da canli LOGO'ya karsi yapilan ilk calismada (bu motorun kurallariyla):
+/// 15 kisinin kartlari arasinda farkli e-posta, 3 kisinin farkli dogum tarihi, 7 kisinin
+/// farkli ad vardir; bunlarin sirasiyla 13, 2 ve 6'si aktif personeldir.
 /// </para>
 /// </remarks>
 public sealed class PersonnelSynchronizer
