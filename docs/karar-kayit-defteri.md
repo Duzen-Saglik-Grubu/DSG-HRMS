@@ -1,7 +1,7 @@
 # Karar Kayıt Defteri
 
 **Belge kimliği:** KKD
-**Son güncelleme:** 2026-09-25
+**Son güncelleme:** 2026-09-26
 **Amaç:** Proje boyunca alınan kararların tek ve resmî kaydı. Bir kararın *ne olduğu*,
 *neden alındığı* ve *ne zaman alındığı* buradan izlenir.
 **İlgili süreçler:** MAN.2 (Proje Değerlendirme ve Kontrol), TEC.2, TEC.5
@@ -104,6 +104,7 @@
 | KR-076 | 2026-09-23 | Hiçbir iletişim bilgisi olmayan personel sisteme **alınmayacak** | 22.09.2026 ölçümüyle hiçbir iletişim bilgisi olmayan 2 personel sisteme giriş yapmayacaktır | İK kararı (S-12). Bu kişiler için ne doğrulama kodu ne de giriş kimliği üretilebilir. İstisna akışı (`KR-075`) teknik olarak mevcuttur; ancak İK bu kişiler için kullanılmayacağını bildirmiştir. **Kapsam:** yalnızca iletişim bilgisi HİÇ olmayan kişiler — telefonu olup e-postası olmayan 2 kişi bu kararın kapsamında değildir (toplantı kaydı §10.1) | İK | Yürürlükte |
 | KR-077 | 2026-09-24 | T3 kapsamında **yalnızca T3'ün ihtiyaç duyduğu** T1 çekirdeği kurulacak | Kişi/istihdam veri modeli ve LOGO senkronizasyonu, onaylı T3 gereksinimlerinin (REQ-KMLK-002, 003, 013, 014, 034) gerektirdiği ölçüde **T3 kapsamında** kurulur. Personel listesi, kişi kartı, filtreler gibi T1 Personel Yönetimi **ekranları ve işlevleri** T1'in kendi İK gereksinim toplantısından sonra geliştirilir | Üyelik akışı, LOGO'dan senkronize edilmiş kişi verisi olmadan çalışamaz; bu veri aynı zamanda T1'in çekirdeğidir. `KR-068` her modülün kendi gereksinim toplantısıyla başlamasını şart koşar. Bu karar ikisini uzlaştırır: T3, **onaylı kendi gereksinimlerinin** gerektirdiği altyapıyı kurar; T1'in onaylanmamış gereksinimlerine dayanan hiçbir şey geliştirilmez. T1 toplantısında bu altyapıya ek gereksinim çıkarsa T1 kapsamında eklenir | İK + Bilgi İşlem | Yürürlükte |
 | KR-078 | 2026-09-25 | Üyelikte eşleşme gizliliği: **onaylı metin korunur**, kalan risk kabul edilir | REQ-KMLK-004 olduğu gibi uygulanır: bilgiler eşleşmese de kanal seçim ekranı görünür, kod gönderilmez. REQ-KMLK-010 de olduğu gibi uygulanır: cep telefonu olmayan kişiye yalnızca e-posta kanalı sunulur. Bu iki kuralın birlikte, telefonu olmayan personel (22.09.2026: 10 kişi) için eşleşmeyi dolaylı olarak ele vermesi **kabul edilen kalan risktir** | Farkı görebilmek için TCKN, doğum tarihi ve kurumsal e-postanın üçünün de doğru bilinmesi gerekir; öğrenilen tek bilgi kişinin kurumda çalıştığıdır ve kod yine kişinin kendi adresine gider. Eşleşmeyince hata göstermek bu bilgiyi herkes için açardı; her zaman iki kanal göstermek ise 10 kişiyi hiç gelmeyecek bir SMS'i beklemeye bırakırdı. T3 kabulünde İK'ya ayrıca gösterilecek (`SYG-KMLK.md` §6, AN-01) | Bilgi İşlem | Yürürlükte |
+| KR-079 | 2026-09-26 | Senkronizasyonda **yalnızca aktif siciller**: ortak e-posta ve ad çelişkisi | (1) Bir e-posta adresinin "ortak" sayılması için, adresin **aktif istihdamı olan** en az iki kişiye tanımlı olması gerekir; ayrılmış personelin kartında kalan adres sayılmaz. (2) Ad/soyad çelişkisi uyarısı yalnızca kişinin iki **aktif** kartı arasında fark varsa üretilir; kişinin adı aktif sicilinden alınır | (1) Paylaşılan adresin riski kodun başkasının okuyabildiği kutuya gitmesidir; ayrılmış kişi üye olamaz ve giriş yapamaz. Sayılsaydı adresi yeniden verilen aktif personel giriş yapamazdı (26.09.2026 canlı doğrulama, sicil 0001100). (2) Türkiye'de kadınlar evlendikten sonra eşinin soyadını veya iki soyadı birlikte kullanabilir; önceki sicille aktif sicil arasındaki soyad farkı doğaldır (İK) | İK + Bilgi İşlem (#77) | Yürürlükte |
 
 ---
 
@@ -133,3 +134,4 @@
 | 2026-09-21 | 2.0 | KR-069…KR-072 eklendi (2FA geliştirme kararı, parola uzunluğu, sır parametreleri, yönetici filtresi); **KR-017 yürürlükten kaldırıldı** | Bilgi İşlem |
 | 2026-09-24 | 2.1 | KR-073…KR-077 eklendi (T3 gereksinim toplantısı kararları: e-posta ile giriş, hareketsizlik 30 dk, İK destekli davet bağlantısı, iletişimsiz personel, T3 kapsamında T1 çekirdeği) | Bilgi İşlem |
 | 2026-09-25 | 2.2 | KR-078 eklendi (üyelikte eşleşme gizliliği ile kanal gösterimi arasındaki kalan riskin kabulü) | Bilgi İşlem |
+| 2026-09-26 | 2.3 | KR-079 eklendi (senkronizasyonda ortak e-posta ve ad çelişkisi için yalnızca aktif siciller, #77) | Bilgi İşlem |

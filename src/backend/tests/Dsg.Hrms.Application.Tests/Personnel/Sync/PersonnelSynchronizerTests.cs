@@ -229,6 +229,68 @@ public sealed class PersonnelSynchronizerTests
     }
 
     [Fact]
+    public void Surname_change_after_marriage_is_not_a_conflict_and_the_active_card_wins()
+    {
+        // #77: Onceki sicil ile aktif sicil arasindaki soyad farki dogaldir (evlilik
+        // sonrasi esin soyadi ya da iki soyad). Aktif sicildeki ad esas alinir.
+        var outcome = Run(
+        [
+            Card("00001", NationalId(1), logoRef: 1, firstName: "Ayse", lastName: "Yilmaz",
+                hireDate: new DateOnly(2012, 1, 1), terminationDate: new DateOnly(2016, 1, 1), emails: ["a@duzen.com.tr"]),
+            Card("00002", NationalId(1), logoRef: 2, firstName: "Ayse", lastName: "Yilmaz Demir",
+                hireDate: new DateOnly(2019, 1, 1), emails: ["a@duzen.com.tr"]),
+        ]);
+
+        outcome.Warnings.ShouldNotContain(w => w.Code == SyncWarningCode.ConflictingName);
+        outcome.NewPersons.Single().LastName.ShouldBe("Yilmaz Demir");
+    }
+
+    [Fact]
+    public void Different_names_on_two_active_cards_still_warn()
+    {
+        var outcome = Run(
+        [
+            Card("00001", NationalId(1), logoRef: 1, lastName: "Yilmaz", emails: ["a@duzen.com.tr"]),
+            Card("00002", NationalId(1), logoRef: 2, lastName: "Demir", emails: ["a@duzen.com.tr"]),
+        ]);
+
+        var warning = outcome.Warnings.Single(w => w.Code == SyncWarningCode.ConflictingName);
+        warning.Detail.ShouldContain("aktif");
+    }
+
+    [Fact]
+    public void Email_left_on_a_former_employees_card_does_not_block_the_active_person()
+    {
+        // #77, 26.09.2026: adres yeniden verilmis, ayrilanlarin kartinda eski haliyle
+        // kalmisti. Ayrilmis kisi uye olamaz ve giris yapamaz; paylasim riski yoktur.
+        var outcome = Run(
+        [
+            Card("00001", NationalId(1), emails: ["birim@duzen.com.tr"]),
+            Card("00002", NationalId(2), emails: ["birim@duzen.com.tr"], terminationDate: new DateOnly(2023, 1, 1)),
+            Card("00003", NationalId(3), emails: ["birim@duzen.com.tr"], terminationDate: new DateOnly(2021, 1, 1)),
+        ]);
+
+        outcome.NewPersons.ShouldAllBe(p => !p.IsEmailShared);
+        outcome.Warnings.ShouldNotContain(w => w.Code == SyncWarningCode.SharedEmail);
+    }
+
+    [Fact]
+    public void Email_shared_by_two_active_persons_is_still_flagged_even_if_a_former_one_also_has_it()
+    {
+        var outcome = Run(
+        [
+            Card("00001", NationalId(1), emails: ["ortak@duzen.com.tr"]),
+            Card("00002", NationalId(2), emails: ["ortak@duzen.com.tr"]),
+            Card("00003", NationalId(3), emails: ["ortak@duzen.com.tr"], terminationDate: new DateOnly(2021, 1, 1)),
+        ]);
+
+        outcome.NewPersons.Where(p => p.IsEmailShared).Select(p => p.NationalId)
+            .ShouldBe([NationalId(1), NationalId(2)], ignoreOrder: true);
+        outcome.Warnings.Where(w => w.Code == SyncWarningCode.SharedEmail).Select(w => w.Detail)
+            .ShouldAllBe(d => d.Contains("2 farkli kisiye"));
+    }
+
+    [Fact]
     public void Same_email_on_two_cards_of_the_same_person_is_not_shared()
     {
         var outcome = Run(
