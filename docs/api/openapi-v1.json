@@ -451,7 +451,7 @@
           },
           "accountExists": {
             "type": "boolean",
-            "description": "Kisinin zaten hesabi var mi; yalnizca VerificationOutcome.Verified iken\r\n`true` olabilir. Kullanici parola sifirlamaya yonlendirilir (SYG-KMLK-020)."
+            "description": "Kisinin zaten hesabi var mi; yalnizca dogrulamadan sonra true olabilir; kullanici parola sifirlamaya yonlendirilir (SYG-KMLK-020)."
           }
         },
         "description": "Kod dogrulama sonucu."

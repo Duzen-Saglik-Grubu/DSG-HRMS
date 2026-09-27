@@ -330,10 +330,7 @@ export interface components {
         VerificationResponse: {
             /** @description Sonuc. */
             result: components["schemas"]["VerificationOutcome"];
-            /**
-             * @description Kisinin zaten hesabi var mi; yalnizca VerificationOutcome.Verified iken
-             *     `true` olabilir. Kullanici parola sifirlamaya yonlendirilir (SYG-KMLK-020).
-             */
+            /** @description Kisinin zaten hesabi var mi; yalnizca dogrulamadan sonra true olabilir; kullanici parola sifirlamaya yonlendirilir (SYG-KMLK-020). */
             accountExists: boolean;
         };
         /** @description Kod dogrulama istegi. */

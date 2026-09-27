@@ -50,10 +50,7 @@ public sealed record CodeRequestedResponse(DateTimeOffset CodeExpiresAt);
 
 /// <summary>Kod dogrulama sonucu.</summary>
 /// <param name="Result">Sonuc.</param>
-/// <param name="AccountExists">
-/// Kisinin zaten hesabi var mi; yalnizca <see cref="VerificationOutcome.Verified"/> iken
-/// <c>true</c> olabilir. Kullanici parola sifirlamaya yonlendirilir (SYG-KMLK-020).
-/// </param>
+/// <param name="AccountExists">Kisinin zaten hesabi var mi; yalnizca dogrulamadan sonra true olabilir; kullanici parola sifirlamaya yonlendirilir (SYG-KMLK-020).</param>
 public sealed record VerificationResponse(VerificationOutcome Result, bool AccountExists);
 
 /// <summary>Dogrulama kanali.</summary>
