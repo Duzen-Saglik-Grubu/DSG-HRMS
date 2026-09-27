@@ -1,5 +1,7 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
+using Dsg.Hrms.Application.Identity.Passwords;
+using Dsg.Hrms.Application.Identity.Registration;
 using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Notifications;
 using Dsg.Hrms.Application.Personnel.Sync;
@@ -9,6 +11,7 @@ using Dsg.Hrms.Infrastructure.Configuration;
 using Dsg.Hrms.Infrastructure.Data;
 using Dsg.Hrms.Infrastructure.Data.Interceptors;
 using Dsg.Hrms.Infrastructure.Identity;
+using Dsg.Hrms.Infrastructure.Identity.Passwords;
 using Dsg.Hrms.Infrastructure.Logo;
 using Dsg.Hrms.Infrastructure.Notifications;
 using Dsg.Hrms.Infrastructure.Personnel;
@@ -97,9 +100,18 @@ public static class InfrastructureRegistration
     {
         var options = OptionsRegistration.ReadAndValidate<CodeHashOptions>(configuration, CodeHashOptions.SectionName);
 
-        services.AddSingleton<IVerificationCodeHasher>(new HmacVerificationCodeHasher(options));
+        var hasher = new HmacVerificationCodeHasher(options);
+        services.AddSingleton<IVerificationCodeHasher>(hasher);
+        services.AddSingleton<IIdentifierHasher>(hasher);
         services.AddScoped<IVerificationCodeStore, VerificationCodeStore>();
         services.AddScoped<VerificationCodeService>();
+
+        // Uyelik ve parola (SYG-KMLK-013…021, 044, 045, 049).
+        services.AddSingleton<ICommonPasswordList, EmbeddedCommonPasswordList>();
+        services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
+        services.AddScoped<PasswordPolicy>();
+        services.AddScoped<IRegistrationStore, RegistrationStore>();
+        services.AddScoped<RegistrationService>();
     }
 
     private static void AddPersonnelSync(IServiceCollection services, IConfiguration configuration)

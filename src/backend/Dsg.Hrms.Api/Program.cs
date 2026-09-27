@@ -2,11 +2,15 @@ using Dsg.Hrms.Api.ErrorHandling;
 using Dsg.Hrms.Api.Health;
 using Dsg.Hrms.Api.Identity;
 using Dsg.Hrms.Api.Logging;
+using Dsg.Hrms.Api.Networking;
 using Dsg.Hrms.Api.Observability;
 using Dsg.Hrms.Api.OpenApi;
+using Dsg.Hrms.Api.Validation;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Infrastructure;
 using Dsg.Hrms.Infrastructure.Logging;
+using FluentValidation;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
 
 // DSG-HRMS API - uygulama giris noktasi (kompozisyon koku).
@@ -34,6 +38,13 @@ try
     builder.Services.AddHrmsProblemDetails();
     builder.Services.AddHrmsOpenApi();
     builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
+    builder.Services.TryAddSingleton(TimeProvider.System);
+
+    // Denetleyiciler ve istek dogrulamasi (ADR-0010: FluentValidation tek dogruluk kaynagi).
+    builder.Services.AddControllers(options => options.Filters.Add<ValidateRequestsFilter>());
+    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+    builder.Services.Configure<RegistrationTimingOptions>(builder.Configuration.GetSection(RegistrationTimingOptions.SectionName));
+    builder.Services.AddHrmsReverseProxy(builder.Configuration);
 
     // Yapilandirma dogrulamasi ve veritabani kaydi.
     // Zorunlu bir ayar eksikse uygulama BURADA degil, acilirken durur (ADR-0008 §4).
@@ -43,6 +54,10 @@ try
     builder.Services.AddHrmsObservability(builder.Configuration);
 
     var app = builder.Build();
+
+    // Gercek istemci IP'si ters vekilden okunur; izleme kimligi ve istek gunlugu bunu
+    // kullanacagi icin en basta calisir (#87).
+    app.UseForwardedHeaders();
 
     // Izleme kimligi, gunluk kaydindan ONCE baglanmalidir; boylece istek kaydi da
     // ayni kimligi tasir.
@@ -69,6 +84,7 @@ try
     // Canlilik ve hazir olma uc noktalari (ADR-0011).
     // LOGO ve NAS kontrolleri, ilgili altyapi bilesenleriyle birlikte eklenecektir.
     app.MapHrmsHealthChecks();
+    app.MapControllers();
 
     await app.RunAsync();
 }

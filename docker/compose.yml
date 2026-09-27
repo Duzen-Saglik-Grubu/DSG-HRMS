@@ -54,6 +54,10 @@ services:
       # LOGO salt-okunur oturumu (KR-004). Bos birakilirsa personel senkronizasyonu
       # DEVRE DISI kalir ve uygulama calismaya devam eder. Deger sir dosyasinda durur.
       Logo__ConnectionString: ${LOGO_CONNECTION_STRING:-}
+      # API, web konteynerindeki nginx'in arkasindadir. Gercek istemci IP'si (denetim izi,
+      # IP basina hiz siniri SYG-KMLK-059) X-Forwarded-For basligindan YALNIZCA bu agdan
+      # gelen isteklerde okunur: Docker kopru aglari (#87).
+      ReverseProxy__TrustedNetworks: '172.16.0.0/12'
       # Sir parametrelerin (SMTP ve NetGSM parolalari) sifreleme anahtari
       # (SYG-KMLK-075). Bos birakilirsa sirlar ekrandan girilemez, yalnizca ortam
       # degiskeninden okunur. Deger sir dosyasinda durur; veritabaninda DEGIL.

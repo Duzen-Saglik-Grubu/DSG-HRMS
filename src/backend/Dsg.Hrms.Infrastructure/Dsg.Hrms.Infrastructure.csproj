@@ -31,4 +31,9 @@
     <PackageReference Include="Serilog.Sinks.File" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Yaygin parola listesi (SYG-KMLK-045). Kaynak ve lisans: Identity/Passwords/README.md -->
+    <EmbeddedResource Include="Identity/Passwords/common-passwords.txt.gz" LogicalName="Dsg.Hrms.Infrastructure.CommonPasswords" />
+  </ItemGroup>
+
 </Project>

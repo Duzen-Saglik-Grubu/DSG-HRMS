@@ -44,6 +44,15 @@ public sealed class UserAccount : Entity, IAuditable
     /// </summary>
     public Guid SecurityStamp { get; private set; } = Guid.NewGuid();
 
+    /// <summary>
+    /// Parola ozeti (PBKDF2-HMAC-SHA512, SYG-KMLK-049). Parola belirlenmemisse <c>null</c>.
+    /// Ad bilincli secildi: denetim izinde ad tabanli kural bu alani HIC yazmaz.
+    /// </summary>
+    public string? PasswordHash { get; private set; }
+
+    /// <summary>Parolanin son belirlendigi an (UTC).</summary>
+    public DateTimeOffset? PasswordChangedAt { get; private set; }
+
     /// <inheritdoc />
     public DateTimeOffset CreatedAt { get; set; }
 
@@ -61,6 +70,27 @@ public sealed class UserAccount : Entity, IAuditable
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(personId);
         return new UserAccount { PersonId = personId, Status = AccountStatus.Active };
+    }
+
+    /// <summary>Uyelik sonunda parolasi belirlenmis aktif hesap olusturur (SYG-KMLK-013).</summary>
+    public static UserAccount Register(long personId, string passwordHash, DateTimeOffset now)
+    {
+        var account = Create(personId);
+        account.SetPassword(passwordHash, now);
+        return account;
+    }
+
+    /// <summary>
+    /// Parolayi degistirir ve guvenlik damgasini yeniler: mevcut oturumlar gecersizlesir
+    /// (SYG-KMLK-048).
+    /// </summary>
+    public void SetPassword(string passwordHash, DateTimeOffset now)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(passwordHash);
+
+        PasswordHash = passwordHash;
+        PasswordChangedAt = now;
+        SecurityStamp = Guid.NewGuid();
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using Dsg.Hrms.Application.Identity.Registration;
 using Dsg.Hrms.Application.Identity.Verification;
 
 namespace Dsg.Hrms.Infrastructure.Identity;
@@ -12,7 +13,7 @@ namespace Dsg.Hrms.Infrastructure.Identity;
 /// uretir. Boylece bir kaydin ozeti bilinse bile baska kayitlar icin onceden
 /// hesaplanmis bir tablo kullanilamaz.
 /// </remarks>
-public sealed class HmacVerificationCodeHasher : IVerificationCodeHasher
+public sealed class HmacVerificationCodeHasher : IVerificationCodeHasher, IIdentifierHasher
 {
     private readonly byte[]? _key;
 
@@ -52,11 +53,23 @@ public sealed class HmacVerificationCodeHasher : IVerificationCodeHasher
         return CryptographicOperations.FixedTimeEquals(Compute(codeId, code), stored);
     }
 
+    /// <inheritdoc />
+    /// <remarks>
+    /// "id:" oneki alan ayrimidir: bir TCKN ozeti hicbir kosulda bir kod ozetiyle
+    /// cakisamaz (kod girdisi "&lt;kimlik&gt;:&lt;kod&gt;" bicimindedir).
+    /// </remarks>
+    public string HashIdentifier(string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return Convert.ToBase64String(HMACSHA256.HashData(RequireKey(), Encoding.UTF8.GetBytes($"id:{value}")));
+    }
+
     private byte[] Compute(Guid codeId, string code)
     {
         ArgumentNullException.ThrowIfNull(code);
-        var key = _key ?? throw new InvalidOperationException("Dogrulama kodu ozet anahtari (Identity:CodeHashKey) tanimli degil.");
-
-        return HMACSHA256.HashData(key, Encoding.UTF8.GetBytes($"{codeId:N}:{code}"));
+        return HMACSHA256.HashData(RequireKey(), Encoding.UTF8.GetBytes($"{codeId:N}:{code}"));
     }
+
+    private byte[] RequireKey() =>
+        _key ?? throw new InvalidOperationException("Dogrulama kodu ozet anahtari (Identity:CodeHashKey) tanimli degil.");
 }

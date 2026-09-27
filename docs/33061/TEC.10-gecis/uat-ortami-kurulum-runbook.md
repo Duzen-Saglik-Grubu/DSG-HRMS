@@ -426,7 +426,25 @@ gönderici adını sorgular. Sonuç 5 dakika önbellekte tutulur.
 
 Gönderim kayıtları `notification.delivery` tablosundadır; içerik tutulmaz, alıcı maskelidir.
 
-### 10.4 SMTP sunucusu sertifikası
+### 10.4 Üyelik ve ters vekil (#87)
+
+Üyelik akışı `IDENTITY_CODE_HASH_KEY` olmadan çalışmaz (kod ve TCKN özetleri bu anahtarla
+alınır). Anahtar değiştirilirse açık kodlar ve son bir saatin hız sınırı sayaçları
+geçersizleşir.
+
+API, gerçek istemci IP'sini nginx'in `X-Forwarded-For` başlığından **yalnızca**
+`ReverseProxy__TrustedNetworks` ağından gelen isteklerde okur (compose'da
+`172.16.0.0/12`). Yığının Docker ağı bu aralıkta olmalıdır:
+
+```bash
+docker network inspect dsg-hrms-uat_default --format '{{(index .IPAM.Config 0).Subnet}}'
+# Beklenen: 172.16.0.0/12 icinde bir alt ag (orn. 172.18.0.0/16)
+```
+
+Aralık dışındaysa denetim izine ve IP başına hız sınırına (SYG-KMLK-059) nginx'in adresi
+yazılır; `ReverseProxy__TrustedNetworks` ağın alt ağına göre güncellenir.
+
+### 10.5 SMTP sunucusu sertifikası
 
 Gönderici sunucu sertifikasını **doğrular**; doğrulama kapatılmaz. SMTP adresi,
 sertifikadaki adla yazılır: `mail.duzen.com.tr:587`.
@@ -466,3 +484,4 @@ openssl s_client -starttls smtp -connect mail.duzen.com.tr:587 -servername mail.
 | 2026-09-26 | 0.7 | Betik ve dosya adları İngilizce: `deploy-uat.sh`, `renew-tls.sh` (sunucuda `dsg-renew-tls.sh`), `acme-dns-hook.sh`, `read-only-login.sql`, `.env.uat.example` (#81) | Bilgi İşlem |
 | 2026-09-26 | 0.8 | §9 sistem parametreleri ve sır parametre şifreleme anahtarı; §8.2 periyot parametreden (#83) | Bilgi İşlem |
 | 2026-09-27 | 0.9 | §10 doğrulama kodu ve ileti gönderimi: özet anahtarı, gönderim kipleri, `/health/notifications` (#85) | Bilgi İşlem |
+| 2026-09-27 | 1.0 | §10.4 üyelik anahtarı ve ters vekil ağı denetimi (#87) | Bilgi İşlem |
