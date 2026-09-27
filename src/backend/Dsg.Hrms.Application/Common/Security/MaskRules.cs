@@ -61,6 +61,11 @@ public static class MaskRules
             ["NationalId"] = new(MaskAction.Mask, PersonalDataKind.NationalId),
             ["IdentityNumber"] = new(MaskAction.Mask, PersonalDataKind.NationalId),
             ["Tckn"] = new(MaskAction.Mask, PersonalDataKind.NationalId),
+
+            // TCKN'nin anahtarli ozeti (RegistrationAttempt). Ozet de yazilmaz: anahtar ele
+            // gecerse TCKN'nin dar araligi denenerek ozetten TCKN bulunabilir.
+            ["NationalIdHash"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
+
             ["Phone"] = new(MaskAction.Mask, PersonalDataKind.Phone),
             ["PhoneNumber"] = new(MaskAction.Mask, PersonalDataKind.Phone),
             ["MobilePhone"] = new(MaskAction.Mask, PersonalDataKind.Phone),

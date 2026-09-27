@@ -16,6 +16,7 @@ namespace Dsg.Hrms.Api.IntegrationTests.Health;
 /// erisilemezken "hazir" diyen bir uc, kapsayici duzenine calismayan bir ornege
 /// trafik yonlendirtir. Bu testler tam olarak o durumu olcer.
 /// </remarks>
+[Collection(ApiHostGroup.Name)]
 public sealed class HealthCheckTests : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:17-alpine")

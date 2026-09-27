@@ -3,10 +3,345 @@
  * Do not make direct changes to the file.
  */
 
-export type paths = Record<string, never>;
+export interface paths {
+    "/api/v1/identity/registrations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Uyeligi baslatir: TCKN, dogum tarihi ve kurumsal e-posta. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["StartRegistrationRequest"];
+                    "text/json": components["schemas"]["StartRegistrationRequest"];
+                    "application/*+json": components["schemas"]["StartRegistrationRequest"];
+                };
+            };
+            responses: {
+                /** @description Kanal secimi. Eslesme olmasa da ayni yanit doner. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RegistrationStartedResponse"];
+                    };
+                };
+                /** @description Bicim hatasi (ornegin gecersiz TCKN). */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Cok fazla deneme. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/registrations/{registrationId}/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Secilen kanala kod gonderir. Kanal degisimi ve tekrar gonderim de bu uctur. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    registrationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RequestCodeRequest"];
+                    "text/json": components["schemas"]["RequestCodeRequest"];
+                    "application/*+json": components["schemas"]["RequestCodeRequest"];
+                };
+            };
+            responses: {
+                /** @description Kod gonderildi (eslesme yoksa gonderilmez; yanit aynidir). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CodeRequestedResponse"];
+                    };
+                };
+                /** @description Uyelik islemi bulunamadi veya suresi doldu. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kanal bu islemde kullanilamaz. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Cok fazla kod istendi. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/registrations/{registrationId}/verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Kodu dogrular. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    registrationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VerifyCodeRequest"];
+                    "text/json": components["schemas"]["VerifyCodeRequest"];
+                    "application/*+json": components["schemas"]["VerifyCodeRequest"];
+                };
+            };
+            responses: {
+                /** @description Dogrulama sonucu. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VerificationResponse"];
+                    };
+                };
+                /** @description Uyelik islemi bulunamadi veya suresi doldu. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/registrations/{registrationId}/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Parolayi belirler ve hesabi olusturur. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    registrationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CompleteRegistrationRequest"];
+                    "text/json": components["schemas"]["CompleteRegistrationRequest"];
+                    "application/*+json": components["schemas"]["CompleteRegistrationRequest"];
+                };
+            };
+            responses: {
+                /** @description Hesap olusturuldu; kullanici giris yapabilir. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Parola kurallara uymuyor (`errors.password`). */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Uyelik islemi bulunamadi, dogrulanmadi veya suresi doldu. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisinin zaten hesabi var. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+}
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        /** @description Kod istendi. */
+        CodeRequestedResponse: {
+            /**
+             * Format: date-time
+             * @description Kodun gecerlilik sonu (geri sayim, SYG-KMLK-028).
+             */
+            codeExpiresAt: string;
+        };
+        /** @description Hesap olusturma istegi. */
+        CompleteRegistrationRequest: {
+            /** @description Parola. */
+            password: string;
+        };
+        ProblemDetails: {
+            type?: null | string;
+            title?: null | string;
+            /** Format: int32 */
+            status?: null | number | string;
+            detail?: null | string;
+            instance?: null | string;
+        };
+        /** @description Uyelik baslatildi. */
+        RegistrationStartedResponse: {
+            /**
+             * Format: uuid
+             * @description Sonraki adimlarda kullanilacak kimlik.
+             */
+            registrationId: string;
+            /** @description Sunulan kanallar. Kodun gidecegi hedef HICBIR bicimde donmez (SYG-KMLK-018). */
+            channels: components["schemas"]["VerificationChannelKind"][];
+            /**
+             * Format: date-time
+             * @description Uyelik isleminin gecerlilik sonu.
+             */
+            expiresAt: string;
+        };
+        /** @description Kod istegi (SYG-KMLK-019). */
+        RequestCodeRequest: {
+            /** @description Secilen kanal. */
+            channel: components["schemas"]["VerificationChannelKind"];
+        };
+        /** @description Uyelik baslatma istegi (SYG-KMLK-013). */
+        StartRegistrationRequest: {
+            /** @description T.C. Kimlik Numarasi. */
+            nationalId: string;
+            /**
+             * Format: date
+             * @description Dogum tarihi.
+             */
+            birthDate: string;
+            /** @description Kurumsal e-posta. */
+            email: string;
+        };
+        /**
+         * @description Dogrulama kanali.
+         * @enum {unknown}
+         */
+        VerificationChannelKind: "email" | "sms";
+        /**
+         * @description Kod dogrulama sonucu.
+         * @enum {unknown}
+         */
+        VerificationOutcome: "verified" | "mismatch" | "expired" | "attemptsExceeded" | "notUsable";
+        /** @description Kod dogrulama sonucu. */
+        VerificationResponse: {
+            /** @description Sonuc. */
+            result: components["schemas"]["VerificationOutcome"];
+            /**
+             * @description Kisinin zaten hesabi var mi; yalnizca VerificationOutcome.Verified iken
+             *     `true` olabilir. Kullanici parola sifirlamaya yonlendirilir (SYG-KMLK-020).
+             */
+            accountExists: boolean;
+        };
+        /** @description Kod dogrulama istegi. */
+        VerifyCodeRequest: {
+            /** @description Girilen kod. */
+            code: string;
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;

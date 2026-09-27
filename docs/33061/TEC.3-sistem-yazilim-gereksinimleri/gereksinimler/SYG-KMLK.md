@@ -266,7 +266,7 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 
 | Kimlik | Gereksinim | Tür | Kaynak | Doğrulama | Parametre |
 |---|---|---|---|---|---|
-| **SYG-KMLK-071** | Kimlik işlemleri `/api/v1/kimlik/` altında sunulur, OpenAPI sözleşmesinde tanımlıdır ve hataları RFC 9457 Problem Details biçiminde döndürür (ADR-0010). | Arayüz | REQ-KMLK-043 | Test | — |
+| **SYG-KMLK-071** | Kimlik işlemleri `/api/v1/identity/` altında sunulur, OpenAPI sözleşmesinde tanımlıdır ve hataları RFC 9457 Problem Details biçiminde döndürür (ADR-0010). | Arayüz | REQ-KMLK-043 | Test | — |
 | **SYG-KMLK-072** | Senkronizasyonun elle tetiklenmesi ve son çalışma bilgisinin okunması için yetki gerektiren uç noktalar sunulur; yetkisiz çağrı `403` döndürür. | Arayüz | REQ-KMLK-003 | Test | — |
 
 ### 4.11 T3'ün ön koşulu olan en küçük altyapılar (§2.4)
@@ -336,6 +336,7 @@ yazılıdır; kapanmamış olanlar ⏳ ile işaretlidir.
 | AN-18 | Kişinin kartları arasındaki ad/soyad farkı her zaman hata değildir: evlilik sonrası eşin soyadı veya iki soyad kullanılabilir (İK, 26.09.2026). | Aktif sicildeki ad esas alınır (esas kart kuralı). Uyarı yalnızca iki **aktif** kart arasında fark varsa üretilir (`KR-079`, #77). | ✅ |
 | AN-19 | REQ-KMLK-035 "yeniden işe girişte hesap aktifleşir", REQ-KMLK-036 "İK hesabı elle pasife alabilir" der. Senkronizasyon 15 dakikada bir çalıştığından, elle pasif hesabı her çalışmada aktifleştirseydi elle pasife alma anlamsız kalırdı. | Yalnızca istihdam bitimiyle pasifleşen hesap otomatik aktifleşir (SYG-KMLK-056). İstihdamı süren kişinin elle pasif hesabı ancak elle aktifleşir (SYG-KMLK-057). Elle pasif hesabın sahibi ayrılırsa neden "istihdam bitti"ye döner ve yeniden işe girişte hesap aktifleşir (`KR-080`, #83). | ✅ |
 | AN-20 | ADR-0012 §7 geliştirme ve UAT'de "içeriği log'a yazan" göndericiler öngörür; SYG-KMLK-026 kodun hiçbir günlüğe yazılmamasını ister. UAT gerçek LOGO verisiyle çalıştığından gerçek personele de kod gitmemelidir. | Gönderim kipleri: `LogOnly` (varsayılan, içerik yazılmaz), `AllowList` (UAT ve geliştirme), `Send` (üretim). ADR-0012 §7 değiştirildi (`KR-083`, #85). | ✅ |
+| AN-21 | SYG-KMLK-071 ilk yazımda `/api/v1/kimlik/` diyordu. ADR-0010 §2 modül ve kaynak adlarını İngilizce kebab-case ister (`/api/v1/leave/leave-requests`); `KR-058` kod tanımlayıcılarını İngilizce tutar. | Yol `/api/v1/identity/` olarak düzeltildi. Paydaş gereksinimi (REQ-KMLK-043: ekran ve iletiler Türkçe) etkilenmez; yol kullanıcıya görünmez (#87). | ✅ |
 | AN-16 | Denetim izi ve erişim kaydı saklama süreleri (`PRM-KVK-01`, `02`) karar bekliyor. | T3'ü engellemez: kayıtlar üretilir, silme işi karar verildiğinde eklenir. | ⏳ KVKK kararı bekliyor |
 
 **Paydaşa geri bildirim (BP3):** AN-01, onaylı bir kabul kriterinin (REQ-KMLK-004)
@@ -455,3 +456,4 @@ madde `İptal` notuyla kalır.
 | 2026-09-26 | 0.3 | SYG-KMLK-008: ortak adres tespitinde yalnızca aktif istihdamlı kişiler; AN-17, AN-18 eklendi (`KR-079`, #77) | Bilgi İşlem |
 | 2026-09-26 | 0.4 | AN-19 eklendi: elle pasife alma ile yeniden işe girişte aktifleşmenin birlikte uygulanması (`KR-080`, #83) | Bilgi İşlem |
 | 2026-09-27 | 0.5 | AN-20 eklendi: ADR-0012 §7 ile SYG-KMLK-026 çelişkisi, gönderim kipleri (`KR-083`, #85) | Bilgi İşlem |
+| 2026-09-27 | 0.6 | SYG-KMLK-071: yol `/api/v1/identity/`; AN-21 eklendi (#87) | Bilgi İşlem |

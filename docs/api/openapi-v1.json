@@ -8,5 +8,472 @@
     },
     "version": "v1"
   },
-  "paths": { }
+  "paths": {
+    "/api/v1/identity/registrations": {
+      "post": {
+        "tags": [
+          "Registrations"
+        ],
+        "summary": "Uyeligi baslatir: TCKN, dogum tarihi ve kurumsal e-posta.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRegistrationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRegistrationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRegistrationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Kanal secimi. Eslesme olmasa da ayni yanit doner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationStartedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bicim hatasi (ornegin gecersiz TCKN).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla deneme.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/registrations/{registrationId}/code": {
+      "post": {
+        "tags": [
+          "Registrations"
+        ],
+        "summary": "Secilen kanala kod gonderir. Kanal degisimi ve tekrar gonderim de bu uctur.",
+        "parameters": [
+          {
+            "name": "registrationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCodeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCodeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Kod gonderildi (eslesme yoksa gonderilmez; yanit aynidir).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeRequestedResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Uyelik islemi bulunamadi veya suresi doldu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Kanal bu islemde kullanilamaz.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla kod istendi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/registrations/{registrationId}/verification": {
+      "post": {
+        "tags": [
+          "Registrations"
+        ],
+        "summary": "Kodu dogrular.",
+        "parameters": [
+          {
+            "name": "registrationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Dogrulama sonucu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Uyelik islemi bulunamadi veya suresi doldu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/registrations/{registrationId}/account": {
+      "post": {
+        "tags": [
+          "Registrations"
+        ],
+        "summary": "Parolayi belirler ve hesabi olusturur.",
+        "parameters": [
+          {
+            "name": "registrationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteRegistrationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteRegistrationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteRegistrationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Hesap olusturuldu; kullanici giris yapabilir.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Parola kurallara uymuyor (`errors.password`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Uyelik islemi bulunamadi, dogrulanmadi veya suresi doldu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Kisinin zaten hesabi var.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CodeRequestedResponse": {
+        "required": [
+          "codeExpiresAt"
+        ],
+        "type": "object",
+        "properties": {
+          "codeExpiresAt": {
+            "type": "string",
+            "description": "Kodun gecerlilik sonu (geri sayim, SYG-KMLK-028).",
+            "format": "date-time"
+          }
+        },
+        "description": "Kod istendi."
+      },
+      "CompleteRegistrationRequest": {
+        "required": [
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "Parola."
+          }
+        },
+        "description": "Hesap olusturma istegi."
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RegistrationStartedResponse": {
+        "required": [
+          "registrationId",
+          "channels",
+          "expiresAt"
+        ],
+        "type": "object",
+        "properties": {
+          "registrationId": {
+            "type": "string",
+            "description": "Sonraki adimlarda kullanilacak kimlik.",
+            "format": "uuid"
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationChannelKind"
+            },
+            "description": "Sunulan kanallar. Kodun gidecegi hedef HICBIR bicimde donmez (SYG-KMLK-018)."
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Uyelik isleminin gecerlilik sonu.",
+            "format": "date-time"
+          }
+        },
+        "description": "Uyelik baslatildi."
+      },
+      "RequestCodeRequest": {
+        "required": [
+          "channel"
+        ],
+        "type": "object",
+        "properties": {
+          "channel": {
+            "description": "Secilen kanal.",
+            "$ref": "#/components/schemas/VerificationChannelKind"
+          }
+        },
+        "description": "Kod istegi (SYG-KMLK-019)."
+      },
+      "StartRegistrationRequest": {
+        "required": [
+          "nationalId",
+          "birthDate",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "nationalId": {
+            "type": "string",
+            "description": "T.C. Kimlik Numarasi."
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "Dogum tarihi.",
+            "format": "date"
+          },
+          "email": {
+            "type": "string",
+            "description": "Kurumsal e-posta."
+          }
+        },
+        "description": "Uyelik baslatma istegi (SYG-KMLK-013)."
+      },
+      "VerificationChannelKind": {
+        "enum": [
+          "email",
+          "sms"
+        ],
+        "description": "Dogrulama kanali."
+      },
+      "VerificationOutcome": {
+        "enum": [
+          "verified",
+          "mismatch",
+          "expired",
+          "attemptsExceeded",
+          "notUsable"
+        ],
+        "description": "Kod dogrulama sonucu."
+      },
+      "VerificationResponse": {
+        "required": [
+          "result",
+          "accountExists"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "description": "Sonuc.",
+            "$ref": "#/components/schemas/VerificationOutcome"
+          },
+          "accountExists": {
+            "type": "boolean",
+            "description": "Kisinin zaten hesabi var mi; yalnizca VerificationOutcome.Verified iken\r\n`true` olabilir. Kullanici parola sifirlamaya yonlendirilir (SYG-KMLK-020)."
+          }
+        },
+        "description": "Kod dogrulama sonucu."
+      },
+      "VerifyCodeRequest": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Girilen kod."
+          }
+        },
+        "description": "Kod dogrulama istegi."
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Registrations"
+    }
+  ]
 }

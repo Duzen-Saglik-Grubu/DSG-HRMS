@@ -38,6 +38,13 @@ kullanıcıya **aynı ekran ve aynı mesaj** gösterilir. Eşleşme yoksa kanal 
 yine görünür, ancak hiçbir kod gönderilmez. Böylece "bu TCKN bu kurumda çalışıyor mu"
 bilgisi dışarı sızmaz (kimlik sıralama / enumeration saldırısı).
 
+> **Gerçekleştirme (27.09.2026, `KR-085`, #87).** Gizlilik yalnızca ilk ekranda değil
+> **tüm akışta** korunur. Eşleşmeyen deneme gerçek bir kod varmış gibi işler: kod
+> isteği aynı yanıtı verir, girilen kod "yanlış" sayılır, süre ve deneme sınırı gerçek
+> kodla aynıdır. Hız sınırları TCKN'nin anahtarlı özetine ve IP'ye göre sayılır. Yanıtlar
+> en az 1 saniye sürer. Uç noktalar: `POST /api/v1/identity/registrations`,
+> `…/{id}/code`, `…/{id}/verification`, `…/{id}/account`.
+
 ### 2. Kanal değiştirme
 
 Kullanıcı SMS'i seçip kod eline ulaşmazsa, **aynı ekrandan e-posta ile doğrulamaya
@@ -124,6 +131,9 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
   dayanağıdır** (`KR-070`).
 - Saklama: **ASP.NET Core Identity varsayılanı** (PBKDF2, yüksek yineleme sayısı) veya
   eşdeğeri. Parola hiçbir koşulda geri döndürülebilir biçimde saklanmaz.
+  *Gerçekleştirme (#87):* PBKDF2-HMAC-SHA512, 210.000 yineleme (OWASP önerisi); yineleme
+  sayısı özetin içinde saklanır. Yaygın parola listesi SecLists'ten (MIT) üç listenin
+  birleşimidir: 143.672 kayıt (`Infrastructure/Identity/Passwords/README.md`).
 - Zorunlu periyodik parola değişimi **varsayılan olarak uygulanmaz** (güncel güvenlik
   rehberleri bunu önermiyor; kullanıcıyı zayıf kalıplara itiyor). Sistem Yönetimi
   parametresiyle açılabilir.
@@ -232,3 +242,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | 2026-09-21 | 0.2 | §6 parola uzunluğu 12 → 6 (`KR-070`); §7 yeniden yazıldı: 2FA geliştirilecek, varsayılan kapalı (`KR-069`, `KR-017` yürürlükten kalktı) | Bilgi İşlem |
 | 2026-09-24 | 0.3 | §8: giriş kimliği kurumsal e-posta (`KR-073`), hareketsizlik 30 dk ve meşru uzun etkinlik (`KR-074`); ödünler bölümündeki bayat "39 personel" güncellendi | Bilgi İşlem |
 | 2026-09-24 | 0.4 | §3 kod saklama: anahtarlı özet; §5 kilit sayacı girilen e-postaya bağlı; §4 kanal tablosu `KR-073`, `KR-075`, `KR-076` ile yeniden yazıldı (İK destekli davet, `KR-020` konusuz) | Bilgi İşlem |
+| 2026-09-27 | 0.5 | §1 ve §6: gerçekleştirme notları (eşleşme gizliliğinin tüm akışa yayılması, parola özeti ve liste; `KR-085`, #87) | Bilgi İşlem |
