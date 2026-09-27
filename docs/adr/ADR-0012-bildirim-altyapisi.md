@@ -61,7 +61,7 @@ Hata kodlarının tamamı ve her biri için "yeniden denenecek mi" kararı
 | Sunucu | Kurum içi Postfix (SMTP) |
 | Kimlik bilgileri | Yapılandırmadan (ADR-0008); koda yazılmaz |
 | Şablon | HTML + düz metin alternatifli; şablonlar kod dışında, yönetilebilir |
-| Gönderen | Kurumsal İK adresi |
+| Gönderen | `ik.bildirim@duzen.com.tr` (`PRM-ENT-05`), görünen ad **Düzen İK Sistemi** |
 | Ekler | Yalnızca gerekli olduğunda; kişisel veri içeren ek gönderilmez |
 
 ### 4. Uygulama içi bildirim
@@ -104,9 +104,26 @@ KVKK işlem kaydı.
 
 ### 7. Test ve alt ortamlar
 
-Geliştirme ve UAT ortamlarında `LoglayanSmsSender` ve `LoglayanEmailSender` devrededir:
-gönderim yapılmaz, içerik log'a yazılır (kişisel veri maskeli). Böylece hem maliyet
-oluşmaz hem de yanlışlıkla gerçek personele mesaj gitmez.
+> **Değişti (27.09.2026, `KR-083`, #85).** İlk metin geliştirme ve UAT'de "içeriği log'a
+> yazan" göndericiler öngörüyordu. Bu, SYG-KMLK-026 ile çelişir: doğrulama kodu hiçbir
+> günlüğe yazılamaz. Ayrı gönderici sınıfları yerine **gönderim kipi** kullanılır.
+
+| Kip | Davranış | Ortam |
+|---|---|---|
+| `LogOnly` (varsayılan) | Hiçbir ileti gönderilmez; gönderim kaydı `Suppressed` olarak yazılır. İçerik **yazılmaz** | Yapılandırılmamış her ortam |
+| `AllowList` | Yalnızca izin listesindeki adres ve numaralara gönderilir; diğerleri `Suppressed` | UAT, geliştirme |
+| `Send` | Tüm alıcılara gönderilir | Üretim |
+
+Varsayılanın `LogOnly` olması bilinçlidir: yanlış yapılandırılmış bir ortam gerçek
+personele ileti göndermez. UAT gerçek LOGO verisiyle çalıştığı için `Send` kipi UAT'de
+kullanılmaz; kabul testleri test yapan kişilerin kendi adresleriyle `AllowList` kipinde
+yapılır.
+
+**Kodlu ileti veritabanına yazılmaz** (`KR-082`). Kuyruk bellek içidir; uygulama yeniden
+başlarsa bekleyen ileti kaybolur ve kullanıcı kodu tekrar ister.
+
+**Kanal sağlığı** (`/health/notifications`) ileti göndermeden yoklanır: SMTP'de oturum açılıp
+kimlik doğrulanır, NetGSM'de bakiye ve gönderici adı sorgulanır.
 
 ### 8. Numara ve adres normalizasyonu
 
@@ -159,3 +176,5 @@ ibarettir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-09-27 | 0.2 | §7: içeriği log'a yazan göndericiler yerine gönderim kipleri; kodlu ileti veritabanına yazılmaz; kanal sağlığı (`KR-082`, `KR-083`, #85) | Bilgi İşlem |
+| 2026-09-27 | 0.3 | §3: gönderen adresi ve görünen ad (Düzen İK Sistemi) yazıldı (#85) | Bilgi İşlem |

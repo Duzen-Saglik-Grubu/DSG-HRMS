@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-09-26
+**Son güncelleme:** 2026-09-27
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 
@@ -135,24 +135,24 @@ gelecektir.
 | 1 | `REQ-KMLK-001` Personel, giriş ekranındaki "Üye Ol" bağlantısıyla kendi hesabını kend… | SYG-KMLK-013, 079 | — | — | — | — |
 | 2 | `REQ-KMLK-002` Üyelik doğrulaması TCKN + doğum tarihi + kurumsal e-posta bilgileriyle… | SYG-KMLK-006, 013, 014 | `ADR-0003` §4, `ADR-0005` §1 | kısmen: SYG-006 (senkronize alanlar) · PR #75 | `PersonnelSynchronizerTests`, `PersonnelSyncStoreTests` | — |
 | 3 | `REQ-KMLK-003` Eşleşme LOGO anlık görüntüsü üzerinden yapılır; yalnızca AKTİF istihda… | SYG-KMLK-001, 002, 003, 004, 006, 011, 012, 013, 072 | `ADR-0003` | kısmen: SYG-001, 002, 003, 004, 006, 011, 012 · PR #75, #76 — SYG-013 (üyelik), 072 (elle tetikleme API) sonraki işler | `PersonnelSynchronizerTests`, `PersonnelSyncStoreTests`, `PersonnelSyncServiceTests`, `LogoReadOnlyAccessTests` | — |
-| 4 | `REQ-KMLK-004` Bilgiler eşleşse de eşleşmese de kullanıcıya AYNI ekran ve AYNI mesaj … | SYG-KMLK-015, 016, 018, 020 | — | — | — | — |
-| 5 | `REQ-KMLK-005` Doğrulama kanalı kullanıcıya seçtirilir: e-posta veya SMS. Hangi kanal… | SYG-KMLK-016, 017, 030, 075 | `ADR-0008` §7 | kısmen: SYG-075 (parametre deposu, şifreli sırlar) · PR #84 — SYG-076 (parametre ekranı) sonraki iş | `ParameterCatalogTests`, `SystemParameterStoreTests`, `AesGcmSecretProtectorTests` | — |
+| 4 | `REQ-KMLK-004` Bilgiler eşleşse de eşleşmese de kullanıcıya AYNI ekran ve AYNI mesaj … | SYG-KMLK-015, 016, 018, 020 | `ADR-0012` §5, `KR-082` | kısmen: SYG-015 (arka plan kuyruğu: gönderim yanıtı bekletmez) · PR #86 — aynı yanıt ve 016, 018, 020 üyelik işinde | `NotificationDispatcherTests` | — |
+| 5 | `REQ-KMLK-005` Doğrulama kanalı kullanıcıya seçtirilir: e-posta veya SMS. Hangi kanal… | SYG-KMLK-016, 017, 030, 075 | `ADR-0008` §7; `ADR-0012` §3 | kısmen: SYG-075 (parametre deposu, şifreli sırlar) · PR #84 — SYG-076 (parametre ekranı) sonraki iş; SYG-030 (SMTP gönderici, Türkçe şablon) · PR #86 | `ParameterCatalogTests`, `SystemParameterStoreTests`, `AesGcmSecretProtectorTests`; `SmtpEmailSenderTests`, `VerificationMessagesTests` | — |
 | 6 | `REQ-KMLK-006` SMS seçilip kod ulaşmazsa kullanıcı aynı ekrandan e-posta kanalına geç… | SYG-KMLK-019 | — | — | — | — |
 | 7 | `REQ-KMLK-007` Kurumsal e-posta adresi bulunmayan personel için e-posta kanalı sunulm… | SYG-KMLK-017 | — | — | — | — |
 | 8 | `REQ-KMLK-008` Kurumsal alan adı dışındaki e-posta adreslerine (gmail, hotmail vb.) d… | SYG-KMLK-009, 017 | `ADR-0003` §5 | kısmen: SYG-009 (normalleştirme) · PR #75 | `ContactNormalizerTests`, `PersonnelSynchronizerTests` | — |
 | 9 | `REQ-KMLK-009` Aynı e-posta adresi birden fazla kişiye tanımlıysa o adrese doğrulama … | SYG-KMLK-008, 017 | `ADR-0003` §5 | kısmen: SYG-008 (paylaşılan adres işaretleme; yalnızca aktif kişiler, `KR-079`) · PR #75, #78 | `PersonnelSynchronizerTests` | — |
 | 10 | `REQ-KMLK-010` Cep telefonu tanımlı olmayan personel için SMS kanalı sunulmaz. | SYG-KMLK-009, 017 | `ADR-0003` §5 | kısmen: SYG-009 (telefon doğrulama) · PR #75 | `ContactNormalizerTests`, `PersonnelSynchronizerTests` | — |
-| 11 | `REQ-KMLK-011` İK, personele tek kullanımlık parola bağlantısı gönderebilir; yalnızca LOGO'daki kurumsal e-postaya… | SYG-KMLK-030, 051, 052, 053, 073, 074 | — | — | — | — |
+| 11 | `REQ-KMLK-011` İK, personele tek kullanımlık parola bağlantısı gönderebilir; yalnızca LOGO'daki kurumsal e-postaya… | SYG-KMLK-030, 051, 052, 053, 073, 074 | `ADR-0012` §3 | kısmen: SYG-030 (SMTP gönderici) · PR #86 — 051–053 (davet), 073, 074 sonraki işler | `SmtpEmailSenderTests` | — |
 | 12 | `REQ-KMLK-012` Kabul edilen kurumsal alan adları koda gömülmez; Sistem Yönetimi param… | SYG-KMLK-017, 075, 076 | `ADR-0008` §7 | kısmen: SYG-075 (parametre deposu, şifreli sırlar) · PR #84 — SYG-076 (parametre ekranı) sonraki iş | `ParameterCatalogTests`, `SystemParameterStoreTests`, `AesGcmSecretProtectorTests` | — |
 | 13 | `REQ-KMLK-013` TCKN’si bulunmayan LOGO kartı için sistemde Kişi kaydı oluşturulmaz; k… | SYG-KMLK-007 | `ADR-0003` §5, `KR-043` | `PersonnelSynchronizer` · PR #75 | `PersonnelSynchronizerTests`, `PersonnelSyncStoreTests`, `NationalIdTests` | — |
 | 14 | `REQ-KMLK-014` Bir kişinin birden fazla sicil numarası olsa da TEK hesabı olur. | SYG-KMLK-001, 020, 021 | `ADR-0005` §1–2, `ADR-0006` | kısmen: SYG-001 (kişi/istihdam ayrımı) · PR #75; SYG-021 (kişiye tek hesap, tekillik kısıtı) · PR #84 | `PersonAndEmploymentTests`, `PersonnelSynchronizerTests`, `PersonnelSyncStoreTests`, `UserAccountTests` | — |
-| 15 | `REQ-KMLK-015` Doğrulama kodu 6 hanedir (parametre: PRM-KML-09) ve kriptografik güven… | SYG-KMLK-022 | — | — | — | — |
-| 16 | `REQ-KMLK-016` Kod 5 dakika geçerlidir (parametre: PRM-KML-10). | SYG-KMLK-023, 079 | — | — | — | — |
-| 17 | `REQ-KMLK-017` Kod en fazla 3 kez yanlış girilebilir; aşılırsa kod iptal edilir ve ye… | SYG-KMLK-024 | — | — | — | — |
-| 18 | `REQ-KMLK-018` Kod veritabanında şifrelenmiş (hash) saklanır; düz metin tutulmaz ve h… | SYG-KMLK-025, 026 | — | — | — | — |
-| 19 | `REQ-KMLK-019` Doğrulanan kod anında geçersiz kılınır (tek kullanımlık). | SYG-KMLK-027 | — | — | — | — |
+| 15 | `REQ-KMLK-015` Doğrulama kodu 6 hanedir (parametre: PRM-KML-09) ve kriptografik güven… | SYG-KMLK-022 | `ADR-0006` §3 | SYG-022 · PR #86 | `VerificationCodeTests`, `VerificationCodeServiceTests`, `VerificationCodeStoreTests` | — |
+| 16 | `REQ-KMLK-016` Kod 5 dakika geçerlidir (parametre: PRM-KML-10). | SYG-KMLK-023, 079 | `ADR-0006` §3 | kısmen: SYG-023 (süre, "süresi doldu" sonucu) · PR #86 — 028 (geri sayım ekranı) üyelik işinde | `VerificationCodeTests`, `VerificationCodeServiceTests`, `VerificationCodeStoreTests` | — |
+| 17 | `REQ-KMLK-017` Kod en fazla 3 kez yanlış girilebilir; aşılırsa kod iptal edilir ve ye… | SYG-KMLK-024 | `ADR-0006` §3 | SYG-024 · PR #86 | `VerificationCodeTests`, `VerificationCodeServiceTests`, `VerificationCodeStoreTests` | — |
+| 18 | `REQ-KMLK-018` Kod veritabanında şifrelenmiş (hash) saklanır; düz metin tutulmaz ve h… | SYG-KMLK-025, 026 | `ADR-0006` §3, `KR-082` | SYG-025 (HMAC-SHA256, anahtar ortam değişkeninde), 026 (kod günlüğe, denetim izine, gönderim kaydına yazılmaz) · PR #86 | `VerificationCodeTests`, `VerificationCodeServiceTests`, `VerificationCodeStoreTests`, `NotificationDispatcherTests` | — |
+| 19 | `REQ-KMLK-019` Doğrulanan kod anında geçersiz kılınır (tek kullanımlık). | SYG-KMLK-027 | `ADR-0004` §4 | SYG-027 (satır sürümüyle tek kullanım) · PR #86 | `VerificationCodeTests`, `VerificationCodeServiceTests`, `VerificationCodeStoreTests` | — |
 | 20 | `REQ-KMLK-020` Kod ekranında kalan süre görünür ve "kodu tekrar gönder" seçeneği bulu… | SYG-KMLK-028 | — | — | — | — |
-| 21 | `REQ-KMLK-021` SMS gönderimleri NetGSM standart servisi üzerinden, DUZEN başlığıyla y… | SYG-KMLK-029, 075, 079 | `ADR-0008` §7 | kısmen: SYG-075 (parametre deposu, şifreli sırlar) · PR #84 — SYG-076 (parametre ekranı) sonraki iş | `ParameterCatalogTests`, `SystemParameterStoreTests`, `AesGcmSecretProtectorTests` | — |
+| 21 | `REQ-KMLK-021` SMS gönderimleri NetGSM standart servisi üzerinden, DUZEN başlığıyla y… | SYG-KMLK-029, 075, 079 | `ADR-0008` §7; `ADR-0012` §2, `analiz/02` | kısmen: SYG-075 (parametre deposu, şifreli sırlar) · PR #84 — SYG-076 (parametre ekranı) sonraki iş; SYG-029 (NetGSM REST v2, tüm hata kodları), 079 (yeniden deneme, gönderim kaydı) · PR #86 — 079 ölçümü UAT'de | `ParameterCatalogTests`, `SystemParameterStoreTests`, `AesGcmSecretProtectorTests`; `NetGsmSmsSenderTests`, `NotificationDispatcherTests` | — |
 | 22 | `REQ-KMLK-022` Kullanıcı kurumsal e-posta adresi ve parolasıyla giriş yapar. | SYG-KMLK-008, 031, 077 | `ADR-0006` §8 | kısmen: SYG-008 (paylaşılan adres işaretleme; yalnızca aktif kişiler, `KR-079`) · PR #75, #78 | `PersonnelSynchronizerTests` | — |
 | 23 | `REQ-KMLK-023` Hatalı girişte "kullanıcı adı veya parola hatalı" denir; hangisinin ya… | SYG-KMLK-032 | — | — | — | — |
 | 24 | `REQ-KMLK-024` 5 başarısız giriş denemesinden sonra hesap 15 dakika kilitlenir (param… | SYG-KMLK-033 | — | — | — | — |
@@ -170,9 +170,9 @@ gelecektir.
 | 36 | `REQ-KMLK-036` İK, bir hesabı elle pasife alabilir; gerekçe zorunludur. | SYG-KMLK-057, 073, 074 | `ADR-0006`, `KR-080` | kısmen: SYG-057 (domain kuralı: gerekçe zorunlu, veritabanı kısıtı) · PR #84 — 073 (İK ekranı), 074 (yetki) sonraki işler | `UserAccountTests`, `PersonnelSyncStoreTests` | — |
 | 37 | `REQ-KMLK-037` Hesap durum değişiklikleri (açılma, pasifleşme, kilitlenme) denetim iz… | SYG-KMLK-053, 058 | `ADR-0009` §2 | kısmen: SYG-058 (pasifleşme ve aktifleşme denetim izinde) · PR #84 — kilitlenme giriş işinde, 053 (davet) sonraki iş | `PersonnelSyncStoreTests` | — |
 | 38 | `REQ-KMLK-038` Üyelik denemeleri TCKN başına saatte 5, IP başına saatte 20 ile sınırl… | SYG-KMLK-059 | — | — | — | — |
-| 39 | `REQ-KMLK-039` Kod gönderimi kişi başına 15 dakikada en fazla 3 kez yapılabilir; sını… | SYG-KMLK-059 | — | — | — | — |
+| 39 | `REQ-KMLK-039` Kod gönderimi kişi başına 15 dakikada en fazla 3 kez yapılabilir; sını… | SYG-KMLK-059 | `ADR-0006` §5 | kısmen: SYG-059 (kişi başına 15 dakikada kod sınırı, olay günlüğü) · PR #86 — 429 yanıtı ve üyelik deneme sınırları üyelik işinde | `VerificationCodeServiceTests`, `VerificationCodeStoreTests` | — |
 | 40 | `REQ-KMLK-040` Tüm kimlik olayları (giriş, başarısız giriş, kilitlenme, kod gönderimi… | SYG-KMLK-005, 010, 060 | `ADR-0003` §4, `ADR-0009` | kısmen: SYG-005 (çalışma kaydı), 010 (günlük, `/health/sync`) · PR #75, #76 — SYG-060 (kimlik olayları) sonraki işler | `PersonnelSyncServiceTests`, `PersonnelSyncStoreTests`, `PersonnelSyncHealthCheckTests` | — |
-| 41 | `REQ-KMLK-041` Kişisel veriler günlük kayıtlarında maskelenir (TCKN 123*901, telefon … | SYG-KMLK-026, 061 | — | — | — | — |
+| 41 | `REQ-KMLK-041` Kişisel veriler günlük kayıtlarında maskelenir (TCKN 123*901, telefon … | SYG-KMLK-026, 061 | `ADR-0009` §4, `KR-083` | kısmen: SYG-026 (kod ve alıcı günlüğe yazılmaz, alıcı maskeli) · PR #86 — 061 kimlik olayları işinde | `NotificationDispatcherTests` | — |
 | 42 | `REQ-KMLK-042` Doğrulama kodu ve parola sıfırlama iletileri bildirim istisnasından MU… | SYG-KMLK-062 | — | — | — | — |
 | 43 | `REQ-KMLK-043` Tüm ekranlar ve hata mesajları Türkçedir; teknik terim kullanılmaz. | SYG-KMLK-064, 071 | — | — | — | — |
 | 44 | `REQ-KMLK-044` Giriş ve üyelik ekranları telefon ve tablette de kullanılabilir. | SYG-KMLK-065 | — | — | — | — |
@@ -219,3 +219,4 @@ dâhil edilmedi. **26.09.2026: zinciri PR #76 ile tamamlandı** (§4.1).
 | 2026-09-26 | 0.5 | §4.1 LOGO salt-okunur kalemi kapandı (PR #76: CI'da yazma reddi kanıtı); §5 REQ-KMLK-003, 034, 040 satırları güncellendi | Bilgi İşlem |
 | 2026-09-26 | 0.6 | REQ-KMLK-009 ve 022 satırlarına PR #78 eklendi (`KR-079`) | Bilgi İşlem |
 | 2026-09-26 | 0.7 | §5: REQ-KMLK-005, 012, 014, 021, 028, 034, 035, 036, 037 satırlarına parametre deposu ve hesap yaşam döngüsü halkaları eklendi (#83, PR #84) | Bilgi İşlem |
+| 2026-09-27 | 0.8 | §5: REQ-KMLK-004, 005, 011, 015–019, 021, 039, 041 satırlarına doğrulama kodu ve iletim altyapısı halkaları eklendi (#85, PR #86) | Bilgi İşlem |

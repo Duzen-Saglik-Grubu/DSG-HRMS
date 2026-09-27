@@ -58,6 +58,18 @@ services:
       # (SYG-KMLK-075). Bos birakilirsa sirlar ekrandan girilemez, yalnizca ortam
       # degiskeninden okunur. Deger sir dosyasinda durur; veritabaninda DEGIL.
       ParameterProtection__Key: ${PARAMETER_PROTECTION_KEY:-}
+      # Dogrulama kodu ozet anahtari (SYG-KMLK-025). Bos birakilirsa kod uretilemez.
+      Identity__CodeHashKey: ${IDENTITY_CODE_HASH_KEY:-}
+      # Gonderim kipi (#85): LogOnly (varsayilan, hicbir ileti gitmez), AllowList (yalnizca
+      # izin listesine), Send (uretim). UAT gercek LOGO verisiyle calistigi icin Send KULLANILMAZ.
+      Notifications__DeliveryMode: ${NOTIFICATIONS_DELIVERY_MODE:-LogOnly}
+      Notifications__AllowedRecipients: ${NOTIFICATIONS_ALLOWED_RECIPIENTS:-}
+      # SMTP ve NetGSM erisim bilgileri (PRM-ENT-01, 02, 04, 06). Parametre ekranindan
+      # girilen deger bunlarin onune gecer. Degerler sir dosyasinda durur.
+      Parameters__SmtpServer: ${SMTP_SERVER:-}
+      Parameters__SmtpPassword: ${SMTP_PASSWORD:-}
+      Parameters__NetGsmUserCode: ${NETGSM_USER_CODE:-}
+      Parameters__NetGsmPassword: ${NETGSM_PASSWORD:-}
       Observability__OtlpEndpoint: ${OTLP_ENDPOINT:-}
     ports:
       - '${API_PORT:-5199}:8080'

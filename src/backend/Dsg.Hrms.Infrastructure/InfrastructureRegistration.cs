@@ -1,12 +1,16 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
+using Dsg.Hrms.Application.Identity.Verification;
+using Dsg.Hrms.Application.Notifications;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Infrastructure.Audit;
 using Dsg.Hrms.Infrastructure.Configuration;
 using Dsg.Hrms.Infrastructure.Data;
 using Dsg.Hrms.Infrastructure.Data.Interceptors;
+using Dsg.Hrms.Infrastructure.Identity;
 using Dsg.Hrms.Infrastructure.Logo;
+using Dsg.Hrms.Infrastructure.Notifications;
 using Dsg.Hrms.Infrastructure.Personnel;
 using Dsg.Hrms.Infrastructure.Settings;
 using Dsg.Hrms.Infrastructure.Time;
@@ -15,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Polly;
 
 namespace Dsg.Hrms.Infrastructure;
 
@@ -46,6 +51,8 @@ public static class InfrastructureRegistration
         AddDatabase(services, configuration, environment);
         AddSystemParameters(services, configuration);
         AddPersonnelSync(services, configuration);
+        AddNotifications(services, configuration);
+        AddVerificationCodes(services, configuration);
 
         return services;
     }
@@ -62,6 +69,37 @@ public static class InfrastructureRegistration
         services.AddSingleton<SystemParameters>();
         services.AddSingleton<ISystemParameters>(provider => provider.GetRequiredService<SystemParameters>());
         services.AddScoped<ISystemParameterEditor, SystemParameterEditor>();
+    }
+
+    private static void AddNotifications(IServiceCollection services, IConfiguration configuration)
+    {
+        var options = OptionsRegistration.ReadAndValidate<NotificationOptions>(configuration, NotificationOptions.SectionName);
+        services.AddSingleton(options);
+
+        services.AddSingleton<InMemoryNotificationDispatch>();
+        services.AddSingleton<INotificationDispatch>(provider => provider.GetRequiredService<InMemoryNotificationDispatch>());
+        services.AddHostedService<NotificationDispatcher>();
+
+        // Zaman asimi ADR-0012 §5 geregi 10 saniye. Yeniden deneme burada DEGIL,
+        // dagiticidadir: SMTP'yi de kapsamali ve NetGSM uygulama kodlarina (80) gore
+        // karar vermelidir.
+        services.AddHttpClient<NetGsmSmsSender>(client => client.BaseAddress = NetGsmSmsSender.BaseAddress)
+            .AddResilienceHandler("netgsm", pipeline => pipeline.AddTimeout(TimeSpan.FromSeconds(10)));
+        services.AddTransient<ISmsSender>(provider => provider.GetRequiredService<NetGsmSmsSender>());
+
+        services.AddTransient<SmtpEmailSender>();
+        services.AddTransient<IEmailSender>(provider => provider.GetRequiredService<SmtpEmailSender>());
+
+        services.AddSingleton<INotificationChannelProbe, NotificationChannelProbe>();
+    }
+
+    private static void AddVerificationCodes(IServiceCollection services, IConfiguration configuration)
+    {
+        var options = OptionsRegistration.ReadAndValidate<CodeHashOptions>(configuration, CodeHashOptions.SectionName);
+
+        services.AddSingleton<IVerificationCodeHasher>(new HmacVerificationCodeHasher(options));
+        services.AddScoped<IVerificationCodeStore, VerificationCodeStore>();
+        services.AddScoped<VerificationCodeService>();
     }
 
     private static void AddPersonnelSync(IServiceCollection services, IConfiguration configuration)

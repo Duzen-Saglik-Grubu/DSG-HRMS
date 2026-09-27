@@ -386,6 +386,71 @@ kaybolursa veritabanındaki sır parametreler çözülemez ve ekrandan yeniden g
 gerekir. Anahtar tanımlı değilse uygulama çalışır; sırlar yalnızca sır dosyasından
 okunur.
 
+## 10. Doğrulama kodu ve ileti gönderimi
+
+### 10.1 Sır dosyasına eklenecekler (bir kez)
+
+```bash
+# Kod özet anahtarı (SYG-KMLK-025); ekrana yazdırılmadan eklenir.
+printf "IDENTITY_CODE_HASH_KEY='%s'
+" "$(openssl rand -base64 32)" >> /opt/dsg-hrms/secrets/.env.uat
+```
+
+SMTP ve NetGSM erişim bilgileri `SMTP_SERVER`, `SMTP_PASSWORD`, `NETGSM_USER_CODE`,
+`NETGSM_PASSWORD` değişkenleriyle, **tek tırnak içinde** eklenir (`.env.uat.example`).
+
+### 10.2 Gönderim kipi (`KR-083`)
+
+UAT **gerçek LOGO verisiyle** çalışır. `NOTIFICATIONS_DELIVERY_MODE=Send` gerçek personele
+kod gönderir ve UAT'de **kullanılmaz**.
+
+| Kip | Ne zaman |
+|---|---|
+| `LogOnly` (varsayılan) | Hiçbir ileti gitmez; gönderim kaydı `Suppressed` yazılır |
+| `AllowList` | Kabul testleri: `NOTIFICATIONS_ALLOWED_RECIPIENTS` yalnızca test yapanların kurumsal e-posta ve `5XXXXXXXXX` telefonları (virgülle) |
+
+### 10.3 Doğrulama
+
+```bash
+curl -s https://insankaynaklaritest.duzen.com.tr/health/notifications
+```
+
+Uç **hiçbir ileti göndermez**: SMTP'de oturum açıp kimlik doğrular, NetGSM'de bakiye ve
+gönderici adını sorgular. Sonuç 5 dakika önbellekte tutulur.
+
+| Durum | Anlamı |
+|---|---|
+| `Healthy` | Kimlik doğrulaması başarılı; ya da kanal bilinçli olarak tanımlı değil |
+| `Degraded` | Sunucuya ulaşılamadı |
+| `Unhealthy` | Parola, kullanıcı, gönderici adı veya **sunucu sertifikası** hatalı; hiç kimse kod alamaz |
+
+Gönderim kayıtları `notification.delivery` tablosundadır; içerik tutulmaz, alıcı maskelidir.
+
+### 10.4 SMTP sunucusu sertifikası
+
+Gönderici sunucu sertifikasını **doğrular**; doğrulama kapatılmaz. SMTP adresi,
+sertifikadaki adla yazılır: `mail.duzen.com.tr:587`.
+
+27.09.2026 ölçümü (#85):
+
+| Port | Sertifika |
+|---|---|
+| 443 (web) | `CN=mail.duzen.com.tr`, Sectigo, geçerlilik sonu 11.10.2026 |
+| **587 (Postfix)** | Kendinden imzalı `CN=localhost`, süresi 07.03.2026'da **dolmuş** |
+
+Postfix geçerli sertifikayı kullanana kadar e-posta kanalı `Unhealthy` görünür ve
+e-postayla kod gönderilemez. Düzeltme sunucu tarafındadır: Postfix'in
+`smtpd_tls_cert_file` ve `smtpd_tls_key_file` ayarları web sunucusundaki
+`mail.duzen.com.tr` sertifikasını (tam zincir) göstermeli, ardından `postfix reload`.
+Sertifika her yenilendiğinde Postfix de yeniden yüklenmelidir.
+
+Doğrulama (ileti göndermez):
+
+```bash
+openssl s_client -starttls smtp -connect mail.duzen.com.tr:587 -servername mail.duzen.com.tr   -verify_hostname mail.duzen.com.tr </dev/null 2>&1 | grep -E "subject=|Verify return code"
+# Beklenen: subject=CN=mail.duzen.com.tr ve "Verify return code: 0 (ok)"
+```
+
 ---
 
 ## Değişiklik Geçmişi
@@ -400,3 +465,4 @@ okunur.
 | 2026-09-26 | 0.6 | §8.1: sır dosyasında LOGO bağlantı dizesi tek tırnak içinde yazılır (#79) | Bilgi İşlem |
 | 2026-09-26 | 0.7 | Betik ve dosya adları İngilizce: `deploy-uat.sh`, `renew-tls.sh` (sunucuda `dsg-renew-tls.sh`), `acme-dns-hook.sh`, `read-only-login.sql`, `.env.uat.example` (#81) | Bilgi İşlem |
 | 2026-09-26 | 0.8 | §9 sistem parametreleri ve sır parametre şifreleme anahtarı; §8.2 periyot parametreden (#83) | Bilgi İşlem |
+| 2026-09-27 | 0.9 | §10 doğrulama kodu ve ileti gönderimi: özet anahtarı, gönderim kipleri, `/health/notifications` (#85) | Bilgi İşlem |

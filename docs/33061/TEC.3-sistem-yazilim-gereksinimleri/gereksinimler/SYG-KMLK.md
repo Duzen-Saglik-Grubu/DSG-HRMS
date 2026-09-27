@@ -4,7 +4,7 @@
 **Süreç:** TEC.3 — Sistem/Yazılım Gereksinimlerinin Tanımlanması
 **Modül:** T3 Kimlik Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-KMLK.md` (23.09.2026'da İK onaylı, 56 gereksinim)
-**Son güncelleme:** 2026-09-26
+**Son güncelleme:** 2026-09-27
 **Sahibi:** Bilgi İşlem
 
 > **Paydaş gereksinimi *ne* istendiğini söyler; bu belge sistemin bunu *hangi
@@ -335,6 +335,7 @@ yazılıdır; kapanmamış olanlar ⏳ ile işaretlidir.
 | AN-17 | **Canlı doğrulamada bulundu (26.09.2026):** Bir adres 3 kişiye tanımlıydı: 2'si ayrılmış, 1'i aktif. REQ-KMLK-009 ayrılmış personeli ayırt etmediği için aktif kişi e-postasıyla giriş yapamayacaktı. | Paylaşım tespitinde yalnızca aktif istihdamı olan kişiler sayılır: ayrılmış kişi üye olamaz ve giriş yapamaz, paylaşım riski doğurmaz (SYG-KMLK-008, `KR-079`, #77). İK ayrılanların kartındaki adresi sildi. | ✅ |
 | AN-18 | Kişinin kartları arasındaki ad/soyad farkı her zaman hata değildir: evlilik sonrası eşin soyadı veya iki soyad kullanılabilir (İK, 26.09.2026). | Aktif sicildeki ad esas alınır (esas kart kuralı). Uyarı yalnızca iki **aktif** kart arasında fark varsa üretilir (`KR-079`, #77). | ✅ |
 | AN-19 | REQ-KMLK-035 "yeniden işe girişte hesap aktifleşir", REQ-KMLK-036 "İK hesabı elle pasife alabilir" der. Senkronizasyon 15 dakikada bir çalıştığından, elle pasif hesabı her çalışmada aktifleştirseydi elle pasife alma anlamsız kalırdı. | Yalnızca istihdam bitimiyle pasifleşen hesap otomatik aktifleşir (SYG-KMLK-056). İstihdamı süren kişinin elle pasif hesabı ancak elle aktifleşir (SYG-KMLK-057). Elle pasif hesabın sahibi ayrılırsa neden "istihdam bitti"ye döner ve yeniden işe girişte hesap aktifleşir (`KR-080`, #83). | ✅ |
+| AN-20 | ADR-0012 §7 geliştirme ve UAT'de "içeriği log'a yazan" göndericiler öngörür; SYG-KMLK-026 kodun hiçbir günlüğe yazılmamasını ister. UAT gerçek LOGO verisiyle çalıştığından gerçek personele de kod gitmemelidir. | Gönderim kipleri: `LogOnly` (varsayılan, içerik yazılmaz), `AllowList` (UAT ve geliştirme), `Send` (üretim). ADR-0012 §7 değiştirildi (`KR-083`, #85). | ✅ |
 | AN-16 | Denetim izi ve erişim kaydı saklama süreleri (`PRM-KVK-01`, `02`) karar bekliyor. | T3'ü engellemez: kayıtlar üretilir, silme işi karar verildiğinde eklenir. | ⏳ KVKK kararı bekliyor |
 
 **Paydaşa geri bildirim (BP3):** AN-01, onaylı bir kabul kriterinin (REQ-KMLK-004)
@@ -453,3 +454,4 @@ madde `İptal` notuyla kalır.
 | 2026-09-25 | 0.2 | Önek `SG-` → `SYG-` (PR #65 incelemesi); AN-01 karara bağlandı (`KR-078`); SYG-KMLK-016'ya yönlendirme iletisi eklendi | Bilgi İşlem |
 | 2026-09-26 | 0.3 | SYG-KMLK-008: ortak adres tespitinde yalnızca aktif istihdamlı kişiler; AN-17, AN-18 eklendi (`KR-079`, #77) | Bilgi İşlem |
 | 2026-09-26 | 0.4 | AN-19 eklendi: elle pasife alma ile yeniden işe girişte aktifleşmenin birlikte uygulanması (`KR-080`, #83) | Bilgi İşlem |
+| 2026-09-27 | 0.5 | AN-20 eklendi: ADR-0012 §7 ile SYG-KMLK-026 çelişkisi, gönderim kipleri (`KR-083`, #85) | Bilgi İşlem |
