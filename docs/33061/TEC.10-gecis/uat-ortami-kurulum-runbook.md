@@ -426,6 +426,31 @@ gönderici adını sorgular. Sonuç 5 dakika önbellekte tutulur.
 
 Gönderim kayıtları `notification.delivery` tablosundadır; içerik tutulmaz, alıcı maskelidir.
 
+### 10.4 SMTP sunucusu sertifikası
+
+Gönderici sunucu sertifikasını **doğrular**; doğrulama kapatılmaz. SMTP adresi,
+sertifikadaki adla yazılır: `mail.duzen.com.tr:587`.
+
+27.09.2026 ölçümü (#85):
+
+| Port | Sertifika |
+|---|---|
+| 443 (web) | `CN=mail.duzen.com.tr`, Sectigo, geçerlilik sonu 11.10.2026 |
+| **587 (Postfix)** | Kendinden imzalı `CN=localhost`, süresi 07.03.2026'da **dolmuş** |
+
+Postfix geçerli sertifikayı kullanana kadar e-posta kanalı `Unhealthy` görünür ve
+e-postayla kod gönderilemez. Düzeltme sunucu tarafındadır: Postfix'in
+`smtpd_tls_cert_file` ve `smtpd_tls_key_file` ayarları web sunucusundaki
+`mail.duzen.com.tr` sertifikasını (tam zincir) göstermeli, ardından `postfix reload`.
+Sertifika her yenilendiğinde Postfix de yeniden yüklenmelidir.
+
+Doğrulama (ileti göndermez):
+
+```bash
+openssl s_client -starttls smtp -connect mail.duzen.com.tr:587 -servername mail.duzen.com.tr   -verify_hostname mail.duzen.com.tr </dev/null 2>&1 | grep -E "subject=|Verify return code"
+# Beklenen: subject=CN=mail.duzen.com.tr ve "Verify return code: 0 (ok)"
+```
+
 ---
 
 ## Değişiklik Geçmişi
