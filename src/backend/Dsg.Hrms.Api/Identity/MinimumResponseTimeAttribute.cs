@@ -32,8 +32,9 @@ public sealed class MinimumResponseTimeAttribute : Attribute, IAsyncActionFilter
 
         await next();
 
-        var remaining = minimum - stopwatch.Elapsed;
-        if (remaining > TimeSpan.Zero)
+        // Zamanlayici birkac milisaniye erken donebilir (Linux'ta olculdu); alt sinir
+        // gercekten saglanana kadar beklenir.
+        for (var remaining = minimum - stopwatch.Elapsed; remaining > TimeSpan.Zero; remaining = minimum - stopwatch.Elapsed)
         {
             await Task.Delay(remaining, CancellationToken.None);
         }
