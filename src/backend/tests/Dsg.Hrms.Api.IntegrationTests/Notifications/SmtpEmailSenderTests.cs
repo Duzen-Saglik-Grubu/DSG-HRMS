@@ -49,7 +49,7 @@ public sealed class SmtpEmailSenderTests : IAsyncLifetime, IDisposable
         }));
 
     [Fact]
-    public async Task Email_is_delivered_with_organization_sender_subject_and_body()
+    public async Task Email_is_delivered_with_sender_name_subject_and_body()
     {
         var result = await CreateSender().SendAsync(
             "ahmet.yilmaz@duzen.com.tr", "DSG-HRMS üyelik doğrulama kodu", "Kodunuz: 482915", CancellationToken.None);
@@ -59,7 +59,7 @@ public sealed class SmtpEmailSenderTests : IAsyncLifetime, IDisposable
         using var list = JsonDocument.Parse(await _http.GetStringAsync("api/v1/messages"));
         var message = list.RootElement.GetProperty("messages").EnumerateArray().Single();
         message.GetProperty("From").GetProperty("Address").GetString().ShouldBe("ik.bildirim@duzen.com.tr");
-        message.GetProperty("From").GetProperty("Name").GetString().ShouldBe("Düzen Sağlık Grubu");
+        message.GetProperty("From").GetProperty("Name").GetString().ShouldBe("Düzen İK Sistemi");
         message.GetProperty("To").EnumerateArray().Single().GetProperty("Address").GetString().ShouldBe("ahmet.yilmaz@duzen.com.tr");
         message.GetProperty("Subject").GetString().ShouldBe("DSG-HRMS üyelik doğrulama kodu");
 

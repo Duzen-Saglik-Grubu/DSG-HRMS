@@ -61,7 +61,7 @@ Hata kodlarının tamamı ve her biri için "yeniden denenecek mi" kararı
 | Sunucu | Kurum içi Postfix (SMTP) |
 | Kimlik bilgileri | Yapılandırmadan (ADR-0008); koda yazılmaz |
 | Şablon | HTML + düz metin alternatifli; şablonlar kod dışında, yönetilebilir |
-| Gönderen | Kurumsal İK adresi |
+| Gönderen | `ik.bildirim@duzen.com.tr` (`PRM-ENT-05`), görünen ad **Düzen İK Sistemi** |
 | Ekler | Yalnızca gerekli olduğunda; kişisel veri içeren ek gönderilmez |
 
 ### 4. Uygulama içi bildirim
@@ -177,3 +177,4 @@ ibarettir.
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-27 | 0.2 | §7: içeriği log'a yazan göndericiler yerine gönderim kipleri; kodlu ileti veritabanına yazılmaz; kanal sağlığı (`KR-082`, `KR-083`, #85) | Bilgi İşlem |
+| 2026-09-27 | 0.3 | §3: gönderen adresi ve görünen ad (Düzen İK Sistemi) yazıldı (#85) | Bilgi İşlem |

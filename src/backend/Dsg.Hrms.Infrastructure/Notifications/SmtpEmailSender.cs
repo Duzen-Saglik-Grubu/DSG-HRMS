@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Net.Sockets;
-using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Notifications;
 using Dsg.Hrms.Application.Settings;
 using MailKit;
@@ -16,7 +15,8 @@ namespace Dsg.Hrms.Infrastructure.Notifications;
 /// <remarks>
 /// <para>
 /// Sunucu, kullanici ve parola parametre deposundan her gonderimde okunur
-/// (<c>PRM-ENT-04…06</c>). Gonderen adres SMTP kullanici adidir; gorunen ad kurum adidir.
+/// (<c>PRM-ENT-04…06</c>). Gonderen adres SMTP kullanici adidir; gorunen ad
+/// <see cref="SenderDisplayName"/>'dir.
 /// </para>
 /// <para>
 /// Baglanti, sunucu destekliyorsa STARTTLS ile sifrelenir; 465 portunda dogrudan TLS
@@ -27,6 +27,12 @@ public sealed class SmtpEmailSender : IEmailSender
 {
     /// <summary>Baglanti ve komut zaman asimi (ADR-0012 §5).</summary>
     public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
+
+    /// <summary>
+    /// Gonderenin gorunen adi (ADR-0012 §3). Personel kodu beklerken gondereni hemen
+    /// tanimali: "IK" iletinin nereden geldigini, "Sistem" otomatik gonderildigini soyler.
+    /// </summary>
+    public const string SenderDisplayName = "Düzen İK Sistemi";
 
     private readonly ISystemParameters _parameters;
 
@@ -46,7 +52,7 @@ public sealed class SmtpEmailSender : IEmailSender
         }
 
         using var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(VerificationMessages.Organization, settings.Value.UserName));
+        message.From.Add(new MailboxAddress(SenderDisplayName, settings.Value.UserName));
         message.To.Add(MailboxAddress.Parse(address));
         message.Subject = subject;
         message.Body = new TextPart("plain") { Text = messageBody };
