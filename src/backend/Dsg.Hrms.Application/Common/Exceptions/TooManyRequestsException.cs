@@ -7,7 +7,7 @@ namespace Dsg.Hrms.Application.Common.Exceptions;
 /// Ileti hangi sinirin asildigini SOYLEMEZ (TCKN mi, IP mi): hangisinin oldugunu bilmek
 /// saldirganin denemelerini ayarlamasina yardim ederdi.
 /// </remarks>
-public sealed class TooManyRequestsException(string message = "Cok fazla deneme yapildi. Lutfen bir sure sonra tekrar deneyin.")
+public sealed class TooManyRequestsException(string message = "Çok fazla deneme yapıldı. Lütfen bir süre sonra tekrar deneyin.")
     : HrmsException(message)
 {
     /// <inheritdoc />
@@ -17,5 +17,5 @@ public sealed class TooManyRequestsException(string message = "Cok fazla deneme 
     public override string ErrorType => "too-many-requests";
 
     /// <inheritdoc />
-    public override string Title => "Cok fazla deneme";
+    public override string Title => "Çok fazla deneme";
 }

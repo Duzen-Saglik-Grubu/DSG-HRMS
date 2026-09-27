@@ -168,7 +168,7 @@ public static partial class ParameterCatalog
     /// <summary>Destek iletisim bilgisi (uyelik ve giris ekranlari).</summary>
     public static readonly ParameterDefinition SupportContact = new(
         "PRM-GRN-04", $"{Section}:SupportContact", ParameterType.Text, "Destek iletisim bilgisi (uyelik ve giris ekranlari)",
-        "Bilgi Islem");
+        "Bilgi İşlem");
 
     /// <summary>Bildirim istisnasinin islemsel iletileri kapsamamasi.</summary>
     public static readonly ParameterDefinition TransactionalMessagesBypassExemption = Boolean(

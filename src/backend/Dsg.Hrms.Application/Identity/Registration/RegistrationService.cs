@@ -109,7 +109,7 @@ public sealed partial class RegistrationService
 
         if (channel is not (RegistrationChannels.Email or RegistrationChannels.Sms) || !attempt.OfferedChannels.HasFlag(channel))
         {
-            throw new BusinessRuleException("Secilen dogrulama kanali kullanilamaz.");
+            throw new BusinessRuleException("Seçilen doğrulama yöntemi kullanılamıyor.");
         }
 
         var limit = await _parameters.GetIntegerAsync(ParameterCatalog.CodeSendLimit, cancellationToken).ConfigureAwait(false);
@@ -134,7 +134,7 @@ public sealed partial class RegistrationService
             if (string.IsNullOrEmpty(recipient))
             {
                 // Deneme basladiktan sonra senkronizasyon iletisim bilgisini silmis olabilir.
-                throw new BusinessRuleException("Secilen dogrulama kanali kullanilamaz.");
+                throw new BusinessRuleException("Seçilen doğrulama yöntemi kullanılamıyor.");
             }
 
             var issued = await _codes.IssueAsync(
@@ -235,7 +235,7 @@ public sealed partial class RegistrationService
 
         if (!candidate.HasActiveEmployment)
         {
-            throw new BusinessRuleException("Aktif istihdam kaydiniz bulunmadigi icin hesap olusturulamaz.");
+            throw new BusinessRuleException("Aktif çalışma kaydınız bulunmadığı için hesap oluşturulamıyor.");
         }
 
         var person = candidate.Person;
@@ -281,9 +281,9 @@ public sealed partial class RegistrationService
 
     // ------------------------------------------------------------------ yardimcilar
 
-    private const string ExpiredMessage = "Uyelik islemi bulunamadi veya suresi doldu. Lutfen bastan baslayin.";
+    private const string ExpiredMessage = "Üyelik işleminin süresi doldu. Lütfen baştan başlayın.";
 
-    private const string AccountExistsMessage = "Bu kisiye ait bir hesap zaten var. Parolanizi unuttuysaniz parola sifirlamayi kullanin.";
+    private const string AccountExistsMessage = "Adınıza açılmış bir hesap zaten var. Parolanızı unuttuysanız parola sıfırlamayı kullanın.";
 
     private async Task EnforceAttemptLimitsAsync(string nationalIdHash, string? ipAddress, DateTimeOffset now, CancellationToken cancellationToken)
     {

@@ -120,6 +120,11 @@ jobs:
       - name: Bicim denetimi
         run: npm run format:check
 
+      # Logonun web imajindaki kopyasi depodaki asil dosyayla ayni olmali (REQ-KMLK-048).
+      - name: Kurumsal logo tek kaynak denetimi
+        working-directory: .
+        run: node .github/scripts/brand-asset-check.mjs
+
       # --max-warnings 0: uyari birikmesine izin verilmez. Birikmis uyari,
       # zamanla "zaten hep kirmizi" durumuna donusur ve hicbir sey ifade etmez.
       - name: Lint

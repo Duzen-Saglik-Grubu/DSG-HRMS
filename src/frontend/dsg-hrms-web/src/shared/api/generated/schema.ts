@@ -4,6 +4,42 @@
  */
 
 export interface paths {
+    "/api/v1/identity/public-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Giris ve uyelik ekranlarinin ayarlarini dondurur. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Ayarlar. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PublicSettingsResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/registrations": {
         parameters: {
             query?: never;
@@ -276,6 +312,21 @@ export interface components {
             /** @description Parola. */
             password: string;
         };
+        /** @description Parola kurallari. */
+        PasswordRulesResponse: {
+            /**
+             * Format: int32
+             * @description En az uzunluk (PRM-KML-05).
+             */
+            minLength: number | string;
+            /**
+             * Format: int32
+             * @description En fazla uzunluk.
+             */
+            maxLength: number | string;
+            /** @description Buyuk/kucuk harf, rakam ve simge zorunlu mu (PRM-KML-06). */
+            requireComplexity: boolean;
+        };
         ProblemDetails: {
             type?: null | string;
             title?: null | string;
@@ -283,6 +334,18 @@ export interface components {
             status?: null | number | string;
             detail?: null | string;
             instance?: null | string;
+        };
+        /** @description Giris ve uyelik ekranlarinin ayarlari. */
+        PublicSettingsResponse: {
+            /** @description Sorun yasayan kullanicinin basvuracagi birim ve iletisim bilgisi (PRM-GRN-04). */
+            supportContact: string;
+            /** @description Parola kurallari (ekranda yardim icin). */
+            passwordRules: components["schemas"]["PasswordRulesResponse"];
+            /**
+             * Format: int32
+             * @description Dogrulama kodunun hane sayisi (PRM-KML-09).
+             */
+            verificationCodeLength: number | string;
         };
         /** @description Uyelik baslatildi. */
         RegistrationStartedResponse: {

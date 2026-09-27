@@ -141,11 +141,11 @@ public static class PasswordMessages
     /// <summary>Ihlalin iletisi.</summary>
     public static string For(PasswordViolation violation) => violation switch
     {
-        PasswordViolation.TooShort => "Parola cok kisa.",
+        PasswordViolation.TooShort => "Parola çok kısa.",
         PasswordViolation.TooLong => "Parola en fazla 128 karakter olabilir.",
-        PasswordViolation.NotComplex => "Parola buyuk harf, kucuk harf, rakam ve simge icermelidir.",
-        PasswordViolation.Common => "Bu parola cok yaygin ve kolay tahmin edilir. Daha az bilinen bir parola secin.",
-        PasswordViolation.ContainsPersonalOrOrganizationWord => "Parola adinizdan, e-posta adresinizden veya kurum adindan turetilmemelidir.",
+        PasswordViolation.NotComplex => "Parola büyük harf, küçük harf, rakam ve simge içermelidir.",
+        PasswordViolation.Common => "Bu parola çok yaygın ve kolay tahmin edilir. Daha az bilinen bir parola seçin.",
+        PasswordViolation.ContainsPersonalOrOrganizationWord => "Parola adınızdan, e-posta adresinizden veya kurum adından türetilmemelidir.",
         _ => "Parola kabul edilmedi.",
     };
 }

@@ -13,7 +13,26 @@ const HomePage = lazy(async () => {
   return { default: page.HomePage };
 });
 
+const RegistrationPage = lazy(async () => {
+  const page = await import('@/features/identity/pages/RegistrationPage');
+
+  return { default: page.RegistrationPage };
+});
+
+/** Kimlik ekranlarinin yollari. Uygulama kabugunun (ust cubuk) DISINDADIR (SYG-KMLK-068). */
+export const identityRoutes = {
+  register: '/register',
+} as const;
+
 export const router = createBrowserRouter([
+  {
+    path: identityRoutes.register,
+    element: (
+      <Suspense fallback={<RouteFallback />}>
+        <RegistrationPage />
+      </Suspense>
+    ),
+  },
   {
     path: '/',
     element: <AppLayout />,
