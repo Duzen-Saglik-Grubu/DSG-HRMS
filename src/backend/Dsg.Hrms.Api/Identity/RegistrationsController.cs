@@ -118,7 +118,8 @@ public sealed class RegistrationsController : ControllerBase
         return StatusCode(StatusCodes.Status201Created);
     }
 
-    private static List<VerificationChannelKind> ToKinds(RegistrationChannels channels)
+    /// <summary>Kanal bayraklarini API degerlerine cevirir.</summary>
+    public static List<VerificationChannelKind> ToKinds(RegistrationChannels channels)
     {
         var kinds = new List<VerificationChannelKind>();
         if (channels.HasFlag(RegistrationChannels.Email))

@@ -31,6 +31,38 @@ public static class OpenApiRegistration
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddOpenApi(DocumentName, options =>
+        {
+            // XML belge yorumlarindan gelen satir sonlari kaynak dosyanin satir sonuna baglidir:
+            // Windows calisma kopyasi CRLF, CI LF uretir ve depodaki belge surekli "degismis"
+            // gorunurdu. Aciklamalar her platformda LF'ye getirilir.
+            options.AddOperationTransformer((operation, _, _) =>
+            {
+                operation.Summary = NormalizeLineEndings(operation.Summary);
+                operation.Description = NormalizeLineEndings(operation.Description);
+                if (operation.Responses is not null)
+                {
+                    foreach (var response in operation.Responses.Values.OfType<OpenApiResponse>())
+                    {
+                        response.Description = NormalizeLineEndings(response.Description);
+                    }
+                }
+
+                return Task.CompletedTask;
+            });
+            options.AddSchemaTransformer((schema, _, _) =>
+            {
+                schema.Description = NormalizeLineEndings(schema.Description);
+                if (schema.Properties is not null)
+                {
+                    foreach (var property in schema.Properties.Values.OfType<OpenApiSchema>())
+                    {
+                        property.Description = NormalizeLineEndings(property.Description);
+                    }
+                }
+
+                return Task.CompletedTask;
+            });
+
             options.AddDocumentTransformer((document, _, _) =>
             {
                 document.Info = new OpenApiInfo
@@ -47,10 +79,14 @@ public static class OpenApiRegistration
                 };
 
                 return Task.CompletedTask;
-            }));
+            });
+        });
 
         return services;
     }
+
+    private static string? NormalizeLineEndings(string? text) =>
+        text?.Replace("\r\n", "\n", StringComparison.Ordinal);
 
     /// <summary>
     /// OpenAPI belgesini ve gelistirme arayuzunu yayimlar.

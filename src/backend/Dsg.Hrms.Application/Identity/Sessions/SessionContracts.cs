@@ -1,0 +1,171 @@
+using Dsg.Hrms.Application.Common.Exceptions;
+using Dsg.Hrms.Domain.Identity;
+using Dsg.Hrms.Domain.Personnel;
+
+namespace Dsg.Hrms.Application.Identity.Sessions;
+
+/// <summary>Oturumlarin veritabani tarafi.</summary>
+public interface ISessionStore
+{
+    /// <summary>
+    /// Giris e-postasiyla hesabi bulur. Adres birden fazla kisiye tanimliysa veya kisinin
+    /// hesabi yoksa <c>null</c> (SYG-KMLK-008, 031).
+    /// </summary>
+    Task<SignInCandidate?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken);
+
+    /// <summary>Hesabi kimligiyle bulur (izlenen).</summary>
+    Task<SignInCandidate?> FindByAccountIdAsync(long userAccountId, CancellationToken cancellationToken);
+
+    /// <summary>Girilen e-postanin sayacini bulur (izlenen); yoksa <c>null</c>.</summary>
+    Task<LoginThrottle?> FindThrottleAsync(string emailHash, CancellationToken cancellationToken);
+
+    /// <summary>Hesabin acik oturumlari (izlenen).</summary>
+    Task<IReadOnlyList<UserSession>> GetOpenSessionsAsync(long userAccountId, CancellationToken cancellationToken);
+
+    /// <summary>Oturumu dis kimligiyle bulur (izlenen).</summary>
+    Task<UserSession?> FindSessionAsync(Guid publicId, CancellationToken cancellationToken);
+
+    /// <summary>Jeton ozetiyle jetonu ve oturumunu bulur (izlenen).</summary>
+    Task<(RefreshToken Token, UserSession Session)?> FindRefreshTokenAsync(string tokenHash, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Jetonu KOSULLU olarak kullanilmis isaretler: yalnizca hala kullanilmamissa. Eszamanli iki
+    /// yenilemeden yalnizca biri basarili olur; digeri yeniden kullanim sayilir (SYG-KMLK-040).
+    /// </summary>
+    Task<bool> TryMarkUsedAsync(long refreshTokenId, DateTimeOffset now, CancellationToken cancellationToken);
+
+    /// <summary>Bekleyen iki adimli girisi bulur (izlenen).</summary>
+    Task<LoginChallenge?> FindChallengeAsync(Guid publicId, CancellationToken cancellationToken);
+
+    /// <summary>Yeni kaydi ekler.</summary>
+    void Add(object entity);
+
+    /// <summary>Degisiklikleri kaydeder.</summary>
+    Task SaveChangesAsync(CancellationToken cancellationToken);
+}
+
+/// <summary>Giris icin aday hesap.</summary>
+/// <param name="Account">Hesap (izlenen).</param>
+/// <param name="Person">Kisi.</param>
+/// <param name="HasActiveEmployment">En az bir aktif istihdam var mi.</param>
+public sealed record SignInCandidate(UserAccount Account, Person Person, bool HasActiveEmployment);
+
+/// <summary>Erisim jetonu uretir (JWT).</summary>
+public interface IAccessTokenIssuer
+{
+    /// <summary>Jeton uretir.</summary>
+    /// <param name="userAccountId">Hesap kimligi (<c>hrms:user_id</c>).</param>
+    /// <param name="session">Oturum (<c>sid</c>).</param>
+    /// <param name="expiresAt">Gecerlilik sonu.</param>
+    string Issue(long userAccountId, UserSession session, DateTimeOffset expiresAt);
+}
+
+/// <summary>Acik oturum bilgisi; istemciye doner.</summary>
+/// <param name="AccessToken">Erisim jetonu (tarayici belleginde tutulur).</param>
+/// <param name="AccessTokenExpiresAt">Erisim jetonunun gecerlilik sonu.</param>
+/// <param name="RefreshToken">Yenileme jetonu (YALNIZCA HttpOnly cerezde tasinir).</param>
+/// <param name="SessionExpiresAt">Toplam oturum suresi siniri.</param>
+/// <param name="IdleTimeout">Hareketsizlik suresi.</param>
+/// <param name="FirstName">Kullanicinin adi.</param>
+/// <param name="LastName">Kullanicinin soyadi.</param>
+public sealed record SessionTokens(
+    string AccessToken,
+    DateTimeOffset AccessTokenExpiresAt,
+    string RefreshToken,
+    DateTimeOffset SessionExpiresAt,
+    TimeSpan IdleTimeout,
+    string FirstName,
+    string LastName)
+{
+    /// <inheritdoc />
+    public override string ToString() => nameof(SessionTokens);
+}
+
+/// <summary>Giris sonucu.</summary>
+/// <param name="Session">Oturum acildiysa jetonlar.</param>
+/// <param name="ChallengeId">Iki adimli dogrulama gerekiyorsa bekleyen girisin kimligi.</param>
+/// <param name="Channels">Iki adimli dogrulamada sunulan kanallar.</param>
+/// <param name="ChallengeExpiresAt">Bekleyen girisin gecerlilik sonu.</param>
+public sealed record SignInResult(SessionTokens? Session, Guid? ChallengeId, RegistrationChannels Channels, DateTimeOffset? ChallengeExpiresAt);
+
+/// <summary>E-posta veya parola hatali (SYG-KMLK-032). Hesap olsa da olmasa da ayni yanit.</summary>
+public sealed class InvalidCredentialsException()
+    : HrmsException("E-posta adresi veya parola hatalı.")
+{
+    /// <inheritdoc />
+    public override int StatusCode => 401;
+
+    /// <inheritdoc />
+    public override string ErrorType => "invalid-credentials";
+
+    /// <inheritdoc />
+    public override string Title => "Giriş başarısız";
+}
+
+/// <summary>Girilen e-posta gecici olarak kilitli (SYG-KMLK-033).</summary>
+public sealed class SignInLockedException(int minutes)
+    : HrmsException($"Çok fazla hatalı giriş denemesi yapıldı. {minutes} dakika sonra tekrar deneyin.")
+{
+    /// <inheritdoc />
+    public override int StatusCode => 429;
+
+    /// <inheritdoc />
+    public override string ErrorType => "sign-in-locked";
+
+    /// <inheritdoc />
+    public override string Title => "Giriş geçici olarak kapalı";
+}
+
+/// <summary>Hesap pasif (SYG-KMLK-055). Yalnizca parola dogruysa soylenir.</summary>
+public sealed class AccountDisabledException()
+    : HrmsException("Hesabınız kullanıma kapalı. İnsan Kaynakları birimiyle iletişime geçin.")
+{
+    /// <inheritdoc />
+    public override int StatusCode => 403;
+
+    /// <inheritdoc />
+    public override string ErrorType => "account-disabled";
+
+    /// <inheritdoc />
+    public override string Title => "Hesap kapalı";
+}
+
+/// <summary>
+/// Oturum sona erdi; istemci giris ekranina doner. Hata turu nedeni tasir
+/// (<c>session-ended/signed-in-elsewhere</c> gibi), boylece istemci dogru iletiyi gosterir
+/// (SYG-KMLK-042).
+/// </summary>
+public sealed class SessionEndedException(SessionEndReason? reason)
+    : HrmsException(MessageFor(reason))
+{
+    /// <summary>Neden; bilinmiyorsa <c>null</c> (gecersiz veya bulunamayan jeton).</summary>
+    public SessionEndReason? Reason { get; } = reason;
+
+    /// <inheritdoc />
+    public override int StatusCode => 401;
+
+    /// <inheritdoc />
+    public override string ErrorType => "session-ended/" + Reason switch
+    {
+        SessionEndReason.LoggedOut => "logged-out",
+        SessionEndReason.SignedInElsewhere => "signed-in-elsewhere",
+        SessionEndReason.TokenReuse => "token-reuse",
+        SessionEndReason.IdleTimeout => "idle-timeout",
+        SessionEndReason.Expired => "expired",
+        SessionEndReason.AccountChanged => "account-changed",
+        _ => "invalid",
+    };
+
+    /// <inheritdoc />
+    public override string Title => "Oturum sona erdi";
+
+    private static string MessageFor(SessionEndReason? reason) => reason switch
+    {
+        SessionEndReason.SignedInElsewhere => "Hesabınıza başka bir cihazdan giriş yapıldı. Devam etmek için yeniden giriş yapın.",
+        SessionEndReason.IdleTimeout => "Uzun süre işlem yapılmadığı için oturumunuz kapandı. Lütfen yeniden giriş yapın.",
+        SessionEndReason.Expired => "Oturum süreniz doldu. Lütfen yeniden giriş yapın.",
+        SessionEndReason.TokenReuse => "Güvenlik nedeniyle tüm oturumlarınız kapatıldı. Lütfen yeniden giriş yapın.",
+        SessionEndReason.AccountChanged => "Hesap bilgileriniz değiştiği için oturumunuz kapandı. Lütfen yeniden giriş yapın.",
+        _ => "Oturumunuz sona erdi. Lütfen yeniden giriş yapın.",
+    };
+}

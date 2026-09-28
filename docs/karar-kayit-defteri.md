@@ -1,7 +1,7 @@
 # Karar Kayıt Defteri
 
 **Belge kimliği:** KKD
-**Son güncelleme:** 2026-09-27
+**Son güncelleme:** 2026-09-28
 **Amaç:** Proje boyunca alınan kararların tek ve resmî kaydı. Bir kararın *ne olduğu*,
 *neden alındığı* ve *ne zaman alındığı* buradan izlenir.
 **İlgili süreçler:** MAN.2 (Proje Değerlendirme ve Kontrol), TEC.2, TEC.5
@@ -111,6 +111,7 @@
 | KR-083 | 2026-09-27 | İleti gönderiminde **üç kip**: `LogOnly` (varsayılan), `AllowList`, `Send` | Geliştirme ve UAT'de içeriği günlüğe yazan göndericiler (ADR-0012 §7 ilk metni) kullanılmaz. Varsayılan kip hiçbir ileti göndermez ve içerik yazmaz. UAT ve geliştirmede yalnızca izin listesindeki adreslere gönderilir; tüm alıcılara gönderim yalnızca üretimde açılır | ADR-0012 §7'nin ilk metni SYG-KMLK-026 ile çelişiyordu: doğrulama kodu hiçbir günlüğe yazılamaz. UAT gerçek LOGO verisiyle çalışır; tüm alıcılara gönderim gerçek personele kod gönderirdi. İzin listesi, kabul testlerinin gerçek SMTP ve NetGSM üzerinden, yalnızca test yapanların adresleriyle yapılmasını sağlar. ADR-0012 §7 değiştirildi | Bilgi İşlem (#85) | Yürürlükte |
 | KR-084 | 2026-09-27 | API uç noktaları **denetleyici (controller)** ile yazılır; istek doğrulaması tek bir filtreden FluentValidation ile yapılır | Uç noktalar `[ApiController]` sınıflarında tanımlanır. Her eylem parametresinin doğrulayıcısı varsa istek eyleme ulaşmadan doğrulanır; hata alan bazlı `400` Problem Details olarak döner (ADR-0010) | ADR-0007'deki eylem yetkisi `[HasPermission]` özniteliğiyle tanımlanır; öznitelik, filtre ve OpenAPI açıklamaları denetleyicilerde doğal olarak birleşir. Kurumun mevcut sistemi MVC'dir; ekip için tanıdık yapıdır. Minimal API aynı işi yapabilirdi, ancak iki biçimin bir arada kullanılması tutarlılığı bozardı | Bilgi İşlem (#87) | Yürürlükte |
 | KR-085 | 2026-09-27 | Üyelikte eşleşme gizliliği: **eşleşmeyen deneme gerçek bir kod varmış gibi işler**; hız sınırı TCKN'nin anahtarlı özetine göre sayılır | Eşleşme olsa da olmasa da deneme kaydı oluşur, aynı kanal ekranı döner ve kod isteği aynı yanıtı verir. Eşleşmeyen denemede kod gönderilmez; girilen her kod "yanlış" sayılır ve süre ile deneme sınırı gerçek kodla aynı işler. Yanıtlar en az 1 saniye sürer (SYG-KMLK-015). TCKN düz metin saklanmaz; hız sınırı ve kod isteği sınırı TCKN'nin HMAC özetine göre sayılır | `KR-016` yalnızca ilk ekranı değil tüm akışı kapsamalıdır: kod adımında "429" yalnızca gerçek personelde, "süre doldu" yalnızca gerçek kodda görülseydi eşleşme ikinci adımda sızardı. Yabancıların yazdığı rastgele TCKN'leri düz saklamak gereksiz kişisel veri birikimi olurdu. Ölçüm: eşleşen ve eşleşmeyen isteklerin medyan farkı 0,08 ms (KPÖ-KMLK-2 eşiği 20 ms) | Bilgi İşlem (#87) | Yürürlükte |
+| KR-086 | 2026-09-28 | Erişim jetonu her istekte **oturumun açık olup olmadığıyla** doğrulanır; jeton tekrarı yalnızca **açık** oturumda "çalınma" sayılır | (1) JWT imzası yetmez: her istekte oturum kaydı ve hesabın güvenlik damgası denetlenir; çıkış, başka cihazdan giriş ve hesabın pasifleşmesi erişim jetonunun 15 dakikalık ömrünü beklemeden etkili olur. (2) Kullanılmış bir yenileme jetonu, oturumu hâlâ açıkken tekrar gelirse hesabın tüm oturumları kapanır (SYG-KMLK-040). Oturum zaten kapalıysa istek kapanma nedeniyle reddedilir; diğer oturumlara dokunulmaz | (1) SYG-KMLK-054 "açık oturumlar sonlandırılır" der; yalnızca imzaya bakılsaydı pasif hesap 15 dakika daha işlem yapabilirdi. Maliyet istek başına tek bir birincil anahtar sorgusudur. (2) Tek aktif oturum kuralı (SYG-KMLK-041) eski sekmenin oturumunu kapatır; o sekmenin yeniden denemesi çalınma değildir ve yeni cihazdaki meşru oturumu kapatmamalıdır (AN-22) | Bilgi İşlem (#92) | Yürürlükte |
 
 ---
 
@@ -144,3 +145,4 @@
 | 2026-09-26 | 2.4 | KR-080 (elle pasife alınan hesap ve senkronizasyon) ve KR-081 (sır parametrelerin şifreli saklanması) eklendi (#83) | Bilgi İşlem |
 | 2026-09-27 | 2.5 | KR-082 (kodlu ileti veritabanına yazılmaz) ve KR-083 (ileti gönderim kipleri) eklendi (#85) | Bilgi İşlem |
 | 2026-09-27 | 2.6 | KR-084 (API denetleyicileri ve doğrulama filtresi) ve KR-085 (üyelikte eşleşme gizliliğinin tüm akışa yayılması) eklendi (#87) | Bilgi İşlem |
+| 2026-09-28 | 2.7 | KR-086 eklendi: oturumun her istekte doğrulanması ve jeton tekrarının yorumu (#92) | Bilgi İşlem |

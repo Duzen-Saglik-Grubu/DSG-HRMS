@@ -25,6 +25,17 @@ public sealed class Pbkdf2PasswordHasher : IPasswordHasher
     public const int Iterations = 210_000;
 
     private const string Prefix = "pbkdf2-sha512";
+
+    private readonly Lazy<string> _dummyHash;
+
+    /// <summary>Yeni ornek olusturur.</summary>
+    public Pbkdf2PasswordHasher()
+    {
+        _dummyHash = new Lazy<string>(() => Hash(Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))));
+    }
+
+    /// <inheritdoc />
+    public string DummyHash => _dummyHash.Value;
     private const int SaltSize = 16;
     private const int HashSize = 32;
 

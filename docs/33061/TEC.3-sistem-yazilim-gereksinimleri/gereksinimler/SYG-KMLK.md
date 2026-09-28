@@ -337,6 +337,7 @@ yazılıdır; kapanmamış olanlar ⏳ ile işaretlidir.
 | AN-19 | REQ-KMLK-035 "yeniden işe girişte hesap aktifleşir", REQ-KMLK-036 "İK hesabı elle pasife alabilir" der. Senkronizasyon 15 dakikada bir çalıştığından, elle pasif hesabı her çalışmada aktifleştirseydi elle pasife alma anlamsız kalırdı. | Yalnızca istihdam bitimiyle pasifleşen hesap otomatik aktifleşir (SYG-KMLK-056). İstihdamı süren kişinin elle pasif hesabı ancak elle aktifleşir (SYG-KMLK-057). Elle pasif hesabın sahibi ayrılırsa neden "istihdam bitti"ye döner ve yeniden işe girişte hesap aktifleşir (`KR-080`, #83). | ✅ |
 | AN-20 | ADR-0012 §7 geliştirme ve UAT'de "içeriği log'a yazan" göndericiler öngörür; SYG-KMLK-026 kodun hiçbir günlüğe yazılmamasını ister. UAT gerçek LOGO verisiyle çalıştığından gerçek personele de kod gitmemelidir. | Gönderim kipleri: `LogOnly` (varsayılan, içerik yazılmaz), `AllowList` (UAT ve geliştirme), `Send` (üretim). ADR-0012 §7 değiştirildi (`KR-083`, #85). | ✅ |
 | AN-21 | SYG-KMLK-071 ilk yazımda `/api/v1/kimlik/` diyordu. ADR-0010 §2 modül ve kaynak adlarını İngilizce kebab-case ister (`/api/v1/leave/leave-requests`); `KR-058` kod tanımlayıcılarını İngilizce tutar. | Yol `/api/v1/identity/` olarak düzeltildi. Paydaş gereksinimi (REQ-KMLK-043: ekran ve iletiler Türkçe) etkilenmez; yol kullanıcıya görünmez (#87). | ✅ |
+| AN-22 | SYG-KMLK-040 "kullanılmış jeton tekrar sunulursa tüm oturumlar kapanır" der; SYG-KMLK-041 ise yeni girişte önceki oturumu kapatır. Kapatılan eski sekme elindeki jetonla tekrar denerse, SYG-040'ın harfi yeni cihazdaki meşru oturumu da kapatırdı. | Yeniden kullanım yalnızca jetonun oturumu **hâlâ açıkken** çalınma sayılır ve tüm oturumlar kapanır. Oturum zaten kapalıysa istek kapanma nedeniyle reddedilir; diğer oturumlara dokunulmaz (`KR-086`, #92). | ✅ |
 | AN-16 | Denetim izi ve erişim kaydı saklama süreleri (`PRM-KVK-01`, `02`) karar bekliyor. | T3'ü engellemez: kayıtlar üretilir, silme işi karar verildiğinde eklenir. | ⏳ KVKK kararı bekliyor |
 
 **Paydaşa geri bildirim (BP3):** AN-01, onaylı bir kabul kriterinin (REQ-KMLK-004)
@@ -458,3 +459,4 @@ madde `İptal` notuyla kalır.
 | 2026-09-27 | 0.5 | AN-20 eklendi: ADR-0012 §7 ile SYG-KMLK-026 çelişkisi, gönderim kipleri (`KR-083`, #85) | Bilgi İşlem |
 | 2026-09-27 | 0.6 | SYG-KMLK-071: yol `/api/v1/identity/`; AN-21 eklendi (#87) | Bilgi İşlem |
 | 2026-09-28 | 0.7 | SYG-KMLK-068: görseli üreten taraf S-13 kararıyla uyumlu hâle getirildi (#90) | Bilgi İşlem |
+| 2026-09-28 | 0.8 | AN-22 eklendi: kapanmış oturumun jeton tekrarı (`KR-086`, #92) | Bilgi İşlem |

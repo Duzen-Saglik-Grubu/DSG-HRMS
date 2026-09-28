@@ -65,13 +65,26 @@ public class RegistrationApiFixture : IAsyncLifetime
 
     public HttpClient CreateClient(string? forwardedFor = null)
     {
-        var client = _factory.CreateClient();
+        // Cerezler test icinde elle yonetilir: yenileme jetonu cerezi "Secure" isaretlidir ve
+        // eski bir cerezi bilerek tekrar gondermek gerekir (SYG-KMLK-040).
+        var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            HandleCookies = false,
+            BaseAddress = new Uri("https://localhost"),
+        });
         if (forwardedFor is not null)
         {
             client.DefaultRequestHeaders.Add("X-Forwarded-For", forwardedFor);
         }
 
         return client;
+    }
+
+    /// <summary>Uygulamanin bir kapsamda servisini kullanir.</summary>
+    public async Task<T> WithServicesAsync<T>(Func<IServiceProvider, Task<T>> action)
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        return await action(scope.ServiceProvider);
     }
 
     public async Task<T> WithDbAsync<T>(Func<HrmsDbContext, Task<T>> action)
@@ -88,9 +101,14 @@ public class RegistrationApiFixture : IAsyncLifetime
         await WithDbAsync(async context =>
         {
             await context.Database.ExecuteSqlRawAsync(
-                "DELETE FROM identity.registration_code_request; DELETE FROM identity.registration_attempt; DELETE FROM identity.verification_code; DELETE FROM identity.user_account;");
+                "DELETE FROM identity.refresh_token; DELETE FROM identity.user_session; DELETE FROM identity.login_challenge; DELETE FROM identity.login_throttle; " +
+                "DELETE FROM identity.registration_code_request; DELETE FROM identity.registration_attempt; DELETE FROM identity.verification_code; DELETE FROM identity.user_account; " +
+                "DELETE FROM settings.system_parameter;");
             return 0;
         });
+
+        // Parametre onbellegi temizlenir: onceki testin ayarladigi deger tasinmasin.
+        _factory.Services.GetRequiredService<Dsg.Hrms.Infrastructure.Settings.SystemParameters>().Invalidate();
     }
 
     private WebApplicationFactory<Program> CreateFactory()
@@ -104,6 +122,7 @@ public class RegistrationApiFixture : IAsyncLifetime
                 builder.UseSetting("Database:Hrms", _container.GetConnectionString());
                 builder.UseSetting("ApplicationLogging:FilePath", "logs/test-.json");
                 builder.UseSetting("Identity:CodeHashKey", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
+                builder.UseSetting("Identity:JwtSigningKey", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
                 builder.UseSetting("ReverseProxy:TrustedNetworks", "172.16.0.0/12");
 
                 builder.ConfigureServices(services =>

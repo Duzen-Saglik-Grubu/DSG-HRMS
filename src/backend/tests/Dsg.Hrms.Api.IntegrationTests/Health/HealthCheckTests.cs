@@ -49,6 +49,7 @@ public sealed class HealthCheckTests : IAsyncLifetime
             {
                 builder.UseEnvironment(Environments.Production);
                 builder.UseSetting("Database:Hrms", connectionString);
+                builder.UseSetting("Identity:JwtSigningKey", Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)));
 
                 // Gunluk dosyasi test cikti klasorune yazilir; depo kirletilmez.
                 builder.UseSetting("ApplicationLogging:FilePath", "logs/test-.json");

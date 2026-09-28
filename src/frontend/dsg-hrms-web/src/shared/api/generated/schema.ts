@@ -295,6 +295,349 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/identity/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Kurumsal e-posta ve parolayla giris (SYG-KMLK-031…034). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SignInRequest"];
+                    "text/json": components["schemas"]["SignInRequest"];
+                    "application/*+json": components["schemas"]["SignInRequest"];
+                };
+            };
+            responses: {
+                /** @description Oturum acildi veya iki adimli dogrulama gerekiyor. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SignInResponse"];
+                    };
+                };
+                /** @description E-posta veya parola hatali (hesap olsa da olmasa da ayni yanit). */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Hesap kullanima kapali. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Cok fazla hatali deneme; e-posta gecici olarak kilitli. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/sessions/challenges/{challengeId}/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Iki adimli dogrulama icin kod gonderir (SYG-KMLK-034). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    challengeId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RequestCodeRequest"];
+                    "text/json": components["schemas"]["RequestCodeRequest"];
+                    "application/*+json": components["schemas"]["RequestCodeRequest"];
+                };
+            };
+            responses: {
+                /** @description Kod gonderildi. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CodeRequestedResponse"];
+                    };
+                };
+                /** @description Giris isleminin suresi doldu. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kanal kullanilamaz. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Cok fazla kod istendi. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/sessions/challenges/{challengeId}/verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Iki adimli dogrulama kodunu dogrular; dogruysa oturum acilir. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    challengeId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VerifyCodeRequest"];
+                    "text/json": components["schemas"]["VerifyCodeRequest"];
+                    "application/*+json": components["schemas"]["VerifyCodeRequest"];
+                };
+            };
+            responses: {
+                /** @description Dogrulama sonucu; `verified` ise oturum bilgisi. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TwoFactorVerificationResponse"];
+                    };
+                };
+                /** @description Hesap kullanima kapali. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Giris isleminin suresi doldu. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/sessions/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Yenileme jetonuyla (cerez) yeni erisim jetonu alir. Jeton her kullanimda yenilenir
+         *     (SYG-KMLK-040). Hareketsizlik sayacini sifirlamaz (SYG-KMLK-038).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Yeni oturum bilgisi. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SessionResponse"];
+                    };
+                };
+                /** @description Oturum sona erdi; hata turu nedeni tasir (`session-ended/…`). */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/sessions/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Kullanici etkilesimi veya mesru uzun etkinlik sinyali (SYG-KMLK-038, 039). Dakikada en
+         *     fazla iki kez kabul edilir; toplam oturum suresini uzatmaz.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Kaydedildi. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Oturum kapali. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Cok sik gonderildi. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/sessions/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Cikis: oturum ve yenileme jetonu sunucuda iptal edilir (SYG-KMLK-043). */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Cikis yapildi (oturum zaten kapaliysa da). */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -367,6 +710,54 @@ export interface components {
             /** @description Secilen kanal. */
             channel: components["schemas"]["VerificationChannelKind"];
         };
+        /** @description Acik oturum. Yenileme jetonu burada DEGIL, HttpOnly cerezdedir. */
+        SessionResponse: {
+            /** @description Erisim jetonu; istemci yalnizca bellekte tutar. */
+            accessToken: string;
+            /**
+             * Format: date-time
+             * @description Erisim jetonunun gecerlilik sonu.
+             */
+            accessTokenExpiresAt: string;
+            /**
+             * Format: date-time
+             * @description Toplam oturum suresi siniri.
+             */
+            sessionExpiresAt: string;
+            /**
+             * Format: int32
+             * @description Hareketsizlik suresi (dakika).
+             */
+            idleTimeoutMinutes: number | string;
+            /** @description Kullanici. */
+            user: components["schemas"]["SessionUserResponse"];
+        };
+        /** @description Oturumdaki kullanici. */
+        SessionUserResponse: {
+            /** @description Ad. */
+            firstName: string;
+            /** @description Soyad. */
+            lastName: string;
+        };
+        /** @description Giris istegi. */
+        SignInRequest: {
+            /** @description Kurumsal e-posta. */
+            email: string;
+            /** @description Parola. */
+            password: string;
+        };
+        /** @description Giris yaniti. */
+        SignInResponse: {
+            /** @description Sonuc. */
+            status: components["schemas"]["SignInStatus"];
+            session: null | components["schemas"]["SessionResponse"];
+            challenge: null | components["schemas"]["TwoFactorChallengeResponse"];
+        };
+        /**
+         * @description Giris sonucu.
+         * @enum {unknown}
+         */
+        SignInStatus: "signedIn" | "verificationRequired";
         /** @description Uyelik baslatma istegi (SYG-KMLK-013). */
         StartRegistrationRequest: {
             /** @description T.C. Kimlik Numarasi. */
@@ -378,6 +769,27 @@ export interface components {
             birthDate: string;
             /** @description Kurumsal e-posta. */
             email: string;
+        };
+        /** @description Bekleyen iki adimli giris. */
+        TwoFactorChallengeResponse: {
+            /**
+             * Format: uuid
+             * @description Kimlik.
+             */
+            challengeId: string;
+            /** @description Sunulan kanallar; hedef donmez. */
+            channels: components["schemas"]["VerificationChannelKind"][];
+            /**
+             * Format: date-time
+             * @description Gecerlilik sonu.
+             */
+            expiresAt: string;
+        };
+        /** @description Iki adimli dogrulama sonucu. */
+        TwoFactorVerificationResponse: {
+            /** @description Sonuc. */
+            result: components["schemas"]["VerificationOutcome"];
+            session: null | components["schemas"]["SessionResponse"];
         };
         /**
          * @description Dogrulama kanali.
