@@ -56,8 +56,9 @@ public interface IAccessTokenIssuer
     /// <summary>Jeton uretir.</summary>
     /// <param name="userAccountId">Hesap kimligi (<c>hrms:user_id</c>).</param>
     /// <param name="session">Oturum (<c>sid</c>).</param>
+    /// <param name="issuedAt">Uretim ani; uygulamanin saatinden (#97).</param>
     /// <param name="expiresAt">Gecerlilik sonu.</param>
-    string Issue(long userAccountId, UserSession session, DateTimeOffset expiresAt);
+    string Issue(long userAccountId, UserSession session, DateTimeOffset issuedAt, DateTimeOffset expiresAt);
 }
 
 /// <summary>Acik oturum bilgisi; istemciye doner.</summary>

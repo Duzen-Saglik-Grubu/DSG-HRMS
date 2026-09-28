@@ -385,7 +385,7 @@ public sealed partial class SessionService
         var accessExpiresAt = now.AddMinutes(accessMinutes) < session.ExpiresAt ? now.AddMinutes(accessMinutes) : session.ExpiresAt;
 
         return new SessionTokens(
-            _tokens.Issue(candidate.Account.Id, session, accessExpiresAt),
+            _tokens.Issue(candidate.Account.Id, session, now, accessExpiresAt),
             accessExpiresAt,
             raw,
             session.ExpiresAt,
