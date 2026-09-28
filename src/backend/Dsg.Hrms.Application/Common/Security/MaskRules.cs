@@ -93,6 +93,10 @@ public static class MaskRules
             // ele gecerse 6 haneli kodun tum olasiliklari saniyeler icinde denenebilir.
             ["CodeHash"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
 
+            // Yenileme jetonu ozeti ve giris sayacinin e-posta ozeti (oturum kayitlari).
+            ["TokenHash"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
+            ["EmailHash"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
+
             ["ApiKey"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
             ["Secret"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
             ["ClientSecret"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),

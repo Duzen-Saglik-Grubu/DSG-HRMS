@@ -176,6 +176,14 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
 | Yeniden kullanım tespiti | Kullanılmış bir yenileme jetonu tekrar gelirse **tüm oturumlar sonlandırılır** ve olay kaydedilir |
 | Çıkış | Yenileme jetonu sunucu tarafında iptal edilir |
 
+> **Gerçekleştirme (28.09.2026, `KR-086`, #92).** Uç noktalar `/api/v1/identity/sessions`
+> altındadır: giriş, iki adımlı doğrulama, `refresh`, `activity`, `current` (çıkış).
+> Yenileme jetonu `hrms_refresh` çerezinde, yalnızca bu yola gönderilir; veritabanında
+> SHA-256 özeti tutulur. Erişim jetonu (HMAC-SHA256, `Identity__JwtSigningKey`) her istekte
+> oturum kaydıyla da doğrulanır. Oturum sona erdiğinde yanıtın hata türü nedeni taşır
+> (`session-ended/signed-in-elsewhere`, `idle-timeout`, `expired`, `token-reuse`,
+> `account-changed`, `logged-out`).
+
 **`localStorage` kullanılmama gerekçesi:** XSS açığı durumunda `localStorage`'daki jeton
 JavaScript ile okunabilir. `HttpOnly` çerez okunamaz.
 
@@ -243,3 +251,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | 2026-09-24 | 0.3 | §8: giriş kimliği kurumsal e-posta (`KR-073`), hareketsizlik 30 dk ve meşru uzun etkinlik (`KR-074`); ödünler bölümündeki bayat "39 personel" güncellendi | Bilgi İşlem |
 | 2026-09-24 | 0.4 | §3 kod saklama: anahtarlı özet; §5 kilit sayacı girilen e-postaya bağlı; §4 kanal tablosu `KR-073`, `KR-075`, `KR-076` ile yeniden yazıldı (İK destekli davet, `KR-020` konusuz) | Bilgi İşlem |
 | 2026-09-27 | 0.5 | §1 ve §6: gerçekleştirme notları (eşleşme gizliliğinin tüm akışa yayılması, parola özeti ve liste; `KR-085`, #87) | Bilgi İşlem |
+| 2026-09-28 | 0.6 | §8: gerçekleştirme notu (uç noktalar, çerez, her istekte oturum doğrulaması; `KR-086`, #92) | Bilgi İşlem |

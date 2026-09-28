@@ -307,6 +307,310 @@
           }
         }
       }
+    },
+    "/api/v1/identity/sessions": {
+      "post": {
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "Kurumsal e-posta ve parolayla giris (SYG-KMLK-031…034).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Oturum acildi veya iki adimli dogrulama gerekiyor.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignInResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "E-posta veya parola hatali (hesap olsa da olmasa da ayni yanit).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Hesap kullanima kapali.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla hatali deneme; e-posta gecici olarak kilitli.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/sessions/challenges/{challengeId}/code": {
+      "post": {
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "Iki adimli dogrulama icin kod gonderir (SYG-KMLK-034).",
+        "parameters": [
+          {
+            "name": "challengeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCodeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCodeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Kod gonderildi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeRequestedResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Giris isleminin suresi doldu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Kanal kullanilamaz.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla kod istendi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/sessions/challenges/{challengeId}/verification": {
+      "post": {
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "Iki adimli dogrulama kodunu dogrular; dogruysa oturum acilir.",
+        "parameters": [
+          {
+            "name": "challengeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Dogrulama sonucu; `verified` ise oturum bilgisi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorVerificationResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Hesap kullanima kapali.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Giris isleminin suresi doldu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/sessions/refresh": {
+      "post": {
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "Yenileme jetonuyla (cerez) yeni erisim jetonu alir. Jeton her kullanimda yenilenir\r\n(SYG-KMLK-040). Hareketsizlik sayacini sifirlamaz (SYG-KMLK-038).",
+        "responses": {
+          "200": {
+            "description": "Yeni oturum bilgisi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Oturum sona erdi; hata turu nedeni tasir (`session-ended/…`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/sessions/activity": {
+      "post": {
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "Kullanici etkilesimi veya mesru uzun etkinlik sinyali (SYG-KMLK-038, 039). Dakikada en\r\nfazla iki kez kabul edilir; toplam oturum suresini uzatmaz.",
+        "responses": {
+          "204": {
+            "description": "Kaydedildi.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "401": {
+            "description": "Oturum kapali.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok sik gonderildi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/sessions/current": {
+      "delete": {
+        "tags": [
+          "Sessions"
+        ],
+        "summary": "Cikis: oturum ve yenileme jetonu sunucuda iptal edilir (SYG-KMLK-043).",
+        "responses": {
+          "204": {
+            "description": "Cikis yapildi (oturum zaten kapaliysa da).",
+            "content": {
+              "application/json": { }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -478,6 +782,126 @@
         },
         "description": "Kod istegi (SYG-KMLK-019)."
       },
+      "SessionResponse": {
+        "required": [
+          "accessToken",
+          "accessTokenExpiresAt",
+          "sessionExpiresAt",
+          "idleTimeoutMinutes",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "Erisim jetonu; istemci yalnizca bellekte tutar."
+          },
+          "accessTokenExpiresAt": {
+            "type": "string",
+            "description": "Erisim jetonunun gecerlilik sonu.",
+            "format": "date-time"
+          },
+          "sessionExpiresAt": {
+            "type": "string",
+            "description": "Toplam oturum suresi siniri.",
+            "format": "date-time"
+          },
+          "idleTimeoutMinutes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Hareketsizlik suresi (dakika).",
+            "format": "int32"
+          },
+          "user": {
+            "description": "Kullanici.",
+            "$ref": "#/components/schemas/SessionUserResponse"
+          }
+        },
+        "description": "Acik oturum. Yenileme jetonu burada DEGIL, HttpOnly cerezdedir."
+      },
+      "SessionUserResponse": {
+        "required": [
+          "firstName",
+          "lastName"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "description": "Ad."
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Soyad."
+          }
+        },
+        "description": "Oturumdaki kullanici."
+      },
+      "SignInRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Kurumsal e-posta."
+          },
+          "password": {
+            "type": "string",
+            "description": "Parola."
+          }
+        },
+        "description": "Giris istegi."
+      },
+      "SignInResponse": {
+        "required": [
+          "status",
+          "session",
+          "challenge"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "Sonuc.",
+            "$ref": "#/components/schemas/SignInStatus"
+          },
+          "session": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Oturum acildiysa bilgisi.",
+                "$ref": "#/components/schemas/SessionResponse"
+              }
+            ]
+          },
+          "challenge": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Iki adimli dogrulama gerekiyorsa bekleyen giris.",
+                "$ref": "#/components/schemas/TwoFactorChallengeResponse"
+              }
+            ]
+          }
+        },
+        "description": "Giris yaniti."
+      },
+      "SignInStatus": {
+        "enum": [
+          "signedIn",
+          "verificationRequired"
+        ],
+        "description": "Giris sonucu."
+      },
       "StartRegistrationRequest": {
         "required": [
           "nationalId",
@@ -501,6 +925,59 @@
           }
         },
         "description": "Uyelik baslatma istegi (SYG-KMLK-013)."
+      },
+      "TwoFactorChallengeResponse": {
+        "required": [
+          "challengeId",
+          "channels",
+          "expiresAt"
+        ],
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "string",
+            "description": "Kimlik.",
+            "format": "uuid"
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationChannelKind"
+            },
+            "description": "Sunulan kanallar; hedef donmez."
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Gecerlilik sonu.",
+            "format": "date-time"
+          }
+        },
+        "description": "Bekleyen iki adimli giris."
+      },
+      "TwoFactorVerificationResponse": {
+        "required": [
+          "result",
+          "session"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "description": "Sonuc.",
+            "$ref": "#/components/schemas/VerificationOutcome"
+          },
+          "session": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Dogrulandiysa oturum.",
+                "$ref": "#/components/schemas/SessionResponse"
+              }
+            ]
+          }
+        },
+        "description": "Iki adimli dogrulama sonucu."
       },
       "VerificationChannelKind": {
         "enum": [
@@ -558,6 +1035,9 @@
     },
     {
       "name": "Registrations"
+    },
+    {
+      "name": "Sessions"
     }
   ]
 }

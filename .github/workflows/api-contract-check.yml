@@ -32,6 +32,9 @@ jobs:
       # (ADR-0008 §4). Bu tasarim zamani degeri gercek bir veritabanina
       # baglanmaz, yalnizca dogrulamayi gecer.
       Database__Hrms: 'Host=openapi-generation;Database=dsg_hrms;Username=openapi;Password=openapi'
+      # Belge uretimi uygulamayi ayaga kaldirir; JWT anahtari zorunlu oldugu icin tasarim
+      # zamani bir anahtar verilir. Hicbir ortamda gecerli degildir (ADR-0008).
+      Identity__JwtSigningKey: 'b3BlbmFwaS1kZXNpZ24tdGltZS1rZXktbm90LWEtc2VjcmV0ISE='
 
     steps:
       - name: Depoyu al

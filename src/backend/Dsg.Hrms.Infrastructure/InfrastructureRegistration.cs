@@ -2,6 +2,7 @@ using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
 using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Application.Identity.Registration;
+using Dsg.Hrms.Application.Identity.Sessions;
 using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Notifications;
 using Dsg.Hrms.Application.Personnel.Sync;
@@ -112,6 +113,11 @@ public static class InfrastructureRegistration
         services.AddScoped<PasswordPolicy>();
         services.AddScoped<IRegistrationStore, RegistrationStore>();
         services.AddScoped<RegistrationService>();
+
+        // Giris ve oturum (SYG-KMLK-031…043). Erisim jetonu ureticisi API katmanindadir:
+        // imzalama ve dogrulama ayni kimlik dogrulama yapilandirmasini kullanir.
+        services.AddScoped<ISessionStore, SessionStore>();
+        services.AddScoped<SessionService>();
     }
 
     private static void AddPersonnelSync(IServiceCollection services, IConfiguration configuration)
@@ -208,6 +214,10 @@ public static class InfrastructureRegistration
         // Erisim kaydi, cagiranin baglamindan AYRI bir baglamla yazilir (ADR-0009 §3).
         // Kapsam (scoped) omurlu fabrika secilmistir: ara katmanlar kapsam omurlu
         // servislerdir ve tekil (singleton) bir fabrika onlari cozemezdi.
-        services.AddDbContextFactory<HrmsDbContext>(Configure, ServiceLifetime.Scoped);
+        //
+        // Fabrikaya yapilandirma eylemi VERILMEZ: EF Core, ayni baglam icin kaydedilen tum
+        // yapilandirma eylemlerini birlestirir. Eylem burada da verildiginde ara katmanlar iki
+        // kez eklenir ve her degisiklik denetim izine IKI SATIR olarak yazilirdi (#93).
+        services.AddDbContextFactory<HrmsDbContext>((Action<DbContextOptionsBuilder>?)null, ServiceLifetime.Scoped);
     }
 }

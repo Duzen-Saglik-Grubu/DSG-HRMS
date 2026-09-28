@@ -396,6 +396,17 @@ printf "IDENTITY_CODE_HASH_KEY='%s'
 " "$(openssl rand -base64 32)" >> /opt/dsg-hrms/secrets/.env.uat
 ```
 
+> **Zorunlu (#92):** `IDENTITY_JWT_SIGNING_KEY` tanımlı değilse API **açılmaz**. Bu sürümle
+> birlikte ilk dağıtımdan ÖNCE eklenir:
+>
+> ```bash
+> printf "IDENTITY_JWT_SIGNING_KEY='%s'
+" "$(openssl rand -base64 32)" >> /opt/dsg-hrms/secrets/.env.uat
+> ```
+>
+> Anahtar değiştirilirse açık erişim jetonları geçersizleşir; kullanıcılar yenileme jetonuyla
+> yeni jeton alır, yeniden giriş gerekmez.
+
 SMTP ve NetGSM erişim bilgileri `SMTP_SERVER`, `SMTP_PASSWORD`, `NETGSM_USER_CODE`,
 `NETGSM_PASSWORD` değişkenleriyle, **tek tırnak içinde** eklenir (`.env.uat.example`).
 
@@ -485,3 +496,4 @@ openssl s_client -starttls smtp -connect mail.duzen.com.tr:587 -servername mail.
 | 2026-09-26 | 0.8 | §9 sistem parametreleri ve sır parametre şifreleme anahtarı; §8.2 periyot parametreden (#83) | Bilgi İşlem |
 | 2026-09-27 | 0.9 | §10 doğrulama kodu ve ileti gönderimi: özet anahtarı, gönderim kipleri, `/health/notifications` (#85) | Bilgi İşlem |
 | 2026-09-27 | 1.0 | §10.4 üyelik anahtarı ve ters vekil ağı denetimi (#87) | Bilgi İşlem |
+| 2026-09-28 | 1.1 | §10.1: JWT imzalama anahtarı zorunlu (#92) | Bilgi İşlem |

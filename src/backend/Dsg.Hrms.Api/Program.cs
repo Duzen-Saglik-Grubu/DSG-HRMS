@@ -46,6 +46,9 @@ try
     builder.Services.Configure<RegistrationTimingOptions>(builder.Configuration.GetSection(RegistrationTimingOptions.SectionName));
     builder.Services.AddHrmsReverseProxy(builder.Configuration);
 
+    // Erisim jetonu (JWT); imzalama anahtari zorunludur (ADR-0008 §4).
+    builder.Services.AddHrmsAuthentication(builder.Configuration);
+
     // Yapilandirma dogrulamasi ve veritabani kaydi.
     // Zorunlu bir ayar eksikse uygulama BURADA degil, acilirken durur (ADR-0008 §4).
     builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
@@ -83,6 +86,9 @@ try
 
     // Canlilik ve hazir olma uc noktalari (ADR-0011).
     // LOGO ve NAS kontrolleri, ilgili altyapi bilesenleriyle birlikte eklenecektir.
+    app.UseAuthentication();
+    app.UseAuthorization();
+
     app.MapHrmsHealthChecks();
     app.MapControllers();
 

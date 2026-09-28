@@ -185,4 +185,11 @@ public interface IPasswordHasher
 
     /// <summary>Parola ozetle eslesiyor mu.</summary>
     bool Verify(string passwordHash, string normalizedPassword);
+
+    /// <summary>
+    /// Hic bir parolayla eslesmeyen, gercekle ayni maliyette bir ozet. Var olmayan kullanici
+    /// icin de parola dogrulamasi yapilir; yanit suresi hesabin varligini ele vermez
+    /// (SYG-KMLK-032).
+    /// </summary>
+    string DummyHash { get; }
 }

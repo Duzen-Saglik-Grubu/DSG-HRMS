@@ -53,6 +53,13 @@ public sealed class UserAccount : Entity, IAuditable
     /// <summary>Parolanin son belirlendigi an (UTC).</summary>
     public DateTimeOffset? PasswordChangedAt { get; private set; }
 
+    /// <summary>
+    /// Hatali giris siniri asildiginda kilidin kalkacagi an (SYG-KMLK-033). Kilitli degilse
+    /// <c>null</c>. Kilit girilen e-postaya gore tutulur; bu alan yalnizca kilitlenme ve
+    /// kilit kalkmasinin denetim izine dusmesi icindir (SYG-KMLK-058).
+    /// </summary>
+    public DateTimeOffset? LockedUntil { get; private set; }
+
     /// <inheritdoc />
     public DateTimeOffset CreatedAt { get; set; }
 
@@ -91,6 +98,21 @@ public sealed class UserAccount : Entity, IAuditable
         PasswordHash = passwordHash;
         PasswordChangedAt = now;
         SecurityStamp = Guid.NewGuid();
+    }
+
+    /// <summary>Kilitlenmeyi kaydeder (SYG-KMLK-058).</summary>
+    public void RecordLockout(DateTimeOffset until) => LockedUntil = until;
+
+    /// <summary>Kilit kalktiysa kaydi temizler; degisiklik olduysa <c>true</c>.</summary>
+    public bool ClearLockout()
+    {
+        if (LockedUntil is null)
+        {
+            return false;
+        }
+
+        LockedUntil = null;
+        return true;
     }
 
     /// <summary>
