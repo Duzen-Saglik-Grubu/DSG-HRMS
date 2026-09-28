@@ -316,7 +316,7 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
         verified.GetProperty("accountExists").GetBoolean().ShouldBeTrue();
         var (status, problem) = await client.PostJsonAsync($"{Base}/{id}/account", new { password = "Baska bir parola 9" });
         status.ShouldBe(HttpStatusCode.Conflict);
-        problem.GetProperty("detail").GetString()!.ShouldContain("parola sifirlama");
+        problem.GetProperty("detail").GetString()!.ShouldContain("parola sıfırlama");
         (await _fixture.WithDbAsync(c => c.Set<UserAccount>().CountAsync())).ShouldBe(1);
     }
 
@@ -346,12 +346,12 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
     // ------------------------------------------------------------------ parola (SYG-KMLK-044, 045)
 
     [Theory]
-    [InlineData("123456789", "yaygin")]
-    [InlineData("iloveyou", "yaygin")]
-    [InlineData("Yilmaz1985", "adinizdan")]
-    [InlineData("ahmet.yilmaz", "adinizdan")]
+    [InlineData("123456789", "yaygın")]
+    [InlineData("iloveyou", "yaygın")]
+    [InlineData("Yilmaz1985", "adınızdan")]
+    [InlineData("ahmet.yilmaz", "adınızdan")]
     [InlineData("duzen2026", "kurum")]
-    [InlineData("kisa", "kisa")]
+    [InlineData("kisa", "kısa")]
     public async Task Weak_passwords_are_rejected_with_a_field_error(string password, string expected)
     {
         using var client = _fixture.CreateClient();
@@ -389,6 +389,26 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
 
         (await client.PostJsonAsync($"{Base}/{Guid.NewGuid()}/code", new { channel = "email" })).Status.ShouldBe(HttpStatusCode.NotFound);
         (await client.PostJsonAsync($"{Base}/{Guid.NewGuid()}/verification", new { code = "123456" })).Status.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    // ------------------------------------------------------------------ herkese acik ayarlar (SYG-KMLK-070)
+
+    [Fact]
+    public async Task Public_settings_expose_only_screen_information()
+    {
+        using var client = _fixture.CreateClient();
+
+        using var response = await client.GetAsync(new Uri("/api/v1/identity/public-settings", UriKind.Relative));
+        var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        body.GetProperty("supportContact").GetString().ShouldBe("Bilgi İşlem");
+        body.GetProperty("passwordRules").GetProperty("minLength").GetInt32().ShouldBe(6);
+        body.GetProperty("passwordRules").GetProperty("requireComplexity").GetBoolean().ShouldBeFalse();
+        body.GetProperty("verificationCodeLength").GetInt32().ShouldBe(6);
+
+        // Yeni bir alan eklenirse bu test bilincli olarak guncellenmelidir: uc kimliksizdir.
+        body.EnumerateObject().Select(p => p.Name).ShouldBe(["supportContact", "passwordRules", "verificationCodeLength"]);
     }
 
     // ------------------------------------------------------------------ yardimcilar

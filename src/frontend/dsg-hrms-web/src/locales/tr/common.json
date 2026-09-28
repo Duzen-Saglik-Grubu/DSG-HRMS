@@ -45,5 +45,91 @@
   "date": {
     "start": "Başlangıç tarihi",
     "end": "Bitiş tarihi"
+  },
+  "identity": {
+    "layout": {
+      "logoAlt": "Düzen Sağlık Grubu logosu",
+      "panelTitle": "İnsan Kaynakları Yönetim Sistemi",
+      "panelText": "Düzen Sağlık Grubu çalışanlarının insan kaynakları işlemleri için tek, güvenli adres.",
+      "supportTitle": "Sorun mu yaşıyorsunuz?",
+      "supportText": "{{contact}} ile iletişime geçin.",
+      "highlightSecure": "Kurumsal e-posta adresiniz ve parolanızla güvenli giriş",
+      "highlightSingleAccount": "Grup şirketlerinin tamamı için tek hesap",
+      "highlightPrivacy": "Kişisel verileriniz KVKK kapsamında korunur"
+    },
+    "registration": {
+      "title": "Üye ol",
+      "stepLabel": "Adım {{current}} / {{total}}",
+      "identity": {
+        "heading": "Bilgileriniz",
+        "intro": "Hesap oluşturmak için kimlik bilgilerinizi ve kurumsal e-posta adresinizi girin.",
+        "nationalId": "T.C. Kimlik Numarası",
+        "nationalIdInvalid": "Geçerli bir T.C. Kimlik Numarası girin.",
+        "birthDate": "Doğum tarihi",
+        "birthDateHint": "GG.AA.YYYY biçiminde yazın veya takvimden seçin",
+        "birthDateInvalid": "Doğum tarihini GG.AA.YYYY biçiminde girin.",
+        "email": "Kurumsal e-posta adresi",
+        "emailHint": "Kurumda kullandığınız e-posta adresi, örneğin ad.soyad@duzen.com.tr",
+        "emailInvalid": "Geçerli bir e-posta adresi girin.",
+        "submit": "Devam et",
+        "birthDatePicker": "Takvimden tarih seç"
+      },
+      "channel": {
+        "heading": "Doğrulama yöntemi",
+        "intro": "Doğrulama kodunu nereden almak istersiniz?",
+        "email": "E-posta ile",
+        "sms": "SMS ile",
+        "submit": "Kodu gönder"
+      },
+      "code": {
+        "heading": "Doğrulama kodu",
+        "intro": "Bilgileriniz kayıtlarımızla eşleşiyorsa doğrulama kodu birkaç dakika içinde gelir. Kod gelmezse bilgilerinizi kontrol edin veya destek birimine başvurun.",
+        "label": "Doğrulama kodu",
+        "hint": "{{count}} haneli kod",
+        "remaining": "Kalan süre: {{time}}",
+        "required": "Doğrulama kodunu girin.",
+        "mismatch": "Kod hatalı. Lütfen tekrar deneyin.",
+        "expired": "Kodun süresi doldu. Yeni kod isteyin.",
+        "attemptsExceeded": "Çok fazla hatalı deneme yapıldı. Yeni kod isteyin.",
+        "notUsable": "Bu kod artık kullanılamaz. Yeni kod isteyin.",
+        "resent": "Yeni kod gönderildi. Önceki kod artık geçersiz.",
+        "submit": "Doğrula",
+        "resend": "Kodu tekrar gönder",
+        "changeChannel": "Başka bir yöntemle doğrula"
+      },
+      "password": {
+        "heading": "Parola",
+        "intro": "Hesabınız için bir parola belirleyin.",
+        "label": "Parola",
+        "confirm": "Parola (tekrar)",
+        "mismatch": "Parolalar aynı değil.",
+        "required": "Parolanızı girin.",
+        "tooShort": "Parola en az {{count}} karakter olmalıdır.",
+        "tooLong": "Parola en fazla {{count}} karakter olabilir.",
+        "show": "Parolayı göster",
+        "hide": "Parolayı gizle",
+        "rulesTitle": "Parolanız:",
+        "ruleLength": "en az {{count}} karakter olmalı,",
+        "ruleComplexity": "büyük harf, küçük harf, rakam ve simge içermeli,",
+        "ruleCommon": "yaygın ve kolay tahmin edilen bir parola olmamalı,",
+        "rulePersonal": "adınızdan, e-posta adresinizden veya kurum adından türetilmemeli.",
+        "submit": "Hesabı oluştur"
+      },
+      "done": {
+        "heading": "Hesabınız oluşturuldu",
+        "text": "Artık kurumsal e-posta adresiniz ve parolanızla giriş yapabilirsiniz."
+      },
+      "exists": {
+        "heading": "Hesabınız zaten var",
+        "text": "Adınıza açılmış bir hesap bulunuyor; ikinci bir hesap açılmaz. Parolanızı hatırlamıyorsanız parola sıfırlamayı kullanın."
+      },
+      "errors": {
+        "rateLimited": "Çok fazla deneme yapıldı. Lütfen bir süre sonra tekrar deneyin.",
+        "sessionExpired": "Üyelik işleminin süresi doldu. Lütfen baştan başlayın.",
+        "channelUnavailable": "Seçilen doğrulama yöntemi kullanılamıyor. Başka bir yöntem seçin."
+      },
+      "restart": "Baştan başla",
+      "subtitle": "Birkaç adımda hesabınızı oluşturun."
+    }
   }
 }

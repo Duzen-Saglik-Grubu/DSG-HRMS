@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.2-PG-KMLK
 **Süreç:** TEC.2 — Paydaş İhtiyaç ve Gereksinimlerinin Tanımlanması
-**Son güncelleme:** 2026-09-24
+**Son güncelleme:** 2026-09-28
 **Kaynak toplantı:** `kayitlar/2026-09-23-kimlik-gereksinim-toplantisi.md`
 **Onay durumu:** **Onaylandı — 2026-09-23** (İK gereksinim toplantısı)
 
@@ -144,7 +144,7 @@ bağ, kimliğin sabit kalmasına dayanır. Numara yeniden kullanılmaz ve deği�
 
 | Kimlik | Gereksinim | Gerekçe / Kaynak | Öncelik | Kabul kriteri | Durum |
 |---|---|---|---|---|---|
-| **REQ-KMLK-047** | Giriş, üye ol, doğrulama ve parola ekranları ekranı iki bölüme ayıran (split layout) bir düzende tasarlanır: bir bölümde form alanları, diğer bölümde kurumsal görsel ve/veya bilgilendirici içerik yer alır. | İK talebi (12.09.2026). Form tek başına ortada durduğunda ekran kurumsal kimlik taşımaz ve kullanıcıya doğru sisteme girdiğini göstermez. Bilgilendirici bölüm ayrıca duyuru ve yardım metni için yer açar. Görsel içerik Bilgi İşlem tarafından üretilecektir (İK kararı 23.09.2026, S-13). | Zorunlu | Masaüstünde ekran iki bölüme ayrılıyor; dar ekranda (telefon) bölümler alt alta geçiyor ve form üstte kalıyor. | Onaylandı |
+| **REQ-KMLK-047** | Giriş, üye ol, doğrulama ve parola ekranları ekranı iki bölüme ayıran (split layout) bir düzende tasarlanır: bir bölümde form alanları, diğer bölümde kurumsal görsel ve/veya bilgilendirici içerik yer alır. | İK talebi (12.09.2026). Form tek başına ortada durduğunda ekran kurumsal kimlik taşımaz ve kullanıcıya doğru sisteme girdiğini göstermez. Bilgilendirici bölüm ayrıca duyuru ve yardım metni için yer açar. Görsel içerik Claude tarafından üretilecektir (İK kararı 23.09.2026, S-13). | Zorunlu | Masaüstünde ekran iki bölüme ayrılıyor; dar ekranda (telefon) bölümler alt alta geçiyor ve form üstte kalıyor. | Onaylandı |
 | **REQ-KMLK-048** | Giriş ve doğrulama ekranlarında kurumsal logo kullanılır; logo, Sistem Yönetimi parametresinden yüklenir (PRM-GRN-01); kurulumda varsayılan olarak depodaki assets/duzen_logo.png dosyası kullanılır. | İK talebi (12.09.2026). Logonun tek bir kaynaktan gelmesi, kurumsal kimlik güncellendiğinde tek yerden değiştirilerek tüm ekranların güncellenmesini sağlar. İK talebi (20.09.2026) ile logo, Sistem Yönetimi parametresi hâline getirildi; değiştirmek için yeni sürüm gerekmez. | Zorunlu | Logo giriş ekranında görünüyor; farklı ekran boyutlarında bozulmuyor ve alternatif metni (alt) tanımlı. | Onaylandı |
 
 ---
@@ -163,3 +163,4 @@ Sistem gereksinimi, tasarım, kod ve test halkaları, işin yapıldığı PR'da 
 |---|---|---|---|
 | 2026-09-24 | 1.0 | İlk sürüm — 23.09.2026 İK toplantısında onaylanan 56 gereksinim | Bilgi İşlem |
 | 2026-09-24 | 1.1 | REQ-KMLK-011: bağlantı yalnızca LOGO'daki kurumsal e-postaya, geçerlilik 3 saat (S-05 revize); REQ-KMLK-022 gerekçesine 2 kişiye e-posta tanımı eklendi | Bilgi İşlem |
+| 2026-09-28 | 1.2 | REQ-KMLK-047 gerekçe notu toplantı kaydıyla uyumlu hâle getirildi: S-13 cevabı "Claude tarafından en uygun görsel üretilsin" (aktarım hatası; gereksinim metni değişmedi, #90) | Bilgi İşlem |

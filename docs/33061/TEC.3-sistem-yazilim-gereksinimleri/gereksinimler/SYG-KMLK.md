@@ -4,7 +4,7 @@
 **Süreç:** TEC.3 — Sistem/Yazılım Gereksinimlerinin Tanımlanması
 **Modül:** T3 Kimlik Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-KMLK.md` (23.09.2026'da İK onaylı, 56 gereksinim)
-**Son güncelleme:** 2026-09-27
+**Son güncelleme:** 2026-09-28
 **Sahibi:** Bilgi İşlem
 
 > **Paydaş gereksinimi *ne* istendiğini söyler; bu belge sistemin bunu *hangi
@@ -258,7 +258,7 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 | **SYG-KMLK-065** | Giriş, üyelik ve parola ekranları 360 piksel genişlikten itibaren yatay kaydırma gerektirmeden kullanılabilir. | İşlevsel olmayan | REQ-KMLK-044 | Test | — |
 | **SYG-KMLK-066** | Ekranlar yalnızca klavyeyle eksiksiz kullanılabilir; her form alanının erişilebilir bir etiketi vardır; odak sırası görsel sırayla aynıdır. | İşlevsel olmayan | REQ-KMLK-045 | Test | — |
 | **SYG-KMLK-067** | Beklenmeyen hata ekranında kullanıcıya izleme kimliği gösterilir. | İşlevsel | REQ-KMLK-046 | Test | — |
-| **SYG-KMLK-068** | Giriş, üyelik, doğrulama ve parola ekranları iki bölümlü düzendedir: bir bölümde form, diğerinde kurumsal görsel. 900 pikselin altında bölümler alt alta geçer ve form üstte kalır. Görsel Bilgi İşlem tarafından üretilir. | İşlevsel | REQ-KMLK-047 | Gösterim | — |
+| **SYG-KMLK-068** | Giriş, üyelik, doğrulama ve parola ekranları iki bölümlü düzendedir: bir bölümde form, diğerinde kurumsal görsel. 900 pikselin altında bölümler alt alta geçer ve form üstte kalır. Görsel, İK kararı gereği (S-13) geliştirme kapsamında Claude tarafından üretilir. | İşlevsel | REQ-KMLK-047 | Gösterim | — |
 | **SYG-KMLK-069** | Kurumsal logo parametreden yüklenir; yüklenmemişse `assets/duzen_logo.png` kullanılır. Logonun alternatif metni tanımlıdır. | İşlevsel | REQ-KMLK-048 | Test | PRM-GRN-01 |
 | **SYG-KMLK-070** | Üyelik ve giriş ekranlarında destek birimi olarak Bilgi İşlem ve parametredeki iletişim bilgisi gösterilir. | İşlevsel | REQ-KMLK-056 | Test | PRM-GRN-04 |
 
@@ -457,3 +457,4 @@ madde `İptal` notuyla kalır.
 | 2026-09-26 | 0.4 | AN-19 eklendi: elle pasife alma ile yeniden işe girişte aktifleşmenin birlikte uygulanması (`KR-080`, #83) | Bilgi İşlem |
 | 2026-09-27 | 0.5 | AN-20 eklendi: ADR-0012 §7 ile SYG-KMLK-026 çelişkisi, gönderim kipleri (`KR-083`, #85) | Bilgi İşlem |
 | 2026-09-27 | 0.6 | SYG-KMLK-071: yol `/api/v1/identity/`; AN-21 eklendi (#87) | Bilgi İşlem |
+| 2026-09-28 | 0.7 | SYG-KMLK-068: görseli üreten taraf S-13 kararıyla uyumlu hâle getirildi (#90) | Bilgi İşlem |

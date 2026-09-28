@@ -8,4 +8,7 @@
  */
 export const queryKeys = {
   saglik: ['saglik'] as const,
+  identity: {
+    publicSettings: ['identity', 'public-settings'] as const,
+  },
 } as const;

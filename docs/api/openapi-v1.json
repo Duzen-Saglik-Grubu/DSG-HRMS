@@ -9,6 +9,26 @@
     "version": "v1"
   },
   "paths": {
+    "/api/v1/identity/public-settings": {
+      "get": {
+        "tags": [
+          "PublicSettings"
+        ],
+        "summary": "Giris ve uyelik ekranlarinin ayarlarini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Ayarlar.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicSettingsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/identity/registrations": {
       "post": {
         "tags": [
@@ -318,6 +338,39 @@
         },
         "description": "Hesap olusturma istegi."
       },
+      "PasswordRulesResponse": {
+        "required": [
+          "minLength",
+          "maxLength",
+          "requireComplexity"
+        ],
+        "type": "object",
+        "properties": {
+          "minLength": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "En az uzunluk (PRM-KML-05).",
+            "format": "int32"
+          },
+          "maxLength": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "En fazla uzunluk.",
+            "format": "int32"
+          },
+          "requireComplexity": {
+            "type": "boolean",
+            "description": "Buyuk/kucuk harf, rakam ve simge zorunlu mu (PRM-KML-06)."
+          }
+        },
+        "description": "Parola kurallari."
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -355,6 +408,34 @@
             ]
           }
         }
+      },
+      "PublicSettingsResponse": {
+        "required": [
+          "supportContact",
+          "passwordRules",
+          "verificationCodeLength"
+        ],
+        "type": "object",
+        "properties": {
+          "supportContact": {
+            "type": "string",
+            "description": "Sorun yasayan kullanicinin basvuracagi birim ve iletisim bilgisi (PRM-GRN-04)."
+          },
+          "passwordRules": {
+            "description": "Parola kurallari (ekranda yardim icin).",
+            "$ref": "#/components/schemas/PasswordRulesResponse"
+          },
+          "verificationCodeLength": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Dogrulama kodunun hane sayisi (PRM-KML-09).",
+            "format": "int32"
+          }
+        },
+        "description": "Giris ve uyelik ekranlarinin ayarlari."
       },
       "RegistrationStartedResponse": {
         "required": [
@@ -472,6 +553,9 @@
     }
   },
   "tags": [
+    {
+      "name": "PublicSettings"
+    },
     {
       "name": "Registrations"
     }

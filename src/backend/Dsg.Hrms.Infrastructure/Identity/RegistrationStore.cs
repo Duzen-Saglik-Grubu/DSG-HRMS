@@ -74,7 +74,7 @@ public sealed class RegistrationStore : IRegistrationStore
         }
         catch (DbUpdateException ex) when (ex.InnerException is PostgresException { ConstraintName: SingleAccountConstraint })
         {
-            throw new ConflictException("Bu kisiye ait bir hesap zaten var. Parolanizi unuttuysaniz parola sifirlamayi kullanin.");
+            throw new ConflictException("Adınıza açılmış bir hesap zaten var. Parolanızı unuttuysanız parola sıfırlamayı kullanın.");
         }
     }
 

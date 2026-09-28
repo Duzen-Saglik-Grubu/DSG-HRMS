@@ -102,16 +102,16 @@ public sealed class StartRegistrationRequestValidator : AbstractValidator<StartR
         // Gecersiz TCKN eslestirmeye GONDERILMEZ; ileti kisinin varligi hakkinda bilgi vermez.
         RuleFor(r => r.NationalId)
             .Must(NationalId.IsValid)
-            .WithMessage("Gecerli bir T.C. Kimlik Numarasi girin.");
+            .WithMessage("Geçerli bir T.C. Kimlik Numarası girin.");
 
         RuleFor(r => r.BirthDate)
             .Must(date => date >= new DateOnly(1900, 1, 1) && date <= DateOnly.FromDateTime(timeProvider.GetUtcNow().UtcDateTime))
-            .WithMessage("Gecerli bir dogum tarihi girin.");
+            .WithMessage("Geçerli bir doğum tarihi girin.");
 
         RuleFor(r => r.Email)
             .NotEmpty().WithMessage("Kurumsal e-posta adresinizi girin.")
-            .MaximumLength(254).WithMessage("Gecerli bir e-posta adresi girin.")
-            .EmailAddress().WithMessage("Gecerli bir e-posta adresi girin.");
+            .MaximumLength(254).WithMessage("Geçerli bir e-posta adresi girin.")
+            .EmailAddress().WithMessage("Geçerli bir e-posta adresi girin.");
     }
 }
 
@@ -121,7 +121,7 @@ public sealed class RequestCodeRequestValidator : AbstractValidator<RequestCodeR
     /// <summary>Yeni ornek olusturur.</summary>
     public RequestCodeRequestValidator()
     {
-        RuleFor(r => r.Channel).IsInEnum().WithMessage("Bir dogrulama kanali secin.");
+        RuleFor(r => r.Channel).IsInEnum().WithMessage("Bir doğrulama yöntemi seçin.");
     }
 }
 
@@ -132,8 +132,8 @@ public sealed class VerifyCodeRequestValidator : AbstractValidator<VerifyCodeReq
     public VerifyCodeRequestValidator()
     {
         RuleFor(r => r.Code)
-            .NotEmpty().WithMessage("Dogrulama kodunu girin.")
-            .MaximumLength(12).WithMessage("Dogrulama kodu gecerli degil.");
+            .NotEmpty().WithMessage("Doğrulama kodunu girin.")
+            .MaximumLength(12).WithMessage("Doğrulama kodu geçerli değil.");
     }
 }
 
@@ -144,7 +144,7 @@ public sealed class CompleteRegistrationRequestValidator : AbstractValidator<Com
     public CompleteRegistrationRequestValidator()
     {
         RuleFor(r => r.Password)
-            .NotEmpty().WithMessage("Parolanizi girin.")
+            .NotEmpty().WithMessage("Parolanızı girin.")
             .MaximumLength(512).WithMessage("Parola en fazla 128 karakter olabilir.");
     }
 }
