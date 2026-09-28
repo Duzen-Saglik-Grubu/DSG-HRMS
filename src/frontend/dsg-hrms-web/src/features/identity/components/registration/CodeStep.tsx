@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert, Button, Stack, TextField, Typography } from '@mui/material';
+import TimerOutlined from '@mui/icons-material/TimerOutlined';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
@@ -9,6 +10,7 @@ import {
   type VerificationOutcome,
 } from '../../api/registrationApi';
 import { formatCountdown, useCountdown } from '../../hooks/useCountdown';
+import { primaryButtonSx } from '../motion';
 import { RegistrationError } from './registrationErrors';
 
 interface CodeStepProps {
@@ -96,9 +98,16 @@ export function CodeStep({
     >
       <Alert severity="info">{t('identity.registration.code.intro')}</Alert>
 
-      <Typography variant="body2" aria-live="off">
-        {t('identity.registration.code.remaining', { time: formatCountdown(remaining) })}
-      </Typography>
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{ alignItems: 'center', color: remaining > 60 ? 'text.secondary' : 'warning.main' }}
+      >
+        <TimerOutlined fontSize="small" aria-hidden />
+        <Typography variant="body2" aria-live="off" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+          {t('identity.registration.code.remaining', { time: formatCountdown(remaining) })}
+        </Typography>
+      </Stack>
 
       <TextField
         label={t('identity.registration.code.label')}
@@ -108,6 +117,15 @@ export function CodeStep({
         autoFocus
         disabled={expired}
         slotProps={{ htmlInput: { inputMode: 'numeric', maxLength: codeLength } }}
+        sx={{
+          '& input': {
+            fontSize: '1.5rem',
+            fontWeight: 600,
+            letterSpacing: '0.45em',
+            textAlign: 'center',
+            fontVariantNumeric: 'tabular-nums',
+          },
+        }}
         error={Boolean(inputError)}
         helperText={inputError ?? t('identity.registration.code.hint', { count: codeLength })}
       />
@@ -123,7 +141,13 @@ export function CodeStep({
       {verify.error ? <RegistrationError error={verify.error} onRestart={onRestart} /> : null}
       {resend.error ? <RegistrationError error={resend.error} onRestart={onRestart} /> : null}
 
-      <Button type="submit" variant="contained" size="large" disabled={expired || verify.isPending}>
+      <Button
+        type="submit"
+        variant="contained"
+        size="large"
+        disabled={expired || verify.isPending}
+        sx={primaryButtonSx}
+      >
         {t('identity.registration.code.submit')}
       </Button>
 

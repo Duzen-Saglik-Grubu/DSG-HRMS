@@ -7,6 +7,8 @@ import { classifyRegistrationError } from '../../utils/registrationErrorKind';
 interface RegistrationErrorProps {
   error: unknown;
   onRestart: () => void;
+  /** Uyelik islemi baslamis mi; ilk adimda "suresi doldu" soylenemez. */
+  canExpire?: boolean;
 }
 
 /**
@@ -16,9 +18,9 @@ interface RegistrationErrorProps {
  * hatada takip numarasi gosterilir (SYG-KMLK-067). Alan hatalari burada gosterilmez;
  * ilgili alanin altinda gorunur.
  */
-export function RegistrationError({ error, onRestart }: RegistrationErrorProps) {
+export function RegistrationError({ error, onRestart, canExpire = true }: RegistrationErrorProps) {
   const { t } = useTranslation();
-  const kind = classifyRegistrationError(error);
+  const kind = classifyRegistrationError(error, { canExpire });
 
   switch (kind) {
     case 'fields':

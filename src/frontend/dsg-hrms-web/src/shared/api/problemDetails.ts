@@ -41,12 +41,20 @@ export class ApiError extends Error {
   /** Sunucuya hic ulasilamadi (ag hatasi, zaman asimi). */
   readonly isNetworkError: boolean;
 
+  /**
+   * Hata turu (Problem Details `type`, ör. `https://dsg-hrms/errors/not-found`).
+   * Ayni durum kodunun farkli anlamlarini ayirmak icindir: uygulamanin "kayit yok"
+   * yaniti ile var olmayan bir adrese yapilan istegin 404'u ayni sey degildir.
+   */
+  readonly type: string | undefined;
+
   constructor(options: {
     message: string;
     status?: number | undefined;
     traceId?: string | undefined;
     errors?: Record<string, string[]> | undefined;
     isNetworkError: boolean;
+    type?: string | undefined;
   }) {
     // message alani kullaniciya GOSTERILEBILIR Turkce metindir.
     super(options.message);
@@ -56,6 +64,7 @@ export class ApiError extends Error {
     this.traceId = options.traceId;
     this.errors = options.errors;
     this.isNetworkError = options.isNetworkError;
+    this.type = options.type;
   }
 }
 
@@ -115,6 +124,7 @@ export function toApiError(
       traceId: body.traceId,
       errors: readFieldErrors(body.errors),
       isNetworkError: false,
+      type: body.type,
     });
   }
 

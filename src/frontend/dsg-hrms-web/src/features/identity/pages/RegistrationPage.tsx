@@ -1,14 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
-import { Alert, Stack, Typography } from '@mui/material';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Box, Stack, Typography } from '@mui/material';
+import { alpha } from '@mui/material/styles';
+import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
+import InfoRounded from '@mui/icons-material/InfoRounded';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { queryKeys } from '@/shared/api/queryKeys';
 import { registrationApi, type VerificationChannel } from '../api/registrationApi';
 import { AuthLayout } from '../components/AuthLayout';
+import { fadeSlide, popIn, reducedMotion } from '../components/motion';
 import { ChannelStep } from '../components/registration/ChannelStep';
 import { CodeStep } from '../components/registration/CodeStep';
 import { IdentityStep } from '../components/registration/IdentityStep';
 import { PasswordStep } from '../components/registration/PasswordStep';
+import { StepProgress } from '../components/registration/StepProgress';
 
 type Step =
   | { name: 'identity' }
@@ -29,6 +34,8 @@ type Step =
   | { name: 'done' }
   | { name: 'exists' };
 
+const TOTAL_STEPS = 4;
+
 const STEP_NUMBER: Record<Step['name'], number> = {
   identity: 1,
   channel: 2,
@@ -37,6 +44,7 @@ const STEP_NUMBER: Record<Step['name'], number> = {
   done: 4,
   exists: 3,
 };
+
 const HEADING: Record<Step['name'], string> = {
   identity: 'identity.registration.identity.heading',
   channel: 'identity.registration.channel.heading',
@@ -51,10 +59,14 @@ const HEADING: Record<Step['name'], string> = {
  *
  * Adim degistiginde odak adim basligina tasinir: klavye ve ekran okuyucu kullanicisi
  * yeni adimin basladigini duyar ve sayfanin basina donmek zorunda kalmaz (SYG-KMLK-066).
+ *
+ * "Bastan basla" akisi tamamen sifirlar: ilk adimdaki form ve hata durumu da temizlenir
+ * (adim bileseni yeniden kurulur).
  */
 export function RegistrationPage() {
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>({ name: 'identity' });
+  const [attempt, setAttempt] = useState(0);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const firstRender = useRef(true);
 
@@ -71,109 +83,169 @@ export function RegistrationPage() {
     }
 
     headingRef.current?.focus();
-  }, [step.name]);
+  }, [step.name, attempt]);
 
-  const restart = () => setStep({ name: 'identity' });
+  const restart = () => {
+    setStep({ name: 'identity' });
+    setAttempt((value) => value + 1);
+  };
+
+  const finished = step.name === 'done' || step.name === 'exists';
 
   return (
     <AuthLayout>
-      <Stack spacing={1}>
-        <Typography variant="h5" component="h1">
-          {t('identity.registration.title')}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          {t('identity.registration.stepLabel', { current: STEP_NUMBER[step.name], total: 4 })}
-        </Typography>
+      <Stack spacing={2}>
+        <Box>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{ fontWeight: 700, fontSize: { xs: '1.625rem', sm: '1.875rem' } }}
+          >
+            {t('identity.registration.title')}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            {t('identity.registration.subtitle')}
+          </Typography>
+        </Box>
+        {finished ? null : <StepProgress current={STEP_NUMBER[step.name]} total={TOTAL_STEPS} />}
         <Typography
           ref={headingRef}
           tabIndex={-1}
           variant="h6"
           component="h2"
-          sx={{ outline: 'none' }}
+          sx={{ outline: 'none', fontWeight: 600 }}
         >
           {t(HEADING[step.name])}
         </Typography>
       </Stack>
 
-      {step.name === 'identity' ? (
-        <IdentityStep
-          onRestart={restart}
-          onStarted={(started) =>
-            setStep({
-              name: 'channel',
-              registrationId: started.registrationId,
-              channels: started.channels,
-            })
-          }
-        />
-      ) : null}
-
-      {step.name === 'channel' ? (
-        <ChannelStep
-          registrationId={step.registrationId}
-          channels={step.channels}
-          initialChannel={step.channel}
-          onRestart={restart}
-          onCodeRequested={(channel, requested) =>
-            setStep({
-              name: 'code',
-              registrationId: step.registrationId,
-              channels: step.channels,
-              channel,
-              codeExpiresAt: requested.codeExpiresAt,
-            })
-          }
-        />
-      ) : null}
-
-      {step.name === 'code' ? (
-        <CodeStep
-          registrationId={step.registrationId}
-          channel={step.channel}
-          channels={step.channels}
-          codeExpiresAt={step.codeExpiresAt}
-          codeLength={settings.data?.verificationCodeLength ?? 6}
-          onRestart={restart}
-          onCodeResent={(requested) => setStep({ ...step, codeExpiresAt: requested.codeExpiresAt })}
-          onChangeChannel={() =>
-            setStep({
-              name: 'channel',
-              registrationId: step.registrationId,
-              channels: step.channels,
-              channel: step.channels.find((item) => item !== step.channel),
-            })
-          }
-          onVerified={(accountExists) =>
-            setStep(
-              accountExists
-                ? { name: 'exists' }
-                : { name: 'password', registrationId: step.registrationId },
-            )
-          }
-        />
-      ) : null}
-
-      {step.name === 'password' ? (
-        <PasswordStep
-          registrationId={step.registrationId}
-          rules={
-            settings.data?.passwordRules ?? {
-              minLength: 6,
-              maxLength: 128,
-              requireComplexity: false,
+      <Box
+        key={`${step.name}-${attempt}`}
+        sx={{
+          animation: `${fadeSlide} 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both`,
+          ...reducedMotion,
+        }}
+      >
+        {step.name === 'identity' ? (
+          <IdentityStep
+            onRestart={restart}
+            onStarted={(started) =>
+              setStep({
+                name: 'channel',
+                registrationId: started.registrationId,
+                channels: started.channels,
+              })
             }
-          }
-          onRestart={restart}
-          onCompleted={() => setStep({ name: 'done' })}
-        />
-      ) : null}
+          />
+        ) : null}
 
-      {step.name === 'done' ? (
-        <Alert severity="success">{t('identity.registration.done.text')}</Alert>
-      ) : null}
-      {step.name === 'exists' ? (
-        <Alert severity="info">{t('identity.registration.exists.text')}</Alert>
-      ) : null}
+        {step.name === 'channel' ? (
+          <ChannelStep
+            registrationId={step.registrationId}
+            channels={step.channels}
+            initialChannel={step.channel}
+            onRestart={restart}
+            onCodeRequested={(channel, requested) =>
+              setStep({
+                name: 'code',
+                registrationId: step.registrationId,
+                channels: step.channels,
+                channel,
+                codeExpiresAt: requested.codeExpiresAt,
+              })
+            }
+          />
+        ) : null}
+
+        {step.name === 'code' ? (
+          <CodeStep
+            registrationId={step.registrationId}
+            channel={step.channel}
+            channels={step.channels}
+            codeExpiresAt={step.codeExpiresAt}
+            codeLength={settings.data?.verificationCodeLength ?? 6}
+            onRestart={restart}
+            onCodeResent={(requested) =>
+              setStep({ ...step, codeExpiresAt: requested.codeExpiresAt })
+            }
+            onChangeChannel={() =>
+              setStep({
+                name: 'channel',
+                registrationId: step.registrationId,
+                channels: step.channels,
+                channel: step.channels.find((item) => item !== step.channel),
+              })
+            }
+            onVerified={(accountExists) =>
+              setStep(
+                accountExists
+                  ? { name: 'exists' }
+                  : { name: 'password', registrationId: step.registrationId },
+              )
+            }
+          />
+        ) : null}
+
+        {step.name === 'password' ? (
+          <PasswordStep
+            registrationId={step.registrationId}
+            rules={
+              settings.data?.passwordRules ?? {
+                minLength: 6,
+                maxLength: 128,
+                requireComplexity: false,
+              }
+            }
+            onRestart={restart}
+            onCompleted={() => setStep({ name: 'done' })}
+          />
+        ) : null}
+
+        {step.name === 'done' ? (
+          <Outcome tone="success" icon={<CheckCircleRounded sx={{ fontSize: 56 }} />}>
+            {t('identity.registration.done.text')}
+          </Outcome>
+        ) : null}
+
+        {step.name === 'exists' ? (
+          <Outcome tone="info" icon={<InfoRounded sx={{ fontSize: 56 }} />}>
+            {t('identity.registration.exists.text')}
+          </Outcome>
+        ) : null}
+      </Box>
     </AuthLayout>
+  );
+}
+
+interface OutcomeProps {
+  tone: 'success' | 'info';
+  icon: ReactNode;
+  children: ReactNode;
+}
+
+/** Akisin sonu: canlandirilmis simge ve aciklama. */
+function Outcome({ tone, icon, children }: OutcomeProps) {
+  return (
+    <Stack spacing={2} sx={{ alignItems: 'center', textAlign: 'center', py: 2 }}>
+      <Box
+        aria-hidden
+        sx={(theme) => ({
+          display: 'grid',
+          placeItems: 'center',
+          width: 88,
+          height: 88,
+          borderRadius: '50%',
+          color: `${tone}.main`,
+          bgcolor: alpha(theme.palette[tone].main, 0.1),
+          animation: `${popIn} 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both`,
+          ...reducedMotion,
+        })}
+      >
+        {icon}
+      </Box>
+      <Typography role="status" color="text.secondary">
+        {children}
+      </Typography>
+    </Stack>
   );
 }

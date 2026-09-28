@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-09-27
+**Son güncelleme:** 2026-09-28
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 
@@ -178,7 +178,7 @@ gelecektir.
 | 44 | `REQ-KMLK-044` Giriş ve üyelik ekranları telefon ve tablette de kullanılabilir. | SYG-KMLK-065 | `ADR-0015` | kısmen: SYG-065 (düzen 360 px'ten itibaren tek sütun, sabit genişlik yok) · PR #91 — ölçüm kabulde (Gösterim), giriş ekranı sonraki iş | — | — |
 | 45 | `REQ-KMLK-045` Ekranlar klavye ile kullanılabilir; form alanlarının etiketi vardır. | SYG-KMLK-066 | `ADR-0015` §7 | kısmen: SYG-066 (etiketli alanlar, klavyeyle akış, adım başlığına odak) · PR #91 — giriş ekranı sonraki iş | `RegistrationPage.test.tsx` | — |
 | 46 | `REQ-KMLK-046` Hata ekranında kullanıcıya bir takip numarası gösterilir. | SYG-KMLK-067 | `ADR-0009` §2 | kısmen: SYG-067 (üyelikte beklenmeyen hatada takip numarası) · PR #91 | `RegistrationPage.test.tsx` | — |
-| 47 | `REQ-KMLK-047` Giriş, üye ol, doğrulama ve parola ekranları ekranı iki bölüme ayıran … | SYG-KMLK-068 | `ADR-0015` | kısmen: SYG-068 (iki bölümlü düzen, 900 px altında form üstte) · PR #91 — kurumsal görsel Bilgi İşlem'den bekleniyor | — | — |
+| 47 | `REQ-KMLK-047` Giriş, üye ol, doğrulama ve parola ekranları ekranı iki bölüme ayıran … | SYG-KMLK-068 | `ADR-0015` | SYG-068 (iki bölümlü düzen, 900 px altında form üstte; kurumsal görsel S-13 gereği kodla üretilen canlandırılmış sahne) · PR #91 — ekranda doğrulama kabulde (Gösterim) | — | — |
 | 48 | `REQ-KMLK-048` Giriş ve doğrulama ekranlarında kurumsal logo kullanılır; logo, Sistem… | SYG-KMLK-069, 076 | `ADR-0015` | kısmen: SYG-069 (varsayılan logo ve alternatif metni; kopya CI'da denetlenir) · PR #91 — parametreden yükleme (PRM-GRN-01, SYG-076) sonraki iş | `RegistrationPage.test.tsx`, `brand-asset-check.mjs` | — |
 | 49 | `REQ-KMLK-049` Bir kullanıcı yeni bir tarayıcıdan giriş yaptığında önceki oturumu son… | SYG-KMLK-041 | — | — | — | — |
 | 50 | `REQ-KMLK-050` Oturumun başka bir yerden sonlandırıldığı kullanıcıya açıkça bildirili… | SYG-KMLK-042 | — | — | — | — |

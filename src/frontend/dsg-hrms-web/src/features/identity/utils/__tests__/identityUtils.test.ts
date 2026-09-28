@@ -1,20 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '@/shared/api/problemDetails';
-import { parseBirthDate } from '../birthDate';
+import { toIsoDate } from '../birthDate';
 import { classifyRegistrationError } from '../registrationErrorKind';
 
-describe('parseBirthDate', () => {
-  it('GG.AA.YYYY bicimini ISO tarihe cevirir', () => {
-    expect(parseBirthDate('12.04.1985')).toBe('1985-04-12');
-    expect(parseBirthDate(' 01.01.1990 ')).toBe('1990-01-01');
+describe('toIsoDate', () => {
+  it('yerel takvim gununu YYYY-AA-GG bicimine cevirir', () => {
+    expect(toIsoDate(new Date(1985, 3, 12))).toBe('1985-04-12');
+    // Gece yarisina yakin saat UTC'ye cevrilseydi gun kayardi.
+    expect(toIsoDate(new Date(1990, 0, 1, 0, 30))).toBe('1990-01-01');
+    expect(toIsoDate(new Date(1990, 11, 31, 23, 59))).toBe('1990-12-31');
   });
-
-  it.each(['31.02.1990', '1985-04-12', '12/04/1985', '12.4.1985', '01.01.1899', '01.01.2999', ''])(
-    'gecersiz veya gelecekteki tarihi reddeder: %s',
-    (value) => {
-      expect(parseBirthDate(value)).toBeNull();
-    },
-  );
 });
 
 describe('classifyRegistrationError', () => {
@@ -23,9 +18,23 @@ describe('classifyRegistrationError', () => {
 
   it('bilinen durumlari ayirir', () => {
     expect(classifyRegistrationError(error(429))).toBe('rateLimited');
-    expect(classifyRegistrationError(error(404))).toBe('sessionExpired');
     expect(classifyRegistrationError(error(422))).toBe('channelUnavailable');
     expect(classifyRegistrationError(error(400, { password: ['kisa'] }))).toBe('fields');
+  });
+
+  it('suresi doldu yalnizca uygulamanin "kayit yok" yanitinda ve islem basladiktan sonra soylenir', () => {
+    const notFound = new ApiError({
+      message: 'x',
+      status: 404,
+      isNetworkError: false,
+      type: 'https://dsg-hrms/errors/not-found',
+    });
+
+    expect(classifyRegistrationError(notFound)).toBe('sessionExpired');
+    // Ilk adimda islem yoktur; 404 baska bir soruna isaret eder.
+    expect(classifyRegistrationError(notFound, { canExpire: false })).toBe('unexpected');
+    // Turu olmayan 404: guncellenmemis sunucu veya yanlis adres.
+    expect(classifyRegistrationError(error(404))).toBe('unexpected');
   });
 
   it('digerlerini beklenmeyen sayar', () => {

@@ -27,12 +27,19 @@ function apiError(
   });
 }
 
+/** Dogum tarihini klavyeyle yazar: alan gun, ay ve yil bolumlerinden olusur; rakamlar sirayla ilerler. */
+async function typeBirthDate(user: ReturnType<typeof userEvent.setup>, digits = '12041985') {
+  const group = screen.getByRole('group', { name: 'Doğum tarihi' });
+  await user.click(within(group).getAllByRole('spinbutton')[0]!);
+  await user.keyboard(digits);
+}
+
 async function fillIdentity(
   user: ReturnType<typeof userEvent.setup>,
   nationalId = VALID_NATIONAL_ID,
 ) {
   await user.type(screen.getByLabelText('T.C. Kimlik Numarası'), nationalId);
-  await user.type(screen.getByLabelText('Doğum tarihi'), '12.04.1985');
+  await typeBirthDate(user);
   await user.type(screen.getByLabelText('Kurumsal e-posta adresi'), 'ahmet.yilmaz@duzen.com.tr');
   await user.click(screen.getByRole('button', { name: 'Devam et' }));
 }
@@ -119,12 +126,12 @@ describe('RegistrationPage', () => {
     expect(registrationApi.start).not.toHaveBeenCalled();
   });
 
-  it('gecersiz dogum tarihini ve e-postayi alanlarinda bildirir', async () => {
+  it('gelecekteki dogum tarihini ve gecersiz e-postayi alanlarinda bildirir', async () => {
     const user = userEvent.setup();
     renderWithProviders(<RegistrationPage />);
 
     await user.type(screen.getByLabelText('T.C. Kimlik Numarası'), VALID_NATIONAL_ID);
-    await user.type(screen.getByLabelText('Doğum tarihi'), '31.02.1990');
+    await typeBirthDate(user, '01012999');
     await user.type(screen.getByLabelText('Kurumsal e-posta adresi'), 'eposta');
     await user.click(screen.getByRole('button', { name: 'Devam et' }));
 
@@ -149,6 +156,46 @@ describe('RegistrationPage', () => {
     expect(await screen.findByRole('radio', { name: 'E-posta ile' })).toBeChecked();
     expect(screen.queryByRole('radio', { name: 'SMS ile' })).not.toBeInTheDocument();
     expect(screen.queryByText(/ahmet\.yilmaz/)).not.toBeInTheDocument();
+  });
+
+  it('dogum tarihi takvimden de secilebilir', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<RegistrationPage />);
+
+    await user.click(screen.getByRole('button', { name: 'Takvimden tarih seç' }));
+
+    // Takvim yil gorunumuyle acilir: dogum yilina gunden gune ilerlemek gerekmez.
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('radio', { name: '1985' }));
+    await user.click(await within(dialog).findByRole('radio', { name: 'Nisan' }));
+    await user.click(await within(dialog).findByRole('gridcell', { name: '12' }));
+
+    await user.type(screen.getByLabelText('T.C. Kimlik Numarası'), VALID_NATIONAL_ID);
+    await user.type(screen.getByLabelText('Kurumsal e-posta adresi'), 'ahmet.yilmaz@duzen.com.tr');
+    await user.click(screen.getByRole('button', { name: 'Devam et' }));
+
+    await waitFor(() =>
+      expect(registrationApi.start).toHaveBeenCalledWith(
+        expect.objectContaining({ birthDate: '1985-04-12' }),
+      ),
+    );
+  });
+
+  it('ilk adimdaki 404 "suresi doldu" sayilmaz; bastan baslat formu temizler', async () => {
+    // Guncellenmemis bir sunucu uyelik adresini tanimaz ve 404 dondurur; bu, islemin
+    // suresinin dolmasi DEGILDIR (#90 geri bildirimi).
+    vi.mocked(registrationApi.start).mockRejectedValue(
+      apiError(404, { traceId: 'IZ-404', message: 'Aradığınız kayıt bulunamadı.' }),
+    );
+    const user = userEvent.setup();
+    renderWithProviders(<RegistrationPage />);
+
+    await fillIdentity(user);
+
+    expect(await screen.findByText(/IZ-404/)).toBeInTheDocument();
+    expect(
+      screen.queryByText('Üyelik işleminin süresi doldu. Lütfen baştan başlayın.'),
+    ).not.toBeInTheDocument();
   });
 
   it('kod ekraninda her durumda "eslesiyorsa gelir" iletisini ve kalan sureyi gosterir (SYG-KMLK-016, 028)', async () => {
@@ -296,7 +343,14 @@ describe('RegistrationPage', () => {
   });
 
   it('suresi dolan islemde bastan baslatir', async () => {
-    vi.mocked(registrationApi.requestCode).mockRejectedValue(apiError(404));
+    vi.mocked(registrationApi.requestCode).mockRejectedValue(
+      new ApiError({
+        message: 'x',
+        status: 404,
+        isNetworkError: false,
+        type: 'https://dsg-hrms/errors/not-found',
+      }),
+    );
     const user = userEvent.setup();
     renderWithProviders(<RegistrationPage />);
     await fillIdentity(user);
@@ -309,7 +363,8 @@ describe('RegistrationPage', () => {
       }),
     );
 
-    expect(await screen.findByLabelText('T.C. Kimlik Numarası')).toBeInTheDocument();
+    // Form ve hata durumu temizlenir: ilk adim bos gelir.
+    expect(await screen.findByLabelText('T.C. Kimlik Numarası')).toHaveValue('');
   });
 
   it('beklenmeyen hatada takip numarasini gosterir (SYG-KMLK-067)', async () => {
@@ -332,8 +387,14 @@ describe('RegistrationPage', () => {
     expect(screen.getByLabelText('T.C. Kimlik Numarası')).toHaveFocus();
     await user.keyboard(VALID_NATIONAL_ID);
     await user.tab();
-    expect(screen.getByLabelText('Doğum tarihi')).toHaveFocus();
-    await user.keyboard('12.04.1985');
+    const dateSections = within(screen.getByRole('group', { name: 'Doğum tarihi' })).getAllByRole(
+      'spinbutton',
+    );
+    expect(dateSections[0]).toHaveFocus();
+    await user.keyboard('12041985');
+    // Tarih alani tek sekme duragidir; ardindan takvim dugmesi gelir.
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Takvimden tarih seç' })).toHaveFocus();
     await user.tab();
     expect(screen.getByLabelText('Kurumsal e-posta adresi')).toHaveFocus();
     await user.keyboard('ahmet.yilmaz@duzen.com.tr{Enter}');

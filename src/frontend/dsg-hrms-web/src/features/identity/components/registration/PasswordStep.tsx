@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { ApiError } from '@/shared/api/problemDetails';
 import { registrationApi, type PublicSettings } from '../../api/registrationApi';
+import { primaryButtonSx } from '../motion';
 import { RegistrationError } from './registrationErrors';
 
 type PasswordForm = { password: string; confirm: string };
@@ -145,7 +146,13 @@ export function PasswordStep({ registrationId, rules, onCompleted, onRestart }: 
 
       {complete.error ? <RegistrationError error={complete.error} onRestart={onRestart} /> : null}
 
-      <Button type="submit" variant="contained" size="large" disabled={complete.isPending}>
+      <Button
+        type="submit"
+        variant="contained"
+        size="large"
+        disabled={complete.isPending}
+        sx={primaryButtonSx}
+      >
         {t('identity.registration.password.submit')}
       </Button>
     </Stack>

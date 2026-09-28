@@ -50,9 +50,12 @@
     "layout": {
       "logoAlt": "Düzen Sağlık Grubu logosu",
       "panelTitle": "İnsan Kaynakları Yönetim Sistemi",
-      "panelText": "Düzen Sağlık Grubu çalışanlarına özel insan kaynakları hizmetleri.",
+      "panelText": "Düzen Sağlık Grubu çalışanlarının insan kaynakları işlemleri için tek, güvenli adres.",
       "supportTitle": "Sorun mu yaşıyorsunuz?",
-      "supportText": "{{contact}} ile iletişime geçin."
+      "supportText": "{{contact}} ile iletişime geçin.",
+      "highlightSecure": "Kurumsal e-posta adresiniz ve parolanızla güvenli giriş",
+      "highlightSingleAccount": "Grup şirketlerinin tamamı için tek hesap",
+      "highlightPrivacy": "Kişisel verileriniz KVKK kapsamında korunur"
     },
     "registration": {
       "title": "Üye ol",
@@ -63,12 +66,13 @@
         "nationalId": "T.C. Kimlik Numarası",
         "nationalIdInvalid": "Geçerli bir T.C. Kimlik Numarası girin.",
         "birthDate": "Doğum tarihi",
-        "birthDateHint": "GG.AA.YYYY biçiminde, örneğin 12.04.1985",
+        "birthDateHint": "GG.AA.YYYY biçiminde yazın veya takvimden seçin",
         "birthDateInvalid": "Doğum tarihini GG.AA.YYYY biçiminde girin.",
         "email": "Kurumsal e-posta adresi",
         "emailHint": "Kurumda kullandığınız e-posta adresi, örneğin ad.soyad@duzen.com.tr",
         "emailInvalid": "Geçerli bir e-posta adresi girin.",
-        "submit": "Devam et"
+        "submit": "Devam et",
+        "birthDatePicker": "Takvimden tarih seç"
       },
       "channel": {
         "heading": "Doğrulama yöntemi",
@@ -124,7 +128,8 @@
         "sessionExpired": "Üyelik işleminin süresi doldu. Lütfen baştan başlayın.",
         "channelUnavailable": "Seçilen doğrulama yöntemi kullanılamıyor. Başka bir yöntem seçin."
       },
-      "restart": "Baştan başla"
+      "restart": "Baştan başla",
+      "subtitle": "Birkaç adımda hesabınızı oluşturun."
     }
   }
 }
