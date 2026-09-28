@@ -45,6 +45,64 @@ function createCorrelationId(): string {
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    /**
+     * Istege erisim jetonu eklenmez ve `401` yanitinda jeton yenilenmez. Giris, jeton
+     * yenileme ve cikis istekleri icindir: bu istekler oturumun KENDISIDIR; kendi
+     * `401`'lerinde yenileme denemek sonsuz donguye yol acardi.
+     */
+    skipAuth?: boolean;
+
+    /** Istek yenilenmis jetonla bir kez tekrarlandi; ikinci kez tekrarlanmaz. */
+    authRetried?: boolean;
+  }
+}
+
+/**
+ * Oturum yonetiminin API istemcisine sagladigi islevler.
+ *
+ * Istemci oturum modulunu ICE AKTARMAZ; oturum modulu kendini buraya kaydeder
+ * (`configureAuth`). Aksi hâlde iki modul birbirini ice aktarirdi: oturum modulu jeton
+ * yenilemek icin bu istemciyi kullanir.
+ */
+export interface AuthHandlers {
+  /** Gecerli erisim jetonu; suresi dolmak uzereyse once yenilenir. Oturum yoksa `null`. */
+  getAccessToken: () => Promise<string | null>;
+
+  /** Jetonu yeniler. Oturum sona erdiyse `null`. */
+  refreshAccessToken: () => Promise<string | null>;
+}
+
+let auth: AuthHandlers | null = null;
+
+/** Oturum yonetimini istemciye baglar (ADR-0015 §3). */
+export function configureAuth(handlers: AuthHandlers | null): void {
+  auth = handlers;
+}
+
+const AUTHORIZATION_HEADER = 'Authorization';
+
+apiClient.interceptors.request.use(async (config) => {
+  // Tekrarlanan istek yenilenmis jetonu zaten tasir; uzerine yazilmaz.
+  if (!config.skipAuth && !config.authRetried && auth) {
+    let token: string | null = null;
+
+    try {
+      token = await auth.getAccessToken();
+    } catch {
+      // Jeton yenilenemedi (ag hatasi). Istek jetonsuz gider; sunucunun 401'i asagida
+      // ele alinir ve kullanici ag hatasi iletisini gorur.
+    }
+
+    if (token) {
+      config.headers.set(AUTHORIZATION_HEADER, `Bearer ${token}`);
+    }
+  }
+
+  return config;
+});
+
 apiClient.interceptors.request.use((config) => {
   // Izleme kimligi bir KOLAYLIKTIR: destek talebini gunluk kaydiyla eslestirir.
   // Uretilemiyorsa istek yine de gitmelidir - yardimci bir ozelligin asil islevi
@@ -60,7 +118,12 @@ apiClient.interceptors.request.use((config) => {
 
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: unknown) => {
+  async (error: unknown) => {
+    const retried = await retryWithFreshToken(error);
+    if (retried) {
+      return retried;
+    }
+
     if (!(error instanceof AxiosError)) {
       return Promise.reject(toApiError(undefined, undefined, i18n.t('error.generic')));
     }
@@ -76,6 +139,40 @@ apiClient.interceptors.response.use(
     return Promise.reject(toApiError(error.response?.data, status, defaultMessageFor(status)));
   },
 );
+
+/**
+ * `401` yanitinda jetonu yeniler ve istegi BIR KEZ tekrarlar (ADR-0015 §3).
+ *
+ * Jeton, istemcinin beklediginden once gecersiz olabilir: sunucu her istekte oturumun acik
+ * oldugunu da denetler (`KR-086`). Yenileme oturumun kapandigini soylerse oturum modulu
+ * kullaniciyi girise dondurur; istek tekrarlanmaz.
+ */
+async function retryWithFreshToken(error: unknown) {
+  if (!(error instanceof AxiosError) || error.response?.status !== 401 || !auth) {
+    return undefined;
+  }
+
+  const config = error.config;
+  if (!config || config.skipAuth || config.authRetried) {
+    return undefined;
+  }
+
+  let token: string | null;
+  try {
+    token = await auth.refreshAccessToken();
+  } catch {
+    return undefined;
+  }
+
+  if (!token) {
+    return undefined;
+  }
+
+  config.authRetried = true;
+  config.headers.set(AUTHORIZATION_HEADER, `Bearer ${token}`);
+
+  return apiClient.request(config);
+}
 
 /**
  * Sunucu bir mesaj dondurmediyse duruma uygun Turkce mesaj uretir.

@@ -22,10 +22,4 @@ export function useCountdown(until: string | undefined, clock: () => number = Da
   return Math.max(0, Math.ceil((Date.parse(until) - now) / 1000));
 }
 
-/** Saniyeyi "d:ss" bicimine cevirir. */
-export function formatCountdown(seconds: number): string {
-  const minutes = Math.floor(seconds / 60);
-  const rest = seconds % 60;
-
-  return `${minutes}:${String(rest).padStart(2, '0')}`;
-}
+export { formatCountdown } from '@/shared/utils/formatCountdown';

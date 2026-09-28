@@ -6,6 +6,7 @@ import { tr } from 'date-fns/locale';
 import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
 import { theme } from '@/shared/theme/theme';
 import { createQueryClient } from './queryClient';
+import { SessionCacheReset } from './SessionCacheReset';
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -21,6 +22,7 @@ export function AppProviders({ children, queryClient }: AppProvidersProps) {
       <ThemeProvider theme={theme}>
         {/* Tarayici varsayilanlarini sifirlar; tema tutarli calisir. */}
         <CssBaseline />
+        <SessionCacheReset />
 
         {/*
           Tarih bileseni Turkce kullanir: gun ve ay adlari, haftanin ilk gunu

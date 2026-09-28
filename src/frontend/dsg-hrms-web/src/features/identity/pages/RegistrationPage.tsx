@@ -1,19 +1,22 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
 import InfoRounded from '@mui/icons-material/InfoRounded';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Link as RouterLink } from 'react-router';
 import { queryKeys } from '@/shared/api/queryKeys';
+import { routes } from '@/shared/routes';
 import { registrationApi, type VerificationChannel } from '../api/registrationApi';
 import { AuthLayout } from '../components/AuthLayout';
-import { fadeSlide, popIn, reducedMotion } from '../components/motion';
-import { ChannelStep } from '../components/registration/ChannelStep';
-import { CodeStep } from '../components/registration/CodeStep';
+import { fadeSlide, popIn, primaryButtonSx, reducedMotion } from '../components/motion';
 import { IdentityStep } from '../components/registration/IdentityStep';
 import { PasswordStep } from '../components/registration/PasswordStep';
+import { RegistrationError } from '../components/registration/RegistrationError';
 import { StepProgress } from '../components/registration/StepProgress';
+import { ChannelStep } from '../components/verification/ChannelStep';
+import { CodeStep } from '../components/verification/CodeStep';
 
 type Step =
   | { name: 'identity' }
@@ -47,8 +50,8 @@ const STEP_NUMBER: Record<Step['name'], number> = {
 
 const HEADING: Record<Step['name'], string> = {
   identity: 'identity.registration.identity.heading',
-  channel: 'identity.registration.channel.heading',
-  code: 'identity.registration.code.heading',
+  channel: 'identity.verification.channel.heading',
+  code: 'identity.verification.code.heading',
   password: 'identity.registration.password.heading',
   done: 'identity.registration.done.heading',
   exists: 'identity.registration.exists.heading',
@@ -141,10 +144,10 @@ export function RegistrationPage() {
 
         {step.name === 'channel' ? (
           <ChannelStep
-            registrationId={step.registrationId}
             channels={step.channels}
             initialChannel={step.channel}
-            onRestart={restart}
+            requestCode={(channel) => registrationApi.requestCode(step.registrationId, channel)}
+            renderError={(error) => <RegistrationError error={error} onRestart={restart} />}
             onCodeRequested={(channel, requested) =>
               setStep({
                 name: 'code',
@@ -159,12 +162,14 @@ export function RegistrationPage() {
 
         {step.name === 'code' ? (
           <CodeStep
-            registrationId={step.registrationId}
+            intro={t('identity.registration.codeIntro')}
             channel={step.channel}
             channels={step.channels}
             codeExpiresAt={step.codeExpiresAt}
             codeLength={settings.data?.verificationCodeLength ?? 6}
-            onRestart={restart}
+            requestCode={(channel) => registrationApi.requestCode(step.registrationId, channel)}
+            verify={(code) => registrationApi.verify(step.registrationId, code)}
+            renderError={(error) => <RegistrationError error={error} onRestart={restart} />}
             onCodeResent={(requested) =>
               setStep({ ...step, codeExpiresAt: requested.codeExpiresAt })
             }
@@ -176,7 +181,7 @@ export function RegistrationPage() {
                 channel: step.channels.find((item) => item !== step.channel),
               })
             }
-            onVerified={(accountExists) =>
+            onVerified={({ accountExists }) =>
               setStep(
                 accountExists
                   ? { name: 'exists' }
@@ -225,6 +230,8 @@ interface OutcomeProps {
 
 /** Akisin sonu: canlandirilmis simge ve aciklama. */
 function Outcome({ tone, icon, children }: OutcomeProps) {
+  const { t } = useTranslation();
+
   return (
     <Stack spacing={2} sx={{ alignItems: 'center', textAlign: 'center', py: 2 }}>
       <Box
@@ -246,6 +253,16 @@ function Outcome({ tone, icon, children }: OutcomeProps) {
       <Typography role="status" color="text.secondary">
         {children}
       </Typography>
+      <Button
+        component={RouterLink}
+        to={routes.login}
+        variant="contained"
+        size="large"
+        fullWidth
+        sx={primaryButtonSx}
+      >
+        {t('identity.registration.goToLogin')}
+      </Button>
     </Stack>
   );
 }

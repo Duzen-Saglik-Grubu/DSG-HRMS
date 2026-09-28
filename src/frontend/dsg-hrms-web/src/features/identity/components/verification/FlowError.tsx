@@ -2,34 +2,44 @@ import { Alert, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '@/shared/api/problemDetails';
 import { ErrorState } from '@/shared/components/ErrorState';
-import { classifyRegistrationError } from '../../utils/registrationErrorKind';
+import { classifyFlowError } from '../../utils/flowErrorKind';
 
-interface RegistrationErrorProps {
+interface FlowErrorProps {
   error: unknown;
   onRestart: () => void;
-  /** Uyelik islemi baslamis mi; ilk adimda "suresi doldu" soylenemez. */
+  /** Suresi dolan islemin iletisi ("Uyelik isleminin suresi doldu" gibi). */
+  expiredText: string;
+  /** Islemi bastan baslatan dugmenin metni. */
+  restartText: string;
+  /** Islem baslamis mi; ilk adimda "suresi doldu" soylenemez. */
   canExpire?: boolean;
 }
 
 /**
- * Uyelik akisindaki hatanin gosterimi.
+ * Uyelik ve iki adimli giris akisindaki hatanin gosterimi.
  *
  * Bilinen durumlar kullaniciya ne yapacagini soyler (SYG-KMLK-064). Beklenmeyen
  * hatada takip numarasi gosterilir (SYG-KMLK-067). Alan hatalari burada gosterilmez;
  * ilgili alanin altinda gorunur.
  */
-export function RegistrationError({ error, onRestart, canExpire = true }: RegistrationErrorProps) {
+export function FlowError({
+  error,
+  onRestart,
+  expiredText,
+  restartText,
+  canExpire = true,
+}: FlowErrorProps) {
   const { t } = useTranslation();
-  const kind = classifyRegistrationError(error, { canExpire });
+  const kind = classifyFlowError(error, { canExpire });
 
   switch (kind) {
     case 'fields':
       return null;
     case 'rateLimited':
-      return <Alert severity="warning">{t('identity.registration.errors.rateLimited')}</Alert>;
+      return <Alert severity="warning">{t('identity.verification.errors.rateLimited')}</Alert>;
     case 'channelUnavailable':
       return (
-        <Alert severity="warning">{t('identity.registration.errors.channelUnavailable')}</Alert>
+        <Alert severity="warning">{t('identity.verification.errors.channelUnavailable')}</Alert>
       );
     case 'sessionExpired':
       return (
@@ -37,11 +47,11 @@ export function RegistrationError({ error, onRestart, canExpire = true }: Regist
           severity="warning"
           action={
             <Button color="inherit" size="small" onClick={onRestart}>
-              {t('identity.registration.restart')}
+              {restartText}
             </Button>
           }
         >
-          {t('identity.registration.errors.sessionExpired')}
+          {expiredText}
         </Alert>
       );
     default:

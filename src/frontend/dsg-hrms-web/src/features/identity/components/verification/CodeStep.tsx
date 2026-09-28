@@ -1,51 +1,55 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Alert, Button, Stack, TextField, Typography } from '@mui/material';
 import TimerOutlined from '@mui/icons-material/TimerOutlined';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import {
-  registrationApi,
-  type CodeRequested,
-  type VerificationChannel,
-  type VerificationOutcome,
+import type {
+  CodeRequested,
+  VerificationChannel,
+  VerificationOutcome,
 } from '../../api/registrationApi';
 import { formatCountdown, useCountdown } from '../../hooks/useCountdown';
 import { primaryButtonSx } from '../motion';
-import { RegistrationError } from './registrationErrors';
 
-interface CodeStepProps {
-  registrationId: string;
+interface CodeStepProps<TResponse extends { result: VerificationOutcome }> {
+  /** Adimin basindaki aciklama; akisa gore degisir. */
+  intro: string;
   channel: VerificationChannel;
   channels: VerificationChannel[];
   codeExpiresAt: string;
   codeLength: number;
-  onVerified: (accountExists: boolean) => void;
+  requestCode: (channel: VerificationChannel) => Promise<CodeRequested>;
+  verify: (code: string) => Promise<TResponse>;
+  onVerified: (response: TResponse) => void;
   onCodeResent: (requested: CodeRequested) => void;
   onChangeChannel: () => void;
-  onRestart: () => void;
+  renderError: (error: unknown) => ReactNode;
 }
 
 /** Yeni kod istenmeden duzelmeyen sonuclar. */
 const TERMINAL: VerificationOutcome[] = ['expired', 'attemptsExceeded', 'notUsable'];
 
 /**
- * 3. adim: dogrulama kodu (SYG-KMLK-016, 019, 023, 024, 028).
+ * Dogrulama kodu (SYG-KMLK-016, 019, 023, 024, 028, 034). Uyelik ve iki adimli giris ayni
+ * adimi kullanir; kod kurallari da aynidir.
  *
- * "Bilgileriniz eslesiyorsa kod gelir" iletisi HER DURUMDA gosterilir (SYG-KMLK-016):
- * ekran eslesmenin olup olmadigini soylemez. Kalan sure sunucunun verdigi bitis
+ * Uyelikte "bilgileriniz eslesiyorsa kod gelir" iletisi HER DURUMDA gosterilir
+ * (SYG-KMLK-016): ekran eslesmenin olup olmadigini soylemez. Kalan sure sunucunun verdigi bitis
  * anindan hesaplanir. Tekrar gonderim ve kanal degisimi sunucuda hiz sinirina tabidir.
  */
-export function CodeStep({
-  registrationId,
+export function CodeStep<TResponse extends { result: VerificationOutcome }>({
+  intro,
   channel,
   channels,
   codeExpiresAt,
   codeLength,
+  requestCode,
+  verify: verifyCode,
   onVerified,
   onCodeResent,
   onChangeChannel,
-  onRestart,
-}: CodeStepProps) {
+  renderError,
+}: CodeStepProps<TResponse>) {
   const { t } = useTranslation();
   const remaining = useCountdown(codeExpiresAt);
   const [code, setCode] = useState('');
@@ -54,10 +58,10 @@ export function CodeStep({
   const [resent, setResent] = useState(false);
 
   const verify = useMutation({
-    mutationFn: () => registrationApi.verify(registrationId, code.trim()),
+    mutationFn: () => verifyCode(code.trim()),
     onSuccess: (response) => {
       if (response.result === 'verified') {
-        onVerified(response.accountExists);
+        onVerified(response);
         return;
       }
 
@@ -67,7 +71,7 @@ export function CodeStep({
   });
 
   const resend = useMutation({
-    mutationFn: () => registrationApi.requestCode(registrationId, channel),
+    mutationFn: () => requestCode(channel),
     onSuccess: (requested) => {
       setOutcome(null);
       setCode('');
@@ -87,7 +91,7 @@ export function CodeStep({
       onSubmit={(event) => {
         event.preventDefault();
         if (code.trim().length === 0) {
-          setInputError(t('identity.registration.code.required'));
+          setInputError(t('identity.verification.code.required'));
           return;
         }
 
@@ -96,7 +100,7 @@ export function CodeStep({
         verify.mutate();
       }}
     >
-      <Alert severity="info">{t('identity.registration.code.intro')}</Alert>
+      <Alert severity="info">{intro}</Alert>
 
       <Stack
         direction="row"
@@ -105,12 +109,12 @@ export function CodeStep({
       >
         <TimerOutlined fontSize="small" aria-hidden />
         <Typography variant="body2" aria-live="off" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-          {t('identity.registration.code.remaining', { time: formatCountdown(remaining) })}
+          {t('identity.verification.code.remaining', { time: formatCountdown(remaining) })}
         </Typography>
       </Stack>
 
       <TextField
-        label={t('identity.registration.code.label')}
+        label={t('identity.verification.code.label')}
         value={code}
         onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))}
         autoComplete="one-time-code"
@@ -127,19 +131,19 @@ export function CodeStep({
           },
         }}
         error={Boolean(inputError)}
-        helperText={inputError ?? t('identity.registration.code.hint', { count: codeLength })}
+        helperText={inputError ?? t('identity.verification.code.hint', { count: codeLength })}
       />
 
       {message ? (
         <Alert severity={message === 'mismatch' ? 'error' : 'warning'} role="alert">
-          {t(`identity.registration.code.${message}`)}
+          {t(`identity.verification.code.${message}`)}
         </Alert>
       ) : null}
 
-      {resent ? <Alert severity="success">{t('identity.registration.code.resent')}</Alert> : null}
+      {resent ? <Alert severity="success">{t('identity.verification.code.resent')}</Alert> : null}
 
-      {verify.error ? <RegistrationError error={verify.error} onRestart={onRestart} /> : null}
-      {resend.error ? <RegistrationError error={resend.error} onRestart={onRestart} /> : null}
+      {verify.error ? renderError(verify.error) : null}
+      {resend.error ? renderError(resend.error) : null}
 
       <Button
         type="submit"
@@ -148,16 +152,16 @@ export function CodeStep({
         disabled={expired || verify.isPending}
         sx={primaryButtonSx}
       >
-        {t('identity.registration.code.submit')}
+        {t('identity.verification.code.submit')}
       </Button>
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
         <Button variant="text" onClick={() => resend.mutate()} disabled={resend.isPending}>
-          {t('identity.registration.code.resend')}
+          {t('identity.verification.code.resend')}
         </Button>
         {channels.length > 1 ? (
           <Button variant="text" onClick={onChangeChannel}>
-            {t('identity.registration.code.changeChannel')}
+            {t('identity.verification.code.changeChannel')}
           </Button>
         ) : null}
       </Stack>
