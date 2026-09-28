@@ -535,7 +535,7 @@
         "tags": [
           "Sessions"
         ],
-        "summary": "Yenileme jetonuyla (cerez) yeni erisim jetonu alir. Jeton her kullanimda yenilenir\r\n(SYG-KMLK-040). Hareketsizlik sayacini sifirlamaz (SYG-KMLK-038).",
+        "summary": "Yenileme jetonuyla (cerez) yeni erisim jetonu alir. Jeton her kullanimda yenilenir\n(SYG-KMLK-040). Hareketsizlik sayacini sifirlamaz (SYG-KMLK-038).",
         "responses": {
           "200": {
             "description": "Yeni oturum bilgisi.",
@@ -565,7 +565,7 @@
         "tags": [
           "Sessions"
         ],
-        "summary": "Kullanici etkilesimi veya mesru uzun etkinlik sinyali (SYG-KMLK-038, 039). Dakikada en\r\nfazla iki kez kabul edilir; toplam oturum suresini uzatmaz.",
+        "summary": "Kullanici etkilesimi veya mesru uzun etkinlik sinyali (SYG-KMLK-038, 039). Dakikada en\nfazla iki kez kabul edilir; toplam oturum suresini uzatmaz.",
         "responses": {
           "204": {
             "description": "Kaydedildi.",
