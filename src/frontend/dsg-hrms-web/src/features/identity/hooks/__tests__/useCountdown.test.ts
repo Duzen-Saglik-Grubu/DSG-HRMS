@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { recordServerDate, resetServerClock } from '@/shared/api/serverClock';
 import { formatCountdown, useCountdown } from '../useCountdown';
 
 describe('useCountdown', () => {
@@ -9,7 +10,17 @@ describe('useCountdown', () => {
   });
 
   afterEach(() => {
+    resetServerClock();
     vi.useRealTimers();
+  });
+
+  it('sunucu saati geride olsa da kalan sureyi dogru gosterir (#103)', () => {
+    // UAT: sunucu 10 dakika geride; 5 dakikalik kodun bitis ani sunucu saatine gore verilir.
+    recordServerDate('Sun, 27 Sep 2026 08:50:00 GMT');
+
+    const { result } = renderHook(() => useCountdown('2026-09-27T08:55:00Z'));
+
+    expect(result.current).toBe(300);
   });
 
   it('sunucunun bitis anindan geriye sayar', () => {

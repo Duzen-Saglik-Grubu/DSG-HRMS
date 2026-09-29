@@ -498,6 +498,33 @@ cd /opt/dsg-hrms/docker && docker compose -f compose.uat.yml --env-file /opt/dsg
 
 Doğrulama: yönetici hesabıyla girişte oturum yanıtındaki `user.permissions` 7 izni içerir. İzinler `docs/mimari/izin-listesi.md` belgesindedir.
 
+## 12. Sunucu saati (#103)
+
+Sunucunun saati **eşitlenmiş olmalıdır**. Bu gereklilik üç yerden doğar:
+- Doğrulama kodunun ve oturumun süreleri sunucunun saatiyle hesaplanır.
+- Denetim izine sunucunun saati yazılır.
+- Günlük kayıtlarındaki zaman sunucunun saatidir.
+
+29.09.2026'da UAT sunucusu yaklaşık **10 dakika gerideydi**. chrony çalışıyordu ama eşitleme yapamıyordu (`System clock synchronized: no`); büyük olasılıkla dış NTP sunucularına erişim kapalı.
+
+Uygulama tarayıcıyla sunucu arasındaki farkı `Date` başlığından ölçüp geri sayımı buna göre düzeltir. Yine de denetim izindeki zamanların doğru olması için sunucu saati eşitlenmelidir.
+
+```bash
+# Durum: "System clock synchronized: yes" beklenir
+timedatectl
+chronyc tracking | grep -E "Reference ID|System time"
+
+# Kurum içi NTP kaynağı (örneğin etki alanı denetleyicisi) tanımlanır:
+echo "server <kurum-ici-ntp-sunucusu> iburst" > /etc/chrony/sources.d/kurum.sources
+chronyc reload sources && chronyc makestep
+```
+
+Doğrulama (sunucu ve tarayıcı saati aynı olmalı):
+
+```bash
+curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date"; date -u
+```
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
@@ -514,3 +541,4 @@ Doğrulama: yönetici hesabıyla girişte oturum yanıtındaki `user.permissions
 | 2026-09-27 | 1.0 | §10.4 üyelik anahtarı ve ters vekil ağı denetimi (#87) | Bilgi İşlem |
 | 2026-09-28 | 1.1 | §10.1: JWT imzalama anahtarı zorunlu (#92) | Bilgi İşlem |
 | 2026-09-29 | 1.2 | §11: ilk sistem yöneticisi (#100) | Bilgi İşlem |
+| 2026-09-29 | 1.3 | §12: sunucu saati eşitlemesi (#103) | Bilgi İşlem |

@@ -1,6 +1,7 @@
 import axios, { AxiosError, type AxiosInstance } from 'axios';
 import i18n from '@/shared/i18n/i18n';
 import { toApiError } from './problemDetails';
+import { recordServerDate } from './serverClock';
 
 /**
  * Uygulamadaki TEK Axios ornegi (ADR-0015 §3).
@@ -117,8 +118,15 @@ apiClient.interceptors.request.use((config) => {
 });
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    recordServerDate(response.headers['date']);
+    return response;
+  },
   async (error: unknown) => {
+    if (error instanceof AxiosError) {
+      recordServerDate(error.response?.headers['date']);
+    }
+
     const retried = await retryWithFreshToken(error);
     if (retried) {
       return retried;
