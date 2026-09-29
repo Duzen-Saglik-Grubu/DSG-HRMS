@@ -75,6 +75,297 @@
         }
       }
     },
+    "/api/v1/identity/accounts": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "summary": "Kisileri sicil numarasi, ad veya soyadla arar.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AccountSortField"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sayfalanmis liste.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResponseOfAccountSummaryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz sayfa veya siralama.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`identity.account.view`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/accounts/{personId}/deactivation": {
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "summary": "Hesabi gerekceyle elle pasife alir; acik oturumlar hemen kapanir.",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountStatusChangeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountStatusChangeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountStatusChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Hesap pasif.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Gerekce girilmedi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`identity.account.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi bulunamadi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Kisinin hesabi yok veya hesap zaten pasif.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/accounts/{personId}/activation": {
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "summary": "Hesabi gerekceyle elle yeniden aktiflestirir.",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountStatusChangeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountStatusChangeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountStatusChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Hesap aktif.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Gerekce girilmedi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`identity.account.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi bulunamadi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Kisinin hesabi yok, hesap zaten aktif veya kisinin aktif calisma kaydi yok.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/identity/password-resets": {
       "post": {
         "tags": [
@@ -1060,6 +1351,115 @@
   },
   "components": {
     "schemas": {
+      "AccountEmploymentResponse": {
+        "required": [
+          "registryCode",
+          "companyName",
+          "isActive"
+        ],
+        "type": "object",
+        "properties": {
+          "registryCode": {
+            "type": "string",
+            "description": "Sicil numarasi."
+          },
+          "companyName": {
+            "type": "string",
+            "description": "Firma."
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Istihdam suruyor mu."
+          }
+        },
+        "description": "Istihdam."
+      },
+      "AccountSortField": {
+        "enum": [
+          "lastName",
+          "firstName"
+        ],
+        "description": "Siralama alani."
+      },
+      "AccountStateKind": {
+        "enum": [
+          "none",
+          "active",
+          "passive",
+          "locked"
+        ],
+        "description": "Hesap durumu."
+      },
+      "AccountStatusChangeRequest": {
+        "required": [
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Gerekce (zorunlu; denetim izine yazilir)."
+          }
+        },
+        "description": "Hesap durumu degisikligi istegi."
+      },
+      "AccountStatusReasonKind": {
+        "enum": [
+          "employmentEnded",
+          "manual",
+          "newEmployment",
+          null
+        ]
+      },
+      "AccountSummaryResponse": {
+        "required": [
+          "personId",
+          "firstName",
+          "lastName",
+          "employments",
+          "state",
+          "statusReason"
+        ],
+        "type": "object",
+        "properties": {
+          "personId": {
+            "type": "string",
+            "description": "Kisinin dis kimligi.",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Ad."
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Soyad."
+          },
+          "employments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountEmploymentResponse"
+            },
+            "description": "Istihdamlar (sicil ve firma)."
+          },
+          "state": {
+            "description": "Hesap durumu.",
+            "$ref": "#/components/schemas/AccountStateKind"
+          },
+          "statusReason": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Durumun nedeni.",
+                "$ref": "#/components/schemas/AccountStatusReasonKind"
+              }
+            ]
+          }
+        },
+        "description": "Listedeki kisi. Yalnizca ad, soyad, sicil ve firma (SYG-KMLK-073)."
+      },
       "ChangePasswordRequest": {
         "required": [
           "currentPassword",
@@ -1104,6 +1504,62 @@
           }
         },
         "description": "Hesap olusturma istegi."
+      },
+      "PagedResponseOfAccountSummaryResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountSummaryResponse"
+            },
+            "description": "Bu sayfadaki kayitlar."
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa numarasi.",
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa boyutu.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam kayit sayisi.",
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam sayfa sayisi.",
+            "format": "int32"
+          }
+        },
+        "description": "Sayfalanmis yanit (ADR-0010 §4)."
       },
       "PasswordRulesResponse": {
         "required": [
@@ -1386,6 +1842,13 @@
         ],
         "description": "Giris sonucu."
       },
+      "SortOrder": {
+        "enum": [
+          "asc",
+          "desc"
+        ],
+        "description": "Siralama yonu."
+      },
       "StartRegistrationRequest": {
         "required": [
           "nationalId",
@@ -1590,6 +2053,9 @@
   "tags": [
     {
       "name": "Account"
+    },
+    {
+      "name": "Accounts"
     },
     {
       "name": "PasswordResets"

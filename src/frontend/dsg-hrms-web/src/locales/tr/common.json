@@ -186,6 +186,42 @@
       "confirm": "Yeni parola (tekrar)",
       "submit": "Parolayı değiştir",
       "done": "Parolanız değiştirildi. Diğer cihazlardaki oturumlarınız kapatıldı; bu oturumunuz açık kalıyor."
+    },
+    "accounts": {
+      "title": "Hesap işlemleri",
+      "subtitle": "Personelin hesap durumunu görün; gerektiğinde hesabı gerekçeyle pasife alın veya yeniden aktifleştirin.",
+      "search": "Sicil numarası, ad veya soyad",
+      "ended": "ayrıldı",
+      "columns": {
+        "name": "Ad soyad",
+        "employments": "Sicil · Firma",
+        "state": "Hesap durumu",
+        "actions": "İşlem"
+      },
+      "state": {
+        "none": "Hesap yok",
+        "active": "Aktif",
+        "passive": "Pasif",
+        "locked": "Kilitli"
+      },
+      "reason": {
+        "employmentEnded": "Çalışma kaydı sona erdi",
+        "manual": "Elle pasife alındı",
+        "newEmployment": "Yeni çalışma kaydıyla aktifleşti",
+        "label": "Gerekçe",
+        "hint": "Gerekçe denetim kaydına yazılır."
+      },
+      "reasonRequired": "Gerekçe girin.",
+      "deactivate": "Pasife al",
+      "activate": "Aktifleştir",
+      "deactivateTitle": "Hesabı pasife al",
+      "activateTitle": "Hesabı aktifleştir",
+      "deactivateText": "{{name}} adlı kişinin hesabı pasife alınacak ve açık oturumları hemen kapatılacak. Kişi, hesap yeniden aktifleştirilene kadar giriş yapamaz.",
+      "activateText": "{{name}} adlı kişinin hesabı yeniden aktifleştirilecek; kişi giriş yapabilecek.",
+      "deactivateDone": "{{name}} adlı kişinin hesabı pasife alındı.",
+      "activateDone": "{{name}} adlı kişinin hesabı aktifleştirildi.",
+      "emptyTitle": "Kayıt bulunamadı",
+      "emptyText": "Arama metnini değiştirin. Sicil numarasının başını veya ad ya da soyadın bir bölümünü yazabilirsiniz."
     }
   },
   "session": {

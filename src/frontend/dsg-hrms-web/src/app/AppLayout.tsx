@@ -12,11 +12,14 @@ import {
 } from '@mui/material';
 import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
 import LockResetRounded from '@mui/icons-material/LockResetRounded';
+import ManageAccountsOutlined from '@mui/icons-material/ManageAccountsOutlined';
 import LogoutRounded from '@mui/icons-material/LogoutRounded';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate } from 'react-router';
 import { session, useSession } from '@/shared/auth/session';
 import { SessionActivity } from '@/shared/auth/SessionActivity';
+import { permissions } from '@/shared/auth/permissions';
+import { usePermission } from '@/shared/auth/usePermission';
 import { routes } from '@/shared/routes';
 
 /**
@@ -56,6 +59,7 @@ function UserMenu() {
   const { t } = useTranslation();
   const state = useSession();
   const navigate = useNavigate();
+  const canManageAccounts = usePermission(permissions.accountView);
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
 
   if (state.status !== 'authenticated') {
@@ -88,6 +92,19 @@ function UserMenu() {
         </Box>
       </Button>
       <Menu id="user-menu" anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
+        {canManageAccounts ? (
+          <MenuItem
+            onClick={() => {
+              setAnchor(null);
+              void navigate(routes.accounts);
+            }}
+          >
+            <ListItemIcon>
+              <ManageAccountsOutlined fontSize="small" />
+            </ListItemIcon>
+            {t('identity.accounts.title')}
+          </MenuItem>
+        ) : null}
         <MenuItem
           onClick={() => {
             setAnchor(null);

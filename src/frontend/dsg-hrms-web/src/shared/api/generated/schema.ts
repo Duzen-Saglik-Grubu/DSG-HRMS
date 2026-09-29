@@ -76,6 +76,253 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/identity/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kisileri sicil numarasi, ad veya soyadla arar. */
+        get: {
+            parameters: {
+                query?: {
+                    q?: string;
+                    page?: number | string;
+                    pageSize?: number | string;
+                    sort?: components["schemas"]["AccountSortField"];
+                    order?: components["schemas"]["SortOrder"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Sayfalanmis liste. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResponseOfAccountSummaryResponse"];
+                    };
+                };
+                /** @description Gecersiz sayfa veya siralama. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`identity.account.view`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/accounts/{personId}/deactivation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hesabi gerekceyle elle pasife alir; acik oturumlar hemen kapanir. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AccountStatusChangeRequest"];
+                    "text/json": components["schemas"]["AccountStatusChangeRequest"];
+                    "application/*+json": components["schemas"]["AccountStatusChangeRequest"];
+                };
+            };
+            responses: {
+                /** @description Hesap pasif. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Gerekce girilmedi. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`identity.account.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi bulunamadi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisinin hesabi yok veya hesap zaten pasif. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/accounts/{personId}/activation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hesabi gerekceyle elle yeniden aktiflestirir. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AccountStatusChangeRequest"];
+                    "text/json": components["schemas"]["AccountStatusChangeRequest"];
+                    "application/*+json": components["schemas"]["AccountStatusChangeRequest"];
+                };
+            };
+            responses: {
+                /** @description Hesap aktif. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Gerekce girilmedi. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`identity.account.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi bulunamadi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisinin hesabi yok, hesap zaten aktif veya kisinin aktif calisma kaydi yok. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/password-resets": {
         parameters: {
             query?: never;
@@ -1095,6 +1342,49 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description Istihdam. */
+        AccountEmploymentResponse: {
+            /** @description Sicil numarasi. */
+            registryCode: string;
+            /** @description Firma. */
+            companyName: string;
+            /** @description Istihdam suruyor mu. */
+            isActive: boolean;
+        };
+        /**
+         * @description Siralama alani.
+         * @enum {unknown}
+         */
+        AccountSortField: "lastName" | "firstName";
+        /**
+         * @description Hesap durumu.
+         * @enum {unknown}
+         */
+        AccountStateKind: "none" | "active" | "passive" | "locked";
+        /** @description Hesap durumu degisikligi istegi. */
+        AccountStatusChangeRequest: {
+            /** @description Gerekce (zorunlu; denetim izine yazilir). */
+            reason: string;
+        };
+        /** @enum {unknown} */
+        AccountStatusReasonKind: "employmentEnded" | "manual" | "newEmployment" | null;
+        /** @description Listedeki kisi. Yalnizca ad, soyad, sicil ve firma (SYG-KMLK-073). */
+        AccountSummaryResponse: {
+            /**
+             * Format: uuid
+             * @description Kisinin dis kimligi.
+             */
+            personId: string;
+            /** @description Ad. */
+            firstName: string;
+            /** @description Soyad. */
+            lastName: string;
+            /** @description Istihdamlar (sicil ve firma). */
+            employments: components["schemas"]["AccountEmploymentResponse"][];
+            /** @description Hesap durumu. */
+            state: components["schemas"]["AccountStateKind"];
+            statusReason: null | components["schemas"]["AccountStatusReasonKind"];
+        };
         /** @description Oturum icinde parola degisikligi istegi (SYG-KMLK-048). */
         ChangePasswordRequest: {
             /** @description Mevcut parola. */
@@ -1114,6 +1404,31 @@ export interface components {
         CompleteRegistrationRequest: {
             /** @description Parola. */
             password: string;
+        };
+        /** @description Sayfalanmis yanit (ADR-0010 §4). */
+        PagedResponseOfAccountSummaryResponse: {
+            /** @description Bu sayfadaki kayitlar. */
+            items: components["schemas"]["AccountSummaryResponse"][];
+            /**
+             * Format: int32
+             * @description Sayfa numarasi.
+             */
+            page: number | string;
+            /**
+             * Format: int32
+             * @description Sayfa boyutu.
+             */
+            pageSize: number | string;
+            /**
+             * Format: int32
+             * @description Toplam kayit sayisi.
+             */
+            totalCount: number | string;
+            /**
+             * Format: int32
+             * @description Toplam sayfa sayisi.
+             */
+            totalPages: number | string;
         };
         /** @description Parola kurallari. */
         PasswordRulesResponse: {
@@ -1225,6 +1540,11 @@ export interface components {
          * @enum {unknown}
          */
         SignInStatus: "signedIn" | "verificationRequired";
+        /**
+         * @description Siralama yonu.
+         * @enum {unknown}
+         */
+        SortOrder: "asc" | "desc";
         /** @description Uyelik baslatma istegi (SYG-KMLK-013). */
         StartRegistrationRequest: {
             /** @description T.C. Kimlik Numarasi. */
