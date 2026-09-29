@@ -165,7 +165,7 @@ public sealed class SessionsController : ControllerBase
             tokens.AccessTokenExpiresAt,
             tokens.SessionExpiresAt,
             (int)tokens.IdleTimeout.TotalMinutes,
-            new SessionUserResponse(tokens.FirstName, tokens.LastName));
+            new SessionUserResponse(tokens.FirstName, tokens.LastName, tokens.Permissions));
     }
 
     private void ClearRefreshCookie() =>
@@ -236,7 +236,8 @@ public sealed record SessionResponse(
 /// <summary>Oturumdaki kullanici.</summary>
 /// <param name="FirstName">Ad.</param>
 /// <param name="LastName">Soyad.</param>
-public sealed record SessionUserResponse(string FirstName, string LastName);
+/// <param name="Permissions">Izinler. Istemci yalnizca GOSTERIM icin kullanir; denetim her istekte sunucudadir (ADR-0007 §3).</param>
+public sealed record SessionUserResponse(string FirstName, string LastName, IReadOnlyList<string> Permissions);
 
 /// <summary>Bekleyen iki adimli giris.</summary>
 /// <param name="ChallengeId">Kimlik.</param>

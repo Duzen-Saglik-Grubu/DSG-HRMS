@@ -8,6 +8,11 @@ export type SessionResponse = ApiSchemas['SessionResponse'];
 export interface SessionUser {
   firstName: string;
   lastName: string;
+  /**
+   * Izinler (ADR-0007). Yalnizca GOSTERIM icindir: menude ve dugmelerde neyin gorunecegini
+   * belirler. Gercek denetim her istekte sunucudadir.
+   */
+  permissions: readonly string[];
 }
 
 /**
@@ -327,12 +332,17 @@ export class SessionManager {
       idleTimeoutMs: Number(session.idleTimeoutMinutes) * 60_000,
     };
 
-    const user = { firstName: session.user.firstName, lastName: session.user.lastName };
+    const user: SessionUser = {
+      firstName: session.user.firstName,
+      lastName: session.user.lastName,
+      permissions: [...session.user.permissions].sort(),
+    };
     const current = this.state;
     if (
       current.status !== 'authenticated' ||
       current.user.firstName !== user.firstName ||
-      current.user.lastName !== user.lastName
+      current.user.lastName !== user.lastName ||
+      current.user.permissions.join() !== user.permissions.join()
     ) {
       this.setState({ status: 'authenticated', user });
     }

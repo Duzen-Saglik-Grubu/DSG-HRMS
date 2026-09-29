@@ -5,6 +5,7 @@ using Dsg.Hrms.Application.Identity.Sessions;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Infrastructure.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
@@ -90,7 +91,12 @@ public static class AuthenticationRegistration
                 bearer.TokenValidationParameters.LifetimeValidator = (notBefore, expires, _, _) =>
                     IsWithinLifetime(notBefore, expires, clock.UtcNow));
 
+        // Eylem yetkisi (ADR-0007 §3): [HasPermission] politikalari istek aninda uretilir;
+        // yetkisiz istek Problem Details ile 403 doner.
         services.AddAuthorization();
+        services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+        services.AddScoped<IAuthorizationHandler, PermissionHandler>();
+        services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemDetailsAuthorizationResultHandler>();
         return services;
     }
 

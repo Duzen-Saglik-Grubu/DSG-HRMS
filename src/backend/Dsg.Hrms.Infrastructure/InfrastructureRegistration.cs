@@ -1,5 +1,6 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
+using Dsg.Hrms.Application.Identity.Authorization;
 using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Application.Identity.Registration;
 using Dsg.Hrms.Application.Identity.Sessions;
@@ -118,6 +119,12 @@ public static class InfrastructureRegistration
         // imzalama ve dogrulama ayni kimlik dogrulama yapilandirmasini kullanir.
         services.AddScoped<ISessionStore, SessionStore>();
         services.AddScoped<SessionService>();
+
+        // Eylem yetkisi (ADR-0007 §1, SYG-KMLK-074). Ilk sistem yoneticileri yapilandirmadan
+        // okunur ve ACILISTA dogrulanir: gecersiz bir adres ilk giriste degil simdi fark edilir.
+        services.AddSingleton(OptionsRegistration.ReadAndValidate<AccessControlOptions>(configuration, AccessControlOptions.SectionName));
+        services.AddScoped<IAccessControlStore, AccessControlStore>();
+        services.AddScoped<AccessControlService>();
     }
 
     private static void AddPersonnelSync(IServiceCollection services, IConfiguration configuration)
@@ -133,6 +140,8 @@ public static class InfrastructureRegistration
 
         AddLogo(services, configuration);
 
+        services.AddSingleton<PersonnelSyncTrigger>();
+        services.AddSingleton<IPersonnelSyncTrigger>(provider => provider.GetRequiredService<PersonnelSyncTrigger>());
         services.AddHostedService<PersonnelSyncWorker>();
     }
 

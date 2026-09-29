@@ -5,7 +5,11 @@ import { sessionApi } from '@/shared/auth/sessionApi';
 import type { SessionEndReason, SessionResponse } from '@/shared/auth/sessionManager';
 
 /** Sahte oturum yaniti. Jeton imzasizdir ve `iat` tasimaz (saat farki sifir sayilir). */
-export function fakeSession(firstName = 'Ahmet', lastName = 'Yılmaz'): SessionResponse {
+export function fakeSession(
+  firstName = 'Ahmet',
+  lastName = 'Yılmaz',
+  permissions: string[] = [],
+): SessionResponse {
   const now = Date.now();
 
   return {
@@ -13,7 +17,7 @@ export function fakeSession(firstName = 'Ahmet', lastName = 'Yılmaz'): SessionR
     accessTokenExpiresAt: new Date(now + 15 * 60_000).toISOString(),
     sessionExpiresAt: new Date(now + 8 * 60 * 60_000).toISOString(),
     idleTimeoutMinutes: 30,
-    user: { firstName, lastName },
+    user: { firstName, lastName, permissions },
   };
 }
 
@@ -32,7 +36,9 @@ export function sessionEnded(reason: SessionEndReason | 'invalid'): ApiError {
  * sunucuya gitmez.
  */
 export async function setSession(
-  target: { status: 'anonymous'; endReason?: SessionEndReason } | { status: 'authenticated' },
+  target:
+    | { status: 'anonymous'; endReason?: SessionEndReason }
+    | { status: 'authenticated'; permissions?: string[] },
 ): Promise<void> {
   vi.spyOn(sessionApi, 'signOut').mockResolvedValue(undefined);
   vi.spyOn(sessionApi, 'activity').mockResolvedValue(undefined);
@@ -41,7 +47,7 @@ export async function setSession(
   session.clearEndReason();
 
   if (target.status === 'authenticated') {
-    session.start(fakeSession());
+    session.start(fakeSession('Ahmet', 'Yılmaz', target.permissions));
     return;
   }
 

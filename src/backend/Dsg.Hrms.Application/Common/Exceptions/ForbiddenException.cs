@@ -9,7 +9,7 @@ namespace Dsg.Hrms.Application.Common.Exceptions;
 /// <see cref="NotFoundException"/> ile karsilanir (ADR-0007 §4).
 /// </remarks>
 public sealed class ForbiddenException(
-    string message = "Bu islem icin yetkiniz bulunmuyor.")
+    string message = "Bu işlem için yetkiniz bulunmuyor.")
     : HrmsException(message)
 {
     /// <inheritdoc />
@@ -19,5 +19,5 @@ public sealed class ForbiddenException(
     public override string ErrorType => "forbidden";
 
     /// <inheritdoc />
-    public override string Title => "Yetkisiz islem";
+    public override string Title => "Yetkisiz işlem";
 }

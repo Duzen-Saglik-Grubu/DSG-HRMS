@@ -70,6 +70,7 @@ public interface IAccessTokenIssuer
 /// <param name="IdleTimeout">Hareketsizlik suresi.</param>
 /// <param name="FirstName">Kullanicinin adi.</param>
 /// <param name="LastName">Kullanicinin soyadi.</param>
+/// <param name="Permissions">Kullanicinin izinleri; istemci yalnizca GOSTERIM icin kullanir (ADR-0007 §3).</param>
 public sealed record SessionTokens(
     string AccessToken,
     DateTimeOffset AccessTokenExpiresAt,
@@ -77,7 +78,8 @@ public sealed record SessionTokens(
     DateTimeOffset SessionExpiresAt,
     TimeSpan IdleTimeout,
     string FirstName,
-    string LastName)
+    string LastName,
+    IReadOnlyList<string> Permissions)
 {
     /// <inheritdoc />
     public override string ToString() => nameof(SessionTokens);

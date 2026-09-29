@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Exceptions;
+using Dsg.Hrms.Application.Identity.Authorization;
 using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Application.Identity.Registration;
 using Dsg.Hrms.Application.Identity.Verification;
@@ -35,6 +36,7 @@ public sealed partial class SessionService
     private readonly IIdentifierHasher _identifierHasher;
     private readonly IAccessTokenIssuer _tokens;
     private readonly VerificationCodeService _codes;
+    private readonly AccessControlService _access;
     private readonly ISystemParameters _parameters;
     private readonly IDateTimeProvider _clock;
     private readonly ILogger<SessionService> _logger;
@@ -47,6 +49,7 @@ public sealed partial class SessionService
         IIdentifierHasher identifierHasher,
         IAccessTokenIssuer tokens,
         VerificationCodeService codes,
+        AccessControlService access,
         ISystemParameters parameters,
         IDateTimeProvider clock,
         ILogger<SessionService> logger)
@@ -57,6 +60,7 @@ public sealed partial class SessionService
         _identifierHasher = identifierHasher;
         _tokens = tokens;
         _codes = codes;
+        _access = access;
         _parameters = parameters;
         _clock = clock;
         _logger = logger;
@@ -471,6 +475,10 @@ public sealed partial class SessionService
         var session = UserSession.Start(candidate.Account.Id, candidate.Account.SecurityStamp, ipAddress, now, TimeSpan.FromHours(maxHours));
         _store.Add(session);
 
+        // Ilk sistem yoneticisi kurulum yapilandirmasiyla belirlenir (SYG-KMLK-074); atama
+        // oturumla birlikte kaydedilir.
+        await _access.EnsureBootstrapAdministratorAsync(candidate.Account.Id, candidate.Person.Email, cancellationToken).ConfigureAwait(false);
+
         // Oturumun kimligi (Id) yenileme jetonu icin gereklidir.
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -493,6 +501,10 @@ public sealed partial class SessionService
         var accessMinutes = await _parameters.GetIntegerAsync(ParameterCatalog.AccessTokenLifetimeMinutes, cancellationToken).ConfigureAwait(false);
         var accessExpiresAt = now.AddMinutes(accessMinutes) < session.ExpiresAt ? now.AddMinutes(accessMinutes) : session.ExpiresAt;
 
+        // Izinler her yenilemede yeniden okunur: rol degisikligi en gec erisim jetonunun omru
+        // kadar sonra ekrana yansir. Sunucu tarafindaki denetim her istekte yapilir.
+        var permissions = await _access.GetPermissionsAsync(candidate.Account.Id, cancellationToken).ConfigureAwait(false);
+
         return new SessionTokens(
             _tokens.Issue(candidate.Account.Id, session, now, accessExpiresAt),
             accessExpiresAt,
@@ -500,7 +512,8 @@ public sealed partial class SessionService
             session.ExpiresAt,
             idle,
             candidate.Person.FirstName,
-            candidate.Person.LastName);
+            candidate.Person.LastName,
+            [.. permissions.Order(StringComparer.Ordinal)]);
     }
 
     private async Task<RegistrationChannels> TwoFactorChannelsAsync(SignInCandidate candidate, CancellationToken cancellationToken)
