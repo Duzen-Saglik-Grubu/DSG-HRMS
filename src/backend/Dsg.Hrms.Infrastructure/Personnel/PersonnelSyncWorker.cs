@@ -39,6 +39,7 @@ public sealed partial class PersonnelSyncWorker : BackgroundService
     private readonly ISystemParameters _parameters;
     private readonly IDateTimeProvider _clock;
     private readonly LogoOptions _logo;
+    private readonly PersonnelSyncTrigger _trigger;
     private readonly ILogger<PersonnelSyncWorker> _logger;
 
     /// <summary>Yeni ornek olusturur.</summary>
@@ -47,12 +48,14 @@ public sealed partial class PersonnelSyncWorker : BackgroundService
         ISystemParameters parameters,
         IDateTimeProvider clock,
         LogoOptions logo,
+        PersonnelSyncTrigger trigger,
         ILogger<PersonnelSyncWorker> logger)
     {
         _scopeFactory = scopeFactory;
         _parameters = parameters;
         _clock = clock;
         _logo = logo;
+        _trigger = trigger;
         _logger = logger;
     }
 
@@ -67,11 +70,17 @@ public sealed partial class PersonnelSyncWorker : BackgroundService
 
         try
         {
+            var trigger = SyncTrigger.Scheduled;
             while (!stoppingToken.IsCancellationRequested)
             {
                 var startedAt = _clock.UtcNow;
-                await RunOnceAsync(stoppingToken).ConfigureAwait(false);
-                await WaitForNextRunAsync(startedAt, stoppingToken).ConfigureAwait(false);
+                await RunOnceAsync(trigger, stoppingToken).ConfigureAwait(false);
+
+                // Elle istenen calisma (SYG-KMLK-072) bekleyisi kisaltir; sonraki periyot o
+                // calismanin basindan sayilir.
+                trigger = await WaitForNextRunAsync(startedAt, stoppingToken).ConfigureAwait(false)
+                    ? SyncTrigger.Manual
+                    : SyncTrigger.Scheduled;
             }
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
@@ -80,7 +89,8 @@ public sealed partial class PersonnelSyncWorker : BackgroundService
         }
     }
 
-    private async Task WaitForNextRunAsync(DateTimeOffset startedAt, CancellationToken stoppingToken)
+    /// <returns>Elle calisma istendiyse <c>true</c>; periyot dolduysa <c>false</c>.</returns>
+    private async Task<bool> WaitForNextRunAsync(DateTimeOffset startedAt, CancellationToken stoppingToken)
     {
         while (true)
         {
@@ -89,10 +99,13 @@ public sealed partial class PersonnelSyncWorker : BackgroundService
 
             if (remaining <= TimeSpan.Zero)
             {
-                return;
+                return false;
             }
 
-            await Task.Delay(remaining < PollInterval ? remaining : PollInterval, stoppingToken).ConfigureAwait(false);
+            if (await _trigger.WaitAsync(remaining < PollInterval ? remaining : PollInterval, stoppingToken).ConfigureAwait(false))
+            {
+                return true;
+            }
         }
     }
 
@@ -118,13 +131,13 @@ public sealed partial class PersonnelSyncWorker : BackgroundService
         }
     }
 
-    private async Task RunOnceAsync(CancellationToken stoppingToken)
+    private async Task RunOnceAsync(SyncTrigger trigger, CancellationToken stoppingToken)
     {
         try
         {
             await using var scope = _scopeFactory.CreateAsyncScope();
             var service = scope.ServiceProvider.GetRequiredService<PersonnelSyncService>();
-            await service.RunAsync(SyncTrigger.Scheduled, stoppingToken).ConfigureAwait(false);
+            await service.RunAsync(trigger, stoppingToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
         {

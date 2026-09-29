@@ -16,7 +16,7 @@ function sessionResponse(): SessionResponse {
     accessTokenExpiresAt: new Date(T0 + 15 * MINUTE).toISOString(),
     sessionExpiresAt: new Date(T0 + 8 * 60 * MINUTE).toISOString(),
     idleTimeoutMinutes: 30,
-    user: { firstName: 'Ahmet', lastName: 'Yılmaz' },
+    user: { firstName: 'Ahmet', lastName: 'Yılmaz', permissions: [] },
   };
 }
 

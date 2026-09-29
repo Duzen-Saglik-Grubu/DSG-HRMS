@@ -966,6 +966,96 @@
           }
         }
       }
+    },
+    "/api/v1/identity/sync-runs/latest": {
+      "get": {
+        "tags": [
+          "SyncRuns"
+        ],
+        "summary": "Son calisma bilgisi.",
+        "responses": {
+          "200": {
+            "description": "Durum. Hic calisma yoksa `lastRun` bostur.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`identity.sync.view`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/sync-runs": {
+      "post": {
+        "tags": [
+          "SyncRuns"
+        ],
+        "summary": "Senkronizasyonu elle baslatir.",
+        "responses": {
+          "202": {
+            "description": "Calisma sira aldi (veya zaten sirada bekliyordu).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncRequestedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`identity.sync.create`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Senkronizasyon bu ortamda tanimli degil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1211,7 +1301,8 @@
       "SessionUserResponse": {
         "required": [
           "firstName",
-          "lastName"
+          "lastName",
+          "permissions"
         ],
         "type": "object",
         "properties": {
@@ -1222,6 +1313,13 @@
           "lastName": {
             "type": "string",
             "description": "Soyad."
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Izinler. Istemci yalnizca GOSTERIM icin kullanir; denetim her istekte sunucudadir (ADR-0007 §3)."
           }
         },
         "description": "Oturumdaki kullanici."
@@ -1311,6 +1409,80 @@
           }
         },
         "description": "Uyelik baslatma istegi (SYG-KMLK-013)."
+      },
+      "SyncRequestedResponse": {
+        "required": [
+          "alreadyQueued"
+        ],
+        "type": "object",
+        "properties": {
+          "alreadyQueued": {
+            "type": "boolean",
+            "description": "Sirada zaten bekleyen bir istek vardi."
+          }
+        },
+        "description": "Elle calisma istegi alindi."
+      },
+      "SyncRunResponse": {
+        "required": [
+          "status",
+          "startedAt",
+          "finishedAt",
+          "failureReason"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Sonuc (`running`, `succeeded`, `completedWithWarnings`, `failed`)."
+          },
+          "startedAt": {
+            "type": "string",
+            "description": "Baslangic.",
+            "format": "date-time"
+          },
+          "finishedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Bitis; suruyorsa bos.",
+            "format": "date-time"
+          },
+          "failureReason": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Basarisizlik nedeni."
+          }
+        },
+        "description": "Bir calismanin ozeti."
+      },
+      "SyncStatusResponse": {
+        "required": [
+          "enabled",
+          "lastRun"
+        ],
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "LOGO baglantisi tanimli mi; degilse senkronizasyon bilincli olarak kapalidir."
+          },
+          "lastRun": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Son calisma; hic yoksa bos.",
+                "$ref": "#/components/schemas/SyncRunResponse"
+              }
+            ]
+          }
+        },
+        "description": "Senkronizasyon durumu."
       },
       "TwoFactorChallengeResponse": {
         "required": [
@@ -1430,6 +1602,9 @@
     },
     {
       "name": "Sessions"
+    },
+    {
+      "name": "SyncRuns"
     }
   ]
 }

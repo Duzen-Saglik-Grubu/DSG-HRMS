@@ -482,6 +482,22 @@ openssl s_client -starttls smtp -connect mail.duzen.com.tr:587 -servername mail.
 
 ---
 
+## 11. İlk sistem yöneticisi (#100)
+
+Rol yönetim ekranı T4'tedir. O zamana kadar sistem yöneticisi, sır dosyasındaki listeyle belirlenir (SYG-KMLK-074):
+
+```bash
+# Kurumsal e-postalar, virgülle. Kişinin hesabı olmalı (üye olmuş olmalı).
+echo "ACCESS_CONTROL_BOOTSTRAP_ADMINISTRATORS='ad.soyad@duzen.com.tr'" >> /opt/dsg-hrms/secrets/.env.uat
+cd /opt/dsg-hrms/docker && docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/secrets/.env.uat up -d api
+```
+
+- Listedeki e-postayla **giriş yapıldığında** Sistem Yöneticisi rolü **bir kez** atanır. Atama denetim izine (`audit.change_log`, varlık `UserRole`) yazılır.
+- Listeden çıkarmak atamayı **geri almaz**. Rolün kaldırılması bilinçli bir işlemdir (T4).
+- Geçersiz bir adres yazılırsa API açılmaz; hata iletisi listeyi gösterir.
+
+Doğrulama: yönetici hesabıyla girişte oturum yanıtındaki `user.permissions` 7 izni içerir. İzinler `docs/mimari/izin-listesi.md` belgesindedir.
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
@@ -497,3 +513,4 @@ openssl s_client -starttls smtp -connect mail.duzen.com.tr:587 -servername mail.
 | 2026-09-27 | 0.9 | §10 doğrulama kodu ve ileti gönderimi: özet anahtarı, gönderim kipleri, `/health/notifications` (#85) | Bilgi İşlem |
 | 2026-09-27 | 1.0 | §10.4 üyelik anahtarı ve ters vekil ağı denetimi (#87) | Bilgi İşlem |
 | 2026-09-28 | 1.1 | §10.1: JWT imzalama anahtarı zorunlu (#92) | Bilgi İşlem |
+| 2026-09-29 | 1.2 | §11: ilk sistem yöneticisi (#100) | Bilgi İşlem |

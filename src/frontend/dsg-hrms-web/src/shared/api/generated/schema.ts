@@ -974,6 +974,123 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/identity/sync-runs/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Son calisma bilgisi. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Durum. Hic calisma yoksa `lastRun` bostur. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SyncStatusResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`identity.sync.view`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/sync-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Senkronizasyonu elle baslatir. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Calisma sira aldi (veya zaten sirada bekliyordu). */
+                202: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SyncRequestedResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`identity.sync.create`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Senkronizasyon bu ortamda tanimli degil. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1086,6 +1203,8 @@ export interface components {
             firstName: string;
             /** @description Soyad. */
             lastName: string;
+            /** @description Izinler. Istemci yalnizca GOSTERIM icin kullanir; denetim her istekte sunucudadir (ADR-0007 §3). */
+            permissions: string[];
         };
         /** @description Giris istegi. */
         SignInRequest: {
@@ -1117,6 +1236,34 @@ export interface components {
             birthDate: string;
             /** @description Kurumsal e-posta. */
             email: string;
+        };
+        /** @description Elle calisma istegi alindi. */
+        SyncRequestedResponse: {
+            /** @description Sirada zaten bekleyen bir istek vardi. */
+            alreadyQueued: boolean;
+        };
+        /** @description Bir calismanin ozeti. */
+        SyncRunResponse: {
+            /** @description Sonuc (`running`, `succeeded`, `completedWithWarnings`, `failed`). */
+            status: string;
+            /**
+             * Format: date-time
+             * @description Baslangic.
+             */
+            startedAt: string;
+            /**
+             * Format: date-time
+             * @description Bitis; suruyorsa bos.
+             */
+            finishedAt: null | string;
+            /** @description Basarisizlik nedeni. */
+            failureReason: null | string;
+        };
+        /** @description Senkronizasyon durumu. */
+        SyncStatusResponse: {
+            /** @description LOGO baglantisi tanimli mi; degilse senkronizasyon bilincli olarak kapalidir. */
+            enabled: boolean;
+            lastRun: null | components["schemas"]["SyncRunResponse"];
         };
         /** @description Bekleyen iki adimli giris. */
         TwoFactorChallengeResponse: {

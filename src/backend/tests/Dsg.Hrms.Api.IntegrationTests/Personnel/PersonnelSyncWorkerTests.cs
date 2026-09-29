@@ -18,6 +18,7 @@ public sealed class PersonnelSyncWorkerTests
 {
     private readonly ILogoPersonnelSource _source = Substitute.For<ILogoPersonnelSource>();
     private readonly IPersonnelSyncStore _store = Substitute.For<IPersonnelSyncStore>();
+    private PersonnelSyncTrigger? _trigger;
 
     private PersonnelSyncWorker CreateWorker(bool logoConfigured)
     {
@@ -29,13 +30,18 @@ public sealed class PersonnelSyncWorkerTests
         services.AddSingleton<ISystemParameters>(new FakeSystemParameters());
         services.AddSingleton(typeof(ILogger<>), typeof(NullLogger<>));
         services.AddScoped<PersonnelSyncService>();
+        var logo = new LogoOptions { ConnectionString = logoConfigured ? "Server=logo;Database=BORDRO" : null };
+        services.AddSingleton(logo);
+        services.AddSingleton<PersonnelSyncTrigger>();
         var provider = services.BuildServiceProvider();
+        _trigger = provider.GetRequiredService<PersonnelSyncTrigger>();
 
         return new PersonnelSyncWorker(
             provider.GetRequiredService<IServiceScopeFactory>(),
             provider.GetRequiredService<ISystemParameters>(),
             provider.GetRequiredService<IDateTimeProvider>(),
-            new LogoOptions { ConnectionString = logoConfigured ? "Server=logo;Database=BORDRO" : null },
+            logo,
+            _trigger,
             NullLogger<PersonnelSyncWorker>.Instance);
     }
 
@@ -88,5 +94,42 @@ public sealed class PersonnelSyncWorkerTests
 
         worker.ExecuteTask!.IsCompleted.ShouldBeFalse();
         await worker.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task A_manual_request_starts_a_run_without_waiting_for_the_period()
+    {
+        // SYG-KMLK-072: periyot 15 dakika; elle istek bunu beklemeden calisma baslatir.
+        var calls = 0;
+        var second = new TaskCompletionSource();
+        _store.TryOpenSessionAsync(Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            if (Interlocked.Increment(ref calls) == 2)
+            {
+                second.TrySetResult();
+            }
+
+            return Task.FromResult<IPersonnelSyncSession?>(null);
+        });
+        using var worker = CreateWorker(logoConfigured: true);
+
+        await worker.StartAsync(CancellationToken.None);
+        await Task.Delay(200);
+        _trigger!.Request().ShouldBe(ManualSyncRequest.Accepted);
+        await second.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        await worker.StopAsync(CancellationToken.None);
+
+        calls.ShouldBe(2);
+    }
+
+    [Fact]
+    public void Trigger_queues_at_most_one_request_and_is_disabled_without_logo()
+    {
+        using var enabled = new PersonnelSyncTrigger(new LogoOptions { ConnectionString = "Server=logo;Database=BORDRO" });
+        enabled.Request().ShouldBe(ManualSyncRequest.Accepted);
+        enabled.Request().ShouldBe(ManualSyncRequest.AlreadyQueued);
+
+        using var disabled = new PersonnelSyncTrigger(new LogoOptions { ConnectionString = null });
+        disabled.Request().ShouldBe(ManualSyncRequest.Disabled);
     }
 }

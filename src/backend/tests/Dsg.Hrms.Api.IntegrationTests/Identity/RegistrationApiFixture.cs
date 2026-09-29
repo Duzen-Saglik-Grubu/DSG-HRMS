@@ -33,6 +33,9 @@ public class RegistrationApiFixture : IAsyncLifetime
 
     public static readonly DateOnly Today = new(2026, 9, 27);
 
+    /// <summary>Ilk sistem yoneticisi olarak yapilandirilan kisinin e-postasi (sentetik kisi 2).</summary>
+    public const string BootstrapAdministratorEmail = "Mehmet.Kaya@duzen.com.tr";
+
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:17-alpine")
         .WithDatabase("dsg_hrms_registration_test")
         .Build();
@@ -102,7 +105,7 @@ public class RegistrationApiFixture : IAsyncLifetime
         {
             await context.Database.ExecuteSqlRawAsync(
                 "DELETE FROM identity.refresh_token; DELETE FROM identity.user_session; DELETE FROM identity.login_challenge; DELETE FROM identity.login_throttle; " +
-                "DELETE FROM identity.registration_code_request; DELETE FROM identity.registration_attempt; DELETE FROM identity.verification_code; DELETE FROM identity.user_account; " +
+                "DELETE FROM identity.registration_code_request; DELETE FROM identity.registration_attempt; DELETE FROM identity.verification_code; DELETE FROM identity.user_role; DELETE FROM identity.user_account; " +
                 "DELETE FROM settings.system_parameter;");
             return 0;
         });
@@ -124,6 +127,7 @@ public class RegistrationApiFixture : IAsyncLifetime
                 builder.UseSetting("Identity:CodeHashKey", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
                 builder.UseSetting("Identity:JwtSigningKey", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
                 builder.UseSetting("ReverseProxy:TrustedNetworks", "172.16.0.0/12");
+                builder.UseSetting("AccessControl:BootstrapAdministrators", BootstrapAdministratorEmail);
 
                 builder.ConfigureServices(services =>
                 {

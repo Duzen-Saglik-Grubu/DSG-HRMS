@@ -66,6 +66,9 @@ services:
       Identity__CodeHashKey: ${IDENTITY_CODE_HASH_KEY:-}
       # Erisim jetonu (JWT) imzalama anahtari (SYG-KMLK-037). ZORUNLU: bos ise API acilmaz.
       Identity__JwtSigningKey: ${IDENTITY_JWT_SIGNING_KEY:-}
+      # Ilk sistem yoneticilerinin kurumsal e-postalari, virgulle (SYG-KMLK-074). Bu adreslerle
+      # giris yapan hesaba Sistem Yoneticisi rolu bir kez atanir.
+      AccessControl__BootstrapAdministrators: ${ACCESS_CONTROL_BOOTSTRAP_ADMINISTRATORS:-}
       # Gonderim kipi (#85): LogOnly (varsayilan, hicbir ileti gitmez), AllowList (yalnizca
       # izin listesine), Send (uretim). UAT gercek LOGO verisiyle calistigi icin Send KULLANILMAZ.
       Notifications__DeliveryMode: ${NOTIFICATIONS_DELIVERY_MODE:-LogOnly}

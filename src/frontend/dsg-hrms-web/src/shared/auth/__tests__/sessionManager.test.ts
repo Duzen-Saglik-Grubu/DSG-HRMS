@@ -32,7 +32,7 @@ function sessionAt(serverNow: number, id = 'a', idleMinutes = 30): SessionRespon
     accessTokenExpiresAt: new Date(serverNow + 15 * MINUTE).toISOString(),
     sessionExpiresAt: new Date(serverNow + 8 * 60 * MINUTE).toISOString(),
     idleTimeoutMinutes: idleMinutes,
-    user: { firstName: 'Ahmet', lastName: 'Yılmaz' },
+    user: { firstName: 'Ahmet', lastName: 'Yılmaz', permissions: [] },
   };
 }
 
@@ -75,7 +75,7 @@ describe('SessionManager — jeton', () => {
 
     expect(session.getState()).toEqual({
       status: 'authenticated',
-      user: { firstName: 'Ahmet', lastName: 'Yılmaz' },
+      user: { firstName: 'Ahmet', lastName: 'Yılmaz', permissions: [] },
     });
     expect(await session.getAccessToken()).toBe(token(T0, 'ilk'));
     expect(api.refresh).not.toHaveBeenCalled();

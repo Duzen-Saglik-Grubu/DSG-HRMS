@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-021`, `KR-022`
+**Karar defteri karşılığı:** `KR-021`, `KR-022`, `KR-089`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **İlgili riskler:** `R-03`
 
@@ -55,6 +55,13 @@ user_account *───* role *───* permission
   yalnızca verilir.
 - `export` izni `view`'dan **ayrıdır**. Veriyi ekranda görebilmek, dışa aktarabilmek
   anlamına gelmez — KVKK açısından dışa aktarma ayrı bir risktir.
+
+> **Gerçekleştirme (29.09.2026, `KR-089`, #100).** Tablolar `identity.permission`,
+> `identity.role`, `identity.role_permission`, `identity.user_role`. İzinler ve hazır iki rol
+> (Sistem Yöneticisi, İK Kimlik İşlemleri) migration ile yüklenir; liste
+> `docs/mimari/izin-listesi.md`. İzinler her istekte veritabanından okunur, erişim jetonunda
+> taşınmaz. İlk sistem yöneticisi `AccessControl__BootstrapAdministrators` ile atanır. Satır
+> bazlı kapsam (eksen 2) T4 kapsamındadır.
 
 ### 2. Eksen 2 — Satır bazlı kapsam
 
@@ -180,3 +187,4 @@ eklenmesi istenirse yeni bir kapsam türü olarak eklenir, mevcut davranış boz
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-09-29 | 0.2 | §1: eylem yetkisinin gerçekleştirme notu (`KR-089`, #100) | Bilgi İşlem |
