@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-09-28
+**Son güncelleme:** 2026-09-29
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 
@@ -162,8 +162,8 @@ gelecektir.
 | 28 | `REQ-KMLK-028` Parola en az 6 karakter olmalıdır; karmaşıklık (büyük/küçük harf, raka… | SYG-KMLK-044, 075, 076 | `ADR-0008` §7; `ADR-0006` §6 | kısmen: SYG-075 (parametre deposu, şifreli sırlar) · PR #84 — SYG-076 (parametre ekranı) sonraki iş; SYG-044 (uzunluk, karmaşıklık, NFKC) · PR #88 | `ParameterCatalogTests`, `SystemParameterStoreTests`, `AesGcmSecretProtectorTests`; `PasswordPolicyTests` | — |
 | 29 | `REQ-KMLK-029` Yaygın sızıntı listesinde bulunan parolalar kabul edilmez; kontrol çev… | SYG-KMLK-045 | `ADR-0006` §6 | SYG-045 (143.672 kayıtlık açık lisanslı liste, kurum ve kişi sözcükleri) · PR #88 | `PasswordPolicyTests`, `PasswordInfrastructureTests`, `RegistrationApiTests` | — |
 | 30 | `REQ-KMLK-030` Zorunlu periyodik parola değişimi varsayılan olarak uygulanmaz (parame… | SYG-KMLK-046 | — | — | — | — |
-| 31 | `REQ-KMLK-031` Parola sıfırlama, üyelikle aynı doğrulama akışını kullanır (kanal seçi… | SYG-KMLK-047 | — | — | — | — |
-| 32 | `REQ-KMLK-032` Oturum içinde parola değiştirirken mevcut parola sorulur. | SYG-KMLK-048 | — | — | — | — |
+| 31 | `REQ-KMLK-031` Parola sıfırlama, üyelikle aynı doğrulama akışını kullanır (kanal seçi… | SYG-KMLK-047 | `ADR-0006` §6, `KR-088` | SYG-047 (üyelikle aynı deneme, eşleştirme, kanal, kod ve hız sınırları; yalnızca amaç ve ileti metni farklı; eşleşme gizliliği; hesabın tüm oturumları kapanır, giriş kilidi kalkar; elle pasif hesapta reddedilir; üyelikte "hesabınız var" sonucundan doğrudan sıfırlama; "Parolamı unuttum" ekranı) · PR #99 | `PasswordApiTests`, `RegistrationAttemptTests`; `ForgotPasswordPage.test.tsx`, `RegistrationPage.test.tsx`, `passwordApi.test.ts` | — |
+| 32 | `REQ-KMLK-032` Oturum içinde parola değiştirirken mevcut parola sorulur. | SYG-KMLK-048 | `ADR-0006` §6, `KR-088` | SYG-048 (mevcut parola zorunlu; yanlış deneme giriş kilidi sayacına eklenir; yeni parola politikaya uyar ve mevcut parolayla aynı olamaz; bu oturum açık kalır, diğerleri `session-ended/password-changed` ile kapanır; "Parolamı değiştir" ekranı) · PR #99 | `PasswordApiTests`, `SessionDomainTests`; `ChangePasswordPage.test.tsx`, `RequireSession.test.tsx`, `LoginPage.test.tsx` | — |
 | 33 | `REQ-KMLK-033` Parola geri döndürülebilir biçimde saklanmaz ve hiçbir kayda yazılmaz. | SYG-KMLK-049 | `ADR-0006` §6 | kısmen: SYG-049 (PBKDF2-HMAC-SHA512, 210.000 yineleme) · PR #88 — 100–500 ms ölçümü UAT'de | `PasswordInfrastructureTests` | — |
 | 34 | `REQ-KMLK-034` Personelin tüm aktif istihdamları sona erdiğinde hesabı otomatik pasif… | SYG-KMLK-004, 005, 054, 055, 078 | `ADR-0003` §4, `ADR-0006` | kısmen: SYG-004 (motor, kilit, periyodik çalışma), 005 (çalışma kaydı) · PR #75, #76; SYG-054 (hesap pasifleşmesi, güvenlik damgası; periyot parametreden) · PR #84 — SYG-054 jeton iptali ve 055 (giriş reddi) giriş işinde, 078 (performans ölçümü) sonraki işler; SYG-054 (pasifleşmede açık oturumlar her istekte kapanır), 055 (pasif hesapla giriş yok) · PR #94 | `PersonnelSynchronizerTests`, `PersonnelSyncStoreTests`, `PersonnelSyncRunTests`, `PersonnelSyncWorkerTests`, `AccountLifecycleTests`, `UserAccountTests`; `SessionApiTests` | — |
 | 35 | `REQ-KMLK-035` Personel yeniden işe girdiğinde mevcut hesabı yeniden aktifleşir; yeni… | SYG-KMLK-056 | `ADR-0006`, `KR-080` | SYG-056 · PR #84 | `AccountLifecycleTests`, `UserAccountTests`, `PersonnelSyncStoreTests` | — |
@@ -224,3 +224,4 @@ dâhil edilmedi. **26.09.2026: zinciri PR #76 ile tamamlandı** (§4.1).
 | 2026-09-27 | 1.0 | §5: üyelik ekranları halkaları eklendi (REQ-KMLK-002, 004, 005, 020, 043–048, 056; #90, PR #91) | Bilgi İşlem |
 | 2026-09-28 | 1.1 | §5: giriş ve oturum API'si halkaları eklendi (REQ-KMLK-022–027, 034, 037, 049–051, 053, 054; #92, PR #94) | Bilgi İşlem |
 | 2026-09-28 | 1.2 | §5: giriş ekranı ve istemci oturum yönetimi halkaları eklendi (REQ-KMLK-022, 025–027, 043–046, 050, 054, 056; #95, PR #96) | Bilgi İşlem |
+| 2026-09-29 | 1.3 | §5: parola sıfırlama ve oturum içinde parola değişikliği halkaları eklendi (REQ-KMLK-031, 032; #98, PR #99) | Bilgi İşlem |

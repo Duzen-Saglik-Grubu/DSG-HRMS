@@ -147,6 +147,7 @@ public static class PasswordMessages
         PasswordViolation.NotComplex => "Parola büyük harf, küçük harf, rakam ve simge içermelidir.",
         PasswordViolation.Common => "Bu parola çok yaygın ve kolay tahmin edilir. Daha az bilinen bir parola seçin.",
         PasswordViolation.ContainsPersonalOrOrganizationWord => "Parola adınızdan, e-posta adresinizden veya kurum adından türetilmemelidir.",
+        PasswordViolation.SameAsCurrent => "Yeni parola mevcut parolanızdan farklı olmalıdır.",
         _ => "Parola kabul edilmedi.",
     };
 }

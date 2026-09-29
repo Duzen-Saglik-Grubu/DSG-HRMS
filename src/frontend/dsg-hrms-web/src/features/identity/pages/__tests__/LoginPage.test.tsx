@@ -198,6 +198,7 @@ describe('LoginPage', () => {
     ['token-reuse', 'tüm oturumlar kapatıldı'],
     ['account-changed', 'Hesap bilgileriniz değiştiği için'],
     ['logged-out', 'Çıkış yaptınız.'],
+    ['password-changed', 'Parolanız değiştirildiği için oturumunuz kapandı.'],
   ] as const)('oturum sonu nedenini soyler: %s', async (reason, text) => {
     await setSession({ status: 'anonymous', endReason: reason });
     renderAt('/login');
@@ -282,6 +283,15 @@ describe('LoginPage', () => {
     renderAt('/login?returnTo=%2Fleave');
 
     expect(await screen.findByText('İzin sayfası')).toBeInTheDocument();
+  });
+
+  it('parola sifirlama ekranina baglanti verir', async () => {
+    renderAt('/login');
+
+    expect(await screen.findByRole('link', { name: 'Parolamı unuttum' })).toHaveAttribute(
+      'href',
+      '/forgot-password',
+    );
   });
 
   it('uyelik ekranina baglanti verir ve destek bilgisini gosterir (SYG-KMLK-070)', async () => {

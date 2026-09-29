@@ -1,4 +1,5 @@
 using Dsg.Hrms.Application.Common.Exceptions;
+using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Personnel;
 
@@ -154,6 +155,7 @@ public sealed class SessionEndedException(SessionEndReason? reason)
         SessionEndReason.IdleTimeout => "idle-timeout",
         SessionEndReason.Expired => "expired",
         SessionEndReason.AccountChanged => "account-changed",
+        SessionEndReason.PasswordChanged => "password-changed",
         _ => "invalid",
     };
 
@@ -167,6 +169,16 @@ public sealed class SessionEndedException(SessionEndReason? reason)
         SessionEndReason.Expired => "Oturum süreniz doldu. Lütfen yeniden giriş yapın.",
         SessionEndReason.TokenReuse => "Güvenlik nedeniyle tüm oturumlarınız kapatıldı. Lütfen yeniden giriş yapın.",
         SessionEndReason.AccountChanged => "Hesap bilgileriniz değiştiği için oturumunuz kapandı. Lütfen yeniden giriş yapın.",
+        SessionEndReason.PasswordChanged => "Parolanız değiştirildiği için oturumunuz kapandı. Yeni parolanızla giriş yapın.",
         _ => "Oturumunuz sona erdi. Lütfen yeniden giriş yapın.",
     };
+}
+
+/// <summary>Oturum icinde parola degisikliginin sonucu (SYG-KMLK-048).</summary>
+/// <param name="CurrentPasswordInvalid">Mevcut parola hataliydi; hicbir sey degismedi.</param>
+/// <param name="Violations">Yeni parolanin kural ihlalleri; bossa ve mevcut parola dogruysa parola degisti.</param>
+public sealed record PasswordChangeResult(bool CurrentPasswordInvalid, IReadOnlyList<PasswordViolation> Violations)
+{
+    /// <summary>Parola degisti mi.</summary>
+    public bool Succeeded => !CurrentPasswordInvalid && Violations.Count == 0;
 }

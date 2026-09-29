@@ -9,6 +9,361 @@
     "version": "v1"
   },
   "paths": {
+    "/api/v1/identity/account/password": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Parolayi degistirir. Mevcut parola istenir; degisiklikten sonra hesabin DIGER oturumlari\nkapanir, bu oturum acik kalir (SYG-KMLK-048).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Parola degisti.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Mevcut parola hatali (`errors.currentPassword`) veya yeni parola kurallara uymuyor (`errors.newPassword`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Oturum kapali.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla hatali deneme; e-posta gecici olarak kilitli.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/password-resets": {
+      "post": {
+        "tags": [
+          "PasswordResets"
+        ],
+        "summary": "Parola sifirlamayi baslatir: TCKN, dogum tarihi ve kurumsal e-posta.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRegistrationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRegistrationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRegistrationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Kanal secimi. Eslesme olmasa da ayni yanit doner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationStartedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bicim hatasi (ornegin gecersiz TCKN).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla deneme.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/password-resets/{resetId}/code": {
+      "post": {
+        "tags": [
+          "PasswordResets"
+        ],
+        "summary": "Secilen kanala kod gonderir. Kanal degisimi ve tekrar gonderim de bu uctur.",
+        "parameters": [
+          {
+            "name": "resetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCodeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCodeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Kod gonderildi (eslesme yoksa gonderilmez; yanit aynidir).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeRequestedResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Islem bulunamadi veya suresi doldu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Kanal bu islemde kullanilamaz.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla kod istendi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/password-resets/{resetId}/verification": {
+      "post": {
+        "tags": [
+          "PasswordResets"
+        ],
+        "summary": "Kodu dogrular. Hesabin olup olmadigi YALNIZCA dogrulamadan sonra soylenir.",
+        "parameters": [
+          {
+            "name": "resetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Dogrulama sonucu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Islem bulunamadi veya suresi doldu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/password-resets/{resetId}/password": {
+      "post": {
+        "tags": [
+          "PasswordResets"
+        ],
+        "summary": "Yeni parolayi belirler; hesabin tum oturumlari kapanir ve giris kilidi kalkar.",
+        "parameters": [
+          {
+            "name": "resetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Parola degisti; kullanici yeni parolasiyla giris yapabilir.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Parola kurallara uymuyor (`errors.password`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Hesap kullanima kapali.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Islem bulunamadi, dogrulanmadi veya suresi doldu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Kisinin hesabi yok; uye olmasi gerekir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/identity/public-settings": {
       "get": {
         "tags": [
@@ -615,6 +970,24 @@
   },
   "components": {
     "schemas": {
+      "ChangePasswordRequest": {
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "description": "Mevcut parola."
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "Yeni parola."
+          }
+        },
+        "description": "Oturum icinde parola degisikligi istegi (SYG-KMLK-048)."
+      },
       "CodeRequestedResponse": {
         "required": [
           "codeExpiresAt"
@@ -781,6 +1154,19 @@
           }
         },
         "description": "Kod istegi (SYG-KMLK-019)."
+      },
+      "ResetPasswordRequest": {
+        "required": [
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "Yeni parola."
+          }
+        },
+        "description": "Parola sifirlama istegi (SYG-KMLK-047)."
       },
       "SessionResponse": {
         "required": [
@@ -1030,6 +1416,12 @@
     }
   },
   "tags": [
+    {
+      "name": "Account"
+    },
+    {
+      "name": "PasswordResets"
+    },
     {
       "name": "PublicSettings"
     },

@@ -98,7 +98,8 @@
       },
       "exists": {
         "heading": "Hesabınız zaten var",
-        "text": "Adınıza açılmış bir hesap bulunuyor; ikinci bir hesap açılmaz. Parolanızı hatırlamıyorsanız parola sıfırlamayı kullanın."
+        "text": "Adınıza açılmış bir hesap bulunuyor; ikinci bir hesap açılmaz. Parolanızı hatırlamıyorsanız parola sıfırlamayı kullanın.",
+        "resetPassword": "Parolamı sıfırla"
       },
       "errors": {
         "sessionExpired": "Üyelik işleminin süresi doldu. Lütfen baştan başlayın."
@@ -152,7 +153,39 @@
       "register": "Üye olun",
       "codeIntro": "Doğrulama kodu seçtiğiniz yönteme gönderildi; birkaç dakika içinde gelir. Kod gelmezse tekrar gönderebilir veya destek birimine başvurabilirsiniz.",
       "expired": "Giriş işleminin süresi doldu. Lütfen yeniden giriş yapın.",
-      "restart": "Yeniden giriş yap"
+      "restart": "Yeniden giriş yap",
+      "forgotPassword": "Parolamı unuttum"
+    },
+    "reset": {
+      "title": "Parolamı unuttum",
+      "subtitle": "Kimliğinizi doğrulayın ve yeni bir parola belirleyin.",
+      "identityIntro": "Parolanızı sıfırlamak için kimlik bilgilerinizi ve kurumsal e-posta adresinizi girin.",
+      "expired": "Parola sıfırlama işleminin süresi doldu. Lütfen baştan başlayın.",
+      "backToLogin": "Giriş ekranına dön",
+      "password": {
+        "heading": "Yeni parola",
+        "intro": "Hesabınız için yeni bir parola belirleyin. Açık olan tüm oturumlarınız kapatılacak.",
+        "submit": "Parolayı değiştir"
+      },
+      "done": {
+        "heading": "Parolanız değiştirildi",
+        "text": "Yeni parolanızla giriş yapabilirsiniz. Açık olan tüm oturumlarınız kapatıldı."
+      },
+      "noAccount": {
+        "heading": "Hesabınız bulunmuyor",
+        "text": "Adınıza açılmış bir hesap yok. Üye olarak hesabınızı oluşturabilirsiniz.",
+        "action": "Üye ol"
+      }
+    },
+    "change": {
+      "title": "Parolamı değiştir",
+      "subtitle": "Güvenliğiniz için mevcut parolanızı da girmeniz gerekir.",
+      "current": "Mevcut parola",
+      "currentRequired": "Mevcut parolanızı girin.",
+      "new": "Yeni parola",
+      "confirm": "Yeni parola (tekrar)",
+      "submit": "Parolayı değiştir",
+      "done": "Parolanız değiştirildi. Diğer cihazlardaki oturumlarınız kapatıldı; bu oturumunuz açık kalıyor."
     }
   },
   "session": {
@@ -163,12 +196,14 @@
       "token-reuse": "Güvenliğiniz için hesabınızdaki tüm oturumlar kapatıldı. Yeniden giriş yapın; bu durum tekrarlanırsa destek birimine başvurun.",
       "idle-timeout": "Uzun süre işlem yapılmadığı için oturumunuz kapandı. Lütfen yeniden giriş yapın.",
       "expired": "Oturum süreniz doldu. Lütfen yeniden giriş yapın.",
-      "account-changed": "Hesap bilgileriniz değiştiği için oturumunuz kapandı. Lütfen yeniden giriş yapın."
+      "account-changed": "Hesap bilgileriniz değiştiği için oturumunuz kapandı. Lütfen yeniden giriş yapın.",
+      "password-changed": "Parolanız değiştirildiği için oturumunuz kapandı. Yeni parolanızla giriş yapın."
     },
     "idleWarning": {
       "title": "Oturumunuz kapanmak üzere",
       "text": "Bir süredir işlem yapmadınız. Oturumunuz güvenliğiniz için {{time}} içinde kapanacak.",
       "continue": "Oturumu sürdür"
-    }
+    },
+    "changePassword": "Parolamı değiştir"
   }
 }

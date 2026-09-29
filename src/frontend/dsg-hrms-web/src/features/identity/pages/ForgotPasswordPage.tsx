@@ -14,31 +14,29 @@ import { AuthLayout } from '../components/AuthLayout';
 import { fadeSlide, popIn, primaryButtonSx, reducedMotion } from '../components/motion';
 import { IdentityStep } from '../components/registration/IdentityStep';
 import { PasswordStep } from '../components/registration/PasswordStep';
-import { RegistrationError } from '../components/registration/RegistrationError';
 import { StepProgress } from '../components/registration/StepProgress';
 import { ChannelStep } from '../components/verification/ChannelStep';
 import { CodeStep } from '../components/verification/CodeStep';
+import { FlowError } from '../components/verification/FlowError';
 
 type Step =
   | { name: 'identity' }
   | {
       name: 'channel';
-      registrationId: string;
+      resetId: string;
       channels: VerificationChannel[];
       channel?: VerificationChannel | undefined;
     }
   | {
       name: 'code';
-      registrationId: string;
+      resetId: string;
       channels: VerificationChannel[];
       channel: VerificationChannel;
       codeExpiresAt: string;
     }
-  | { name: 'password'; registrationId: string }
+  | { name: 'password'; resetId: string }
   | { name: 'done' }
-  | { name: 'exists'; registrationId: string }
-  | { name: 'reset'; registrationId: string }
-  | { name: 'resetDone' };
+  | { name: 'noAccount' };
 
 const TOTAL_STEPS = 4;
 
@@ -48,32 +46,26 @@ const STEP_NUMBER: Record<Step['name'], number> = {
   code: 3,
   password: 4,
   done: 4,
-  exists: 3,
-  reset: 4,
-  resetDone: 4,
+  noAccount: 3,
 };
 
 const HEADING: Record<Step['name'], string> = {
   identity: 'identity.registration.identity.heading',
   channel: 'identity.verification.channel.heading',
   code: 'identity.verification.code.heading',
-  password: 'identity.registration.password.heading',
-  done: 'identity.registration.done.heading',
-  exists: 'identity.registration.exists.heading',
-  reset: 'identity.reset.password.heading',
-  resetDone: 'identity.reset.done.heading',
+  password: 'identity.reset.password.heading',
+  done: 'identity.reset.done.heading',
+  noAccount: 'identity.reset.noAccount.heading',
 };
 
 /**
- * Uyelik akisi (ADR-0006 §1): bilgiler, kanal, kod, parola.
+ * Parola sifirlama (SYG-KMLK-047): bilgiler, kanal, kod, yeni parola.
  *
- * Adim degistiginde odak adim basligina tasinir: klavye ve ekran okuyucu kullanicisi
- * yeni adimin basladigini duyar ve sayfanin basina donmek zorunda kalmaz (SYG-KMLK-066).
- *
- * "Bastan basla" akisi tamamen sifirlar: ilk adimdaki form ve hata durumu da temizlenir
- * (adim bileseni yeniden kurulur).
+ * Uyelikle AYNI adimlar ve ayni kurallar kullanilir; ayri bir dogrulama mekanizmasi yoktur.
+ * Ilk uc adimin yanitlari eslesme olsa da olmasa da aynidir (KR-085). Hesabin olup olmadigi
+ * YALNIZCA kod dogrulandiktan sonra soylenir: hesap yoksa kullanici uyelige yonlendirilir.
  */
-export function RegistrationPage() {
+export function ForgotPasswordPage() {
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>({ name: 'identity' });
   const [attempt, setAttempt] = useState(0);
@@ -86,6 +78,7 @@ export function RegistrationPage() {
     staleTime: 5 * 60_000,
   });
 
+  // Adim degisince odak adim basligina tasinir (SYG-KMLK-066).
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false;
@@ -100,7 +93,16 @@ export function RegistrationPage() {
     setAttempt((value) => value + 1);
   };
 
-  const finished = step.name === 'done' || step.name === 'exists' || step.name === 'resetDone';
+  const renderError = (error: unknown) => (
+    <FlowError
+      error={error}
+      onRestart={restart}
+      expiredText={t('identity.reset.expired')}
+      restartText={t('identity.registration.restart')}
+    />
+  );
+
+  const finished = step.name === 'done' || step.name === 'noAccount';
 
   return (
     <AuthLayout>
@@ -111,10 +113,10 @@ export function RegistrationPage() {
             component="h1"
             sx={{ fontWeight: 700, fontSize: { xs: '1.625rem', sm: '1.875rem' } }}
           >
-            {t('identity.registration.title')}
+            {t('identity.reset.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            {t('identity.registration.subtitle')}
+            {t('identity.reset.subtitle')}
           </Typography>
         </Box>
         {finished ? null : <StepProgress current={STEP_NUMBER[step.name]} total={TOTAL_STEPS} />}
@@ -138,11 +140,13 @@ export function RegistrationPage() {
       >
         {step.name === 'identity' ? (
           <IdentityStep
+            start={passwordApi.startReset}
+            intro={t('identity.reset.identityIntro')}
             onRestart={restart}
             onStarted={(started) =>
               setStep({
                 name: 'channel',
-                registrationId: started.registrationId,
+                resetId: started.registrationId,
                 channels: started.channels,
               })
             }
@@ -153,12 +157,12 @@ export function RegistrationPage() {
           <ChannelStep
             channels={step.channels}
             initialChannel={step.channel}
-            requestCode={(channel) => registrationApi.requestCode(step.registrationId, channel)}
-            renderError={(error) => <RegistrationError error={error} onRestart={restart} />}
+            requestCode={(channel) => passwordApi.requestCode(step.resetId, channel)}
+            renderError={renderError}
             onCodeRequested={(channel, requested) =>
               setStep({
                 name: 'code',
-                registrationId: step.registrationId,
+                resetId: step.resetId,
                 channels: step.channels,
                 channel,
                 codeExpiresAt: requested.codeExpiresAt,
@@ -174,25 +178,23 @@ export function RegistrationPage() {
             channels={step.channels}
             codeExpiresAt={step.codeExpiresAt}
             codeLength={settings.data?.verificationCodeLength ?? 6}
-            requestCode={(channel) => registrationApi.requestCode(step.registrationId, channel)}
-            verify={(code) => registrationApi.verify(step.registrationId, code)}
-            renderError={(error) => <RegistrationError error={error} onRestart={restart} />}
+            requestCode={(channel) => passwordApi.requestCode(step.resetId, channel)}
+            verify={(code) => passwordApi.verify(step.resetId, code)}
+            renderError={renderError}
             onCodeResent={(requested) =>
               setStep({ ...step, codeExpiresAt: requested.codeExpiresAt })
             }
             onChangeChannel={() =>
               setStep({
                 name: 'channel',
-                registrationId: step.registrationId,
+                resetId: step.resetId,
                 channels: step.channels,
                 channel: step.channels.find((item) => item !== step.channel),
               })
             }
             onVerified={({ accountExists }) =>
               setStep(
-                accountExists
-                  ? { name: 'exists', registrationId: step.registrationId }
-                  : { name: 'password', registrationId: step.registrationId },
+                accountExists ? { name: 'password', resetId: step.resetId } : { name: 'noAccount' },
               )
             }
           />
@@ -200,7 +202,7 @@ export function RegistrationPage() {
 
         {step.name === 'password' ? (
           <PasswordStep
-            registrationId={step.registrationId}
+            registrationId={step.resetId}
             rules={
               settings.data?.passwordRules ?? {
                 minLength: 6,
@@ -208,62 +210,48 @@ export function RegistrationPage() {
                 requireComplexity: false,
               }
             }
+            submit={(password) => passwordApi.reset(step.resetId, password)}
+            intro={t('identity.reset.password.intro')}
+            submitLabel={t('identity.reset.password.submit')}
+            renderError={renderError}
             onRestart={restart}
             onCompleted={() => setStep({ name: 'done' })}
           />
         ) : null}
 
         {step.name === 'done' ? (
-          <Outcome tone="success" icon={<CheckCircleRounded sx={{ fontSize: 56 }} />}>
-            {t('identity.registration.done.text')}
-          </Outcome>
-        ) : null}
-
-        {step.name === 'exists' ? (
           <Outcome
-            tone="info"
-            icon={<InfoRounded sx={{ fontSize: 56 }} />}
-            secondary={
-              // Kimlik bu islemde dogrulandi; parola sifirlama bastan baslamadan yapilabilir
-              // (SYG-KMLK-020, 047).
-              <Button
-                variant="outlined"
-                size="large"
-                fullWidth
-                onClick={() => setStep({ name: 'reset', registrationId: step.registrationId })}
-              >
-                {t('identity.registration.exists.resetPassword')}
-              </Button>
-            }
+            tone="success"
+            icon={<CheckCircleRounded sx={{ fontSize: 56 }} />}
+            action={t('identity.registration.goToLogin')}
+            to={routes.login}
           >
-            {t('identity.registration.exists.text')}
-          </Outcome>
-        ) : null}
-
-        {step.name === 'reset' ? (
-          <PasswordStep
-            registrationId={step.registrationId}
-            rules={
-              settings.data?.passwordRules ?? {
-                minLength: 6,
-                maxLength: 128,
-                requireComplexity: false,
-              }
-            }
-            submit={(password) => passwordApi.reset(step.registrationId, password)}
-            intro={t('identity.reset.password.intro')}
-            submitLabel={t('identity.reset.password.submit')}
-            onRestart={restart}
-            onCompleted={() => setStep({ name: 'resetDone' })}
-          />
-        ) : null}
-
-        {step.name === 'resetDone' ? (
-          <Outcome tone="success" icon={<CheckCircleRounded sx={{ fontSize: 56 }} />}>
             {t('identity.reset.done.text')}
           </Outcome>
         ) : null}
+
+        {step.name === 'noAccount' ? (
+          <Outcome
+            tone="info"
+            icon={<InfoRounded sx={{ fontSize: 56 }} />}
+            action={t('identity.reset.noAccount.action')}
+            to={routes.register}
+          >
+            {t('identity.reset.noAccount.text')}
+          </Outcome>
+        ) : null}
       </Box>
+
+      {step.name === 'identity' ? (
+        <Button
+          component={RouterLink}
+          to={routes.login}
+          variant="text"
+          sx={{ alignSelf: 'center' }}
+        >
+          {t('identity.reset.backToLogin')}
+        </Button>
+      ) : null}
     </AuthLayout>
   );
 }
@@ -271,15 +259,13 @@ export function RegistrationPage() {
 interface OutcomeProps {
   tone: 'success' | 'info';
   icon: ReactNode;
+  action: string;
+  to: string;
   children: ReactNode;
-  /** Giris dugmesinin altinda ikinci eylem. */
-  secondary?: ReactNode;
 }
 
-/** Akisin sonu: canlandirilmis simge ve aciklama. */
-function Outcome({ tone, icon, children, secondary }: OutcomeProps) {
-  const { t } = useTranslation();
-
+/** Akisin sonu: canlandirilmis simge, aciklama ve sonraki adim. */
+function Outcome({ tone, icon, action, to, children }: OutcomeProps) {
   return (
     <Stack spacing={2} sx={{ alignItems: 'center', textAlign: 'center', py: 2 }}>
       <Box
@@ -303,15 +289,14 @@ function Outcome({ tone, icon, children, secondary }: OutcomeProps) {
       </Typography>
       <Button
         component={RouterLink}
-        to={routes.login}
+        to={to}
         variant="contained"
         size="large"
         fullWidth
         sx={primaryButtonSx}
       >
-        {t('identity.registration.goToLogin')}
+        {action}
       </Button>
-      {secondary}
     </Stack>
   );
 }

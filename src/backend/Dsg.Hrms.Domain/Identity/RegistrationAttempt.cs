@@ -3,9 +3,16 @@ using Dsg.Hrms.Domain.Common;
 namespace Dsg.Hrms.Domain.Identity;
 
 /// <summary>
-/// Bir uyelik denemesi (ADR-0006 §1, SYG-KMLK-013…021).
+/// Bir uyelik veya parola sifirlama denemesi (ADR-0006 §1, SYG-KMLK-013…021, 047).
 /// </summary>
 /// <remarks>
+/// <para>
+/// Parola sifirlama uyelikle AYNI eslestirme, kanal ve kod akisini kullanir; ayri bir
+/// dogrulama mekanizmasi yoktur (SYG-KMLK-047). Iki akisi ayiran yalnizca
+/// <see cref="Purpose"/>'tur: kod iletisinin metni ve sure dolumu iletisi buna gore secilir.
+/// Dogrulanmis kimlik iki sonuca da gidebilir: hesap yoksa hesap olusturulur, varsa parola
+/// sifirlanir.
+/// </para>
 /// <para>
 /// <b>Eslesme olsa da olmasa da olusturulur</b> (<c>KR-016</c>). Eslesmeyen denemede
 /// <see cref="PersonId"/> bostur ve kod gonderilmez; ama deneme, gercek bir kod varmis
@@ -32,6 +39,9 @@ public sealed class RegistrationAttempt : Entity, IAuditable
 
     /// <summary>Girilen TCKN'nin anahtarli ozeti (hiz siniri).</summary>
     public string NationalIdHash { get; private set; } = string.Empty;
+
+    /// <summary>Denemenin amaci: uyelik veya parola sifirlama.</summary>
+    public VerificationPurpose Purpose { get; private set; } = VerificationPurpose.Registration;
 
     /// <summary>Eslesen kisi; eslesme yoksa <c>null</c>.</summary>
     public long? PersonId { get; private set; }
@@ -84,7 +94,8 @@ public sealed class RegistrationAttempt : Entity, IAuditable
         long? personId,
         string? ipAddress,
         RegistrationChannels offeredChannels,
-        DateTimeOffset now)
+        DateTimeOffset now,
+        VerificationPurpose purpose = VerificationPurpose.Registration)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(nationalIdHash);
 
@@ -93,8 +104,14 @@ public sealed class RegistrationAttempt : Entity, IAuditable
             throw new ArgumentException("En az bir kanal sunulmalidir.", nameof(offeredChannels));
         }
 
+        if (purpose is not (VerificationPurpose.Registration or VerificationPurpose.PasswordReset))
+        {
+            throw new ArgumentOutOfRangeException(nameof(purpose), purpose, "Deneme yalnizca uyelik veya parola sifirlama icindir.");
+        }
+
         return new RegistrationAttempt
         {
+            Purpose = purpose,
             NationalIdHash = nationalIdHash,
             PersonId = personId,
             IpAddress = ipAddress,
@@ -168,7 +185,7 @@ public sealed class RegistrationAttempt : Entity, IAuditable
     public bool CanComplete(DateTimeOffset now) =>
         Status == RegistrationStatus.Verified && VerifiedAt is not null && now < VerifiedAt.Value + CompletionWindow;
 
-    /// <summary>Hesap olusturuldu; deneme kapanir.</summary>
+    /// <summary>Hesap olusturuldu veya parola sifirlandi; deneme kapanir.</summary>
     public void Complete()
     {
         if (Status != RegistrationStatus.Verified)
@@ -214,6 +231,6 @@ public enum RegistrationStatus
     /// <summary>Kod dogrulandi; parola bekleniyor.</summary>
     Verified = 3,
 
-    /// <summary>Hesap olusturuldu.</summary>
+    /// <summary>Hesap olusturuldu veya parola sifirlandi.</summary>
     Completed = 4,
 }

@@ -9,6 +9,8 @@ export const routes = {
   home: '/',
   login: '/login',
   register: '/register',
+  forgotPassword: '/forgot-password',
+  changePassword: '/account/password',
 } as const;
 
 /** Giristen sonra donulecek adresin tasindigi sorgu parametresi. */

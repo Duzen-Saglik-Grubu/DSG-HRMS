@@ -18,6 +18,9 @@ public sealed class RegistrationAttemptConfiguration : IEntityTypeConfiguration<
             // HMAC-SHA256 ozeti (Base64, 44 karakter). Duz TCKN (11 hane) yazilamaz.
             table.HasCheckConstraint("ck_registration_attempt_national_id_hash_length", "length(national_id_hash) = 44");
             table.HasCheckConstraint("ck_registration_attempt_channels", "offered_channels BETWEEN 1 AND 3");
+
+            // Yalnizca uyelik (1) ve parola sifirlama (2); iki adimli giris kendi kaydini kullanir.
+            table.HasCheckConstraint("ck_registration_attempt_purpose", "purpose IN (1, 2)");
         });
 
         builder.HasKey(attempt => attempt.Id);

@@ -38,6 +38,23 @@ public sealed record CompleteRegistrationRequest([property: Secret] string Passw
     public override string ToString() => nameof(CompleteRegistrationRequest);
 }
 
+/// <summary>Parola sifirlama istegi (SYG-KMLK-047).</summary>
+/// <param name="Password">Yeni parola.</param>
+public sealed record ResetPasswordRequest([property: Secret] string Password)
+{
+    /// <inheritdoc />
+    public override string ToString() => nameof(ResetPasswordRequest);
+}
+
+/// <summary>Oturum icinde parola degisikligi istegi (SYG-KMLK-048).</summary>
+/// <param name="CurrentPassword">Mevcut parola.</param>
+/// <param name="NewPassword">Yeni parola.</param>
+public sealed record ChangePasswordRequest([property: Secret] string CurrentPassword, [property: Secret] string NewPassword)
+{
+    /// <inheritdoc />
+    public override string ToString() => nameof(ChangePasswordRequest);
+}
+
 /// <summary>Uyelik baslatildi.</summary>
 /// <param name="RegistrationId">Sonraki adimlarda kullanilacak kimlik.</param>
 /// <param name="Channels">Sunulan kanallar. Kodun gidecegi hedef HICBIR bicimde donmez (SYG-KMLK-018).</param>
@@ -145,6 +162,34 @@ public sealed class CompleteRegistrationRequestValidator : AbstractValidator<Com
     {
         RuleFor(r => r.Password)
             .NotEmpty().WithMessage("Parolanızı girin.")
+            .MaximumLength(512).WithMessage("Parola en fazla 128 karakter olabilir.");
+    }
+}
+
+/// <summary>Parola sifirlama istegi dogrulamasi. Parola kurallari serviste denetlenir.</summary>
+public sealed class ResetPasswordRequestValidator : AbstractValidator<ResetPasswordRequest>
+{
+    /// <summary>Yeni ornek olusturur.</summary>
+    public ResetPasswordRequestValidator()
+    {
+        RuleFor(r => r.Password)
+            .NotEmpty().WithMessage("Yeni parolanızı girin.")
+            .MaximumLength(512).WithMessage("Parola en fazla 128 karakter olabilir.");
+    }
+}
+
+/// <summary>Parola degisikligi istegi dogrulamasi. Parola kurallari serviste denetlenir.</summary>
+public sealed class ChangePasswordRequestValidator : AbstractValidator<ChangePasswordRequest>
+{
+    /// <summary>Yeni ornek olusturur.</summary>
+    public ChangePasswordRequestValidator()
+    {
+        RuleFor(r => r.CurrentPassword)
+            .NotEmpty().WithMessage("Mevcut parolanızı girin.")
+            .MaximumLength(512).WithMessage("Mevcut parolanız hatalı.");
+
+        RuleFor(r => r.NewPassword)
+            .NotEmpty().WithMessage("Yeni parolanızı girin.")
             .MaximumLength(512).WithMessage("Parola en fazla 128 karakter olabilir.");
     }
 }

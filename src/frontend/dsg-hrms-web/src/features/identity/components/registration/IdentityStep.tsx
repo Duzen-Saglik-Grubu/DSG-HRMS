@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Button, Stack, TextField, Typography } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { ApiError } from '@/shared/api/problemDetails';
 import { isValidNationalId } from '@/shared/utils/nationalId';
 import { registrationApi, type RegistrationStarted } from '../../api/registrationApi';
+import type { ApiSchemas } from '@/shared/api/schemas';
 import { MIN_BIRTH_DATE, toIsoDate } from '../../utils/birthDate';
 import { primaryButtonSx } from '../motion';
 import { BirthDateField } from './BirthDateField';
@@ -18,6 +19,10 @@ type IdentityForm = { nationalId: string; birthDate: Date | null; email: string 
 interface IdentityStepProps {
   onStarted: (started: RegistrationStarted) => void;
   onRestart: () => void;
+  /** Islemi baslatan cagri; varsayilan uyelik. Parola sifirlama ayni adimi kullanir (SYG-KMLK-047). */
+  start?: (body: ApiSchemas['StartRegistrationRequest']) => Promise<RegistrationStarted>;
+  /** Adimin aciklamasi; varsayilan uyelik metni. */
+  intro?: ReactNode;
 }
 
 /**
@@ -26,7 +31,12 @@ interface IdentityStepProps {
  * TCKN istemcide de sagla algoritmasiyla denetlenir; gecersiz numara sunucuya
  * gonderilmez. Yanit, eslesme olsa da olmasa da aynidir (KR-085).
  */
-export function IdentityStep({ onStarted, onRestart }: IdentityStepProps) {
+export function IdentityStep({
+  onStarted,
+  onRestart,
+  start: startFlow = registrationApi.start,
+  intro,
+}: IdentityStepProps) {
   const { t } = useTranslation();
 
   const schema = z.object({
@@ -61,7 +71,7 @@ export function IdentityStep({ onStarted, onRestart }: IdentityStepProps) {
 
   const start = useMutation({
     mutationFn: (form: IdentityForm) =>
-      registrationApi.start({
+      startFlow({
         nationalId: form.nationalId.trim(),
         birthDate: toIsoDate(form.birthDate!),
         email: form.email.trim(),
@@ -88,7 +98,7 @@ export function IdentityStep({ onStarted, onRestart }: IdentityStepProps) {
       onSubmit={(event) => void handleSubmit((form) => start.mutate(form))(event)}
     >
       <Typography variant="body2" color="text.secondary">
-        {t('identity.registration.identity.intro')}
+        {intro ?? t('identity.registration.identity.intro')}
       </Typography>
 
       <TextField

@@ -140,6 +140,20 @@ public sealed class UserSession
         return true;
     }
 
+    /// <summary>
+    /// Kullanici parolasini BU oturumda degistirdi: oturum hesabin yeni guvenlik damgasini
+    /// benimser ve acik kalir; damgasi eski kalan diger oturumlar kapanir (SYG-KMLK-048).
+    /// </summary>
+    public void AdoptSecurityStamp(Guid securityStamp)
+    {
+        if (!IsOpen)
+        {
+            throw new InvalidOperationException("Kapali oturum yeni damga alamaz.");
+        }
+
+        SecurityStamp = securityStamp;
+    }
+
     /// <summary>Oturumu kapatir. Zaten kapaliysa ilk neden korunur.</summary>
     public void End(SessionEndReason reason, DateTimeOffset now)
     {
@@ -174,6 +188,9 @@ public enum SessionEndReason
     /// <summary>Toplam oturum suresi doldu (SYG-KMLK-037).</summary>
     Expired = 5,
 
-    /// <summary>Hesap pasiflesti veya parola degisti (SYG-KMLK-054).</summary>
+    /// <summary>Hesap pasiflesti veya guvenlik damgasi baska bir nedenle degisti (SYG-KMLK-054).</summary>
     AccountChanged = 6,
+
+    /// <summary>Parola sifirlandi veya baska bir oturumda degistirildi (SYG-KMLK-047, 048).</summary>
+    PasswordChanged = 7,
 }

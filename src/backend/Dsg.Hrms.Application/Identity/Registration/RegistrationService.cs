@@ -1,6 +1,7 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Exceptions;
 using Dsg.Hrms.Application.Identity.Passwords;
+using Dsg.Hrms.Application.Identity.Sessions;
 using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Identity;
@@ -9,9 +10,16 @@ using Microsoft.Extensions.Logging;
 namespace Dsg.Hrms.Application.Identity.Registration;
 
 /// <summary>
-/// Uyelik akisi (ADR-0006 §1–4, SYG-KMLK-013…021).
+/// Uyelik ve parola sifirlama akisi (ADR-0006 §1–4, §6; SYG-KMLK-013…021, 047).
 /// </summary>
 /// <remarks>
+/// <para>
+/// <b>Tek akis (SYG-KMLK-047):</b> Parola sifirlama uyelikle ayni eslestirme, kanal, kod, hiz
+/// siniri ve eslesme gizliligi kurallarini kullanir. Denemenin amaci yalnizca kod iletisinin
+/// metnini belirler. Dogrulanmis kimlik, hesap yoksa hesap olusturmaya
+/// (<see cref="CompleteAsync"/>), varsa parola sifirlamaya (<see cref="ResetPasswordAsync"/>)
+/// gider.
+/// </para>
 /// <para>
 /// <b>Eslesme gizliligi (<c>KR-016</c>):</b> Eslesme olsa da olmasa da her adimin yaniti
 /// ayni bicimdedir. Eslesme yoksa kod gonderilmez, ama deneme sahte bir kod varmis gibi
@@ -30,6 +38,7 @@ public sealed partial class RegistrationService
     public static readonly TimeSpan AttemptWindow = TimeSpan.FromHours(1);
 
     private readonly IRegistrationStore _store;
+    private readonly ISessionStore _sessions;
     private readonly IIdentifierHasher _identifierHasher;
     private readonly VerificationCodeService _codes;
     private readonly PasswordPolicy _passwordPolicy;
@@ -39,8 +48,13 @@ public sealed partial class RegistrationService
     private readonly ILogger<RegistrationService> _logger;
 
     /// <summary>Yeni ornek olusturur.</summary>
+    /// <remarks>
+    /// Iki depo ayni veritabani baglamini (is birimini) paylasir: parola sifirlamada hesap,
+    /// oturumlar ve giris sayaci TEK kayitla birlikte yazilir.
+    /// </remarks>
     public RegistrationService(
         IRegistrationStore store,
+        ISessionStore sessions,
         IIdentifierHasher identifierHasher,
         VerificationCodeService codes,
         PasswordPolicy passwordPolicy,
@@ -50,6 +64,7 @@ public sealed partial class RegistrationService
         ILogger<RegistrationService> logger)
     {
         _store = store;
+        _sessions = sessions;
         _identifierHasher = identifierHasher;
         _codes = codes;
         _passwordPolicy = passwordPolicy;
@@ -80,7 +95,7 @@ public sealed partial class RegistrationService
         var matched = await MatchAsync(candidate, request, allowed, cancellationToken).ConfigureAwait(false);
 
         // Eslesme yoksa izin verilen tum kanallar sunulur (SYG-KMLK-016).
-        var attempt = RegistrationAttempt.Start(nationalIdHash, matched?.PersonId, ipAddress, matched?.Channels ?? allowed, now);
+        var attempt = RegistrationAttempt.Start(nationalIdHash, matched?.PersonId, ipAddress, matched?.Channels ?? allowed, now, request.Purpose);
         _store.Add(attempt);
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -104,7 +119,7 @@ public sealed partial class RegistrationService
 
         if (!attempt.CanRequestCode(now))
         {
-            throw new NotFoundException(ExpiredMessage);
+            throw new NotFoundException(ExpiredMessageFor(attempt));
         }
 
         if (channel is not (RegistrationChannels.Email or RegistrationChannels.Sms) || !attempt.OfferedChannels.HasFlag(channel))
@@ -128,7 +143,7 @@ public sealed partial class RegistrationService
         if (attempt.IsMatch)
         {
             var candidate = await _store.FindCandidateAsync(attempt.PersonId!.Value, cancellationToken).ConfigureAwait(false)
-                ?? throw new NotFoundException(ExpiredMessage);
+                ?? throw new NotFoundException(ExpiredMessageFor(attempt));
 
             var recipient = channel == RegistrationChannels.Email ? candidate.Person.Email : candidate.Person.MobilePhone;
             if (string.IsNullOrEmpty(recipient))
@@ -140,7 +155,7 @@ public sealed partial class RegistrationService
             var issued = await _codes.IssueAsync(
                 new VerificationRequest(
                     candidate.Person.Id,
-                    VerificationPurpose.Registration,
+                    attempt.Purpose,
                     channel == RegistrationChannels.Email ? VerificationChannel.Email : VerificationChannel.Sms,
                     recipient),
                 cancellationToken).ConfigureAwait(false);
@@ -222,11 +237,11 @@ public sealed partial class RegistrationService
 
         if (attempt is null || !attempt.IsMatch || !attempt.CanComplete(now))
         {
-            throw new NotFoundException(ExpiredMessage);
+            throw new NotFoundException(ExpiredMessageFor(attempt));
         }
 
         var candidate = await _store.FindCandidateAsync(attempt.PersonId!.Value, cancellationToken).ConfigureAwait(false)
-            ?? throw new NotFoundException(ExpiredMessage);
+            ?? throw new NotFoundException(ExpiredMessageFor(attempt));
 
         if (candidate.Account is not null)
         {
@@ -257,6 +272,76 @@ public sealed partial class RegistrationService
         return [];
     }
 
+    // ------------------------------------------------------------------ 4. parola sifirla
+
+    /// <summary>
+    /// Dogrulanmis kimlikle parolayi sifirlar (SYG-KMLK-047). Hesabin TUM oturumlari kapanir ve
+    /// giris kilidi kalkar: kimligini kanitlayan kisi, kilit suresini beklemeden yeni parolasiyla
+    /// giris yapabilir. Ihlal varsa hicbir sey kaydedilmez ve ihlaller doner.
+    /// </summary>
+    /// <exception cref="NotFoundException">Deneme dogrulanmamissa veya suresi dolduysa.</exception>
+    /// <exception cref="BusinessRuleException">Kisinin hesabi yoksa.</exception>
+    /// <exception cref="AccountDisabledException">Hesap kullanima kapaliysa.</exception>
+    public async Task<IReadOnlyList<PasswordViolation>> ResetPasswordAsync(Guid registrationId, string password, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(password);
+
+        var now = _clock.UtcNow;
+        var attempt = await _store.FindAttemptAsync(registrationId, cancellationToken).ConfigureAwait(false);
+
+        if (attempt is null || !attempt.IsMatch || !attempt.CanComplete(now))
+        {
+            throw new NotFoundException(ExpiredMessageFor(attempt));
+        }
+
+        var registration = await _store.FindCandidateAsync(attempt.PersonId!.Value, cancellationToken).ConfigureAwait(false)
+            ?? throw new NotFoundException(ExpiredMessageFor(attempt));
+
+        if (registration.Account is null)
+        {
+            throw new BusinessRuleException(NoAccountMessage);
+        }
+
+        var candidate = await _sessions.FindByAccountIdAsync(registration.Account.Id, cancellationToken).ConfigureAwait(false)
+            ?? throw new NotFoundException(ExpiredMessageFor(attempt));
+        var account = candidate.Account;
+
+        // Elle pasife alinan hesap parola sifirlamayla acilamaz (SYG-KMLK-057).
+        if (account.Status != AccountStatus.Active || !candidate.HasActiveEmployment)
+        {
+            throw new AccountDisabledException();
+        }
+
+        var person = candidate.Person;
+        var violations = await _passwordPolicy.ValidateAsync(password, PersonalWords(person.FirstName, person.LastName, person.Email), cancellationToken)
+            .ConfigureAwait(false);
+        if (violations.Count > 0)
+        {
+            return violations;
+        }
+
+        account.SetPassword(_passwordHasher.Hash(PasswordPolicy.Normalize(password)), now);
+        account.ClearLockout();
+
+        foreach (var session in await _sessions.GetOpenSessionsAsync(account.Id, cancellationToken).ConfigureAwait(false))
+        {
+            session.End(SessionEndReason.PasswordChanged, now);
+        }
+
+        if (person.Email is not null)
+        {
+            var throttle = await _sessions.FindThrottleAsync(_identifierHasher.HashIdentifier(SessionService.LoginIdentifier(person.Email)), cancellationToken)
+                .ConfigureAwait(false);
+            throttle?.Reset(now);
+        }
+
+        attempt.Complete();
+        await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        LogPasswordReset(_logger, registrationId, account.Id);
+        return [];
+    }
+
     /// <summary>Parola denetiminde kullanilacak kisisel sozcukler (SYG-KMLK-045).</summary>
     public static IEnumerable<string> PersonalWords(string firstName, string lastName, string? email)
     {
@@ -282,6 +367,13 @@ public sealed partial class RegistrationService
     // ------------------------------------------------------------------ yardimcilar
 
     private const string ExpiredMessage = "Üyelik işleminin süresi doldu. Lütfen baştan başlayın.";
+
+    private const string ResetExpiredMessage = "Parola sıfırlama işleminin süresi doldu. Lütfen baştan başlayın.";
+
+    private const string NoAccountMessage = "Adınıza açılmış bir hesap bulunmuyor. Üye olarak hesap oluşturabilirsiniz.";
+
+    private static string ExpiredMessageFor(RegistrationAttempt? attempt) =>
+        attempt?.Purpose == VerificationPurpose.PasswordReset ? ResetExpiredMessage : ExpiredMessage;
 
     private const string AccountExistsMessage = "Adınıza açılmış bir hesap zaten var. Parolanızı unuttuysanız parola sıfırlamayı kullanın.";
 
@@ -374,7 +466,7 @@ public sealed partial class RegistrationService
         var attempt = await _store.FindAttemptAsync(registrationId, cancellationToken).ConfigureAwait(false);
         if (attempt is null || now >= attempt.ExpiresAt || attempt.Status is RegistrationStatus.Verified or RegistrationStatus.Completed)
         {
-            throw new NotFoundException(ExpiredMessage);
+            throw new NotFoundException(ExpiredMessageFor(attempt));
         }
 
         return attempt;
@@ -391,13 +483,21 @@ public sealed partial class RegistrationService
 
     [LoggerMessage(EventId = 3703, Level = LogLevel.Information, Message = "Uyelik tamamlandi {RegistrationId}: kisi {PersonId} icin hesap olusturuldu.")]
     private static partial void LogCompleted(ILogger logger, Guid registrationId, long personId);
+
+    [LoggerMessage(EventId = 3704, Level = LogLevel.Information, Message = "Parola sifirlandi {RegistrationId}: hesap {AccountId}; acik oturumlar kapatildi.")]
+    private static partial void LogPasswordReset(ILogger logger, Guid registrationId, long accountId);
 }
 
 /// <summary>Uyelik baslatma istegi.</summary>
 /// <param name="NationalId">TCKN (bicimi ve sagla algoritmasi API katmaninda dogrulanmis).</param>
 /// <param name="BirthDate">Dogum tarihi.</param>
 /// <param name="Email">Kurumsal e-posta.</param>
-public sealed record StartRegistration(string NationalId, DateOnly BirthDate, string Email)
+/// <param name="Purpose">Uyelik veya parola sifirlama (SYG-KMLK-047).</param>
+public sealed record StartRegistration(
+    string NationalId,
+    DateOnly BirthDate,
+    string Email,
+    VerificationPurpose Purpose = VerificationPurpose.Registration)
 {
     /// <inheritdoc />
     public override string ToString() => "StartRegistration";

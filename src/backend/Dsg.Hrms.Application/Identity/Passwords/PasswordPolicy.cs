@@ -165,6 +165,9 @@ public enum PasswordViolation
 
     /// <summary>Kisinin adi, soyadi, e-postasi veya kurum adindan turetilmis.</summary>
     ContainsPersonalOrOrganizationWord = 5,
+
+    /// <summary>Yeni parola mevcut parolayla ayni (oturum icinde degisiklik, SYG-KMLK-048).</summary>
+    SameAsCurrent = 6,
 }
 
 /// <summary>Uygulamaya gomulu yaygin parola listesi (SYG-KMLK-045).</summary>
