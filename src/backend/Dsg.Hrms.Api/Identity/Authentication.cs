@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Identity.Sessions;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Infrastructure.Configuration;
@@ -23,6 +24,11 @@ namespace Dsg.Hrms.Api.Identity;
 /// dogrulanir. Boylece cikis, baska cihazdan giris ve hesabin pasiflesmesi jetonun 15
 /// dakikalik omrunu beklemeden etkili olur (SYG-KMLK-054).
 /// </para>
+/// <para>
+/// Jetonun omru <b>uygulamanin saatiyle</b> (<see cref="IDateTimeProvider"/>) uretilir ve ayni
+/// saatle dogrulanir. Kutuphanenin varsayilani sistem saatidir; uretim ve dogrulama farkli
+/// saatlere baksaydi zamana bagli her test calistigi saate gore gecer ya da duserdi (#97).
+/// </para>
 /// </remarks>
 public static class AuthenticationRegistration
 {
@@ -34,6 +40,9 @@ public static class AuthenticationRegistration
 
     /// <summary>Oturum kimliginin tasindigi talep.</summary>
     public const string SessionIdClaim = "sid";
+
+    /// <summary>Saat farki toleransi.</summary>
+    public static readonly TimeSpan ClockSkew = TimeSpan.FromSeconds(30);
 
     /// <summary>Kimlik dogrulamayi kaydeder.</summary>
     public static IServiceCollection AddHrmsAuthentication(this IServiceCollection services, IConfiguration configuration)
@@ -58,7 +67,7 @@ public static class AuthenticationRegistration
                     IssuerSigningKey = key,
                     ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
                     NameClaimType = HttpContextCurrentUser.UserIdClaimType,
-                    ClockSkew = TimeSpan.FromSeconds(30),
+                    ClockSkew = ClockSkew,
                 };
                 bearer.Events = new JwtBearerEvents
                 {
@@ -75,8 +84,26 @@ public static class AuthenticationRegistration
                 };
             });
 
+        services
+            .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .Configure<IDateTimeProvider>((bearer, clock) =>
+                bearer.TokenValidationParameters.LifetimeValidator = (notBefore, expires, _, _) =>
+                    IsWithinLifetime(notBefore, expires, clock.UtcNow));
+
         services.AddAuthorization();
         return services;
+    }
+
+    /// <summary>
+    /// Jeton verilen anda gecerli mi. Bitis zorunludur; saat farki toleransi iki uca da uygulanir.
+    /// </summary>
+    public static bool IsWithinLifetime(DateTime? notBefore, DateTime? expires, DateTimeOffset now)
+    {
+        var utcNow = now.UtcDateTime;
+
+        return expires is not null
+            && utcNow < expires.Value.ToUniversalTime() + ClockSkew
+            && (notBefore is null || utcNow >= notBefore.Value.ToUniversalTime() - ClockSkew);
     }
 }
 
@@ -121,7 +148,7 @@ public sealed class JwtAccessTokenIssuer(SecurityKey key) : IAccessTokenIssuer
     private readonly SigningCredentials _credentials = new(key, SecurityAlgorithms.HmacSha256);
 
     /// <inheritdoc />
-    public string Issue(long userAccountId, UserSession session, DateTimeOffset expiresAt)
+    public string Issue(long userAccountId, UserSession session, DateTimeOffset issuedAt, DateTimeOffset expiresAt)
     {
         ArgumentNullException.ThrowIfNull(session);
 
@@ -130,8 +157,8 @@ public sealed class JwtAccessTokenIssuer(SecurityKey key) : IAccessTokenIssuer
         {
             Issuer = AuthenticationRegistration.Issuer,
             Audience = AuthenticationRegistration.Audience,
-            IssuedAt = DateTime.UtcNow,
-            NotBefore = DateTime.UtcNow.AddSeconds(-5),
+            IssuedAt = issuedAt.UtcDateTime,
+            NotBefore = issuedAt.UtcDateTime.AddSeconds(-5),
             Expires = expiresAt.UtcDateTime,
             SigningCredentials = _credentials,
             Claims = new Dictionary<string, object>

@@ -316,6 +316,21 @@ public sealed class SessionApiTests : IClassFixture<RegistrationApiFixture>, IAs
     }
 
     [Fact]
+    public async Task Access_token_lifetime_follows_the_application_clock()
+    {
+        // Uygulama saati gercek saatten gunlerce ileride: jetonun omru sistem saatine gore
+        // olculseydi gecerli jeton reddedilir, suresi dolmus jeton kabul edilirdi (#97).
+        _fixture.Clock.Advance(TimeSpan.FromDays(30));
+        using var client = _fixture.CreateClient();
+        var token = AccessToken(await SignInAsync(client));
+
+        (await ActivityAsync(client, token)).ShouldBe(HttpStatusCode.NoContent);
+
+        _fixture.Clock.Advance(TimeSpan.FromMinutes(16));
+        (await ActivityAsync(client, token)).ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
     public async Task Activity_requires_a_valid_access_token()
     {
         using var client = _fixture.CreateClient();

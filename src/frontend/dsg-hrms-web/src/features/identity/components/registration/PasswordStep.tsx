@@ -18,7 +18,7 @@ import { z } from 'zod';
 import { ApiError } from '@/shared/api/problemDetails';
 import { registrationApi, type PublicSettings } from '../../api/registrationApi';
 import { primaryButtonSx } from '../motion';
-import { RegistrationError } from './registrationErrors';
+import { RegistrationError } from './RegistrationError';
 
 type PasswordForm = { password: string; confirm: string };
 

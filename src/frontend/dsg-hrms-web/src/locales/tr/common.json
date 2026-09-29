@@ -74,29 +74,6 @@
         "submit": "Devam et",
         "birthDatePicker": "Takvimden tarih seç"
       },
-      "channel": {
-        "heading": "Doğrulama yöntemi",
-        "intro": "Doğrulama kodunu nereden almak istersiniz?",
-        "email": "E-posta ile",
-        "sms": "SMS ile",
-        "submit": "Kodu gönder"
-      },
-      "code": {
-        "heading": "Doğrulama kodu",
-        "intro": "Bilgileriniz kayıtlarımızla eşleşiyorsa doğrulama kodu birkaç dakika içinde gelir. Kod gelmezse bilgilerinizi kontrol edin veya destek birimine başvurun.",
-        "label": "Doğrulama kodu",
-        "hint": "{{count}} haneli kod",
-        "remaining": "Kalan süre: {{time}}",
-        "required": "Doğrulama kodunu girin.",
-        "mismatch": "Kod hatalı. Lütfen tekrar deneyin.",
-        "expired": "Kodun süresi doldu. Yeni kod isteyin.",
-        "attemptsExceeded": "Çok fazla hatalı deneme yapıldı. Yeni kod isteyin.",
-        "notUsable": "Bu kod artık kullanılamaz. Yeni kod isteyin.",
-        "resent": "Yeni kod gönderildi. Önceki kod artık geçersiz.",
-        "submit": "Doğrula",
-        "resend": "Kodu tekrar gönder",
-        "changeChannel": "Başka bir yöntemle doğrula"
-      },
       "password": {
         "heading": "Parola",
         "intro": "Hesabınız için bir parola belirleyin.",
@@ -124,12 +101,74 @@
         "text": "Adınıza açılmış bir hesap bulunuyor; ikinci bir hesap açılmaz. Parolanızı hatırlamıyorsanız parola sıfırlamayı kullanın."
       },
       "errors": {
-        "rateLimited": "Çok fazla deneme yapıldı. Lütfen bir süre sonra tekrar deneyin.",
-        "sessionExpired": "Üyelik işleminin süresi doldu. Lütfen baştan başlayın.",
-        "channelUnavailable": "Seçilen doğrulama yöntemi kullanılamıyor. Başka bir yöntem seçin."
+        "sessionExpired": "Üyelik işleminin süresi doldu. Lütfen baştan başlayın."
       },
       "restart": "Baştan başla",
-      "subtitle": "Birkaç adımda hesabınızı oluşturun."
+      "subtitle": "Birkaç adımda hesabınızı oluşturun.",
+      "codeIntro": "Bilgileriniz kayıtlarımızla eşleşiyorsa doğrulama kodu birkaç dakika içinde gelir. Kod gelmezse bilgilerinizi kontrol edin veya destek birimine başvurun.",
+      "goToLogin": "Giriş yap"
+    },
+    "verification": {
+      "channel": {
+        "heading": "Doğrulama yöntemi",
+        "intro": "Doğrulama kodunu nereden almak istersiniz?",
+        "email": "E-posta ile",
+        "sms": "SMS ile",
+        "submit": "Kodu gönder"
+      },
+      "code": {
+        "heading": "Doğrulama kodu",
+        "label": "Doğrulama kodu",
+        "hint": "{{count}} haneli kod",
+        "remaining": "Kalan süre: {{time}}",
+        "required": "Doğrulama kodunu girin.",
+        "mismatch": "Kod hatalı. Lütfen tekrar deneyin.",
+        "expired": "Kodun süresi doldu. Yeni kod isteyin.",
+        "attemptsExceeded": "Çok fazla hatalı deneme yapıldı. Yeni kod isteyin.",
+        "notUsable": "Bu kod artık kullanılamaz. Yeni kod isteyin.",
+        "resent": "Yeni kod gönderildi. Önceki kod artık geçersiz.",
+        "submit": "Doğrula",
+        "resend": "Kodu tekrar gönder",
+        "changeChannel": "Başka bir yöntemle doğrula"
+      },
+      "errors": {
+        "rateLimited": "Çok fazla deneme yapıldı. Lütfen bir süre sonra tekrar deneyin.",
+        "channelUnavailable": "Seçilen doğrulama yöntemi kullanılamıyor. Başka bir yöntem seçin."
+      }
+    },
+    "login": {
+      "title": "Giriş yap",
+      "subtitle": "İnsan Kaynakları Yönetim Sistemi’ne hoş geldiniz.",
+      "heading": "Hesabınıza giriş yapın",
+      "email": "Kurumsal e-posta adresi",
+      "emailHint": "Örneğin ad.soyad@duzen.com.tr",
+      "emailInvalid": "Geçerli bir e-posta adresi girin.",
+      "password": "Parola",
+      "passwordRequired": "Parolanızı girin.",
+      "showPassword": "Parolayı göster",
+      "hidePassword": "Parolayı gizle",
+      "submit": "Giriş yap",
+      "noAccount": "Henüz hesabınız yok mu?",
+      "register": "Üye olun",
+      "codeIntro": "Doğrulama kodu seçtiğiniz yönteme gönderildi; birkaç dakika içinde gelir. Kod gelmezse tekrar gönderebilir veya destek birimine başvurabilirsiniz.",
+      "expired": "Giriş işleminin süresi doldu. Lütfen yeniden giriş yapın.",
+      "restart": "Yeniden giriş yap"
+    }
+  },
+  "session": {
+    "signOut": "Çıkış yap",
+    "ended": {
+      "logged-out": "Çıkış yaptınız.",
+      "signed-in-elsewhere": "Hesabınıza başka bir cihazdan giriş yapıldı. Devam etmek için yeniden giriş yapın.",
+      "token-reuse": "Güvenliğiniz için hesabınızdaki tüm oturumlar kapatıldı. Yeniden giriş yapın; bu durum tekrarlanırsa destek birimine başvurun.",
+      "idle-timeout": "Uzun süre işlem yapılmadığı için oturumunuz kapandı. Lütfen yeniden giriş yapın.",
+      "expired": "Oturum süreniz doldu. Lütfen yeniden giriş yapın.",
+      "account-changed": "Hesap bilgileriniz değiştiği için oturumunuz kapandı. Lütfen yeniden giriş yapın."
+    },
+    "idleWarning": {
+      "title": "Oturumunuz kapanmak üzere",
+      "text": "Bir süredir işlem yapmadınız. Oturumunuz güvenliğiniz için {{time}} içinde kapanacak.",
+      "continue": "Oturumu sürdür"
     }
   }
 }

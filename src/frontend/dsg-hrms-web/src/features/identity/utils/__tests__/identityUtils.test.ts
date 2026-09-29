@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '@/shared/api/problemDetails';
 import { toIsoDate } from '../birthDate';
-import { classifyRegistrationError } from '../registrationErrorKind';
+import { classifyFlowError } from '../flowErrorKind';
 
 describe('toIsoDate', () => {
   it('yerel takvim gununu YYYY-AA-GG bicimine cevirir', () => {
@@ -12,14 +12,14 @@ describe('toIsoDate', () => {
   });
 });
 
-describe('classifyRegistrationError', () => {
+describe('classifyFlowError', () => {
   const error = (status: number, errors?: Record<string, string[]>) =>
     new ApiError({ message: 'x', status, errors, isNetworkError: false });
 
   it('bilinen durumlari ayirir', () => {
-    expect(classifyRegistrationError(error(429))).toBe('rateLimited');
-    expect(classifyRegistrationError(error(422))).toBe('channelUnavailable');
-    expect(classifyRegistrationError(error(400, { password: ['kisa'] }))).toBe('fields');
+    expect(classifyFlowError(error(429))).toBe('rateLimited');
+    expect(classifyFlowError(error(422))).toBe('channelUnavailable');
+    expect(classifyFlowError(error(400, { password: ['kisa'] }))).toBe('fields');
   });
 
   it('suresi doldu yalnizca uygulamanin "kayit yok" yanitinda ve islem basladiktan sonra soylenir', () => {
@@ -30,16 +30,16 @@ describe('classifyRegistrationError', () => {
       type: 'https://dsg-hrms/errors/not-found',
     });
 
-    expect(classifyRegistrationError(notFound)).toBe('sessionExpired');
+    expect(classifyFlowError(notFound)).toBe('sessionExpired');
     // Ilk adimda islem yoktur; 404 baska bir soruna isaret eder.
-    expect(classifyRegistrationError(notFound, { canExpire: false })).toBe('unexpected');
+    expect(classifyFlowError(notFound, { canExpire: false })).toBe('unexpected');
     // Turu olmayan 404: guncellenmemis sunucu veya yanlis adres.
-    expect(classifyRegistrationError(error(404))).toBe('unexpected');
+    expect(classifyFlowError(error(404))).toBe('unexpected');
   });
 
   it('digerlerini beklenmeyen sayar', () => {
-    expect(classifyRegistrationError(error(400))).toBe('unexpected');
-    expect(classifyRegistrationError(error(500))).toBe('unexpected');
-    expect(classifyRegistrationError(new Error('x'))).toBe('unexpected');
+    expect(classifyFlowError(error(400))).toBe('unexpected');
+    expect(classifyFlowError(error(500))).toBe('unexpected');
+    expect(classifyFlowError(new Error('x'))).toBe('unexpected');
   });
 });

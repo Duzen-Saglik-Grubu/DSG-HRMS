@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   Box,
   Button,
@@ -14,24 +14,21 @@ import EmailOutlined from '@mui/icons-material/EmailOutlined';
 import SmsOutlined from '@mui/icons-material/SmsOutlined';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import {
-  registrationApi,
-  type CodeRequested,
-  type VerificationChannel,
-} from '../../api/registrationApi';
+import type { CodeRequested, VerificationChannel } from '../../api/registrationApi';
 import { primaryButtonSx } from '../motion';
-import { RegistrationError } from './registrationErrors';
 
 interface ChannelStepProps {
-  registrationId: string;
   channels: VerificationChannel[];
   initialChannel?: VerificationChannel | undefined;
+  /** Secilen kanala kod gonderir (uyelik veya iki adimli giris). */
+  requestCode: (channel: VerificationChannel) => Promise<CodeRequested>;
   onCodeRequested: (channel: VerificationChannel, requested: CodeRequested) => void;
-  onRestart: () => void;
+  renderError: (error: unknown) => ReactNode;
 }
 
 /**
- * 2. adim: dogrulama kanali (SYG-KMLK-016, 017, 018).
+ * Dogrulama kanali secimi (SYG-KMLK-016, 017, 018, 034). Uyelik ve iki adimli giris ayni
+ * adimi kullanir.
  *
  * Yalnizca sunucunun sundugu kanallar listelenir. Kodun gidecegi adres veya numara
  * maskeli bile GOSTERILMEZ (SYG-KMLK-018): sunucu zaten dondurmez.
@@ -40,11 +37,11 @@ interface ChannelStepProps {
  * gezilir, ekran okuyucu secimi duyurur.
  */
 export function ChannelStep({
-  registrationId,
   channels,
   initialChannel,
+  requestCode,
   onCodeRequested,
-  onRestart,
+  renderError,
 }: ChannelStepProps) {
   const { t } = useTranslation();
   const [channel, setChannel] = useState<VerificationChannel>(
@@ -52,7 +49,7 @@ export function ChannelStep({
   );
 
   const request = useMutation({
-    mutationFn: () => registrationApi.requestCode(registrationId, channel),
+    mutationFn: () => requestCode(channel),
     onSuccess: (requested) => onCodeRequested(channel, requested),
   });
 
@@ -71,7 +68,7 @@ export function ChannelStep({
           id="channel-label"
           sx={{ mb: 1.5, color: 'text.secondary', typography: 'body2' }}
         >
-          {t('identity.registration.channel.intro')}
+          {t('identity.verification.channel.intro')}
         </FormLabel>
         <RadioGroup
           aria-labelledby="channel-label"
@@ -121,13 +118,13 @@ export function ChannelStep({
                   {item === 'email' ? <EmailOutlined /> : <SmsOutlined />}
                 </Box>
                 <Typography sx={{ flexGrow: 1, fontWeight: 500 }}>
-                  {t(`identity.registration.channel.${item}`)}
+                  {t(`identity.verification.channel.${item}`)}
                 </Typography>
                 <Radio
                   value={item}
                   autoFocus={index === 0}
                   slotProps={{
-                    input: { 'aria-label': t(`identity.registration.channel.${item}`) },
+                    input: { 'aria-label': t(`identity.verification.channel.${item}`) },
                   }}
                 />
               </Box>
@@ -136,7 +133,7 @@ export function ChannelStep({
         </RadioGroup>
       </FormControl>
 
-      {request.error ? <RegistrationError error={request.error} onRestart={onRestart} /> : null}
+      {request.error ? renderError(request.error) : null}
 
       <Button
         type="submit"
@@ -145,7 +142,7 @@ export function ChannelStep({
         disabled={request.isPending}
         sx={primaryButtonSx}
       >
-        {t('identity.registration.channel.submit')}
+        {t('identity.verification.channel.submit')}
       </Button>
     </Stack>
   );

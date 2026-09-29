@@ -11,7 +11,7 @@ import { registrationApi, type RegistrationStarted } from '../../api/registratio
 import { MIN_BIRTH_DATE, toIsoDate } from '../../utils/birthDate';
 import { primaryButtonSx } from '../motion';
 import { BirthDateField } from './BirthDateField';
-import { RegistrationError } from './registrationErrors';
+import { RegistrationError } from './RegistrationError';
 
 type IdentityForm = { nationalId: string; birthDate: Date | null; email: string };
 

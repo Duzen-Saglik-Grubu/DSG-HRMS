@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`, `KR-078`
+**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`, `KR-078`, `KR-086`, `KR-087`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **İlgili riskler:** `R-08`, `R-12`, `R-13`, `R-14`
 
@@ -183,6 +183,15 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
 > oturum kaydıyla da doğrulanır. Oturum sona erdiğinde yanıtın hata türü nedeni taşır
 > (`session-ended/signed-in-elsewhere`, `idle-timeout`, `expired`, `token-reuse`,
 > `account-changed`, `logged-out`).
+>
+> **İstemci (28.09.2026, `KR-087`, #95).** Erişim jetonu sekmenin belleğindedir; sayfa
+> açılışında oturum yenileme çereziyle geri getirilir. Jeton, süresi dolmadan 30 saniye önce
+> veya bir istek `401` aldığında yenilenir; sekme içinde aynı anda gelen istekler tek
+> yenilemeyi bekler, sekmeler arasında yenilemeler `navigator.locks` ile sıraya girer (aksi
+> hâlde aynı çerezi gönderen iki sekme jeton tekrarına düşerdi). Etkinlik sinyali görünür
+> sekmedeki kullanıcı etkileşimi ve oynayan medya için dakikada en fazla bir kez gider
+> (AN-23); hareketsizlik dolmadan 2 dakika önce uyarı gösterilir. Sekmeler giriş, çıkış ve son
+> etkileşimi `BroadcastChannel` ile birbirine bildirir; jeton iletilmez.
 
 **`localStorage` kullanılmama gerekçesi:** XSS açığı durumunda `localStorage`'daki jeton
 JavaScript ile okunabilir. `HttpOnly` çerez okunamaz.
@@ -252,3 +261,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | 2026-09-24 | 0.4 | §3 kod saklama: anahtarlı özet; §5 kilit sayacı girilen e-postaya bağlı; §4 kanal tablosu `KR-073`, `KR-075`, `KR-076` ile yeniden yazıldı (İK destekli davet, `KR-020` konusuz) | Bilgi İşlem |
 | 2026-09-27 | 0.5 | §1 ve §6: gerçekleştirme notları (eşleşme gizliliğinin tüm akışa yayılması, parola özeti ve liste; `KR-085`, #87) | Bilgi İşlem |
 | 2026-09-28 | 0.6 | §8: gerçekleştirme notu (uç noktalar, çerez, her istekte oturum doğrulaması; `KR-086`, #92) | Bilgi İşlem |
+| 2026-09-28 | 0.7 | §8: istemci tarafı gerçekleştirme notu (bellekte jeton, sekmeler arası yenileme, etkinlik sinyali; `KR-087`, #95) | Bilgi İşlem |

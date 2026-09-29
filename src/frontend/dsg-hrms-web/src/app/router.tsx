@@ -1,8 +1,10 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router';
+import { routes } from '@/shared/routes';
 import { AppLayout } from './AppLayout';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { RouteFallback } from './pages/RouteFallback';
+import { RequireSession } from './RequireSession';
 
 // Rota bazli kod bolme (ADR-0015 §11): ilk yukleme kucuk kalir, her modul
 // yalnizca acildiginda indirilir. Modul sayisi 35'e ciktiginda bunun etkisi
@@ -13,20 +15,31 @@ const HomePage = lazy(async () => {
   return { default: page.HomePage };
 });
 
+const LoginPage = lazy(async () => {
+  const page = await import('@/features/identity/pages/LoginPage');
+
+  return { default: page.LoginPage };
+});
+
 const RegistrationPage = lazy(async () => {
   const page = await import('@/features/identity/pages/RegistrationPage');
 
   return { default: page.RegistrationPage };
 });
 
-/** Kimlik ekranlarinin yollari. Uygulama kabugunun (ust cubuk) DISINDADIR (SYG-KMLK-068). */
-export const identityRoutes = {
-  register: '/register',
-} as const;
-
+// Kimlik ekranlari uygulama kabugunun (ust cubuk) DISINDADIR (SYG-KMLK-068) ve oturum
+// gerektirmez. Kabuk ve altindaki her sayfa oturum ister (SYG-KMLK-055).
 export const router = createBrowserRouter([
   {
-    path: identityRoutes.register,
+    path: routes.login,
+    element: (
+      <Suspense fallback={<RouteFallback />}>
+        <LoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: routes.register,
     element: (
       <Suspense fallback={<RouteFallback />}>
         <RegistrationPage />
@@ -34,8 +47,12 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/',
-    element: <AppLayout />,
+    path: routes.home,
+    element: (
+      <RequireSession>
+        <AppLayout />
+      </RequireSession>
+    ),
     children: [
       {
         index: true,
