@@ -158,6 +158,22 @@ describe('SessionManager — acilis ve cikis', () => {
     expect(api.activity).toHaveBeenCalledOnce();
   });
 
+  it('acilista durum degisikligiyle ayni anda calisan hareketsizlik denetimi oturumu KAPATMAZ (#102)', async () => {
+    // React, oturum durumu degisince uygulama kabugunu HEMEN cizer ve hareketsizlik denetimi
+    // calisir; restore() henuz sonraki satirina gecmemistir.
+    const session = manager();
+    session.subscribe(() => {
+      if (session.getState().status === 'authenticated') {
+        session.checkDeadlines();
+      }
+    });
+
+    await session.restore();
+
+    expect(session.getState().status).toBe('authenticated');
+    expect(api.signOut).not.toHaveBeenCalled();
+  });
+
   it('cerez yoksa ileti gostermeden anonim olur', async () => {
     api.refresh.mockRejectedValue(ended('invalid'));
     const session = manager();

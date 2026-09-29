@@ -325,6 +325,14 @@ export class SessionManager {
     const skew = clockSkew(session.accessToken, this.now());
     const toLocal = (value: string) => Date.parse(value) + skew;
 
+    // Oturum bu sekmede ilk kez kabul ediliyor (giris veya sayfa acilisi): bu bir kullanici
+    // etkilesimidir ve durum degisikliginden ONCE kaydedilir. Durum degisince React uygulama
+    // kabugunu hemen cizer ve hareketsizlik denetimi calisir; son etkilesim o anda hâlâ 0
+    // olsaydi oturum "30 dakikadir hareketsiz" sayilip kapatilirdi (#102).
+    if (this.tokens === null) {
+      this.lastInteractionAt = Math.max(this.lastInteractionAt, this.now());
+    }
+
     this.tokens = {
       accessToken: session.accessToken,
       accessTokenExpiresAt: toLocal(session.accessTokenExpiresAt),

@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
+import { serverNow } from '@/shared/api/serverClock';
 
 /**
  * Verilen ana kadar kalan saniye (SYG-KMLK-028: kod ekranindaki geri sayim).
  *
- * Sure sunucunun verdigi bitis anindan hesaplanir; istemcide sayac tutulmaz.
+ * Sure sunucunun verdigi bitis anindan, SUNUCUNUN saatine gore hesaplanir (#103); istemcide
+ * sayac tutulmaz.
  * Boylece sekme arka planda kalip zamanlayici yavaslasa bile gosterilen sure dogru
  * kalir. Saniyede bir yalnizca "simdi" guncellenir.
  */
-export function useCountdown(until: string | undefined, clock: () => number = Date.now): number {
+export function useCountdown(until: string | undefined, clock: () => number = serverNow): number {
   const [now, setNow] = useState(clock);
 
   useEffect(() => {
