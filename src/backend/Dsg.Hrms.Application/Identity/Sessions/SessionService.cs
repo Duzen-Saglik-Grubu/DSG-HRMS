@@ -31,6 +31,7 @@ public sealed partial class SessionService
 
     private readonly ISessionStore _store;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly PasswordPolicy _passwordPolicy;
     private readonly IIdentifierHasher _identifierHasher;
     private readonly IAccessTokenIssuer _tokens;
     private readonly VerificationCodeService _codes;
@@ -42,6 +43,7 @@ public sealed partial class SessionService
     public SessionService(
         ISessionStore store,
         IPasswordHasher passwordHasher,
+        PasswordPolicy passwordPolicy,
         IIdentifierHasher identifierHasher,
         IAccessTokenIssuer tokens,
         VerificationCodeService codes,
@@ -51,12 +53,23 @@ public sealed partial class SessionService
     {
         _store = store;
         _passwordHasher = passwordHasher;
+        _passwordPolicy = passwordPolicy;
         _identifierHasher = identifierHasher;
         _tokens = tokens;
         _codes = codes;
         _parameters = parameters;
         _clock = clock;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Giris sayacinin ozetlenen kimligi (SYG-KMLK-033). Sayac girilen e-postaya baglidir;
+    /// parola sifirlama ve degisikligi de ayni sayaci kullanir.
+    /// </summary>
+    public static string LoginIdentifier(string email)
+    {
+        ArgumentNullException.ThrowIfNull(email);
+        return LoginIdentifierPrefix + email.Trim().ToLowerInvariant();
     }
 
     // ------------------------------------------------------------------ giris
@@ -72,7 +85,7 @@ public sealed partial class SessionService
 
         var now = _clock.UtcNow;
         var normalizedEmail = email.Trim().ToLowerInvariant();
-        var emailHash = _identifierHasher.HashIdentifier(LoginIdentifierPrefix + normalizedEmail);
+        var emailHash = _identifierHasher.HashIdentifier(LoginIdentifier(normalizedEmail));
 
         var throttle = await _store.FindThrottleAsync(emailHash, cancellationToken).ConfigureAwait(false);
         if (throttle is null)
@@ -307,6 +320,102 @@ public sealed partial class SessionService
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    // ------------------------------------------------------------------ parola degisikligi
+
+    /// <summary>
+    /// Oturum icinde parola degisikligi (SYG-KMLK-048). Mevcut parola istenir: acik birakilmis
+    /// bir oturumu bulan kisi parolayi degistirip hesabi ele geciremez. Yanlis mevcut parola
+    /// giris sayacina eklenir; sinir asilinca e-posta, giristeki gibi kilitlenir (SYG-KMLK-033).
+    /// Degisiklikten sonra hesabin DIGER oturumlari kapanir; bu oturum acik kalir.
+    /// </summary>
+    /// <exception cref="SessionEndedException">Oturum kapaliysa.</exception>
+    /// <exception cref="SignInLockedException">Hatali deneme siniri asildiysa.</exception>
+    public async Task<PasswordChangeResult> ChangePasswordAsync(
+        Guid sessionId,
+        string currentPassword,
+        string newPassword,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(currentPassword);
+        ArgumentNullException.ThrowIfNull(newPassword);
+
+        var now = _clock.UtcNow;
+        var session = await _store.FindSessionAsync(sessionId, cancellationToken).ConfigureAwait(false);
+        if (session is null || !session.IsOpen)
+        {
+            throw new SessionEndedException(session?.EndReason);
+        }
+
+        var candidate = await _store.FindByAccountIdAsync(session.UserAccountId, cancellationToken).ConfigureAwait(false)
+            ?? throw new SessionEndedException(SessionEndReason.AccountChanged);
+        var account = candidate.Account;
+        var person = candidate.Person;
+
+        // Hesabin giris e-postasi yoksa sayac oturum kimligine baglanir; kilit yine isler.
+        var throttleKey = _identifierHasher.HashIdentifier(
+            person.Email is null ? $"session:{sessionId}" : LoginIdentifier(person.Email));
+        var throttle = await _store.FindThrottleAsync(throttleKey, cancellationToken).ConfigureAwait(false);
+        if (throttle is null)
+        {
+            throttle = LoginThrottle.For(throttleKey, now);
+            _store.Add(throttle);
+        }
+
+        var lockoutMinutes = await _parameters.GetIntegerAsync(ParameterCatalog.LockoutMinutes, cancellationToken).ConfigureAwait(false);
+        if (throttle.IsLocked(now))
+        {
+            await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            throw new SignInLockedException(lockoutMinutes);
+        }
+
+        if (account.PasswordHash is null || !_passwordHasher.Verify(account.PasswordHash, PasswordPolicy.Normalize(currentPassword)))
+        {
+            var maxFailures = await _parameters.GetIntegerAsync(ParameterCatalog.MaxFailedLogins, cancellationToken).ConfigureAwait(false);
+            var lockedUntil = throttle.RegisterFailure(maxFailures, TimeSpan.FromMinutes(lockoutMinutes), now);
+            if (lockedUntil is not null)
+            {
+                account.RecordLockout(lockedUntil.Value);
+                LogLockedNow(_logger, account.Id);
+            }
+
+            await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return new PasswordChangeResult(CurrentPasswordInvalid: true, []);
+        }
+
+        var normalizedNew = PasswordPolicy.Normalize(newPassword);
+        var violations = new List<PasswordViolation>(
+            await _passwordPolicy.ValidateAsync(newPassword, RegistrationService.PersonalWords(person.FirstName, person.LastName, person.Email), cancellationToken)
+                .ConfigureAwait(false));
+        if (violations.Count == 0 && _passwordHasher.Verify(account.PasswordHash, normalizedNew))
+        {
+            violations.Add(PasswordViolation.SameAsCurrent);
+        }
+
+        if (violations.Count > 0)
+        {
+            // Mevcut parola dogruydu: sayac sifirlanir, ihlal kaydedilmez.
+            throttle.Reset(now);
+            await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return new PasswordChangeResult(CurrentPasswordInvalid: false, violations);
+        }
+
+        account.SetPassword(_passwordHasher.Hash(normalizedNew), now);
+        session.AdoptSecurityStamp(account.SecurityStamp);
+        throttle.Reset(now);
+
+        foreach (var other in await _store.GetOpenSessionsAsync(account.Id, cancellationToken).ConfigureAwait(false))
+        {
+            if (other.PublicId != session.PublicId)
+            {
+                other.End(SessionEndReason.PasswordChanged, now);
+            }
+        }
+
+        await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        LogPasswordChanged(_logger, account.Id);
+        return new PasswordChangeResult(CurrentPasswordInvalid: false, []);
+    }
+
     /// <summary>
     /// Erisim jetonunun oturumu hala acik mi. Her istekte cagrilir: pasiflesen hesap, baska
     /// cihazdan giris veya cikis erisim jetonunun suresini beklemeden etkili olur (SYG-KMLK-054).
@@ -437,4 +546,7 @@ public sealed partial class SessionService
 
     [LoggerMessage(EventId = 3804, Level = LogLevel.Warning, Message = "GUVENLIK: kullanilmis yenileme jetonu tekrar sunuldu; hesap {AccountId} icin tum oturumlar kapatildi (SYG-KMLK-040).")]
     private static partial void LogTokenReuse(ILogger logger, long accountId);
+
+    [LoggerMessage(EventId = 3805, Level = LogLevel.Information, Message = "Parola oturum icinde degistirildi: hesap {AccountId}; diger oturumlar kapatildi (SYG-KMLK-048).")]
+    private static partial void LogPasswordChanged(ILogger logger, long accountId);
 }

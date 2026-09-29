@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`, `KR-078`, `KR-086`, `KR-087`
+**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`, `KR-078`, `KR-086`, `KR-087`, `KR-088`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **İlgili riskler:** `R-08`, `R-12`, `R-13`, `R-14`
 
@@ -138,6 +138,11 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
   rehberleri bunu önermiyor; kullanıcıyı zayıf kalıplara itiyor). Sistem Yönetimi
   parametresiyle açılabilir.
 - Parola sıfırlama, üyelik akışıyla aynı doğrulama mekanizmasını kullanır.
+  *Gerçekleştirme (29.09.2026, `KR-088`, #98):* Sıfırlama bir üyelik denemesidir; yalnızca
+  amacı ve kod iletisinin metni farklıdır (`/api/v1/identity/password-resets`). Sıfırlama
+  hesabın tüm oturumlarını kapatır ve giriş kilidini kaldırır. Oturum içinde değişiklik
+  (`/api/v1/identity/account/password`) mevcut parolayı ister; yanlış deneme giriş kilidine
+  sayılır. Değişiklikten sonra bu oturum açık kalır, diğerleri kapanır.
 
 ### 7. İki aşamalı doğrulama (2FA)
 
@@ -262,3 +267,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | 2026-09-27 | 0.5 | §1 ve §6: gerçekleştirme notları (eşleşme gizliliğinin tüm akışa yayılması, parola özeti ve liste; `KR-085`, #87) | Bilgi İşlem |
 | 2026-09-28 | 0.6 | §8: gerçekleştirme notu (uç noktalar, çerez, her istekte oturum doğrulaması; `KR-086`, #92) | Bilgi İşlem |
 | 2026-09-28 | 0.7 | §8: istemci tarafı gerçekleştirme notu (bellekte jeton, sekmeler arası yenileme, etkinlik sinyali; `KR-087`, #95) | Bilgi İşlem |
+| 2026-09-29 | 0.8 | §6: parola sıfırlama ve oturum içinde değişiklik gerçekleştirme notu (`KR-088`, #98) | Bilgi İşlem |

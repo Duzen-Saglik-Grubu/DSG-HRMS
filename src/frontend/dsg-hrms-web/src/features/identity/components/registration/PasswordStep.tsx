@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   Box,
   Button,
@@ -27,6 +27,14 @@ interface PasswordStepProps {
   rules: PublicSettings['passwordRules'];
   onCompleted: () => void;
   onRestart: () => void;
+  /** Parolayi kaydeden cagri; varsayilan hesap olusturma. Parola sifirlama ayni adimi kullanir. */
+  submit?: (password: string) => Promise<void>;
+  /** Adimin aciklamasi. */
+  intro?: string;
+  /** Gonderim dugmesinin metni. */
+  submitLabel?: string;
+  /** Hata gosterimi; varsayilan uyelik iletileri. */
+  renderError?: (error: unknown) => ReactNode;
 }
 
 /**
@@ -36,7 +44,16 @@ interface PasswordStepProps {
  * ayniligini denetler. Yaygin parola ve kisisel sozcuk denetimi sunucudadir; sunucunun
  * iletisi parola alaninin altinda gosterilir.
  */
-export function PasswordStep({ registrationId, rules, onCompleted, onRestart }: PasswordStepProps) {
+export function PasswordStep({
+  registrationId,
+  rules,
+  onCompleted,
+  onRestart,
+  submit,
+  intro,
+  submitLabel,
+  renderError,
+}: PasswordStepProps) {
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
 
@@ -71,7 +88,8 @@ export function PasswordStep({ registrationId, rules, onCompleted, onRestart }: 
   });
 
   const complete = useMutation({
-    mutationFn: (form: PasswordForm) => registrationApi.complete(registrationId, form.password),
+    mutationFn: (form: PasswordForm) =>
+      submit ? submit(form.password) : registrationApi.complete(registrationId, form.password),
     onSuccess: onCompleted,
   });
 
@@ -107,7 +125,7 @@ export function PasswordStep({ registrationId, rules, onCompleted, onRestart }: 
       onSubmit={(event) => void handleSubmit((form) => complete.mutate(form))(event)}
     >
       <Typography variant="body2" color="text.secondary">
-        {t('identity.registration.password.intro')}
+        {intro ?? t('identity.registration.password.intro')}
       </Typography>
 
       <Box component="section" aria-labelledby="password-rules">
@@ -144,7 +162,11 @@ export function PasswordStep({ registrationId, rules, onCompleted, onRestart }: 
         helperText={errors.confirm?.message}
       />
 
-      {complete.error ? <RegistrationError error={complete.error} onRestart={onRestart} /> : null}
+      {complete.error
+        ? (renderError?.(complete.error) ?? (
+            <RegistrationError error={complete.error} onRestart={onRestart} />
+          ))
+        : null}
 
       <Button
         type="submit"
@@ -153,7 +175,7 @@ export function PasswordStep({ registrationId, rules, onCompleted, onRestart }: 
         disabled={complete.isPending}
         sx={primaryButtonSx}
       >
-        {t('identity.registration.password.submit')}
+        {submitLabel ?? t('identity.registration.password.submit')}
       </Button>
     </Stack>
   );

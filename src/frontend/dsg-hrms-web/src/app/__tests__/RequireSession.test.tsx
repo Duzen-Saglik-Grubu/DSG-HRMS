@@ -30,6 +30,7 @@ function renderAt(path: string) {
         children: [
           { index: true, element: <p>Ana içerik</p> },
           { path: 'leave', element: <p>İzin sayfası</p> },
+          { path: 'account/password', element: <p>Parola sayfası</p> },
         ],
       },
     ],
@@ -86,6 +87,17 @@ describe('RequireSession', () => {
 
     expect(await screen.findByText(/^Giriş ekranı\s*$/)).toBeInTheDocument();
     expect(signOut).toHaveBeenCalledOnce();
+  });
+
+  it('kullanici menusunden parola degistirme sayfasina gider (SYG-KMLK-048)', async () => {
+    await setSession({ status: 'authenticated' });
+    const user = userEvent.setup();
+    renderAt('/leave');
+
+    await user.click(await screen.findByRole('button', { name: 'Ahmet Yılmaz' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Parolamı değiştir' }));
+
+    expect(await screen.findByText('Parola sayfası')).toBeInTheDocument();
   });
 
   it('oturum baska cihazdan giriste kapaninca girise doner', async () => {

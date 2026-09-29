@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '@/shared/api/problemDetails';
 import { renderWithProviders } from '@/test/render';
+import { passwordApi } from '../../api/passwordApi';
 import { registrationApi } from '../../api/registrationApi';
 import { RegistrationPage } from '../RegistrationPage';
 
@@ -275,6 +276,30 @@ describe('RegistrationPage', () => {
 
     expect(await screen.findByRole('heading', { name: 'Hesabınız zaten var' })).toBeInTheDocument();
     expect(screen.queryByLabelText('Parola')).not.toBeInTheDocument();
+  });
+
+  it('mevcut hesabi olan kisi ayni islemle parolasini sifirlayabilir (SYG-KMLK-047)', async () => {
+    vi.mocked(registrationApi.verify).mockResolvedValue({
+      result: 'verified',
+      accountExists: true,
+    });
+    const reset = vi.spyOn(passwordApi, 'reset').mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    renderWithProviders(<RegistrationPage />);
+    await reachCodeStep(user);
+    await user.type(screen.getByLabelText('Doğrulama kodu'), '482915');
+    await user.click(screen.getByRole('button', { name: 'Doğrula' }));
+
+    await user.click(await screen.findByRole('button', { name: 'Parolamı sıfırla' }));
+    await user.type(await screen.findByLabelText('Parola'), 'Mavi deniz 42 kez');
+    await user.type(screen.getByLabelText('Parola (tekrar)'), 'Mavi deniz 42 kez');
+    await user.click(screen.getByRole('button', { name: 'Parolayı değiştir' }));
+
+    expect(
+      await screen.findByRole('heading', { name: 'Parolanız değiştirildi' }),
+    ).toBeInTheDocument();
+    expect(reset).toHaveBeenCalledWith('r-1', 'Mavi deniz 42 kez');
+    expect(registrationApi.complete).not.toHaveBeenCalled();
   });
 
   it('sunucunun parola hatasini parola alaninda gosterir (SYG-KMLK-045)', async () => {

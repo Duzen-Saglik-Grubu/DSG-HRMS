@@ -20,7 +20,8 @@ export type SessionEndReason =
   | 'token-reuse'
   | 'idle-timeout'
   | 'expired'
-  | 'account-changed';
+  | 'account-changed'
+  | 'password-changed';
 
 const END_REASONS: readonly SessionEndReason[] = [
   'logged-out',
@@ -29,6 +30,7 @@ const END_REASONS: readonly SessionEndReason[] = [
   'idle-timeout',
   'expired',
   'account-changed',
+  'password-changed',
 ];
 
 /** Oturum durumu. `unknown`: sayfa yeni acildi, oturum cerezden geri getiriliyor. */

@@ -11,11 +11,13 @@ import {
   Typography,
 } from '@mui/material';
 import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
+import LockResetRounded from '@mui/icons-material/LockResetRounded';
 import LogoutRounded from '@mui/icons-material/LogoutRounded';
 import { useTranslation } from 'react-i18next';
-import { Outlet } from 'react-router';
+import { Outlet, useNavigate } from 'react-router';
 import { session, useSession } from '@/shared/auth/session';
 import { SessionActivity } from '@/shared/auth/SessionActivity';
+import { routes } from '@/shared/routes';
 
 /**
  * Uygulama kabugu: ust cubuk ve icerik alani.
@@ -49,10 +51,11 @@ export function AppLayout() {
   );
 }
 
-/** Oturumdaki kullanicinin adi ve cikis (SYG-KMLK-043). */
+/** Oturumdaki kullanicinin adi, parola degisikligi ve cikis (SYG-KMLK-043, 048). */
 function UserMenu() {
   const { t } = useTranslation();
   const state = useSession();
+  const navigate = useNavigate();
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
 
   if (state.status !== 'authenticated') {
@@ -85,6 +88,17 @@ function UserMenu() {
         </Box>
       </Button>
       <Menu id="user-menu" anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
+        <MenuItem
+          onClick={() => {
+            setAnchor(null);
+            void navigate(routes.changePassword);
+          }}
+        >
+          <ListItemIcon>
+            <LockResetRounded fontSize="small" />
+          </ListItemIcon>
+          {t('session.changePassword')}
+        </MenuItem>
         <MenuItem
           onClick={() => {
             setAnchor(null);

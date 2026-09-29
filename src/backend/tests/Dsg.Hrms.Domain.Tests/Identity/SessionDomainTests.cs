@@ -68,6 +68,21 @@ public sealed class SessionDomainTests
     }
 
     [Fact]
+    public void Session_that_adopts_the_new_stamp_stays_open_while_others_end()
+    {
+        // SYG-KMLK-048: parola bu oturumda degisti; damgasi eski kalan oturum kapanir.
+        var current = NewSession();
+        var other = NewSession();
+        var newStamp = Guid.NewGuid();
+
+        current.AdoptSecurityStamp(newStamp);
+
+        current.Check(newStamp, true, Now, Idle).ShouldBeNull();
+        other.Check(newStamp, true, Now, Idle).ShouldBe(SessionEndReason.AccountChanged);
+        Should.Throw<InvalidOperationException>(() => other.AdoptSecurityStamp(newStamp));
+    }
+
+    [Fact]
     public void Session_requires_an_account()
     {
         Should.Throw<ArgumentOutOfRangeException>(() => UserSession.Start(0, Stamp, null, Now, TimeSpan.FromHours(8)));

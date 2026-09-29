@@ -44,6 +44,7 @@ const END_SEVERITY: Record<SessionEndReason, 'info' | 'warning'> = {
   'idle-timeout': 'warning',
   expired: 'warning',
   'account-changed': 'warning',
+  'password-changed': 'warning',
 };
 
 /**
@@ -207,12 +208,17 @@ export function LoginPage() {
       )}
 
       {step.name === 'credentials' ? (
-        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-          {t('identity.login.noAccount')}{' '}
-          <Link component={RouterLink} to={routes.register} sx={{ fontWeight: 600 }}>
-            {t('identity.login.register')}
+        <Stack spacing={1} sx={{ alignItems: 'center' }}>
+          <Link component={RouterLink} to={routes.forgotPassword} variant="body2">
+            {t('identity.login.forgotPassword')}
           </Link>
-        </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+            {t('identity.login.noAccount')}{' '}
+            <Link component={RouterLink} to={routes.register} sx={{ fontWeight: 600 }}>
+              {t('identity.login.register')}
+            </Link>
+          </Typography>
+        </Stack>
       ) : null}
     </AuthLayout>
   );

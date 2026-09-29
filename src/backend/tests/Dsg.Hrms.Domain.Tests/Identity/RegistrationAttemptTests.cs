@@ -110,6 +110,19 @@ public sealed class RegistrationAttemptTests
     }
 
     [Fact]
+    public void Attempt_is_for_registration_by_default_and_can_be_for_password_reset()
+    {
+        // SYG-KMLK-047: sifirlama ayni akisi kullanir; yalnizca amac farklidir.
+        RegistrationAttempt.Start(Hash, 7, null, RegistrationChannels.Email, Now).Purpose.ShouldBe(VerificationPurpose.Registration);
+        RegistrationAttempt.Start(Hash, 7, null, RegistrationChannels.Email, Now, VerificationPurpose.PasswordReset)
+            .Purpose.ShouldBe(VerificationPurpose.PasswordReset);
+
+        // Iki adimli giris kendi kaydini kullanir; deneme bu amacla acilamaz.
+        Should.Throw<ArgumentOutOfRangeException>(() =>
+            RegistrationAttempt.Start(Hash, 7, null, RegistrationChannels.Email, Now, VerificationPurpose.TwoFactor));
+    }
+
+    [Fact]
     public void Setting_a_password_rotates_the_security_stamp()
     {
         // SYG-KMLK-048: parola degisince diger oturumlar sonlanir.

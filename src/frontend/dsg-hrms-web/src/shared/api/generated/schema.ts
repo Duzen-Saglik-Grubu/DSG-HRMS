@@ -4,6 +4,342 @@
  */
 
 export interface paths {
+    "/api/v1/identity/account/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Parolayi degistirir. Mevcut parola istenir; degisiklikten sonra hesabin DIGER oturumlari
+         *     kapanir, bu oturum acik kalir (SYG-KMLK-048).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ChangePasswordRequest"];
+                    "text/json": components["schemas"]["ChangePasswordRequest"];
+                    "application/*+json": components["schemas"]["ChangePasswordRequest"];
+                };
+            };
+            responses: {
+                /** @description Parola degisti. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Mevcut parola hatali (`errors.currentPassword`) veya yeni parola kurallara uymuyor (`errors.newPassword`). */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Oturum kapali. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Cok fazla hatali deneme; e-posta gecici olarak kilitli. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/password-resets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Parola sifirlamayi baslatir: TCKN, dogum tarihi ve kurumsal e-posta. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["StartRegistrationRequest"];
+                    "text/json": components["schemas"]["StartRegistrationRequest"];
+                    "application/*+json": components["schemas"]["StartRegistrationRequest"];
+                };
+            };
+            responses: {
+                /** @description Kanal secimi. Eslesme olmasa da ayni yanit doner. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RegistrationStartedResponse"];
+                    };
+                };
+                /** @description Bicim hatasi (ornegin gecersiz TCKN). */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Cok fazla deneme. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/password-resets/{resetId}/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Secilen kanala kod gonderir. Kanal degisimi ve tekrar gonderim de bu uctur. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    resetId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RequestCodeRequest"];
+                    "text/json": components["schemas"]["RequestCodeRequest"];
+                    "application/*+json": components["schemas"]["RequestCodeRequest"];
+                };
+            };
+            responses: {
+                /** @description Kod gonderildi (eslesme yoksa gonderilmez; yanit aynidir). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CodeRequestedResponse"];
+                    };
+                };
+                /** @description Islem bulunamadi veya suresi doldu. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kanal bu islemde kullanilamaz. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Cok fazla kod istendi. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/password-resets/{resetId}/verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Kodu dogrular. Hesabin olup olmadigi YALNIZCA dogrulamadan sonra soylenir. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    resetId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VerifyCodeRequest"];
+                    "text/json": components["schemas"]["VerifyCodeRequest"];
+                    "application/*+json": components["schemas"]["VerifyCodeRequest"];
+                };
+            };
+            responses: {
+                /** @description Dogrulama sonucu. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VerificationResponse"];
+                    };
+                };
+                /** @description Islem bulunamadi veya suresi doldu. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/password-resets/{resetId}/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Yeni parolayi belirler; hesabin tum oturumlari kapanir ve giris kilidi kalkar. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    resetId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ResetPasswordRequest"];
+                    "text/json": components["schemas"]["ResetPasswordRequest"];
+                    "application/*+json": components["schemas"]["ResetPasswordRequest"];
+                };
+            };
+            responses: {
+                /** @description Parola degisti; kullanici yeni parolasiyla giris yapabilir. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Parola kurallara uymuyor (`errors.password`). */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Hesap kullanima kapali. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Islem bulunamadi, dogrulanmadi veya suresi doldu. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisinin hesabi yok; uye olmasi gerekir. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/public-settings": {
         parameters: {
             query?: never;
@@ -642,6 +978,13 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description Oturum icinde parola degisikligi istegi (SYG-KMLK-048). */
+        ChangePasswordRequest: {
+            /** @description Mevcut parola. */
+            currentPassword: string;
+            /** @description Yeni parola. */
+            newPassword: string;
+        };
         /** @description Kod istendi. */
         CodeRequestedResponse: {
             /**
@@ -709,6 +1052,11 @@ export interface components {
         RequestCodeRequest: {
             /** @description Secilen kanal. */
             channel: components["schemas"]["VerificationChannelKind"];
+        };
+        /** @description Parola sifirlama istegi (SYG-KMLK-047). */
+        ResetPasswordRequest: {
+            /** @description Yeni parola. */
+            password: string;
         };
         /** @description Acik oturum. Yenileme jetonu burada DEGIL, HttpOnly cerezdedir. */
         SessionResponse: {

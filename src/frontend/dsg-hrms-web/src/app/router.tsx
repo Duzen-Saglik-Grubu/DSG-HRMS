@@ -21,6 +21,18 @@ const LoginPage = lazy(async () => {
   return { default: page.LoginPage };
 });
 
+const ForgotPasswordPage = lazy(async () => {
+  const page = await import('@/features/identity/pages/ForgotPasswordPage');
+
+  return { default: page.ForgotPasswordPage };
+});
+
+const ChangePasswordPage = lazy(async () => {
+  const page = await import('@/features/identity/pages/ChangePasswordPage');
+
+  return { default: page.ChangePasswordPage };
+});
+
 const RegistrationPage = lazy(async () => {
   const page = await import('@/features/identity/pages/RegistrationPage');
 
@@ -35,6 +47,14 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<RouteFallback />}>
         <LoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: routes.forgotPassword,
+    element: (
+      <Suspense fallback={<RouteFallback />}>
+        <ForgotPasswordPage />
       </Suspense>
     ),
   },
@@ -59,6 +79,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<RouteFallback />}>
             <HomePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: routes.changePassword,
+        element: (
+          <Suspense fallback={<RouteFallback />}>
+            <ChangePasswordPage />
           </Suspense>
         ),
       },
