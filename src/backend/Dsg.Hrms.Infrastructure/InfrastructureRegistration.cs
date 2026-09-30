@@ -76,6 +76,10 @@ public static class InfrastructureRegistration
         services.AddSingleton<SystemParameters>();
         services.AddSingleton<ISystemParameters>(provider => provider.GetRequiredService<SystemParameters>());
         services.AddScoped<ISystemParameterEditor, SystemParameterEditor>();
+
+        // Kurumsal logo (PRM-GRN-01, SYG-KMLK-069).
+        services.AddScoped<IBrandLogoStore, BrandLogoStore>();
+        services.AddScoped<BrandingService>();
     }
 
     private static void AddNotifications(IServiceCollection services, IConfiguration configuration)

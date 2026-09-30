@@ -8,6 +8,9 @@
  */
 export const queryKeys = {
   saglik: ['saglik'] as const,
+  system: {
+    parameters: ['system', 'parameters'] as const,
+  },
   identity: {
     publicSettings: ['identity', 'public-settings'] as const,
     accounts: ['identity', 'accounts'] as const,

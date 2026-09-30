@@ -55,7 +55,7 @@ public sealed class SystemParameterEditor : ISystemParameterEditor
     /// <inheritdoc />
     public async Task UpdateAsync(string key, string value, CancellationToken cancellationToken)
     {
-        var parameter = ParameterCatalog.Find(key) ?? throw new NotFoundException("Parametre bulunamadi.");
+        var parameter = ParameterCatalog.Find(key) ?? throw new NotFoundException("Parametre bulunamadı.");
 
         var row = await _context.Set<SystemParameter>()
             .SingleOrDefaultAsync(p => p.Key == parameter.Key, cancellationToken)
@@ -72,13 +72,13 @@ public sealed class SystemParameterEditor : ISystemParameterEditor
             // Sir KIRPILMAZ: parolanin basindaki/sonundaki bosluk parolanin parcasi olabilir.
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new BusinessRuleException("Deger bos olamaz.");
+                throw new BusinessRuleException("Değer boş olamaz.");
             }
 
             if (!_protector.IsConfigured)
             {
                 throw new BusinessRuleException(
-                    "Sir parametre kaydedilemiyor: sifreleme anahtari (ParameterProtection:Key) tanimli degil.");
+                    "Gizli değer kaydedilemiyor: şifreleme anahtarı (ParameterProtection:Key) tanımlı değil. Bilgi İşlem birimine başvurun.");
             }
 
             row.SetProtectedValue(_protector.Protect(value, parameter.Key));

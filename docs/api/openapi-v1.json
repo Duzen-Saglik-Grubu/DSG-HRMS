@@ -9,6 +9,354 @@
     "version": "v1"
   },
   "paths": {
+    "/api/v1/system/logo": {
+      "get": {
+        "tags": [
+          "Branding"
+        ],
+        "summary": "Yuklu logoyu dondurur.",
+        "responses": {
+          "200": {
+            "description": "Logo (PNG veya JPEG).",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileContentResult"
+                }
+              },
+              "image/jpeg": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileContentResult"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Tarayicidaki surum guncel."
+          },
+          "404": {
+            "description": "Logo yuklenmemis; varsayilan kullanilir.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Branding"
+        ],
+        "summary": "Logoyu yukler veya degistirir (PNG veya JPEG, en fazla 512 KB).",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "$ref": "#/components/schemas/IFormFile"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Kaydedildi."
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`system.parameter.update`).",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya bos, cok buyuk veya PNG/JPEG degil.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Branding"
+        ],
+        "summary": "Yuklu logoyu kaldirir; varsayilan logoya donulur.",
+        "responses": {
+          "204": {
+            "description": "Kaldirildi (yuklu degilse de)."
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`system.parameter.update`).",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system/parameters": {
+      "get": {
+        "tags": [
+          "SystemParameters"
+        ],
+        "summary": "T3 parametrelerini katalog sirasiyla, gecerli degerleriyle listeler.",
+        "description": "Tum listeleme uclari gibi sayfalidir (ADR-0010 §4); katalog tek sayfaya sigar.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parametreler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResponseOfParameterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz sayfa.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`system.parameter.view`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system/parameters/{key}": {
+      "put": {
+        "tags": [
+          "SystemParameters"
+        ],
+        "summary": "Parametrenin degerini degistirir.",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateParameterRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateParameterRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateParameterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Kaydedildi; en gec 1 dakika icinde etkili olur.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Deger bos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`system.parameter.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parametre katalogda yok.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Deger turune veya araligina uymuyor; hicbir sey kaydedilmedi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/identity/account/password": {
       "post": {
         "tags": [
@@ -1741,6 +2089,62 @@
         },
         "description": "Hesap olusturma istegi."
       },
+      "EntityTagHeaderValue": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "$ref": "#/components/schemas/StringSegment"
+          },
+          "isWeak": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FileContentResult": {
+        "type": "object",
+        "properties": {
+          "fileContents": {
+            "type": "string",
+            "format": "byte"
+          },
+          "contentType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "fileDownloadName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lastModified": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "entityTag": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EntityTagHeaderValue"
+              }
+            ]
+          },
+          "enableRangeProcessing": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IFormFile": {
+        "type": "string",
+        "format": "binary"
+      },
       "InvitationInfoResponse": {
         "required": [
           "firstName",
@@ -1861,6 +2265,144 @@
         },
         "description": "Sayfalanmis yanit (ADR-0010 §4)."
       },
+      "PagedResponseOfParameterResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParameterResponse"
+            },
+            "description": "Bu sayfadaki kayitlar."
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa numarasi.",
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa boyutu.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam kayit sayisi.",
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam sayfa sayisi.",
+            "format": "int32"
+          }
+        },
+        "description": "Sayfalanmis yanit (ADR-0010 §4)."
+      },
+      "ParameterKind": {
+        "enum": [
+          "number",
+          "toggle",
+          "text",
+          "list",
+          "secret"
+        ],
+        "description": "Parametre turu."
+      },
+      "ParameterResponse": {
+        "required": [
+          "key",
+          "description",
+          "type",
+          "min",
+          "max",
+          "value",
+          "isSet",
+          "source"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Katalog kimligi (orn. `PRM-KML-03`)."
+          },
+          "description": {
+            "type": "string",
+            "description": "Aciklama (istemci kendi Turkce etiketini kullanir)."
+          },
+          "type": {
+            "description": "Tur.",
+            "$ref": "#/components/schemas/ParameterKind"
+          },
+          "min": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "description": "Tam sayi icin alt sinir.",
+            "format": "int32"
+          },
+          "max": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "description": "Tam sayi icin ust sinir.",
+            "format": "int32"
+          },
+          "value": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Gecerli deger. Sir parametrede DAIMA bos (`KR-071`)."
+          },
+          "isSet": {
+            "type": "boolean",
+            "description": "Deger herhangi bir kaynakta tanimli mi."
+          },
+          "source": {
+            "description": "Degerin geldigi kaynak.",
+            "$ref": "#/components/schemas/ParameterSourceKind"
+          }
+        },
+        "description": "Parametre."
+      },
+      "ParameterSourceKind": {
+        "enum": [
+          "none",
+          "default",
+          "configuration",
+          "database"
+        ],
+        "description": "Degerin kaynagi."
+      },
       "PasswordRulesResponse": {
         "required": [
           "minLength",
@@ -1936,7 +2478,8 @@
         "required": [
           "supportContact",
           "passwordRules",
-          "verificationCodeLength"
+          "verificationCodeLength",
+          "logoVersion"
         ],
         "type": "object",
         "properties": {
@@ -1956,6 +2499,13 @@
             ],
             "description": "Dogrulama kodunun hane sayisi (PRM-KML-09).",
             "format": "int32"
+          },
+          "logoVersion": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Yuklu kurumsal logonun surumu (PRM-GRN-01); yuklenmemisse bos ve varsayilan logo kullanilir."
           }
         },
         "description": "Giris ve uyelik ekranlarinin ayarlari."
@@ -2173,6 +2723,42 @@
         },
         "description": "Uyelik baslatma istegi (SYG-KMLK-013)."
       },
+      "StringSegment": {
+        "type": "object",
+        "properties": {
+          "buffer": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "offset": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "length": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "value": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "hasValue": {
+            "type": "boolean"
+          }
+        }
+      },
       "SyncRequestedResponse": {
         "required": [
           "alreadyQueued"
@@ -2300,6 +2886,19 @@
         },
         "description": "Iki adimli dogrulama sonucu."
       },
+      "UpdateParameterRequest": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Yeni deger; turune gore dogrulanir."
+          }
+        },
+        "description": "Parametre degisikligi."
+      },
       "VerificationChannelKind": {
         "enum": [
           "email",
@@ -2351,6 +2950,12 @@
     }
   },
   "tags": [
+    {
+      "name": "Branding"
+    },
+    {
+      "name": "SystemParameters"
+    },
     {
       "name": "Account"
     },

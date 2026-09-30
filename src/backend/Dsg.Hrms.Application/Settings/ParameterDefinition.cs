@@ -65,7 +65,7 @@ public sealed record ParameterDefinition(
 
         if (value.Length == 0)
         {
-            return ParameterValidation.Invalid("Deger bos olamaz.");
+            return ParameterValidation.Invalid("Değer boş olamaz.");
         }
 
         return Type switch
@@ -74,7 +74,7 @@ public sealed record ParameterDefinition(
             ParameterType.Toggle => ValidateBoolean(value),
             ParameterType.List => ValidateList(value),
             ParameterType.Text when Pattern is not null && !Pattern.IsMatch(value) =>
-                ParameterValidation.Invalid("Deger beklenen bicimde degil."),
+                ParameterValidation.Invalid("Değer beklenen biçimde değil."),
             _ => ParameterValidation.Valid(value),
         };
     }
@@ -83,13 +83,13 @@ public sealed record ParameterDefinition(
     {
         if (!int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out var number))
         {
-            return ParameterValidation.Invalid("Deger bir tam sayi olmalidir.");
+            return ParameterValidation.Invalid("Değer bir tam sayı olmalıdır.");
         }
 
         if ((Min is { } min && number < min) || (Max is { } max && number > max))
         {
             return ParameterValidation.Invalid(
-                string.Create(CultureInfo.InvariantCulture, $"Deger {Min}-{Max} araliginda olmalidir."));
+                string.Create(CultureInfo.InvariantCulture, $"Değer {Min}–{Max} aralığında olmalıdır."));
         }
 
         return ParameterValidation.Valid(number.ToString(CultureInfo.InvariantCulture));
@@ -99,7 +99,7 @@ public sealed record ParameterDefinition(
     {
         "TRUE" => ParameterValidation.Valid("true"),
         "FALSE" => ParameterValidation.Valid("false"),
-        _ => ParameterValidation.Invalid("Deger true veya false olmalidir."),
+        _ => ParameterValidation.Invalid("Değer açık veya kapalı olmalıdır."),
     };
 
     private ParameterValidation ValidateList(string value)
@@ -112,7 +112,7 @@ public sealed record ParameterDefinition(
 
         if (items.Count == 0)
         {
-            return ParameterValidation.Invalid("Liste en az bir oge icermelidir.");
+            return ParameterValidation.Invalid("Liste en az bir öğe içermelidir.");
         }
 
         foreach (var item in items)
@@ -120,12 +120,12 @@ public sealed record ParameterDefinition(
             if (AllowedItems is not null && !AllowedItems.Contains(item, StringComparer.Ordinal))
             {
                 return ParameterValidation.Invalid(
-                    $"Gecersiz oge: '{item}'. Izin verilenler: {string.Join(", ", AllowedItems)}.");
+                    $"Geçersiz öğe: '{item}'. İzin verilenler: {string.Join(", ", AllowedItems)}.");
             }
 
             if (Pattern is not null && !Pattern.IsMatch(item))
             {
-                return ParameterValidation.Invalid($"Gecersiz oge: '{item}'.");
+                return ParameterValidation.Invalid($"Geçersiz öğe: '{item}'.");
             }
         }
 

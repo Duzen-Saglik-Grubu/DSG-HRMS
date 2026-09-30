@@ -13,6 +13,7 @@ import {
 import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
 import LockResetRounded from '@mui/icons-material/LockResetRounded';
 import ManageAccountsOutlined from '@mui/icons-material/ManageAccountsOutlined';
+import TuneRounded from '@mui/icons-material/TuneRounded';
 import LogoutRounded from '@mui/icons-material/LogoutRounded';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate } from 'react-router';
@@ -60,6 +61,7 @@ function UserMenu() {
   const state = useSession();
   const navigate = useNavigate();
   const canManageAccounts = usePermission(permissions.accountView);
+  const canViewParameters = usePermission(permissions.parameterView);
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
 
   if (state.status !== 'authenticated') {
@@ -103,6 +105,19 @@ function UserMenu() {
               <ManageAccountsOutlined fontSize="small" />
             </ListItemIcon>
             {t('identity.accounts.title')}
+          </MenuItem>
+        ) : null}
+        {canViewParameters ? (
+          <MenuItem
+            onClick={() => {
+              setAnchor(null);
+              void navigate(routes.parameters);
+            }}
+          >
+            <ListItemIcon>
+              <TuneRounded fontSize="small" />
+            </ListItemIcon>
+            {t('system.parameters.title')}
           </MenuItem>
         ) : null}
         <MenuItem

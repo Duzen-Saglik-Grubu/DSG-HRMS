@@ -11,9 +11,9 @@ namespace Dsg.Hrms.Application.Settings;
 /// modulu katalogun tamamini getirdiginde bu liste genisler; kimlikler degismez.
 /// </para>
 /// <para>
-/// <b>Katalogda olmayanlar:</b> <c>PRM-GRN-01</c> (logo dosyasi) parametre ekraniyla
-/// birlikte, <c>PRM-BLD-01</c> (bildirim rolu) rol altyapisiyla birlikte eklenecektir;
-/// ikisi de dosya/rol turu gerektirir.
+/// <b>Katalogda olmayanlar:</b> <c>PRM-GRN-01</c> (logo dosyasi) bir dosya oldugu icin ayri
+/// tabloda tutulur (<see cref="BrandingService"/>, <c>KR-091</c>). <c>PRM-BLD-01</c> (bildirim
+/// rolu) rol yonetimiyle (T4) birlikte eklenecektir.
 /// </para>
 /// <para>
 /// Yapilandirma anahtarlari Ingilizcedir (<c>KR-058</c>). Ortam degiskeninde

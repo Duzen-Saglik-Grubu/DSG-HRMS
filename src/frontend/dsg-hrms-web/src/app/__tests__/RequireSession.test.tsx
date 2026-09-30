@@ -32,6 +32,7 @@ function renderAt(path: string) {
           { path: 'leave', element: <p>İzin sayfası</p> },
           { path: 'account/password', element: <p>Parola sayfası</p> },
           { path: 'accounts', element: <p>Hesaplar sayfası</p> },
+          { path: 'system/parameters', element: <p>Parametreler sayfası</p> },
         ],
       },
     ],
@@ -120,6 +121,17 @@ describe('RequireSession', () => {
     await user.click(await screen.findByRole('menuitem', { name: 'Hesap işlemleri' }));
 
     expect(await screen.findByText('Hesaplar sayfası')).toBeInTheDocument();
+  });
+
+  it('parametre ekrani baglantisi yalnizca izni olana gorunur', async () => {
+    const user = userEvent.setup();
+    await setSession({ status: 'authenticated', permissions: ['system.parameter.view'] });
+    renderAt('/leave');
+
+    await user.click(await screen.findByRole('button', { name: 'Ahmet Yılmaz' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Sistem parametreleri' }));
+
+    expect(await screen.findByText('Parametreler sayfası')).toBeInTheDocument();
   });
 
   it('oturum baska cihazdan giriste kapaninca girise doner', async () => {

@@ -12,6 +12,8 @@ export interface PublicSettings {
   supportContact: string;
   passwordRules: { minLength: number; maxLength: number; requireComplexity: boolean };
   verificationCodeLength: number;
+  /** Yuklu kurumsal logonun surumu (PRM-GRN-01); yoksa varsayilan logo kullanilir. */
+  logoVersion: string | null;
 }
 
 const BASE = '/identity/registrations';
@@ -64,6 +66,7 @@ export const registrationApi = {
         requireComplexity: data.passwordRules.requireComplexity,
       },
       verificationCodeLength: Number(data.verificationCodeLength),
+      logoVersion: data.logoVersion ?? null,
     };
   },
 };
