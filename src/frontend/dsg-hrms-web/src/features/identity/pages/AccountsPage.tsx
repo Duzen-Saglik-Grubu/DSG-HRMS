@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import SearchRounded from '@mui/icons-material/SearchRounded';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_PAGE_SIZE, type PageRequest } from '@/shared/api/paging';
 import { ApiError } from '@/shared/api/problemDetails';
@@ -28,6 +29,7 @@ import { EmptyState } from '@/shared/components/EmptyState';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { PageHeader } from '@/shared/components/PageHeader';
 import { accountsApi, type AccountState, type AccountSummary } from '../api/accountsApi';
+import { invitationApi } from '../api/invitationApi';
 
 /** Arama kutusunda yazma durduktan sonra istegin gidecegi sure. */
 const SEARCH_DELAY_MS = 300;
@@ -39,7 +41,7 @@ const STATE_COLOR: Record<AccountState, 'default' | 'success' | 'warning' | 'err
   locked: 'warning',
 };
 
-type Action = { kind: 'deactivate' | 'activate'; account: AccountSummary };
+type Action = { kind: 'deactivate' | 'activate' | 'invite'; account: AccountSummary };
 
 /**
  * IK hesap islemleri (SYG-KMLK-057, 073): kisiyi sicil, ad veya soyadla arama, hesap durumunu
@@ -128,22 +130,32 @@ export function AccountsPage() {
       header: t('identity.accounts.columns.actions'),
       align: 'right',
       render: (row) => (
-        <PermissionGate permission={permissions.accountUpdate}>
-          {row.state === 'passive' ? (
-            <Button size="small" onClick={() => setAction({ kind: 'activate', account: row })}>
-              {t('identity.accounts.activate')}
-            </Button>
+        <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end' }}>
+          {row.state !== 'passive' ? (
+            // Aktif calisma kaydi olmayan kisiye baglanti gonderilemez; sunucu reddeder.
+            <PermissionGate permission={permissions.inviteCreate}>
+              <Button size="small" onClick={() => setAction({ kind: 'invite', account: row })}>
+                {t('identity.accounts.invite')}
+              </Button>
+            </PermissionGate>
           ) : null}
-          {row.state === 'active' || row.state === 'locked' ? (
-            <Button
-              size="small"
-              color="error"
-              onClick={() => setAction({ kind: 'deactivate', account: row })}
-            >
-              {t('identity.accounts.deactivate')}
-            </Button>
-          ) : null}
-        </PermissionGate>
+          <PermissionGate permission={permissions.accountUpdate}>
+            {row.state === 'passive' ? (
+              <Button size="small" onClick={() => setAction({ kind: 'activate', account: row })}>
+                {t('identity.accounts.activate')}
+              </Button>
+            ) : null}
+            {row.state === 'active' || row.state === 'locked' ? (
+              <Button
+                size="small"
+                color="error"
+                onClick={() => setAction({ kind: 'deactivate', account: row })}
+              >
+                {t('identity.accounts.deactivate')}
+              </Button>
+            ) : null}
+          </PermissionGate>
+        </Stack>
       ),
     },
   ];
@@ -237,7 +249,8 @@ interface StatusDialogProps {
 }
 
 /**
- * Pasife alma / aktiflestirme. Gerekce zorunludur ve denetim izine yazilir (SYG-KMLK-057).
+ * Pasife alma, aktiflestirme ve davet baglantisi. Gerekce zorunludur ve denetim izine yazilir
+ * (SYG-KMLK-053, 057).
  */
 function StatusDialog({ action, onClose, onDone }: StatusDialogProps) {
   const { t } = useTranslation();
@@ -248,13 +261,24 @@ function StatusDialog({ action, onClose, onDone }: StatusDialogProps) {
   const key = action.kind;
 
   const change = useMutation({
-    mutationFn: () =>
-      key === 'deactivate'
+    mutationFn: async (): Promise<string | undefined> => {
+      if (key === 'invite') {
+        return (await invitationApi.send(action.account.personId, reason.trim())).expiresAt;
+      }
+
+      await (key === 'deactivate'
         ? accountsApi.deactivate(action.account.personId, reason.trim())
-        : accountsApi.activate(action.account.personId, reason.trim()),
-    onSuccess: async () => {
+        : accountsApi.activate(action.account.personId, reason.trim()));
+      return undefined;
+    },
+    onSuccess: async (expiresAt) => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.identity.accounts });
-      onDone(t(`identity.accounts.${key}Done`, { name }));
+      onDone(
+        t(`identity.accounts.${key}Done`, {
+          name,
+          time: expiresAt ? format(new Date(expiresAt), 'HH:mm') : '',
+        }),
+      );
     },
   });
 

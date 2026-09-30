@@ -105,7 +105,7 @@ public class RegistrationApiFixture : IAsyncLifetime
         {
             await context.Database.ExecuteSqlRawAsync(
                 "DELETE FROM identity.refresh_token; DELETE FROM identity.user_session; DELETE FROM identity.login_challenge; DELETE FROM identity.login_throttle; " +
-                "DELETE FROM identity.registration_code_request; DELETE FROM identity.registration_attempt; DELETE FROM identity.verification_code; DELETE FROM identity.user_role; DELETE FROM identity.user_account; " +
+                "DELETE FROM identity.registration_code_request; DELETE FROM identity.registration_attempt; DELETE FROM identity.verification_code; DELETE FROM identity.user_role; DELETE FROM identity.user_account; DELETE FROM identity.account_invitation; " +
                 "DELETE FROM settings.system_parameter;");
             return 0;
         });

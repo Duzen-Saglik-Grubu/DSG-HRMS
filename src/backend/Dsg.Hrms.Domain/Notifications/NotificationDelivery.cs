@@ -110,6 +110,9 @@ public enum NotificationPurpose
 
     /// <summary>Iki adimli dogrulama kodu.</summary>
     TwoFactorCode = 3,
+
+    /// <summary>IK davetiyle parola olusturma baglantisi (SYG-KMLK-051).</summary>
+    Invitation = 4,
 }
 
 /// <summary>Gonderim sonucu.</summary>

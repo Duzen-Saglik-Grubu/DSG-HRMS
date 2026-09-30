@@ -366,6 +366,224 @@
         }
       }
     },
+    "/api/v1/identity/accounts/{personId}/invitations": {
+      "post": {
+        "tags": [
+          "Invitations"
+        ],
+        "summary": "Kisiye tek kullanimlik parola olusturma baglantisi gonderir.",
+        "description": "Baglanti yalnizca kisinin LOGO'daki kurumsal e-postasina gider; IK adres giremez.\nKisinin onceki baglantilari gecersizlesir.",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Baglanti gonderim kuyruguna alindi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationSentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gerekce girilmedi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`identity.invite.create`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi bulunamadi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Davet kapali veya kisinin uygun kurumsal e-postasi, aktif calisma kaydi yok ya da hesabi pasif.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/invitations/lookup": {
+      "post": {
+        "tags": [
+          "Invitations"
+        ],
+        "summary": "Baglantinin gecerli olup olmadigini okur.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationTokenRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationTokenRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Baglanti gecerli.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationInfoResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Baglanti gecersiz, kullanilmis veya suresi dolmus.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/invitations/acceptance": {
+      "post": {
+        "tags": [
+          "Invitations"
+        ],
+        "summary": "Parolayi belirler. Hesap yoksa olusturulur; varsa parola yenilenir ve acik oturumlar\nkapanir. Baglanti tek kullanimliktir.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInvitationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInvitationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInvitationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Parola belirlendi; kullanici giris yapabilir.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Parola kurallara uymuyor (`errors.password`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Hesap kullanima kapali.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Baglanti gecersiz, kullanilmis veya suresi dolmus.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/identity/password-resets": {
       "post": {
         "tags": [
@@ -1351,6 +1569,24 @@
   },
   "components": {
     "schemas": {
+      "AcceptInvitationRequest": {
+        "required": [
+          "token",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Baglantidaki jeton."
+          },
+          "password": {
+            "type": "string",
+            "description": "Parola."
+          }
+        },
+        "description": "Parola belirleme istegi."
+      },
       "AccountEmploymentResponse": {
         "required": [
           "registryCode",
@@ -1504,6 +1740,70 @@
           }
         },
         "description": "Hesap olusturma istegi."
+      },
+      "InvitationInfoResponse": {
+        "required": [
+          "firstName",
+          "accountExists",
+          "expiresAt"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "description": "Kisinin adi (karsilama icin)."
+          },
+          "accountExists": {
+            "type": "boolean",
+            "description": "Hesap var mi; varsa parola yenilenir, yoksa hesap olusur."
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Gecerlilik sonu.",
+            "format": "date-time"
+          }
+        },
+        "description": "Baglanti bilgisi."
+      },
+      "InvitationRequest": {
+        "required": [
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Gerekce (zorunlu; denetim izine yazilir, SYG-KMLK-053)."
+          }
+        },
+        "description": "Davet gonderim istegi."
+      },
+      "InvitationSentResponse": {
+        "required": [
+          "expiresAt"
+        ],
+        "type": "object",
+        "properties": {
+          "expiresAt": {
+            "type": "string",
+            "description": "Baglantinin gecerlilik sonu.",
+            "format": "date-time"
+          }
+        },
+        "description": "Davet gonderildi."
+      },
+      "InvitationTokenRequest": {
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Baglantidaki jeton."
+          }
+        },
+        "description": "Baglanti sorgusu."
       },
       "PagedResponseOfAccountSummaryResponse": {
         "required": [
@@ -2056,6 +2356,9 @@
     },
     {
       "name": "Accounts"
+    },
+    {
+      "name": "Invitations"
     },
     {
       "name": "PasswordResets"

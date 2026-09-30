@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`, `KR-078`, `KR-086`, `KR-087`, `KR-088`
+**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`, `KR-078`, `KR-086`, `KR-087`, `KR-088`, `KR-090`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **İlgili riskler:** `R-08`, `R-12`, `R-13`, `R-14`
 
@@ -98,6 +98,12 @@ geçerliliğini korur.
 
 Eşleşmenin sızmaması (`KR-016`) ile kanal gösterimi arasındaki gerilim ve çözümü:
 `SYG-KMLK.md` §6, AN-01 ve `KR-078`.
+
+> **Gerçekleştirme (30.09.2026, `KR-090`, #107).** İK daveti hesap işlemleri ekranından gönderilir
+> (`POST /api/v1/identity/accounts/{personId}/invitations`, `identity.invite.create`). Bağlantı
+> `/invite#token=…` biçimindedir. Jeton 256 bit, özeti saklanır, 3 saat geçerlidir
+> (PRM-HSP-04). Yeni bağlantı öncekileri geçersiz kılar. Bağlantı hesap yoksa oluşturur, varsa
+> parolayı yeniler.
 
 ### 5. Hız sınırlama ve kilitleme
 
@@ -268,3 +274,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | 2026-09-28 | 0.6 | §8: gerçekleştirme notu (uç noktalar, çerez, her istekte oturum doğrulaması; `KR-086`, #92) | Bilgi İşlem |
 | 2026-09-28 | 0.7 | §8: istemci tarafı gerçekleştirme notu (bellekte jeton, sekmeler arası yenileme, etkinlik sinyali; `KR-087`, #95) | Bilgi İşlem |
 | 2026-09-29 | 0.8 | §6: parola sıfırlama ve oturum içinde değişiklik gerçekleştirme notu (`KR-088`, #98) | Bilgi İşlem |
+| 2026-09-30 | 0.9 | §4: İK davet bağlantısı gerçekleştirme notu (`KR-090`, #107) | Bilgi İşlem |

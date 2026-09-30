@@ -1,6 +1,7 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
 using Dsg.Hrms.Application.Identity.Accounts;
+using Dsg.Hrms.Application.Identity.Invitations;
 using Dsg.Hrms.Application.Identity.Authorization;
 using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Application.Identity.Registration;
@@ -130,6 +131,10 @@ public static class InfrastructureRegistration
         // IK hesap islemleri (SYG-KMLK-057, 073).
         services.AddScoped<IAccountAdministrationStore, AccountAdministrationStore>();
         services.AddScoped<AccountAdministrationService>();
+
+        // IK davet baglantisi (SYG-KMLK-051…053).
+        services.AddScoped<IInvitationStore, InvitationStore>();
+        services.AddScoped<InvitationService>();
     }
 
     private static void AddPersonnelSync(IServiceCollection services, IConfiguration configuration)

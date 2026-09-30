@@ -498,6 +498,10 @@ cd /opt/dsg-hrms/docker && docker compose -f compose.uat.yml --env-file /opt/dsg
 
 Doğrulama: yönetici hesabıyla girişte oturum yanıtındaki `user.permissions` 7 izni içerir. İzinler `docs/mimari/izin-listesi.md` belgesindedir.
 
+### 11.1 Davet bağlantısının adresi (#107)
+
+İK'nin gönderdiği parola oluşturma bağlantısı `Identity__PublicBaseUrl` + `/invite` adresini taşır. UAT'de varsayılan `https://insankaynaklaritest.duzen.com.tr` olduğundan ayrıca bir şey yapılmaz. Başka bir adres için sır dosyasına `IDENTITY_PUBLIC_BASE_URL='https://…'` yazılır.
+
 ## 12. Sunucu saati (#103)
 
 Sunucunun saati **eşitlenmiş olmalıdır**. Bu gereklilik üç yerden doğar:
@@ -560,3 +564,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-09-29 | 1.2 | §11: ilk sistem yöneticisi (#100) | Bilgi İşlem |
 | 2026-09-29 | 1.3 | §12: sunucu saati eşitlemesi (#103) | Bilgi İşlem |
 | 2026-09-30 | 1.4 | §12.1: NTS kapalı, düz NTP ile eşitleme ayarı; §12.2 doğrulama (#103) | Bilgi İşlem |
+| 2026-09-30 | 1.5 | §11.1: davet bağlantısının adresi (#107) | Bilgi İşlem |

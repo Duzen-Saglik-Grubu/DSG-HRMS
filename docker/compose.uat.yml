@@ -74,6 +74,9 @@ services:
       # Ilk sistem yoneticilerinin kurumsal e-postalari, virgulle (SYG-KMLK-074). Bu adreslerle
       # giris yapan hesaba Sistem Yoneticisi rolu bir kez atanir.
       AccessControl__BootstrapAdministrators: ${ACCESS_CONTROL_BOOTSTRAP_ADMINISTRATORS:-}
+      # Davet baglantisinin adresi (SYG-KMLK-051), ornegin https://insankaynaklaritest.duzen.com.tr.
+      # UAT alan adi varsayilandir; nginx arkasindaki ic adres e-postaya yazilmasin.
+      Identity__PublicBaseUrl: ${IDENTITY_PUBLIC_BASE_URL:-https://insankaynaklaritest.duzen.com.tr}
       # Gonderim kipi (#85): LogOnly (varsayilan, hicbir ileti gitmez), AllowList (yalnizca
       # izin listesine), Send (uretim). UAT gercek LOGO verisiyle calistigi icin Send KULLANILMAZ.
       Notifications__DeliveryMode: ${NOTIFICATIONS_DELIVERY_MODE:-LogOnly}
