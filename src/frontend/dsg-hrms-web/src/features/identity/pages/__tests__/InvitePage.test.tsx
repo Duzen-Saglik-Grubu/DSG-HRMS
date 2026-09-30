@@ -8,7 +8,7 @@ import { registrationApi } from '../../api/registrationApi';
 import { InvitePage } from '../InvitePage';
 
 /** IK'nin gonderdigi parola olusturma baglantisi (SYG-KMLK-051, 052). Veriler SENTETIKTIR. */
-const TOKEN = 'abcDEF123_-xyz';
+const TOKEN = 'ornek-davet';
 const FUTURE = () => new Date(Date.now() + 3 * 60 * 60_000).toISOString();
 
 function openWith(hash: string) {

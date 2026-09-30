@@ -1,8 +1,8 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
 using Dsg.Hrms.Application.Identity.Accounts;
-using Dsg.Hrms.Application.Identity.Invitations;
 using Dsg.Hrms.Application.Identity.Authorization;
+using Dsg.Hrms.Application.Identity.Invitations;
 using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Application.Identity.Registration;
 using Dsg.Hrms.Application.Identity.Sessions;

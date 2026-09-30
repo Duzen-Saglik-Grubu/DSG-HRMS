@@ -51,11 +51,12 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
 # oldugunu soyler (uygulama saglikli olmayabilir); ayri bir saglik ikili dosyasi
 # yazmak ise bakim maliyeti uretirdi. curl ~1 MB ve tek amacli kullanilir.
 #
-# Not: Alpine tabanli web imajindan farkli olarak burada TAM PAKET YUKSELTMESI
-# yapilmaz. Microsoft'un .NET imajlari sik yeniden yayimlanir ve tarama bu
-# imajda acik bulmadi; gereksiz yukseltme derleme suresini uzatir ve surumleri
-# ongorulemez kilar. Tarama bir gun acik bulursa yukseltme eklenir.
+# Guvenlik yukseltmesi: taban imaj yeniden yayimlanmadan once Ubuntu'nun yayimladigi
+# guvenlik duzeltmeleri de imaja girer. Onceki surum yukseltme yapmiyordu; 30.09.2026'da
+# tarama taban imajdaki libssl3t64'te duzeltmesi yayimlanmis bir acik (CVE-2026-84782,
+# HIGH) buldu ve derleme durdu (#107).
 RUN apt-get update \
+    && apt-get upgrade --no-install-recommends --yes \
     && apt-get install --no-install-recommends --yes curl \
     && rm -rf /var/lib/apt/lists/*
 
