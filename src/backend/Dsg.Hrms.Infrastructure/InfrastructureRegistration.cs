@@ -1,5 +1,6 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
+using Dsg.Hrms.Application.Identity.Accounts;
 using Dsg.Hrms.Application.Identity.Authorization;
 using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Application.Identity.Registration;
@@ -125,6 +126,10 @@ public static class InfrastructureRegistration
         services.AddSingleton(OptionsRegistration.ReadAndValidate<AccessControlOptions>(configuration, AccessControlOptions.SectionName));
         services.AddScoped<IAccessControlStore, AccessControlStore>();
         services.AddScoped<AccessControlService>();
+
+        // IK hesap islemleri (SYG-KMLK-057, 073).
+        services.AddScoped<IAccountAdministrationStore, AccountAdministrationStore>();
+        services.AddScoped<AccountAdministrationService>();
     }
 
     private static void AddPersonnelSync(IServiceCollection services, IConfiguration configuration)

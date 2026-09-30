@@ -505,23 +505,40 @@ Sunucunun saati **eşitlenmiş olmalıdır**. Bu gereklilik üç yerden doğar:
 - Denetim izine sunucunun saati yazılır.
 - Günlük kayıtlarındaki zaman sunucunun saatidir.
 
-29.09.2026'da UAT sunucusu yaklaşık **10 dakika gerideydi**. chrony çalışıyordu ama eşitleme yapamıyordu (`System clock synchronized: no`); büyük olasılıkla dış NTP sunucularına erişim kapalı.
+Uygulama tarayıcıyla sunucu arasındaki farkı `Date` başlığından ölçüp geri sayımı buna göre düzeltir. Yine de sunucu saatinin kendisi doğru olmalıdır.
 
-Uygulama tarayıcıyla sunucu arasındaki farkı `Date` başlığından ölçüp geri sayımı buna göre düzeltir. Yine de denetim izindeki zamanların doğru olması için sunucu saati eşitlenmelidir.
+### 12.1 Bulgu ve yapılan ayar (29.09.2026)
+
+UAT sunucusu yaklaşık **10 dakika (594 sn) gerideydi**; `System clock synchronized: no`.
+
+| Denetim | Sonuç |
+|---|---|
+| Ubuntu 26.04 varsayılan kaynakları | Yalnızca **NTS**'li (şifreli) Canonical sunucuları |
+| NTS anahtar değişimi (TCP 4460) | **Kapalı** (kurum ağı) — varsayılan kaynaklara hiç ulaşılamıyor |
+| Düz NTP (UDP 123) | **Açık** — `pool.ntp.org`, `time.google.com` yanıt veriyor |
+| 192.168.3.180 | Ağ geçidi; zaman hizmeti vermiyor |
+
+Varsayılan dosyalar değiştirilmeden iki dosya eklendi:
 
 ```bash
-# Durum: "System clock synchronized: yes" beklenir
-timedatectl
-chronyc tracking | grep -E "Reference ID|System time"
+# /etc/chrony/sources.d/dsg-hrms-ntp.sources — duz NTP kaynaklari
+pool tr.pool.ntp.org iburst maxsources 3
+pool time.google.com iburst maxsources 1
 
-# Kurum içi NTP kaynağı (örneğin etki alanı denetleyicisi) tanımlanır:
-echo "server <kurum-ici-ntp-sunucusu> iburst" > /etc/chrony/sources.d/kurum.sources
-chronyc reload sources && chronyc makestep
+# /etc/chrony/conf.d/dsg-hrms.conf — NTS kaynaklari tanimliyken dogrulanmamis
+# kaynaklarin bekletilmemesi icin (varsayilan "mix" kipi onlari hic secmiyordu)
+authselectmode ignore
 ```
 
-Doğrulama (sunucu ve tarayıcı saati aynı olmalı):
+Ardından `systemctl restart chrony && chronyc makestep`. Sonuç `System clock synchronized: yes` oldu; chrony açılışta başlıyor (`enabled`).
+
+> Kurum içinde bir NTP sunucusu kurulursa `dsg-hrms-ntp.sources` dosyasına o yazılır; genel havuz kaldırılabilir.
+
+### 12.2 Doğrulama
 
 ```bash
+timedatectl | grep synchronized            # "yes" beklenir
+chronyc tracking | grep -E "Reference ID|System time"
 curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date"; date -u
 ```
 
@@ -542,3 +559,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-09-28 | 1.1 | §10.1: JWT imzalama anahtarı zorunlu (#92) | Bilgi İşlem |
 | 2026-09-29 | 1.2 | §11: ilk sistem yöneticisi (#100) | Bilgi İşlem |
 | 2026-09-29 | 1.3 | §12: sunucu saati eşitlemesi (#103) | Bilgi İşlem |
+| 2026-09-30 | 1.4 | §12.1: NTS kapalı, düz NTP ile eşitleme ayarı; §12.2 doğrulama (#103) | Bilgi İşlem |

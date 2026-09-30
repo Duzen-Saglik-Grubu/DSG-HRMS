@@ -90,6 +90,9 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
     public async Task Registration_responses_never_reveal_the_target_and_audit_has_no_secrets()
     {
         // SYG-KMLK-018: hedef maskeli bile donmez. SYG-KMLK-026/049: kod, parola ve ozet izde yok.
+        // Iz yalnizca BU testin urettigi kayitlarla denetlenir: onceki testlerden biriken
+        // kayitlarda 6 haneli kodun rakamlari (zaman damgasi, kimlik) rastlantiyla gecebilir.
+        var before = await _fixture.WithDbAsync(c => c.ChangeLog.MaxAsync(e => (long?)e.Id)) ?? 0;
         using var client = _fixture.CreateClient(forwardedFor: "10.9.8.7");
         var (_, started) = await client.PostJsonAsync(Base, Start(1));
         var id = started.GetProperty("registrationId").GetString();
@@ -107,7 +110,7 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
         }
 
         var (entries, hash) = await _fixture.WithDbAsync(async c => (
-            await c.ChangeLog.ToListAsync(),
+            await c.ChangeLog.Where(e => e.Id > before).ToListAsync(),
             await c.Set<UserAccount>().Select(a => a.PasswordHash).SingleAsync()));
 
         entries.ShouldContain(e => e.EntityName == nameof(RegistrationAttempt) && e.Operation == AuditOperation.Insert);

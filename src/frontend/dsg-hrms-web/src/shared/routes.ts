@@ -11,6 +11,7 @@ export const routes = {
   register: '/register',
   forgotPassword: '/forgot-password',
   changePassword: '/account/password',
+  accounts: '/accounts',
 } as const;
 
 /** Giristen sonra donulecek adresin tasindigi sorgu parametresi. */

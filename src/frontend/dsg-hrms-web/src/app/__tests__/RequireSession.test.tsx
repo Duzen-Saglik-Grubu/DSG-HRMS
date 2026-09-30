@@ -31,6 +31,7 @@ function renderAt(path: string) {
           { index: true, element: <p>Ana içerik</p> },
           { path: 'leave', element: <p>İzin sayfası</p> },
           { path: 'account/password', element: <p>Parola sayfası</p> },
+          { path: 'accounts', element: <p>Hesaplar sayfası</p> },
         ],
       },
     ],
@@ -98,6 +99,27 @@ describe('RequireSession', () => {
     await user.click(await screen.findByRole('menuitem', { name: 'Parolamı değiştir' }));
 
     expect(await screen.findByText('Parola sayfası')).toBeInTheDocument();
+  });
+
+  it('hesap islemleri baglantisi yalnizca izni olana gorunur', async () => {
+    const user = userEvent.setup();
+    await setSession({ status: 'authenticated' });
+    renderAt('/leave');
+
+    await user.click(await screen.findByRole('button', { name: 'Ahmet Yılmaz' }));
+    expect(await screen.findByRole('menuitem', { name: 'Parolamı değiştir' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Hesap işlemleri' })).not.toBeInTheDocument();
+  });
+
+  it('izni olan kullanici menuden hesap islemlerine gider', async () => {
+    const user = userEvent.setup();
+    await setSession({ status: 'authenticated', permissions: ['identity.account.view'] });
+    renderAt('/leave');
+
+    await user.click(await screen.findByRole('button', { name: 'Ahmet Yılmaz' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Hesap işlemleri' }));
+
+    expect(await screen.findByText('Hesaplar sayfası')).toBeInTheDocument();
   });
 
   it('oturum baska cihazdan giriste kapaninca girise doner', async () => {
