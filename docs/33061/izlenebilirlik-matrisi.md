@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-09-30
+**Son güncelleme:** 2026-10-01
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 
@@ -183,7 +183,7 @@ gelecektir.
 | 49 | `REQ-KMLK-049` Bir kullanıcı yeni bir tarayıcıdan giriş yaptığında önceki oturumu son… | SYG-KMLK-041 | `ADR-0006` §8 | SYG-041 (tek aktif oturum; parametreyle kapatılabilir) · PR #94 | `SessionApiTests` | — |
 | 50 | `REQ-KMLK-050` Oturumun başka bir yerden sonlandırıldığı kullanıcıya açıkça bildirili… | SYG-KMLK-042 | `ADR-0006` §8 | kısmen: SYG-042 (makine tarafından okunabilir neden kodu `session-ended/signed-in-elsewhere`) · PR #94; kullanıcı iletisi ve diğer oturum sonu nedenleri giriş ekranında · PR #96 | `SessionApiTests`; `LoginPage.test.tsx` | — |
 | 51 | `REQ-KMLK-051` 2FA açıkken, parola doğrulandıktan sonra kullanıcıdan doğrulama kodu i… | SYG-KMLK-034 | `ADR-0006` §7 | SYG-034 (2FA kodu üyelikle aynı altyapı) · PR #94 | `SessionApiTests` | — |
-| 52 | `REQ-KMLK-052` 2FA açıkken hiçbir doğrulama kanalı bulunmayan kullanıcı sisteme girem… | SYG-KMLK-035 | — | — | — | — |
+| 52 | `REQ-KMLK-052` 2FA açıkken hiçbir doğrulama kanalı bulunmayan kullanıcı sisteme girem… | SYG-KMLK-035 | `ADR-0006` §7 | SYG-035 (2FA açılmadan önce, girişle aynı kanal kuralına göre hiçbir doğrulama kanalı olmayan aktif hesap sahibi sayısı; uyarı açıkken onaysız açma sunucuda reddedilir; parametre ekranında onay penceresi) · PR #112 | `SystemParametersApiTests`, `TwoFactorImpactServiceTests`, `ParametersPage.test.tsx` | — |
 | 53 | `REQ-KMLK-053` 2FA'nın açık ve kapalı hâli (PRM-KML-08) ayrı ayrı test edilir. | SYG-KMLK-036 | `ADR-0006` §7 | SYG-036 (2FA kapalı ve açık hâl ayrı testler) · PR #94 | `SessionApiTests` | — |
 | 54 | `REQ-KMLK-054` Meşru uzun süreli etkinlik sırasında (ör. eğitim videosu oynatılırken)… | SYG-KMLK-038, 039 | `ADR-0006` §8 | kısmen: SYG-038, 039 (etkinlik sinyali ucu, dakikada 2, toplam süreyi uzatmaz) · PR #94; istemci sinyali: görünür sekmede kullanıcı etkileşimi ve oynayan medya, dakikada en fazla 1 (AN-23) · PR #96 | `SessionApiTests`, `SessionDomainTests`; `SessionActivity.test.tsx` | — |
 | 55 | `REQ-KMLK-055` İlk girişte parola değiştirme zorunluluğu Sistem Yönetimi parametresiy… | SYG-KMLK-050 | — | — | — | — |
@@ -229,3 +229,4 @@ dâhil edilmedi. **26.09.2026: zinciri PR #76 ile tamamlandı** (§4.1).
 | 2026-09-30 | 1.5 | §5: İK hesap işlemleri ekranı halkaları eklendi (REQ-KMLK-011, 036; #105, PR #106) | Bilgi İşlem |
 | 2026-09-30 | 1.6 | §5: İK davet bağlantısı halkaları eklendi (REQ-KMLK-011; #107, PR #108) | Bilgi İşlem |
 | 2026-09-30 | 1.7 | §5: parametre ekranı ve kurumsal logo halkaları eklendi (REQ-KMLK-012, 028, 048, 056; #109, PR #110) | Bilgi İşlem |
+| 2026-10-01 | 1.8 | §5: 2FA etki uyarısı halkası eklendi (REQ-KMLK-052; #111, PR #112) | Bilgi İşlem |

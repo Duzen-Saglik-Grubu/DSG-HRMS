@@ -19,9 +19,13 @@ import { queryKeys } from '@/shared/api/queryKeys';
 import { permissions } from '@/shared/auth/permissions';
 import { usePermission } from '@/shared/auth/usePermission';
 import { DEFAULT_LOGO_URL } from '@/shared/branding';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { PageHeader } from '@/shared/components/PageHeader';
 import { parametersApi, type Parameter } from '../api/parametersApi';
+
+/** Iki adimli dogrulama parametresi; acilmadan once etki onayi istenir (SYG-KMLK-035). */
+const TWO_FACTOR_KEY = 'PRM-KML-08';
 
 /** Katalog kimliginin onekine gore gruplar (Y4 katalogundaki bolumler). */
 const GROUPS = ['GRN', 'KML', 'HSP', 'ENT', 'BLD'] as const;
@@ -120,12 +124,16 @@ function ParameterRow({ parameter, canUpdate }: ParameterRowProps) {
   const isSecret = parameter.type === 'secret';
   const [value, setValue] = useState(isSecret ? '' : (parameter.value ?? ''));
   const [saved, setSaved] = useState(false);
+  const [impact, setImpact] = useState<number | null>(null);
 
   const labelKey = `system.parameters.labels.${parameter.key}`;
   const label = i18n.exists(labelKey) ? t(labelKey) : parameter.description;
 
   const save = useMutation({
-    mutationFn: (next: string) => parametersApi.update(parameter.key, next),
+    mutationFn: ({ next, confirmed }: { next: string; confirmed?: boolean }) =>
+      confirmed
+        ? parametersApi.update(parameter.key, next, true)
+        : parametersApi.update(parameter.key, next),
     onMutate: () => setSaved(false),
     onSuccess: async () => {
       setSaved(true);
@@ -139,6 +147,21 @@ function ParameterRow({ parameter, canUpdate }: ParameterRowProps) {
       ]);
     },
   });
+
+  // 2FA acilirken once etkisi gosterilir ve onay istenir (SYG-KMLK-035); sunucu da onaysiz
+  // acmayi reddeder.
+  const toggle = async (next: string) => {
+    if (parameter.key === TWO_FACTOR_KEY && next === 'true') {
+      const result = await parametersApi.twoFactorImpact();
+      if (result.confirmationRequired) {
+        setImpact(result.affectedCount);
+        return;
+      }
+    }
+
+    setValue(next);
+    save.mutate({ next });
+  };
 
   const error =
     save.error instanceof ApiError
@@ -193,8 +216,7 @@ function ParameterRow({ parameter, canUpdate }: ParameterRowProps) {
                 disabled={!canUpdate || save.isPending}
                 onChange={(event) => {
                   const next = event.target.checked ? 'true' : 'false';
-                  setValue(next);
-                  save.mutate(next);
+                  void toggle(next);
                 }}
               />
             }
@@ -209,7 +231,7 @@ function ParameterRow({ parameter, canUpdate }: ParameterRowProps) {
             sx={{ alignItems: 'flex-start' }}
             onSubmit={(event) => {
               event.preventDefault();
-              save.mutate(value);
+              save.mutate({ next: value });
             }}
           >
             <TextField
@@ -246,6 +268,19 @@ function ParameterRow({ parameter, canUpdate }: ParameterRowProps) {
             ) : null}
           </Stack>
         )}
+        <ConfirmDialog
+          open={impact !== null}
+          title={t('system.parameters.twoFactor.title')}
+          description={t('system.parameters.twoFactor.text', { count: impact ?? 0 })}
+          destructive={(impact ?? 0) > 0}
+          confirmLabel={t('system.parameters.twoFactor.confirm')}
+          onCancel={() => setImpact(null)}
+          onConfirm={() => {
+            setImpact(null);
+            setValue('true');
+            save.mutate({ next: 'true', confirmed: true });
+          }}
+        />
         {parameter.type === 'toggle' && (error || saved) ? (
           <Typography
             variant="caption"

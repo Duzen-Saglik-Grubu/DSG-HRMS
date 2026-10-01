@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Dsg.Hrms.Api.Identity;
 using Dsg.Hrms.Application.Common.Paging;
 using Dsg.Hrms.Application.Identity.Authorization;
+using Dsg.Hrms.Application.Identity.Sessions;
 using Dsg.Hrms.Application.Settings;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -28,11 +29,13 @@ namespace Dsg.Hrms.Api.Settings;
 public sealed class SystemParametersController : ControllerBase
 {
     private readonly ISystemParameterEditor _editor;
+    private readonly TwoFactorImpactService _twoFactorImpact;
 
     /// <summary>Yeni ornek olusturur.</summary>
-    public SystemParametersController(ISystemParameterEditor editor)
+    public SystemParametersController(ISystemParameterEditor editor, TwoFactorImpactService twoFactorImpact)
     {
         _editor = editor;
+        _twoFactorImpact = twoFactorImpact;
     }
 
     /// <summary>T3 parametrelerini katalog sirasiyla, gecerli degerleriyle listeler.</summary>
@@ -61,7 +64,7 @@ public sealed class SystemParametersController : ControllerBase
     /// <response code="400">Deger bos.</response>
     /// <response code="403">Yetki yok (<c>system.parameter.update</c>).</response>
     /// <response code="404">Parametre katalogda yok.</response>
-    /// <response code="422">Deger turune veya araligina uymuyor; hicbir sey kaydedilmedi.</response>
+    /// <response code="422">Deger turune veya araligina uymuyor ya da 2FA etki onayi verilmedi; hicbir sey kaydedilmedi.</response>
     [HttpPut("{key}")]
     [HasPermission(Permissions.ParameterUpdate)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -74,8 +77,27 @@ public sealed class SystemParametersController : ControllerBase
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        // 2FA acilmadan once etki onayi (SYG-KMLK-035); kural sunucudadir.
+        await _twoFactorImpact.EnsureConfirmedAsync(key, request.Value, request.Confirmed, cancellationToken);
         await _editor.UpdateAsync(key, request.Value, cancellationToken);
         return NoContent();
+    }
+
+    /// <summary>
+    /// Iki adimli dogrulama acilirsa giris yapamayacak aktif hesap sahiplerinin sayisi
+    /// (SYG-KMLK-035). Kisilerin kendisi donmez, yalnizca sayi.
+    /// </summary>
+    /// <response code="200">Etki.</response>
+    /// <response code="403">Yetki yok (<c>system.parameter.view</c>).</response>
+    [HttpGet("two-factor-impact")]
+    [HasPermission(Permissions.ParameterView)]
+    [ProducesResponseType<TwoFactorImpactResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    public async Task<TwoFactorImpactResponse> TwoFactorImpactAsync(CancellationToken cancellationToken)
+    {
+        var impact = await _twoFactorImpact.EvaluateAsync(cancellationToken);
+        return new TwoFactorImpactResponse(impact.AffectedCount, impact.ConfirmationRequired);
     }
 
     private static ParameterResponse ToResponse(ParameterView view) => new(
@@ -192,9 +214,15 @@ public sealed class ParameterListRequestValidator : AbstractValidator<ParameterL
     }
 }
 
+/// <summary>2FA'nin acilmasinin etkisi (SYG-KMLK-035).</summary>
+/// <param name="AffectedCount">Hicbir dogrulama kanali olmayan aktif hesap sahibi sayisi.</param>
+/// <param name="ConfirmationRequired">Acmak icin onay gerekiyor mu (PRM-KML-15).</param>
+public sealed record TwoFactorImpactResponse(int AffectedCount, bool ConfirmationRequired);
+
 /// <summary>Parametre degisikligi.</summary>
 /// <param name="Value">Yeni deger; turune gore dogrulanir.</param>
-public sealed record UpdateParameterRequest(string Value)
+/// <param name="Confirmed">Etkisi gosterilip onaylandi mi; yalnizca 2FA'yi acarken gerekir (SYG-KMLK-035).</param>
+public sealed record UpdateParameterRequest(string Value, bool Confirmed = false)
 {
     /// <inheritdoc />
     /// <remarks>Deger bir sir olabilir; nesnenin metin hali icerik tasimaz.</remarks>

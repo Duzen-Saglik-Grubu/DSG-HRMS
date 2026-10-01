@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '@/shared/api/problemDetails';
@@ -119,14 +119,51 @@ describe('ParametersPage', () => {
     expect(await screen.findByText('Değer 3–10 aralığında olmalıdır.')).toBeInTheDocument();
   });
 
-  it('acik/kapali parametre dugmeyle hemen kaydedilir', async () => {
+  it('acik/kapali parametre dugmeyle hemen kaydedilir; uyari kapaliysa 2FA onaysiz acilir', async () => {
+    vi.spyOn(parametersApi, 'twoFactorImpact').mockResolvedValue({
+      affectedCount: 0,
+      confirmationRequired: false,
+    });
     const update = vi.spyOn(parametersApi, 'update').mockResolvedValue(undefined);
     const user = userEvent.setup();
     renderWithProviders(<ParametersPage />);
 
     await user.click(await screen.findByLabelText('İki adımlı doğrulama (2FA)'));
 
-    expect(update).toHaveBeenCalledWith('PRM-KML-08', 'true');
+    await waitFor(() => expect(update).toHaveBeenCalledWith('PRM-KML-08', 'true'));
+  });
+
+  it('2FA acilmadan once etkilenecek kisi sayisini gosterir ve onay ister (SYG-KMLK-035)', async () => {
+    vi.spyOn(parametersApi, 'twoFactorImpact').mockResolvedValue({
+      affectedCount: 2,
+      confirmationRequired: true,
+    });
+    const update = vi.spyOn(parametersApi, 'update').mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    renderWithProviders(<ParametersPage />);
+
+    await user.click(await screen.findByLabelText('İki adımlı doğrulama (2FA)'));
+    const dialog = await screen.findByRole('dialog', { name: 'İki adımlı doğrulamayı aç' });
+    expect(
+      within(dialog).getByText(/2 aktif hesap sahibinin hiçbir doğrulama kanalı/),
+    ).toBeInTheDocument();
+    expect(update).not.toHaveBeenCalled();
+
+    await user.click(within(dialog).getByRole('button', { name: 'Vazgeç' }));
+    expect(update).not.toHaveBeenCalled();
+    expect(screen.getByLabelText('İki adımlı doğrulama (2FA)')).not.toBeChecked();
+
+    await user.click(screen.getByLabelText('İki adımlı doğrulama (2FA)'));
+    await user.click(
+      within(await screen.findByRole('dialog', { name: 'İki adımlı doğrulamayı aç' })).getByRole(
+        'button',
+        {
+          name: 'Aç',
+        },
+      ),
+    );
+
+    expect(update).toHaveBeenCalledWith('PRM-KML-08', 'true', true);
   });
 
   it('degistirme izni yoksa alanlar kapali ve kaydet dugmesi yok', async () => {
