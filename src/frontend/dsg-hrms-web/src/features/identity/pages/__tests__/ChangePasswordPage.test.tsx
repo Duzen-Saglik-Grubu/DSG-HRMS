@@ -36,6 +36,7 @@ describe('ChangePasswordPage', () => {
       supportContact: 'Bilgi İşlem',
       passwordRules: { minLength: 6, maxLength: 128, requireComplexity: false },
       verificationCodeLength: 6,
+      logoVersion: null,
     });
   });
 

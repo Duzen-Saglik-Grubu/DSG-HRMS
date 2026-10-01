@@ -411,7 +411,7 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
         body.GetProperty("verificationCodeLength").GetInt32().ShouldBe(6);
 
         // Yeni bir alan eklenirse bu test bilincli olarak guncellenmelidir: uc kimliksizdir.
-        body.EnumerateObject().Select(p => p.Name).ShouldBe(["supportContact", "passwordRules", "verificationCodeLength"]);
+        body.EnumerateObject().Select(p => p.Name).ShouldBe(["supportContact", "passwordRules", "verificationCodeLength", "logoVersion"]);
     }
 
     // ------------------------------------------------------------------ yardimcilar

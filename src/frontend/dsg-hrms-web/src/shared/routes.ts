@@ -13,6 +13,7 @@ export const routes = {
   changePassword: '/account/password',
   accounts: '/accounts',
   invite: '/invite',
+  parameters: '/system/parameters',
 } as const;
 
 /** Giristen sonra donulecek adresin tasindigi sorgu parametresi. */

@@ -4,6 +4,314 @@
  */
 
 export interface paths {
+    "/api/v1/system/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Yuklu logoyu dondurur. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Logo (PNG veya JPEG). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "image/png": components["schemas"]["FileContentResult"];
+                        "image/jpeg": components["schemas"]["FileContentResult"];
+                    };
+                };
+                /** @description Tarayicidaki surum guncel. */
+                304: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Logo yuklenmemis; varsayilan kullanilir. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        /** Logoyu yukler veya degistirir (PNG veya JPEG, en fazla 512 KB). */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        file?: components["schemas"]["IFormFile"];
+                    };
+                };
+            };
+            responses: {
+                /** @description Kaydedildi. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`system.parameter.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Dosya bos, cok buyuk veya PNG/JPEG degil. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /** Yuklu logoyu kaldirir; varsayilan logoya donulur. */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Kaldirildi (yuklu degilse de). */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`system.parameter.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/parameters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * T3 parametrelerini katalog sirasiyla, gecerli degerleriyle listeler.
+         * @description Tum listeleme uclari gibi sayfalidir (ADR-0010 §4); katalog tek sayfaya sigar.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number | string;
+                    pageSize?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Parametreler. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResponseOfParameterResponse"];
+                    };
+                };
+                /** @description Gecersiz sayfa. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`system.parameter.view`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/parameters/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Parametrenin degerini degistirir. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    key: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateParameterRequest"];
+                    "text/json": components["schemas"]["UpdateParameterRequest"];
+                    "application/*+json": components["schemas"]["UpdateParameterRequest"];
+                };
+            };
+            responses: {
+                /** @description Kaydedildi; en gec 1 dakika icinde etkili olur. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Deger bos. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`system.parameter.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Parametre katalogda yok. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Deger turune veya araligina uymuyor; hicbir sey kaydedilmedi. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/account/password": {
         parameters: {
             query?: never;
@@ -1628,6 +1936,22 @@ export interface components {
             /** @description Parola. */
             password: string;
         };
+        EntityTagHeaderValue: {
+            tag?: components["schemas"]["StringSegment"];
+            isWeak?: boolean;
+        };
+        FileContentResult: {
+            /** Format: byte */
+            fileContents?: string;
+            contentType?: null | string;
+            fileDownloadName?: null | string;
+            /** Format: date-time */
+            lastModified?: null | string;
+            entityTag?: null | components["schemas"]["EntityTagHeaderValue"];
+            enableRangeProcessing?: boolean;
+        };
+        /** Format: binary */
+        IFormFile: string;
         /** @description Baglanti bilgisi. */
         InvitationInfoResponse: {
             /** @description Kisinin adi (karsilama icin). */
@@ -1683,6 +2007,66 @@ export interface components {
              */
             totalPages: number | string;
         };
+        /** @description Sayfalanmis yanit (ADR-0010 §4). */
+        PagedResponseOfParameterResponse: {
+            /** @description Bu sayfadaki kayitlar. */
+            items: components["schemas"]["ParameterResponse"][];
+            /**
+             * Format: int32
+             * @description Sayfa numarasi.
+             */
+            page: number | string;
+            /**
+             * Format: int32
+             * @description Sayfa boyutu.
+             */
+            pageSize: number | string;
+            /**
+             * Format: int32
+             * @description Toplam kayit sayisi.
+             */
+            totalCount: number | string;
+            /**
+             * Format: int32
+             * @description Toplam sayfa sayisi.
+             */
+            totalPages: number | string;
+        };
+        /**
+         * @description Parametre turu.
+         * @enum {unknown}
+         */
+        ParameterKind: "number" | "toggle" | "text" | "list" | "secret";
+        /** @description Parametre. */
+        ParameterResponse: {
+            /** @description Katalog kimligi (orn. `PRM-KML-03`). */
+            key: string;
+            /** @description Aciklama (istemci kendi Turkce etiketini kullanir). */
+            description: string;
+            /** @description Tur. */
+            type: components["schemas"]["ParameterKind"];
+            /**
+             * Format: int32
+             * @description Tam sayi icin alt sinir.
+             */
+            min: null | number | string;
+            /**
+             * Format: int32
+             * @description Tam sayi icin ust sinir.
+             */
+            max: null | number | string;
+            /** @description Gecerli deger. Sir parametrede DAIMA bos (`KR-071`). */
+            value: null | string;
+            /** @description Deger herhangi bir kaynakta tanimli mi. */
+            isSet: boolean;
+            /** @description Degerin geldigi kaynak. */
+            source: components["schemas"]["ParameterSourceKind"];
+        };
+        /**
+         * @description Degerin kaynagi.
+         * @enum {unknown}
+         */
+        ParameterSourceKind: "none" | "default" | "configuration" | "database";
         /** @description Parola kurallari. */
         PasswordRulesResponse: {
             /**
@@ -1717,6 +2101,8 @@ export interface components {
              * @description Dogrulama kodunun hane sayisi (PRM-KML-09).
              */
             verificationCodeLength: number | string;
+            /** @description Yuklu kurumsal logonun surumu (PRM-GRN-01); yuklenmemisse bos ve varsayilan logo kullanilir. */
+            logoVersion: null | string;
         };
         /** @description Uyelik baslatildi. */
         RegistrationStartedResponse: {
@@ -1810,6 +2196,15 @@ export interface components {
             /** @description Kurumsal e-posta. */
             email: string;
         };
+        StringSegment: {
+            buffer?: null | string;
+            /** Format: int32 */
+            offset?: number | string;
+            /** Format: int32 */
+            length?: number | string;
+            value?: null | string;
+            hasValue?: boolean;
+        };
         /** @description Elle calisma istegi alindi. */
         SyncRequestedResponse: {
             /** @description Sirada zaten bekleyen bir istek vardi. */
@@ -1858,6 +2253,11 @@ export interface components {
             /** @description Sonuc. */
             result: components["schemas"]["VerificationOutcome"];
             session: null | components["schemas"]["SessionResponse"];
+        };
+        /** @description Parametre degisikligi. */
+        UpdateParameterRequest: {
+            /** @description Yeni deger; turune gore dogrulanir. */
+            value: string;
         };
         /**
          * @description Dogrulama kanali.

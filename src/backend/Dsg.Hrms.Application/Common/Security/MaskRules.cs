@@ -106,6 +106,10 @@ public static class MaskRules
             // denetim izinde yalnizca "degisti" gorunur (KR-071).
             ["ProtectedValue"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
 
+            // Kurumsal logonun dosya icerigi (BrandLogo). Denetim izine dosya degil, ozeti ve boyutu
+            // yazilir; izin satiri yuzlerce KB buyumez.
+            ["Content"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
+
             // Hesap guvenlik damgasi (UserAccount). Oturum jetonlari buna baglanir;
             // denetim izini okuyan biri jeton uretimine yardimci bir deger gormemelidir.
             ["SecurityStamp"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),

@@ -1,16 +1,16 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import SupportAgentOutlined from '@mui/icons-material/SupportAgentOutlined';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { queryKeys } from '@/shared/api/queryKeys';
+import { DEFAULT_LOGO_URL, uploadedLogoUrl } from '@/shared/branding';
 import { registrationApi } from '../api/registrationApi';
 import { BrandPanel } from './BrandPanel';
 import { fadeUp, reducedMotion } from './motion';
 
-/** Varsayilan kurumsal logo (SYG-KMLK-069). Kaynagi depodaki assets/duzen_logo.png'dir. */
-export const DEFAULT_LOGO_URL = '/brand/duzen_logo.png';
+export { DEFAULT_LOGO_URL } from '@/shared/branding';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -25,6 +25,16 @@ interface AuthLayoutProps {
  */
 export function AuthLayout({ children }: AuthLayoutProps) {
   const { t } = useTranslation();
+  const { data: settings } = useQuery({
+    queryKey: queryKeys.identity.publicSettings,
+    queryFn: registrationApi.publicSettings,
+    staleTime: 5 * 60_000,
+  });
+  const [logoFailed, setLogoFailed] = useState(false);
+
+  // Yuklu logo varsa o, yoksa veya yuklenemezse depodaki varsayilan logo (SYG-KMLK-069).
+  const logoUrl =
+    settings?.logoVersion && !logoFailed ? uploadedLogoUrl(settings.logoVersion) : DEFAULT_LOGO_URL;
 
   return (
     <Box
@@ -71,7 +81,8 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           <Stack spacing={3}>
             <Box
               component="img"
-              src={DEFAULT_LOGO_URL}
+              src={logoUrl}
+              onError={() => setLogoFailed(true)}
               alt={t('identity.layout.logoAlt')}
               sx={{ height: 44, width: 'auto', maxWidth: '100%', alignSelf: 'flex-start' }}
             />

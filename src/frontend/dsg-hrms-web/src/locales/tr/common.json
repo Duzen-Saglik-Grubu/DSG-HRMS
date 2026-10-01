@@ -256,5 +256,79 @@
       "continue": "Oturumu sürdür"
     },
     "changePassword": "Parolamı değiştir"
+  },
+  "system": {
+    "parameters": {
+      "title": "Sistem parametreleri",
+      "subtitle": "Kimlik yönetiminin çalışma kurallarını değiştirin. Değişiklik en geç 1 dakika içinde etkili olur ve denetim kaydına yazılır.",
+      "groups": {
+        "GRN": "Genel",
+        "KML": "Kimlik ve oturum",
+        "HSP": "Hesap işlemleri",
+        "ENT": "Entegrasyonlar",
+        "BLD": "Bildirim"
+      },
+      "source": {
+        "none": "Tanımlı değil",
+        "default": "Varsayılan",
+        "configuration": "Sunucu yapılandırması",
+        "database": "Bu ekrandan"
+      },
+      "secretSet": "Tanımlı",
+      "secretNotSet": "Tanımlı değil",
+      "secretPlaceholder": "Değiştirmek için yeni değeri yazın",
+      "listHint": "Değerleri virgülle ayırın.",
+      "range": "{{min}} ile {{max}} arasında",
+      "on": "Açık",
+      "off": "Kapalı",
+      "save": "Kaydet",
+      "saved": "Kaydedildi.",
+      "labels": {
+        "PRM-ENT-01": "NetGSM kullanıcı kodu",
+        "PRM-ENT-02": "NetGSM API parolası",
+        "PRM-ENT-03": "SMS gönderici başlığı",
+        "PRM-ENT-04": "SMTP sunucusu ve portu (sunucu:port)",
+        "PRM-ENT-05": "SMTP kullanıcı adı (gönderen hesap)",
+        "PRM-ENT-06": "SMTP parolası",
+        "PRM-ENT-07": "LOGO senkronizasyon periyodu (dakika)",
+        "PRM-KML-01": "Kabul edilen kurumsal e-posta alan adları",
+        "PRM-KML-02": "Üyelik ve parola sıfırlamada kullanılacak kanallar",
+        "PRM-KML-03": "Hesap kilitlenmeden önceki başarısız giriş sayısı",
+        "PRM-KML-04": "Hesap kilit süresi (dakika)",
+        "PRM-KML-05": "Parola en az karakter sayısı",
+        "PRM-KML-06": "Karmaşık parola zorunluluğu",
+        "PRM-KML-07": "Zorunlu periyodik parola değiştirme",
+        "PRM-KML-08": "İki adımlı doğrulama (2FA)",
+        "PRM-KML-09": "Doğrulama kodu uzunluğu",
+        "PRM-KML-10": "Doğrulama kodu geçerlilik süresi (dakika)",
+        "PRM-KML-11": "Erişim jetonu ömrü (dakika)",
+        "PRM-KML-12": "Oturum toplam süresi (saat)",
+        "PRM-KML-13": "Hareketsizlik süresi (dakika)",
+        "PRM-KML-14": "Tek aktif oturum kuralı",
+        "PRM-KML-15": "2FA açılmadan önce etkilenecek kullanıcı uyarısı",
+        "PRM-KML-16": "Doğrulama kodunda en fazla yanlış deneme sayısı",
+        "PRM-KML-17": "Kod gönderim sınırı (kişi başına / 15 dakika)",
+        "PRM-KML-18": "Üyelik deneme sınırı (TCKN başına / saat)",
+        "PRM-KML-19": "Üyelik deneme sınırı (IP başına / saat)",
+        "PRM-KML-20": "İlk girişte parola değiştirme zorunluluğu",
+        "PRM-HSP-01": "İK'nın personele parola oluşturma bağlantısı gönderebilmesi",
+        "PRM-HSP-02": "Çalışma kaydı biten hesabın otomatik pasifleştirilmesi",
+        "PRM-HSP-03": "İK'nın kilitli hesabı açabilmesi",
+        "PRM-HSP-04": "Parola oluşturma bağlantısının geçerlilik süresi (saat)",
+        "PRM-GRN-04": "Destek iletişim bilgisi (üyelik ve giriş ekranları)",
+        "PRM-BLD-03": "Bildirim istisnasının işlemsel iletileri kapsamaması"
+      }
+    },
+    "logo": {
+      "title": "Kurumsal logo",
+      "hint": "Giriş, üyelik ve parola ekranlarında görünür. PNG veya JPEG, en fazla 512 KB. Yüklenmemişse varsayılan Düzen Sağlık Grubu logosu kullanılır.",
+      "previewAlt": "Kullanılan kurumsal logo",
+      "usingDefault": "Varsayılan logo kullanılıyor",
+      "usingUploaded": "Yüklenen logo kullanılıyor",
+      "choose": "Logo yükle",
+      "reset": "Varsayılana dön",
+      "uploaded": "Logo yüklendi.",
+      "removed": "Varsayılan logoya dönüldü."
+    }
   }
 }

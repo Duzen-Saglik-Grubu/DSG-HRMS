@@ -34,6 +34,7 @@ describe('ForgotPasswordPage', () => {
       supportContact: 'Bilgi İşlem - dahili 1234',
       passwordRules: { minLength: 6, maxLength: 128, requireComplexity: false },
       verificationCodeLength: 6,
+      logoVersion: null,
     });
     vi.spyOn(passwordApi, 'startReset').mockResolvedValue({
       registrationId: 'r-1',

@@ -136,7 +136,7 @@ public sealed class SystemParameterStoreTests : IAsyncLifetime
         var parameters = CreateParameters();
 
         var ex = await Should.ThrowAsync<BusinessRuleException>(() => UpdateAsync(parameters, ParameterCatalog.MaxFailedLogins, "50"));
-        ex.Message.ShouldContain("3-10");
+        ex.Message.ShouldBe("Değer 3–10 aralığında olmalıdır.");
 
         await using var context = Read();
         (await context.Set<SystemParameter>().CountAsync()).ShouldBe(0);
