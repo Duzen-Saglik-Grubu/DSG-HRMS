@@ -143,6 +143,10 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
 - Zorunlu periyodik parola değişimi **varsayılan olarak uygulanmaz** (güncel güvenlik
   rehberleri bunu önermiyor; kullanıcıyı zayıf kalıplara itiyor). Sistem Yönetimi
   parametresiyle açılabilir.
+  *Gerçekleştirme (01.10.2026, `KR-092`, #113):* Süre `PRM-KML-21` parametresidir (varsayılan
+  90 gün). Zorunluluk (periyodik veya ilk giriş, `PRM-KML-20`) girişte değerlendirilir ve
+  oturumda tutulur. Parola değişene kadar yalnızca parola değiştirme ve oturum uçları
+  kullanılabilir; diğer uçlar `403 password-change-required` döner.
 - Parola sıfırlama, üyelik akışıyla aynı doğrulama mekanizmasını kullanır.
   *Gerçekleştirme (29.09.2026, `KR-088`, #98):* Sıfırlama bir üyelik denemesidir; yalnızca
   amacı ve kod iletisinin metni farklıdır (`/api/v1/identity/password-resets`). Sıfırlama
@@ -275,3 +279,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | 2026-09-28 | 0.7 | §8: istemci tarafı gerçekleştirme notu (bellekte jeton, sekmeler arası yenileme, etkinlik sinyali; `KR-087`, #95) | Bilgi İşlem |
 | 2026-09-29 | 0.8 | §6: parola sıfırlama ve oturum içinde değişiklik gerçekleştirme notu (`KR-088`, #98) | Bilgi İşlem |
 | 2026-09-30 | 0.9 | §4: İK davet bağlantısı gerçekleştirme notu (`KR-090`, #107) | Bilgi İşlem |
+| 2026-10-01 | 1.0 | §6: zorunlu parola değişimi gerçekleştirme notu (`KR-092`, #113) | Bilgi İşlem |

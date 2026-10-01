@@ -403,6 +403,7 @@
           "Account"
         ],
         "summary": "Parolayi degistirir. Mevcut parola istenir; degisiklikten sonra hesabin DIGER oturumlari\nkapanir, bu oturum acik kalir (SYG-KMLK-048).",
+        "description": "Parola degisimi bekleyen oturumda da kullanilabilir; degisince kisit kalkar (SYG-KMLK-046, 050).",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2443,6 +2444,13 @@
         ],
         "description": "Degerin kaynagi."
       },
+      "PasswordChangeReasonKind": {
+        "enum": [
+          "firstSignIn",
+          "expired",
+          null
+        ]
+      },
       "PasswordRulesResponse": {
         "required": [
           "minLength",
@@ -2610,7 +2618,8 @@
           "accessTokenExpiresAt",
           "sessionExpiresAt",
           "idleTimeoutMinutes",
-          "user"
+          "user",
+          "passwordChangeRequired"
         ],
         "type": "object",
         "properties": {
@@ -2640,6 +2649,17 @@
           "user": {
             "description": "Kullanici.",
             "$ref": "#/components/schemas/SessionUserResponse"
+          },
+          "passwordChangeRequired": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Parola degisimi bekleniyorsa nedeni, beklenmiyorsa `null`; bu durumda diger korumali uclar `403 password-change-required` doner (SYG-KMLK-046, 050).",
+                "$ref": "#/components/schemas/PasswordChangeReasonKind"
+              }
+            ]
           }
         },
         "description": "Acik oturum. Yenileme jetonu burada DEGIL, HttpOnly cerezdedir."

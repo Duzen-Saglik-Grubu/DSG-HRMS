@@ -4,7 +4,7 @@
 **Süreç:** TEC.3 — Sistem/Yazılım Gereksinimlerinin Tanımlanması
 **Modül:** T3 Kimlik Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-KMLK.md` (23.09.2026'da İK onaylı, 56 gereksinim)
-**Son güncelleme:** 2026-09-28
+**Son güncelleme:** 2026-10-01
 **Sahibi:** Bilgi İşlem
 
 > **Paydaş gereksinimi *ne* istendiğini söyler; bu belge sistemin bunu *hangi
@@ -216,11 +216,11 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 |---|---|---|---|---|---|
 | **SYG-KMLK-044** | Parola en az parametredeki uzunlukta (varsayılan 6), en fazla 128 karakter olabilir. Karmaşıklık zorunluluğu parametreyle açılır (varsayılan kapalı). Unicode karakterler kabul edilir ve karşılaştırmadan önce NFKC biçimine normalleştirilir. | İşlevsel | REQ-KMLK-028 | Test | PRM-KML-05, PRM-KML-06 |
 | **SYG-KMLK-045** | Parola, uygulamaya gömülü **yaygın parola listesinde** bulunursa reddedilir. Liste en az 100.000 kayıt içerir, açık lisanslı bir kaynaktan alınır ve kuruma özgü sözcüklerle genişletilir (kurum ve grup şirketi adları; kullanıcının adı, soyadı ve e-posta adresinin yerel kısmı). Denetim çevrimdışıdır ve **devre dışı bırakılamaz.** | İşlevsel olmayan | REQ-KMLK-029 | Test | — |
-| **SYG-KMLK-046** | Zorunlu periyodik parola değişimi parametreyle açılır (varsayılan kapalı). | İşlevsel | REQ-KMLK-030 | Test | PRM-KML-07 |
+| **SYG-KMLK-046** | Zorunlu periyodik parola değişimi parametreyle açılır (varsayılan kapalı). Açıkken, parolası parametredeki süreden (varsayılan **90 gün**) eski olan kullanıcı girişte parolasını değiştirmeden uygulamayı kullanamaz. | İşlevsel | REQ-KMLK-030 | Test | PRM-KML-07, PRM-KML-21 |
 | **SYG-KMLK-047** | Parola sıfırlama, üyelikle aynı eşleştirme, kanal ve kod akışını kullanır; ayrı bir doğrulama mekanizması bulunmaz. | İşlevsel | REQ-KMLK-031 | Test | PRM-KML-02, PRM-KML-09, PRM-KML-10 |
 | **SYG-KMLK-048** | Oturum içinde parola değişikliği mevcut parolanın girilmesini gerektirir. Değişiklikten sonra kullanıcının **diğer tüm oturumları** sonlandırılır. | İşlevsel | REQ-KMLK-032 | Test | — |
 | **SYG-KMLK-049** | Parola, uyarlanabilir maliyetli bir özet işleviyle (PBKDF2-HMAC-SHA512, en az 100.000 yineleme veya eşdeğeri) saklanır; özetleme süresi sunucuda 100–500 ms aralığında tutulur. Parola hiçbir kayda yazılmaz. | Kısıt | REQ-KMLK-033 | Test | — |
-| **SYG-KMLK-050** | İlk girişte parola değiştirme zorunluluğu parametreyle açılır (varsayılan kapalı). | İşlevsel | REQ-KMLK-055 | Test | PRM-KML-20 |
+| **SYG-KMLK-050** | İlk girişte parola değiştirme zorunluluğu parametreyle açılır (varsayılan kapalı). Açıkken, daha önce hiç giriş yapmamış her hesap, parolasını üyelikte kendisi belirlemiş olsa da, ilk girişte parolasını değiştirmeden uygulamayı kullanamaz. | İşlevsel | REQ-KMLK-055 | Test | PRM-KML-20 |
 
 ### 4.6 İK destekli davet
 
@@ -339,6 +339,7 @@ yazılıdır; kapanmamış olanlar ⏳ ile işaretlidir.
 | AN-21 | SYG-KMLK-071 ilk yazımda `/api/v1/kimlik/` diyordu. ADR-0010 §2 modül ve kaynak adlarını İngilizce kebab-case ister (`/api/v1/leave/leave-requests`); `KR-058` kod tanımlayıcılarını İngilizce tutar. | Yol `/api/v1/identity/` olarak düzeltildi. Paydaş gereksinimi (REQ-KMLK-043: ekran ve iletiler Türkçe) etkilenmez; yol kullanıcıya görünmez (#87). | ✅ |
 | AN-22 | SYG-KMLK-040 "kullanılmış jeton tekrar sunulursa tüm oturumlar kapanır" der; SYG-KMLK-041 ise yeni girişte önceki oturumu kapatır. Kapatılan eski sekme elindeki jetonla tekrar denerse, SYG-040'ın harfi yeni cihazdaki meşru oturumu da kapatırdı. | Yeniden kullanım yalnızca jetonun oturumu **hâlâ açıkken** çalınma sayılır ve tüm oturumlar kapanır. Oturum zaten kapalıysa istek kapanma nedeniyle reddedilir; diğer oturumlara dokunulmaz (`KR-086`, #92). | ✅ |
 | AN-23 | SYG-KMLK-038 hareketsizliği **kullanıcı etkileşimine** göre ölçer; sunucu etkileşimi yalnızca etkinlik sinyali ucundan (SYG-KMLK-039) öğrenebilir. SYG-KMLK-039'un son cümlesi ("istemci sinyali yalnızca medya oynarken ve sekme görünürken gönderir") harfiyen uygulansaydı, etkileşimle çalışan kullanıcının oturumu 30 dakikada kapanırdı. | Cümle, **etkileşim olmadan** gönderilen sinyali sınırlar. İstemci, görünür sekmede kullanıcı etkileşimi (tıklama, tuş, kaydırma, dokunma) olduğunda ve görünür sekmede medya oynarken sinyal gönderir; dakikada en fazla 1. Görünmeyen sekme, fare hareketi ve arka plan istekleri sinyal göndermez (`KR-087`, #95). | ✅ |
+| AN-24 | SYG-KMLK-046 değişimin **ne sıklıkta** isteneceğini söylemez; Y4 taslak kataloğunda da süre parametresi yoktur. SYG-KMLK-050 "ilk giriş"in kapsamını söylemez: S-02 kararı "üyelikte belirlenen parola yeterli" gerekçesiyle parametreyi varsayılan kapalı tutar; açıldığında kimlerin değiştireceği belirsizdir. | (1) Süre yeni parametredir: `PRM-KML-21`, varsayılan 90 gün (30–365). (2) Parametre açıkken hiç giriş yapmamış **her** hesap değiştirir; parolasını üyelikte kendisi belirleyenler de dahildir. Kural açılmadan önce giriş yapmış hesaplar etkilenmez. (3) İkisi de girişte değerlendirilir ve oturumda tutulur. Değişim yapılana kadar yalnızca parola değiştirme ve oturum uçları kullanılabilir; bu kural sunucuda uygulanır (Doğuş Uçanok, 01.10.2026; `KR-092`, #113). | ✅ |
 | AN-16 | Denetim izi ve erişim kaydı saklama süreleri (`PRM-KVK-01`, `02`) karar bekliyor. | T3'ü engellemez: kayıtlar üretilir, silme işi karar verildiğinde eklenir. | ⏳ KVKK kararı bekliyor |
 
 **Paydaşa geri bildirim (BP3):** AN-01, onaylı bir kabul kriterinin (REQ-KMLK-004)
@@ -462,3 +463,4 @@ madde `İptal` notuyla kalır.
 | 2026-09-28 | 0.7 | SYG-KMLK-068: görseli üreten taraf S-13 kararıyla uyumlu hâle getirildi (#90) | Bilgi İşlem |
 | 2026-09-28 | 0.8 | AN-22 eklendi: kapanmış oturumun jeton tekrarı (`KR-086`, #92) | Bilgi İşlem |
 | 2026-09-28 | 0.9 | AN-23 eklendi: etkinlik sinyalinin kapsamı (`KR-087`, #95); §7 kurumsal görsel durumu güncellendi | Bilgi İşlem |
+| 2026-10-01 | 1.0 | SYG-KMLK-046 ve 050 netleştirildi; `PRM-KML-21` eklendi; AN-24 (`KR-092`, #113) | Bilgi İşlem |

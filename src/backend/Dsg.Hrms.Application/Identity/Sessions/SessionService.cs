@@ -423,14 +423,16 @@ public sealed partial class SessionService
     /// <summary>
     /// Erisim jetonunun oturumu hala acik mi. Her istekte cagrilir: pasiflesen hesap, baska
     /// cihazdan giris veya cikis erisim jetonunun suresini beklemeden etkili olur (SYG-KMLK-054).
+    /// Oturum parola degisimi bekliyorsa bu da her istekte okunur: degisimden sonra kisit, yeni
+    /// erisim jetonu beklenmeden kalkar (SYG-KMLK-046, 050).
     /// </summary>
-    public async Task<bool> IsSessionActiveAsync(Guid sessionId, CancellationToken cancellationToken)
+    public async Task<SessionAccess> CheckSessionAsync(Guid sessionId, CancellationToken cancellationToken)
     {
         var now = _clock.UtcNow;
         var session = await _store.FindSessionAsync(sessionId, cancellationToken).ConfigureAwait(false);
         if (session is null || !session.IsOpen)
         {
-            return false;
+            return SessionAccess.Closed;
         }
 
         var candidate = await _store.FindByAccountIdAsync(session.UserAccountId, cancellationToken).ConfigureAwait(false);
@@ -441,10 +443,10 @@ public sealed partial class SessionService
         {
             session.End(ended.Value, now);
             await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            return false;
+            return SessionAccess.Closed;
         }
 
-        return true;
+        return session.PasswordChangeRequired is null ? SessionAccess.Open : SessionAccess.PasswordChangeRequired;
     }
 
     /// <summary>Yenileme jetonunun ozeti (SHA-256, Base64).</summary>
@@ -471,8 +473,10 @@ public sealed partial class SessionService
 
         var maxHours = await _parameters.GetIntegerAsync(ParameterCatalog.SessionMaxHours, cancellationToken).ConfigureAwait(false);
         var idle = TimeSpan.FromMinutes(await _parameters.GetIntegerAsync(ParameterCatalog.IdleTimeoutMinutes, cancellationToken).ConfigureAwait(false));
+        var passwordChange = await RequiredPasswordChangeAsync(candidate.Account, now, cancellationToken).ConfigureAwait(false);
 
-        var session = UserSession.Start(candidate.Account.Id, candidate.Account.SecurityStamp, ipAddress, now, TimeSpan.FromHours(maxHours));
+        var session = UserSession.Start(
+            candidate.Account.Id, candidate.Account.SecurityStamp, ipAddress, now, TimeSpan.FromHours(maxHours), passwordChange);
         _store.Add(session);
 
         // Ilk sistem yoneticisi kurulum yapilandirmasiyla belirlenir (SYG-KMLK-074); atama
@@ -483,7 +487,29 @@ public sealed partial class SessionService
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         LogSignedIn(_logger, candidate.Account.Id, session.PublicId);
+        if (passwordChange is not null)
+        {
+            LogPasswordChangeRequired(_logger, candidate.Account.Id, passwordChange.Value);
+        }
+
         return await IssueTokensAsync(candidate, session, idle, now, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Girisi hesaba kaydeder ve parola degisimi gerekiyor mu bakar (SYG-KMLK-046, 050).
+    /// Ilk giris kurali (a) secenegiyle uygulanir: hic giris yapmamis HER hesap, parolasini
+    /// uyelikte kendisi belirlemis olsa da degistirir (#113).
+    /// </summary>
+    private async Task<PasswordChangeReason?> RequiredPasswordChangeAsync(UserAccount account, DateTimeOffset now, CancellationToken cancellationToken)
+    {
+        var firstSignInRule = await _parameters.GetBooleanAsync(ParameterCatalog.RequirePasswordChangeOnFirstLogin, cancellationToken).ConfigureAwait(false);
+        account.RecordSignIn(now, firstSignInRule);
+
+        TimeSpan? maxAge = await _parameters.GetBooleanAsync(ParameterCatalog.RequirePeriodicPasswordChange, cancellationToken).ConfigureAwait(false)
+            ? TimeSpan.FromDays(await _parameters.GetIntegerAsync(ParameterCatalog.PasswordMaxAgeDays, cancellationToken).ConfigureAwait(false))
+            : null;
+
+        return account.RequiredPasswordChange(firstSignInRule, maxAge, now);
     }
 
     private async Task<SessionTokens> IssueTokensAsync(
@@ -513,7 +539,8 @@ public sealed partial class SessionService
             idle,
             candidate.Person.FirstName,
             candidate.Person.LastName,
-            [.. permissions.Order(StringComparer.Ordinal)]);
+            [.. permissions.Order(StringComparer.Ordinal)],
+            session.PasswordChangeRequired);
     }
 
     private async Task<RegistrationChannels> TwoFactorChannelsAsync(SignInCandidate candidate, CancellationToken cancellationToken)
@@ -562,4 +589,7 @@ public sealed partial class SessionService
 
     [LoggerMessage(EventId = 3805, Level = LogLevel.Information, Message = "Parola oturum icinde degistirildi: hesap {AccountId}; diger oturumlar kapatildi (SYG-KMLK-048).")]
     private static partial void LogPasswordChanged(ILogger logger, long accountId);
+
+    [LoggerMessage(EventId = 3806, Level = LogLevel.Information, Message = "Oturum parola degisimi bekliyor: hesap {AccountId}, neden {Reason} (SYG-KMLK-046, 050).")]
+    private static partial void LogPasswordChangeRequired(ILogger logger, long accountId, PasswordChangeReason reason);
 }

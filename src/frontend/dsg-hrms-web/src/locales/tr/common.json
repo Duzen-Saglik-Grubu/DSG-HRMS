@@ -185,7 +185,11 @@
       "new": "Yeni parola",
       "confirm": "Yeni parola (tekrar)",
       "submit": "Parolayı değiştir",
-      "done": "Parolanız değiştirildi. Diğer cihazlardaki oturumlarınız kapatıldı; bu oturumunuz açık kalıyor."
+      "done": "Parolanız değiştirildi. Diğer cihazlardaki oturumlarınız kapatıldı; bu oturumunuz açık kalıyor.",
+      "required": {
+        "firstSignIn": "İlk girişinizde parolanızı değiştirmeniz gerekiyor. Parolanızı değiştirene kadar uygulamanın diğer bölümleri kullanılamaz.",
+        "expired": "Parolanızın kullanım süresi doldu. Devam etmek için yeni bir parola belirleyin."
+      }
     },
     "accounts": {
       "title": "Hesap işlemleri",
@@ -311,6 +315,7 @@
         "PRM-KML-18": "Üyelik deneme sınırı (TCKN başına / saat)",
         "PRM-KML-19": "Üyelik deneme sınırı (IP başına / saat)",
         "PRM-KML-20": "İlk girişte parola değiştirme zorunluluğu",
+        "PRM-KML-21": "Periyodik parola değişim süresi (gün)",
         "PRM-HSP-01": "İK'nın personele parola oluşturma bağlantısı gönderebilmesi",
         "PRM-HSP-02": "Çalışma kaydı biten hesabın otomatik pasifleştirilmesi",
         "PRM-HSP-03": "İK'nın kilitli hesabı açabilmesi",

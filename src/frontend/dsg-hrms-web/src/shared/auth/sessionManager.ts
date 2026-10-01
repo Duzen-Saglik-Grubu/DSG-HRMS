@@ -4,6 +4,12 @@ import type { ApiSchemas } from '@/shared/api/schemas';
 /** Sunucunun actigi oturum. Yenileme jetonu burada DEGIL, `HttpOnly` cerezdedir. */
 export type SessionResponse = ApiSchemas['SessionResponse'];
 
+/**
+ * Parola degisiminin zorunlu olma nedeni (SYG-KMLK-046, 050): ilk giris veya parolanin suresi
+ * doldu.
+ */
+export type PasswordChangeReason = 'firstSignIn' | 'expired';
+
 /** Oturumdaki kullanici. */
 export interface SessionUser {
   firstName: string;
@@ -13,6 +19,12 @@ export interface SessionUser {
    * belirler. Gercek denetim her istekte sunucudadir.
    */
   permissions: readonly string[];
+
+  /**
+   * Oturum parola degisimi bekliyorsa nedeni. Bu durumda sunucu parola degistirme ve oturum
+   * uclari disindaki istekleri reddeder; istemci kullaniciyi parola ekranina goturur.
+   */
+  passwordChangeRequired: PasswordChangeReason | null;
 }
 
 /**
@@ -62,7 +74,8 @@ export type SessionMessage =
   | { type: 'signed-in' }
   | { type: 'ended'; reason?: SessionEndReason | undefined }
   | { type: 'interaction'; at: number }
-  | { type: 'signal'; at: number };
+  | { type: 'signal'; at: number }
+  | { type: 'password-changed' };
 
 export interface SessionManagerOptions {
   api: SessionApi;
@@ -307,6 +320,15 @@ export class SessionManager {
     };
   }
 
+  /**
+   * Parola bu oturumda degisti: sunucu kisiti hemen kaldirir, istemci de kaldirir. Ayni
+   * oturumu paylasan diger sekmelere bildirilir.
+   */
+  passwordChanged(): void {
+    this.liftPasswordChange();
+    this.post({ type: 'password-changed' });
+  }
+
   /** Giris ekranindaki oturum sonu iletisini temizler. */
   clearEndReason(): void {
     if (this.state.status === 'anonymous' && this.state.endReason) {
@@ -344,13 +366,15 @@ export class SessionManager {
       firstName: session.user.firstName,
       lastName: session.user.lastName,
       permissions: [...session.user.permissions].sort(),
+      passwordChangeRequired: session.passwordChangeRequired ?? null,
     };
     const current = this.state;
     if (
       current.status !== 'authenticated' ||
       current.user.firstName !== user.firstName ||
       current.user.lastName !== user.lastName ||
-      current.user.permissions.join() !== user.permissions.join()
+      current.user.permissions.join() !== user.permissions.join() ||
+      current.user.passwordChangeRequired !== user.passwordChangeRequired
     ) {
       this.setState({ status: 'authenticated', user });
     }
@@ -392,6 +416,19 @@ export class SessionManager {
       case 'signal':
         this.lastSignalAt = Math.max(this.lastSignalAt, message.at);
         break;
+      case 'password-changed':
+        this.liftPasswordChange();
+        break;
+    }
+  }
+
+  private liftPasswordChange(): void {
+    const current = this.state;
+    if (current.status === 'authenticated' && current.user.passwordChangeRequired !== null) {
+      this.setState({
+        status: 'authenticated',
+        user: { ...current.user, passwordChangeRequired: null },
+      });
     }
   }
 

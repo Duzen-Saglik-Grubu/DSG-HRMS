@@ -77,9 +77,17 @@ public static class AuthenticationRegistration
                         var sid = context.Principal?.FindFirstValue(SessionIdClaim);
                         var sessions = context.HttpContext.RequestServices.GetRequiredService<SessionService>();
 
-                        if (!Guid.TryParse(sid, out var sessionId) || !await sessions.IsSessionActiveAsync(sessionId, context.HttpContext.RequestAborted))
+                        var access = Guid.TryParse(sid, out var sessionId)
+                            ? await sessions.CheckSessionAsync(sessionId, context.HttpContext.RequestAborted)
+                            : SessionAccess.Closed;
+
+                        if (access == SessionAccess.Closed)
                         {
                             context.Fail("Oturum kapali.");
+                        }
+                        else if (access == SessionAccess.PasswordChangeRequired)
+                        {
+                            PasswordChangeGateFilter.MarkRequired(context.HttpContext);
                         }
                     },
                 };

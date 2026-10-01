@@ -381,6 +381,7 @@ export interface paths {
         /**
          * Parolayi degistirir. Mevcut parola istenir; degisiklikten sonra hesabin DIGER oturumlari
          *     kapanir, bu oturum acik kalir (SYG-KMLK-048).
+         * @description Parola degisimi bekleyen oturumda da kullanilabilir; degisince kisit kalkar (SYG-KMLK-046, 050).
          */
         post: {
             parameters: {
@@ -2124,6 +2125,8 @@ export interface components {
          * @enum {unknown}
          */
         ParameterSourceKind: "none" | "default" | "configuration" | "database";
+        /** @enum {unknown} */
+        PasswordChangeReasonKind: "firstSignIn" | "expired" | null;
         /** @description Parola kurallari. */
         PasswordRulesResponse: {
             /**
@@ -2207,6 +2210,7 @@ export interface components {
             idleTimeoutMinutes: number | string;
             /** @description Kullanici. */
             user: components["schemas"]["SessionUserResponse"];
+            passwordChangeRequired: null | components["schemas"]["PasswordChangeReasonKind"];
         };
         /** @description Oturumdaki kullanici. */
         SessionUserResponse: {

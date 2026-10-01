@@ -33,6 +33,7 @@ function sessionAt(serverNow: number, id = 'a', idleMinutes = 30): SessionRespon
     sessionExpiresAt: new Date(serverNow + 8 * 60 * MINUTE).toISOString(),
     idleTimeoutMinutes: idleMinutes,
     user: { firstName: 'Ahmet', lastName: 'Yılmaz', permissions: [] },
+    passwordChangeRequired: null,
   };
 }
 
@@ -75,7 +76,12 @@ describe('SessionManager — jeton', () => {
 
     expect(session.getState()).toEqual({
       status: 'authenticated',
-      user: { firstName: 'Ahmet', lastName: 'Yılmaz', permissions: [] },
+      user: {
+        firstName: 'Ahmet',
+        lastName: 'Yılmaz',
+        permissions: [],
+        passwordChangeRequired: null,
+      },
     });
     expect(await session.getAccessToken()).toBe(token(T0, 'ilk'));
     expect(api.refresh).not.toHaveBeenCalled();
@@ -340,6 +346,21 @@ describe('SessionManager — sekmeler arasi', () => {
 
     expect(b.getState()).toEqual({ status: 'anonymous', endReason: 'logged-out' });
     expect(api.signOut).toHaveBeenCalledOnce();
+  });
+
+  it('bir sekmede parola degisince diger sekmede de kisit kalkar (SYG-KMLK-046, 050)', () => {
+    const [left, right] = linkedChannels();
+    const a = manager({ channel: left });
+    const b = manager({ channel: right });
+    const required: SessionResponse = { ...sessionAt(T0), passwordChangeRequired: 'firstSignIn' };
+    a.start(required);
+    b.start(required);
+    expect(b.getState()).toMatchObject({ user: { passwordChangeRequired: 'firstSignIn' } });
+
+    a.passwordChanged();
+
+    expect(a.getState()).toMatchObject({ user: { passwordChangeRequired: null } });
+    expect(b.getState()).toMatchObject({ user: { passwordChangeRequired: null } });
   });
 
   it('bir sekmede giris yapilinca girisi bekleyen sekme oturumu geri getirir', async () => {

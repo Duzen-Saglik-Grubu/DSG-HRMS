@@ -64,11 +64,30 @@ public sealed class UserSession
     /// <summary>Istemcinin IP adresi.</summary>
     public string? IpAddress { get; private set; }
 
+    /// <summary>
+    /// Oturum parola degisimi bekliyorsa nedeni (SYG-KMLK-046, 050). Bu durumda yalnizca
+    /// parola degistirme ve oturum uclari kullanilabilir; parola degisince kalkar. Giriste
+    /// belirlenir: oturum surerken parolanin suresi dolsa da kullanicinin isi yarida kesilmez.
+    /// </summary>
+    public PasswordChangeReason? PasswordChangeRequired { get; private set; }
+
     /// <summary>Oturum acik mi.</summary>
     public bool IsOpen => EndedAt is null;
 
     /// <summary>Yeni oturum acar.</summary>
-    public static UserSession Start(long userAccountId, Guid securityStamp, string? ipAddress, DateTimeOffset now, TimeSpan maxLifetime)
+    /// <param name="userAccountId">Hesap.</param>
+    /// <param name="securityStamp">Hesabin guvenlik damgasi.</param>
+    /// <param name="ipAddress">Istemcinin IP adresi.</param>
+    /// <param name="now">Giris ani.</param>
+    /// <param name="maxLifetime">Toplam sure.</param>
+    /// <param name="passwordChangeRequired">Parola degisimi gerekiyorsa nedeni.</param>
+    public static UserSession Start(
+        long userAccountId,
+        Guid securityStamp,
+        string? ipAddress,
+        DateTimeOffset now,
+        TimeSpan maxLifetime,
+        PasswordChangeReason? passwordChangeRequired = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(userAccountId);
 
@@ -81,6 +100,7 @@ public sealed class UserSession
             ExpiresAt = now + maxLifetime,
             LastActivityAt = now,
             ActivityWindowStartedAt = now,
+            PasswordChangeRequired = passwordChangeRequired,
         };
     }
 
@@ -142,7 +162,8 @@ public sealed class UserSession
 
     /// <summary>
     /// Kullanici parolasini BU oturumda degistirdi: oturum hesabin yeni guvenlik damgasini
-    /// benimser ve acik kalir; damgasi eski kalan diger oturumlar kapanir (SYG-KMLK-048).
+    /// benimser ve acik kalir; damgasi eski kalan diger oturumlar kapanir (SYG-KMLK-048). Bekleyen
+    /// parola degisimi zorunlulugu da kalkar (SYG-KMLK-046, 050).
     /// </summary>
     public void AdoptSecurityStamp(Guid securityStamp)
     {
@@ -152,6 +173,7 @@ public sealed class UserSession
         }
 
         SecurityStamp = securityStamp;
+        PasswordChangeRequired = null;
     }
 
     /// <summary>Oturumu kapatir. Zaten kapaliysa ilk neden korunur.</summary>
