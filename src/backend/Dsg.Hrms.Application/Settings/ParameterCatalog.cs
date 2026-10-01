@@ -145,6 +145,13 @@ public static partial class ParameterCatalog
     public static readonly ParameterDefinition RequirePasswordChangeOnFirstLogin = Boolean(
         "PRM-KML-20", "RequirePasswordChangeOnFirstLogin", "Ilk giriste parola degistirme zorunlulugu", false);
 
+    /// <summary>
+    /// Periyodik parola degisiminde parolanin en uzun omru (gun). Yalnizca PRM-KML-07 acikken
+    /// uygulanir. Y4 taslak katalogunda yoktu; IK karariyla eklendi (01.10.2026, SYG-KMLK AN-24).
+    /// </summary>
+    public static readonly ParameterDefinition PasswordMaxAgeDays = Integer(
+        "PRM-KML-21", "PasswordMaxAgeDays", "Periyodik parola degisim suresi (gun)", 90, 30, 365);
+
     // ------------------------------------------------------------------ hesap
 
     /// <summary>IK'nin personele parola olusturma baglantisi gonderebilmesi.</summary>
@@ -184,7 +191,7 @@ public static partial class ParameterCatalog
             RequireComplexPassword, RequirePeriodicPasswordChange, TwoFactorEnabled, VerificationCodeLength,
             VerificationCodeLifetimeMinutes, AccessTokenLifetimeMinutes, SessionMaxHours, IdleTimeoutMinutes,
             SingleActiveSession, TwoFactorImpactWarning, MaxVerificationAttempts, CodeSendLimit,
-            RegistrationLimitPerNationalId, RegistrationLimitPerIp, RequirePasswordChangeOnFirstLogin,
+            RegistrationLimitPerNationalId, RegistrationLimitPerIp, RequirePasswordChangeOnFirstLogin, PasswordMaxAgeDays,
             HrInviteEnabled, AutoDeactivateOnEmploymentEnd, HrCanUnlockAccounts, InviteLinkLifetimeHours,
             SupportContact, TransactionalMessagesBypassExemption,
         }.OrderBy(p => p.Key, StringComparer.Ordinal),

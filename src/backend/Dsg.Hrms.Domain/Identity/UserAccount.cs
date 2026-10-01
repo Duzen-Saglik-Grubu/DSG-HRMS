@@ -60,6 +60,16 @@ public sealed class UserAccount : Entity, IAuditable
     /// </summary>
     public DateTimeOffset? LockedUntil { get; private set; }
 
+    /// <summary>Ilk basarili girisin ani (SYG-KMLK-050). Hic giris yapilmadiysa <c>null</c>.</summary>
+    public DateTimeOffset? FirstSignedInAt { get; private set; }
+
+    /// <summary>
+    /// Ilk giriste parola degisimi bekleniyor (SYG-KMLK-050). Ilk giris, parametre acikken
+    /// yapildiysa isaretlenir; parola degisince kalkar. Kullanici degistirmeden cikip yeniden
+    /// girerse zorunluluk surer.
+    /// </summary>
+    public bool FirstPasswordChangePending { get; private set; }
+
     /// <inheritdoc />
     public DateTimeOffset CreatedAt { get; set; }
 
@@ -97,7 +107,51 @@ public sealed class UserAccount : Entity, IAuditable
 
         PasswordHash = passwordHash;
         PasswordChangedAt = now;
+        FirstPasswordChangePending = false;
         SecurityStamp = Guid.NewGuid();
+    }
+
+    /// <summary>
+    /// Basarili girisi kaydeder. Yalnizca ILK giris iz birakir (SYG-KMLK-050): her giriste
+    /// hesap satiri degisseydi denetim izi her giriste buyurdu.
+    /// </summary>
+    /// <param name="now">Giris ani.</param>
+    /// <param name="requirePasswordChange">Ilk giriste parola degisimi zorunlu mu (PRM-KML-20).</param>
+    public void RecordSignIn(DateTimeOffset now, bool requirePasswordChange)
+    {
+        if (FirstSignedInAt is not null)
+        {
+            return;
+        }
+
+        FirstSignedInAt = now;
+        FirstPasswordChangePending = requirePasswordChange;
+    }
+
+    /// <summary>
+    /// Bu giriste parola degisimi gerekiyor mu; gerekiyorsa nedeni (SYG-KMLK-046, 050).
+    /// Girisi kaydettikten (<see cref="RecordSignIn"/>) SONRA cagrilir.
+    /// </summary>
+    /// <param name="firstSignInRule">Ilk giriste degisim kurali acik mi (PRM-KML-20).</param>
+    /// <param name="maxPasswordAge">Periyodik degisim aciksa parolanin en uzun omru (PRM-KML-07, 21); kapaliysa <c>null</c>.</param>
+    /// <param name="now">Simdiki an.</param>
+    /// <remarks>
+    /// Parametre sonradan kapatilirsa bekleyen ilk giris degisimi de istenmez. Parolanin
+    /// belirlenme ani bilinmiyorsa suresi dolmus sayilir.
+    /// </remarks>
+    public PasswordChangeReason? RequiredPasswordChange(bool firstSignInRule, TimeSpan? maxPasswordAge, DateTimeOffset now)
+    {
+        if (firstSignInRule && FirstPasswordChangePending)
+        {
+            return PasswordChangeReason.FirstSignIn;
+        }
+
+        if (maxPasswordAge is { } maxAge && (PasswordChangedAt is null || now - PasswordChangedAt.Value >= maxAge))
+        {
+            return PasswordChangeReason.Expired;
+        }
+
+        return null;
     }
 
     /// <summary>Kilitlenmeyi kaydeder (SYG-KMLK-058).</summary>
@@ -243,6 +297,16 @@ public enum AccountStatus
 
     /// <summary>Giris yapilamaz (SYG-KMLK-055).</summary>
     Passive = 2,
+}
+
+/// <summary>Parola degisiminin zorunlu olma nedeni (SYG-KMLK-046, 050).</summary>
+public enum PasswordChangeReason
+{
+    /// <summary>Ilk giris (PRM-KML-20).</summary>
+    FirstSignIn = 1,
+
+    /// <summary>Parolanin suresi doldu (PRM-KML-07, PRM-KML-21).</summary>
+    Expired = 2,
 }
 
 /// <summary>Hesap durumunun son degisme nedeni.</summary>

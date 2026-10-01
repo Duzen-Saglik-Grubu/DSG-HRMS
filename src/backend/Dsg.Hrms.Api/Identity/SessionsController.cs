@@ -127,6 +127,7 @@ public sealed class SessionsController : ControllerBase
     /// <response code="429">Cok sik gonderildi.</response>
     [HttpPost("activity")]
     [Authorize]
+    [AllowDuringPasswordChange]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
@@ -165,7 +166,13 @@ public sealed class SessionsController : ControllerBase
             tokens.AccessTokenExpiresAt,
             tokens.SessionExpiresAt,
             (int)tokens.IdleTimeout.TotalMinutes,
-            new SessionUserResponse(tokens.FirstName, tokens.LastName, tokens.Permissions));
+            new SessionUserResponse(tokens.FirstName, tokens.LastName, tokens.Permissions),
+            tokens.PasswordChangeRequired switch
+            {
+                PasswordChangeReason.FirstSignIn => PasswordChangeReasonKind.FirstSignIn,
+                PasswordChangeReason.Expired => PasswordChangeReasonKind.Expired,
+                _ => null,
+            });
     }
 
     private void ClearRefreshCookie() =>
@@ -222,15 +229,34 @@ public enum SignInStatus
 /// <param name="SessionExpiresAt">Toplam oturum suresi siniri.</param>
 /// <param name="IdleTimeoutMinutes">Hareketsizlik suresi (dakika).</param>
 /// <param name="User">Kullanici.</param>
+/// <param name="PasswordChangeRequired">
+/// Oturum parola degisimi bekliyorsa nedeni; beklemiyorsa <c>null</c>. Bu durumda yalnizca parola
+/// degistirme ve oturum uclari kullanilabilir, digerleri <c>403 password-change-required</c> doner
+/// (SYG-KMLK-046, 050).
+/// </param>
 public sealed record SessionResponse(
     string AccessToken,
     DateTimeOffset AccessTokenExpiresAt,
     DateTimeOffset SessionExpiresAt,
     int IdleTimeoutMinutes,
-    SessionUserResponse User)
+    SessionUserResponse User,
+    PasswordChangeReasonKind? PasswordChangeRequired)
 {
     /// <inheritdoc />
     public override string ToString() => nameof(SessionResponse);
+}
+
+/// <summary>Parola degisiminin zorunlu olma nedeni (SYG-KMLK-046, 050).</summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<PasswordChangeReasonKind>))]
+public enum PasswordChangeReasonKind
+{
+    /// <summary>Ilk giris (PRM-KML-20).</summary>
+    [System.Text.Json.Serialization.JsonStringEnumMemberName("firstSignIn")]
+    FirstSignIn = 1,
+
+    /// <summary>Parolanin suresi doldu (PRM-KML-07, PRM-KML-21).</summary>
+    [System.Text.Json.Serialization.JsonStringEnumMemberName("expired")]
+    Expired = 2,
 }
 
 /// <summary>Oturumdaki kullanici.</summary>

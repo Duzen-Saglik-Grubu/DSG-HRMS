@@ -41,7 +41,12 @@ try
     builder.Services.TryAddSingleton(TimeProvider.System);
 
     // Denetleyiciler ve istek dogrulamasi (ADR-0010: FluentValidation tek dogruluk kaynagi).
-    builder.Services.AddControllers(options => options.Filters.Add<ValidateRequestsFilter>());
+    builder.Services.AddControllers(options =>
+    {
+        // Parola degisimi bekleyen oturum yalnizca izinli uclari kullanir (SYG-KMLK-046, 050).
+        options.Filters.Add<PasswordChangeGateFilter>();
+        options.Filters.Add<ValidateRequestsFilter>();
+    });
     builder.Services.AddValidatorsFromAssemblyContaining<Program>();
     builder.Services.Configure<RegistrationTimingOptions>(builder.Configuration.GetSection(RegistrationTimingOptions.SectionName));
     builder.Services.AddHrmsReverseProxy(builder.Configuration);

@@ -83,6 +83,19 @@ public sealed class SessionDomainTests
     }
 
     [Fact]
+    public void Changing_the_password_in_the_session_lifts_the_password_change_requirement()
+    {
+        // SYG-KMLK-046, 050: kisit oturumda tutulur ve parola bu oturumda degisince kalkar.
+        var session = UserSession.Start(1, Stamp, null, Now, TimeSpan.FromHours(8), PasswordChangeReason.Expired);
+        session.PasswordChangeRequired.ShouldBe(PasswordChangeReason.Expired);
+
+        session.AdoptSecurityStamp(Guid.NewGuid());
+
+        session.PasswordChangeRequired.ShouldBeNull();
+        NewSession().PasswordChangeRequired.ShouldBeNull();
+    }
+
+    [Fact]
     public void Session_requires_an_account()
     {
         Should.Throw<ArgumentOutOfRangeException>(() => UserSession.Start(0, Stamp, null, Now, TimeSpan.FromHours(8)));

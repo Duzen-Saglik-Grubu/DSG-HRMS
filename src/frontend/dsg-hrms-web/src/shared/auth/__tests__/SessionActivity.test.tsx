@@ -17,6 +17,7 @@ function sessionResponse(): SessionResponse {
     sessionExpiresAt: new Date(T0 + 8 * 60 * MINUTE).toISOString(),
     idleTimeoutMinutes: 30,
     user: { firstName: 'Ahmet', lastName: 'Yılmaz', permissions: [] },
+    passwordChangeRequired: null,
   };
 }
 

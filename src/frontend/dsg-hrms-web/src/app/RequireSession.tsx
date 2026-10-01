@@ -15,6 +15,9 @@ interface RequireSessionProps {
  * kullanici kaldigi yere doner. Kullanici kendisi cikis yaptiysa adres tasinmaz: cikistan
  * sonraki girisin ayni sayfaya donmesi beklenmez.
  *
+ * Oturum parola degisimi bekliyorsa (SYG-KMLK-046, 050) kullanici parola ekranina gider; diger
+ * sayfalari sunucu zaten reddeder.
+ *
  * Bu bir KOLAYLIKTIR, guvenlik onlemi degildir: veriyi koruyan, her istekte jetonu ve oturumu
  * denetleyen sunucudur.
  */
@@ -35,6 +38,10 @@ export function RequireSession({ children }: RequireSessionProps) {
           }).toString()}`;
 
     return <Navigate to={target} replace />;
+  }
+
+  if (state.user.passwordChangeRequired !== null && location.pathname !== routes.changePassword) {
+    return <Navigate to={routes.changePassword} replace />;
   }
 
   return children;

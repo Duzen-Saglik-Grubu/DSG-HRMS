@@ -2,7 +2,9 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '@/shared/api/problemDetails';
+import { session } from '@/shared/auth/session';
 import { renderWithProviders } from '@/test/render';
+import { setSession } from '@/test/session';
 import { passwordApi } from '../../api/passwordApi';
 import { registrationApi } from '../../api/registrationApi';
 import { ChangePasswordPage } from '../ChangePasswordPage';
@@ -30,8 +32,9 @@ function fieldError(field: string, message: string) {
 }
 
 describe('ChangePasswordPage', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.restoreAllMocks();
+    await setSession({ status: 'authenticated' });
     vi.spyOn(registrationApi, 'publicSettings').mockResolvedValue({
       supportContact: 'Bilgi İşlem',
       passwordRules: { minLength: 6, maxLength: 128, requireComplexity: false },
@@ -55,6 +58,31 @@ describe('ChangePasswordPage', () => {
       newPassword: 'Mavi deniz 42 kez',
     });
     expect(screen.getByLabelText('Mevcut parola')).toHaveValue('');
+  });
+
+  it('zorunlu degisimde nedeni gosterir; degisince kisit kalkar (SYG-KMLK-046, 050)', async () => {
+    vi.spyOn(passwordApi, 'change').mockResolvedValue(undefined);
+    await setSession({ status: 'authenticated', passwordChangeRequired: 'firstSignIn' });
+    const user = userEvent.setup();
+    renderWithProviders(<ChangePasswordPage />);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'İlk girişinizde parolanızı değiştirmeniz gerekiyor',
+    );
+
+    await fill(user);
+
+    expect(await screen.findByRole('status')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    const state = session.getState();
+    expect(state.status === 'authenticated' && state.user.passwordChangeRequired).toBeNull();
+  });
+
+  it('suresi dolan parolada nedeni soyler', async () => {
+    await setSession({ status: 'authenticated', passwordChangeRequired: 'expired' });
+    renderWithProviders(<ChangePasswordPage />);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Parolanızın kullanım süresi doldu');
   });
 
   it('mevcut parola hataliysa alanin altinda soyler', async () => {

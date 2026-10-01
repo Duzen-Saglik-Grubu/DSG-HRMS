@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient } from '@tanstack/react-query';
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router';
@@ -100,6 +100,16 @@ describe('RequireSession', () => {
     await user.click(await screen.findByRole('menuitem', { name: 'Parolamı değiştir' }));
 
     expect(await screen.findByText('Parola sayfası')).toBeInTheDocument();
+  });
+
+  it('parola degisimi bekleyen oturum her sayfadan parola ekranina gider (SYG-KMLK-046, 050)', async () => {
+    await setSession({ status: 'authenticated', passwordChangeRequired: 'expired' });
+    renderAt('/accounts');
+
+    expect(await screen.findByText('Parola sayfası')).toBeInTheDocument();
+    expect(screen.queryByText('Hesaplar sayfası')).not.toBeInTheDocument();
+
+    act(() => session.passwordChanged());
   });
 
   it('hesap islemleri baglantisi yalnizca izni olana gorunur', async () => {

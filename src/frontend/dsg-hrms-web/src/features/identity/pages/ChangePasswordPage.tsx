@@ -20,6 +20,7 @@ import { z } from 'zod';
 import { queryKeys } from '@/shared/api/queryKeys';
 import { ApiError } from '@/shared/api/problemDetails';
 import { ErrorState } from '@/shared/components/ErrorState';
+import { session, useSession } from '@/shared/auth/session';
 import { PageHeader } from '@/shared/components/PageHeader';
 import { passwordApi } from '../api/passwordApi';
 import { registrationApi } from '../api/registrationApi';
@@ -34,12 +35,17 @@ const FIELDS = ['currentPassword', 'newPassword'] as const;
  * Mevcut parola istenir: acik birakilmis bir oturumu bulan kisi parolayi degistirip hesabi ele
  * geciremez. Yanlis mevcut parola giris kilidine sayilir. Degisiklikten sonra bu oturum acik
  * kalir; diger cihazlardaki oturumlar kapanir ve kullaniciya bu soylenir.
+ *
+ * Oturum parola degisimi bekliyorsa (SYG-KMLK-046, 050) nedeni gosterilir; degisince kisit
+ * kalkar ve uygulamanin geri kalani kullanilabilir.
  */
 export function ChangePasswordPage() {
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [changed, setChanged] = useState(false);
   const successRef = useRef<HTMLDivElement>(null);
+  const state = useSession();
+  const required = state.status === 'authenticated' ? state.user.passwordChangeRequired : null;
 
   const settings = useQuery({
     queryKey: queryKeys.identity.publicSettings,
@@ -91,6 +97,7 @@ export function ChangePasswordPage() {
     onSuccess: () => {
       reset();
       setChanged(true);
+      session.passwordChanged();
     },
   });
 
@@ -141,6 +148,14 @@ export function ChangePasswordPage() {
           noValidate
           onSubmit={(event) => void handleSubmit((form) => change.mutate(form))(event)}
         >
+          {required ? (
+            <Alert severity="warning" role="alert">
+              {required === 'firstSignIn'
+                ? t('identity.change.required.firstSignIn')
+                : t('identity.change.required.expired')}
+            </Alert>
+          ) : null}
+
           {changed ? (
             <Alert severity="success" role="status" ref={successRef} tabIndex={-1}>
               {t('identity.change.done')}

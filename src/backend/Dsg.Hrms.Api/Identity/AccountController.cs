@@ -31,8 +31,10 @@ public sealed class AccountController : ControllerBase
     /// <response code="204">Parola degisti.</response>
     /// <response code="400">Mevcut parola hatali (<c>errors.currentPassword</c>) veya yeni parola kurallara uymuyor (<c>errors.newPassword</c>).</response>
     /// <response code="401">Oturum kapali.</response>
+    /// <remarks>Parola degisimi bekleyen oturumda da kullanilabilir; degisince kisit kalkar (SYG-KMLK-046, 050).</remarks>
     /// <response code="429">Cok fazla hatali deneme; e-posta gecici olarak kilitli.</response>
     [HttpPost("password")]
+    [AllowDuringPasswordChange]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]

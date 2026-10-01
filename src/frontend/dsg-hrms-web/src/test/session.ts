@@ -2,13 +2,18 @@ import { vi } from 'vitest';
 import { ApiError } from '@/shared/api/problemDetails';
 import { session } from '@/shared/auth/session';
 import { sessionApi } from '@/shared/auth/sessionApi';
-import type { SessionEndReason, SessionResponse } from '@/shared/auth/sessionManager';
+import type {
+  PasswordChangeReason,
+  SessionEndReason,
+  SessionResponse,
+} from '@/shared/auth/sessionManager';
 
 /** Sahte oturum yaniti. Jeton imzasizdir ve `iat` tasimaz (saat farki sifir sayilir). */
 export function fakeSession(
   firstName = 'Ahmet',
   lastName = 'Yılmaz',
   permissions: string[] = [],
+  passwordChangeRequired: PasswordChangeReason | null = null,
 ): SessionResponse {
   const now = Date.now();
 
@@ -18,6 +23,7 @@ export function fakeSession(
     sessionExpiresAt: new Date(now + 8 * 60 * 60_000).toISOString(),
     idleTimeoutMinutes: 30,
     user: { firstName, lastName, permissions },
+    passwordChangeRequired,
   };
 }
 
@@ -38,7 +44,11 @@ export function sessionEnded(reason: SessionEndReason | 'invalid'): ApiError {
 export async function setSession(
   target:
     | { status: 'anonymous'; endReason?: SessionEndReason }
-    | { status: 'authenticated'; permissions?: string[] },
+    | {
+        status: 'authenticated';
+        permissions?: string[];
+        passwordChangeRequired?: PasswordChangeReason;
+      },
 ): Promise<void> {
   vi.spyOn(sessionApi, 'signOut').mockResolvedValue(undefined);
   vi.spyOn(sessionApi, 'activity').mockResolvedValue(undefined);
@@ -47,7 +57,9 @@ export async function setSession(
   session.clearEndReason();
 
   if (target.status === 'authenticated') {
-    session.start(fakeSession('Ahmet', 'Yılmaz', target.permissions));
+    session.start(
+      fakeSession('Ahmet', 'Yılmaz', target.permissions, target.passwordChangeRequired ?? null),
+    );
     return;
   }
 

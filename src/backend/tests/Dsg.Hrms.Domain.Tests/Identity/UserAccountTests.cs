@@ -3,7 +3,7 @@ using Dsg.Hrms.Domain.Identity;
 namespace Dsg.Hrms.Domain.Tests.Identity;
 
 /// <summary>
-/// Hesap yasam dongusu kurallari (SYG-KMLK-054, 056, 057).
+/// Hesap yasam dongusu ve zorunlu parola degisimi kurallari (SYG-KMLK-046, 050, 054, 056, 057).
 /// </summary>
 public sealed class UserAccountTests
 {
@@ -185,5 +185,74 @@ public sealed class UserAccountTests
 
         account.ReactivateForNewEmployment().ShouldBeTrue();
         account.StatusNote.ShouldBeNull();
+    }
+
+    // ------------------------------------------------------------------ zorunlu parola degisimi (SYG-KMLK-046, 050)
+
+    private static readonly DateTimeOffset Registered = new(2026, 10, 1, 9, 0, 0, TimeSpan.Zero);
+
+    [Fact]
+    public void First_sign_in_with_the_rule_requires_a_change_until_the_password_changes()
+    {
+        var account = UserAccount.Register(1, "hash", Registered);
+
+        account.RecordSignIn(Registered.AddMinutes(5), requirePasswordChange: true);
+        account.FirstSignedInAt.ShouldBe(Registered.AddMinutes(5));
+        account.RequiredPasswordChange(true, null, Registered.AddMinutes(5)).ShouldBe(PasswordChangeReason.FirstSignIn);
+
+        // Sonraki giris ilk giris degildir; degistirilmeyen parola zorunlulugu surdurur.
+        account.RecordSignIn(Registered.AddDays(1), requirePasswordChange: true);
+        account.FirstSignedInAt.ShouldBe(Registered.AddMinutes(5));
+        account.RequiredPasswordChange(true, null, Registered.AddDays(1)).ShouldBe(PasswordChangeReason.FirstSignIn);
+
+        account.SetPassword("new-hash", Registered.AddDays(1));
+        account.FirstPasswordChangePending.ShouldBeFalse();
+        account.RequiredPasswordChange(true, null, Registered.AddDays(1)).ShouldBeNull();
+    }
+
+    [Fact]
+    public void First_sign_in_without_the_rule_is_recorded_and_never_requires_a_change_later()
+    {
+        var account = UserAccount.Register(1, "hash", Registered);
+
+        account.RecordSignIn(Registered, requirePasswordChange: false);
+        account.RecordSignIn(Registered.AddDays(1), requirePasswordChange: true);
+
+        account.RequiredPasswordChange(true, null, Registered.AddDays(1)).ShouldBeNull();
+    }
+
+    [Fact]
+    public void Disabled_rule_ignores_a_pending_first_sign_in_change()
+    {
+        var account = UserAccount.Register(1, "hash", Registered);
+        account.RecordSignIn(Registered, requirePasswordChange: true);
+
+        account.RequiredPasswordChange(false, null, Registered).ShouldBeNull();
+    }
+
+    [Fact]
+    public void Password_expires_when_it_reaches_the_maximum_age()
+    {
+        var account = UserAccount.Register(1, "hash", Registered);
+        var maxAge = TimeSpan.FromDays(90);
+
+        account.RequiredPasswordChange(false, maxAge, Registered.AddDays(90).AddTicks(-1)).ShouldBeNull();
+        account.RequiredPasswordChange(false, maxAge, Registered.AddDays(90)).ShouldBe(PasswordChangeReason.Expired);
+        account.RequiredPasswordChange(false, null, Registered.AddDays(400)).ShouldBeNull();
+    }
+
+    [Fact]
+    public void Password_with_an_unknown_age_counts_as_expired()
+    {
+        UserAccount.Create(1).RequiredPasswordChange(false, TimeSpan.FromDays(90), Registered).ShouldBe(PasswordChangeReason.Expired);
+    }
+
+    [Fact]
+    public void First_sign_in_reason_takes_precedence_over_expiry()
+    {
+        var account = UserAccount.Register(1, "hash", Registered);
+        account.RecordSignIn(Registered.AddDays(100), requirePasswordChange: true);
+
+        account.RequiredPasswordChange(true, TimeSpan.FromDays(90), Registered.AddDays(100)).ShouldBe(PasswordChangeReason.FirstSignIn);
     }
 }

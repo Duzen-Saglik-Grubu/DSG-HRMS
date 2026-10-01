@@ -71,6 +71,7 @@ public interface IAccessTokenIssuer
 /// <param name="FirstName">Kullanicinin adi.</param>
 /// <param name="LastName">Kullanicinin soyadi.</param>
 /// <param name="Permissions">Kullanicinin izinleri; istemci yalnizca GOSTERIM icin kullanir (ADR-0007 §3).</param>
+/// <param name="PasswordChangeRequired">Oturum parola degisimi bekliyorsa nedeni (SYG-KMLK-046, 050).</param>
 public sealed record SessionTokens(
     string AccessToken,
     DateTimeOffset AccessTokenExpiresAt,
@@ -79,7 +80,8 @@ public sealed record SessionTokens(
     TimeSpan IdleTimeout,
     string FirstName,
     string LastName,
-    IReadOnlyList<string> Permissions)
+    IReadOnlyList<string> Permissions,
+    PasswordChangeReason? PasswordChangeRequired = null)
 {
     /// <inheritdoc />
     public override string ToString() => nameof(SessionTokens);
@@ -174,6 +176,38 @@ public sealed class SessionEndedException(SessionEndReason? reason)
         SessionEndReason.PasswordChanged => "Parolanız değiştirildiği için oturumunuz kapandı. Yeni parolanızla giriş yapın.",
         _ => "Oturumunuz sona erdi. Lütfen yeniden giriş yapın.",
     };
+}
+
+/// <summary>Her istekte yapilan oturum denetiminin sonucu.</summary>
+public enum SessionAccess
+{
+    /// <summary>Oturum kapali veya gecersiz.</summary>
+    Closed = 0,
+
+    /// <summary>Oturum acik.</summary>
+    Open = 1,
+
+    /// <summary>
+    /// Oturum acik ama parola degisimi bekliyor: yalnizca parola degistirme ve oturum uclari
+    /// kullanilabilir (SYG-KMLK-046, 050).
+    /// </summary>
+    PasswordChangeRequired = 2,
+}
+
+/// <summary>
+/// Oturum parola degisimi bekliyor; istenen uc bu durumda kullanilamaz (SYG-KMLK-046, 050).
+/// </summary>
+public sealed class PasswordChangeRequiredException()
+    : HrmsException("Devam etmek için önce parolanızı değiştirmeniz gerekiyor.")
+{
+    /// <inheritdoc />
+    public override int StatusCode => 403;
+
+    /// <inheritdoc />
+    public override string ErrorType => "password-change-required";
+
+    /// <inheritdoc />
+    public override string Title => "Parola değişikliği gerekli";
 }
 
 /// <summary>Oturum icinde parola degisikliginin sonucu (SYG-KMLK-048).</summary>
