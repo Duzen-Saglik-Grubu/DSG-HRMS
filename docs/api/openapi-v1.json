@@ -2656,7 +2656,7 @@
                 "type": "null"
               },
               {
-                "description": "Oturum parola degisimi bekliyorsa nedeni; beklemiyorsa `null`. Bu durumda yalnizca parola\r\ndegistirme ve oturum uclari kullanilabilir, digerleri `403 password-change-required` doner\r\n(SYG-KMLK-046, 050).",
+                "description": "Parola degisimi bekleniyorsa nedeni, beklenmiyorsa `null`; bu durumda diger korumali uclar `403 password-change-required` doner (SYG-KMLK-046, 050).",
                 "$ref": "#/components/schemas/PasswordChangeReasonKind"
               }
             ]

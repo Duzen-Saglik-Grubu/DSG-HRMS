@@ -229,11 +229,7 @@ public enum SignInStatus
 /// <param name="SessionExpiresAt">Toplam oturum suresi siniri.</param>
 /// <param name="IdleTimeoutMinutes">Hareketsizlik suresi (dakika).</param>
 /// <param name="User">Kullanici.</param>
-/// <param name="PasswordChangeRequired">
-/// Oturum parola degisimi bekliyorsa nedeni; beklemiyorsa <c>null</c>. Bu durumda yalnizca parola
-/// degistirme ve oturum uclari kullanilabilir, digerleri <c>403 password-change-required</c> doner
-/// (SYG-KMLK-046, 050).
-/// </param>
+/// <param name="PasswordChangeRequired">Parola degisimi bekleniyorsa nedeni, beklenmiyorsa <c>null</c>; bu durumda diger korumali uclar <c>403 password-change-required</c> doner (SYG-KMLK-046, 050).</param>
 public sealed record SessionResponse(
     string AccessToken,
     DateTimeOffset AccessTokenExpiresAt,
