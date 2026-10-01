@@ -18,8 +18,19 @@ export const parametersApi = {
     return response.data.items;
   },
 
-  update: async (key: string, value: string): Promise<void> => {
-    await apiClient.put(`/system/parameters/${encodeURIComponent(key)}`, { value });
+  update: async (key: string, value: string, confirmed = false): Promise<void> => {
+    await apiClient.put(`/system/parameters/${encodeURIComponent(key)}`, { value, confirmed });
+  },
+
+  /** 2FA acilirsa giris yapamayacak aktif hesap sahiplerinin sayisi (SYG-KMLK-035). */
+  twoFactorImpact: async (): Promise<{ affectedCount: number; confirmationRequired: boolean }> => {
+    const response = await apiClient.get<ApiSchemas['TwoFactorImpactResponse']>(
+      '/system/parameters/two-factor-impact',
+    );
+    return {
+      affectedCount: Number(response.data.affectedCount),
+      confirmationRequired: response.data.confirmationRequired,
+    };
   },
 
   uploadLogo: async (file: File): Promise<void> => {

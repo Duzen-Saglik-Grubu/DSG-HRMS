@@ -317,6 +317,13 @@
         "PRM-HSP-04": "Parola oluşturma bağlantısının geçerlilik süresi (saat)",
         "PRM-GRN-04": "Destek iletişim bilgisi (üyelik ve giriş ekranları)",
         "PRM-BLD-03": "Bildirim istisnasının işlemsel iletileri kapsamaması"
+      },
+      "twoFactor": {
+        "title": "İki adımlı doğrulamayı aç",
+        "text_zero": "Tüm aktif hesap sahiplerinin en az bir doğrulama kanalı var; iki adımlı doğrulama açıldığında herkes giriş yapabilir. Açmak istiyor musunuz?",
+        "text_one": "{{count}} aktif hesap sahibinin hiçbir doğrulama kanalı (e-posta veya cep telefonu) yok. İki adımlı doğrulama açılırsa bu kişi giriş yapamaz. Yine de açmak istiyor musunuz?",
+        "text_other": "{{count}} aktif hesap sahibinin hiçbir doğrulama kanalı (e-posta veya cep telefonu) yok. İki adımlı doğrulama açılırsa bu kişiler giriş yapamaz. Yine de açmak istiyor musunuz?",
+        "confirm": "Aç"
       }
     },
     "logo": {

@@ -345,7 +345,47 @@
             }
           },
           "422": {
-            "description": "Deger turune veya araligina uymuyor; hicbir sey kaydedilmedi.",
+            "description": "Deger turune veya araligina uymuyor ya da 2FA etki onayi verilmedi; hicbir sey kaydedilmedi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system/parameters/two-factor-impact": {
+      "get": {
+        "tags": [
+          "SystemParameters"
+        ],
+        "summary": "Iki adimli dogrulama acilirsa giris yapamayacak aktif hesap sahiplerinin sayisi\n(SYG-KMLK-035). Kisilerin kendisi donmez, yalnizca sayi.",
+        "responses": {
+          "200": {
+            "description": "Etki.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorImpactResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`system.parameter.view`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2861,6 +2901,29 @@
         },
         "description": "Bekleyen iki adimli giris."
       },
+      "TwoFactorImpactResponse": {
+        "required": [
+          "affectedCount",
+          "confirmationRequired"
+        ],
+        "type": "object",
+        "properties": {
+          "affectedCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Hicbir dogrulama kanali olmayan aktif hesap sahibi sayisi.",
+            "format": "int32"
+          },
+          "confirmationRequired": {
+            "type": "boolean",
+            "description": "Acmak icin onay gerekiyor mu (PRM-KML-15)."
+          }
+        },
+        "description": "2FA'nin acilmasinin etkisi (SYG-KMLK-035)."
+      },
       "TwoFactorVerificationResponse": {
         "required": [
           "result",
@@ -2895,6 +2958,11 @@
           "value": {
             "type": "string",
             "description": "Yeni deger; turune gore dogrulanir."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "description": "Etkisi gosterilip onaylandi mi; yalnizca 2FA'yi acarken gerekir (SYG-KMLK-035).",
+            "default": false
           }
         },
         "description": "Parametre degisikligi."

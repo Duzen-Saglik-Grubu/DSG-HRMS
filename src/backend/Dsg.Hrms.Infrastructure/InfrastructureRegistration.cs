@@ -125,6 +125,8 @@ public static class InfrastructureRegistration
         // imzalama ve dogrulama ayni kimlik dogrulama yapilandirmasini kullanir.
         services.AddScoped<ISessionStore, SessionStore>();
         services.AddScoped<SessionService>();
+        services.AddScoped<ITwoFactorImpactStore, TwoFactorImpactStore>();
+        services.AddScoped<TwoFactorImpactService>();
 
         // Eylem yetkisi (ADR-0007 §1, SYG-KMLK-074). Ilk sistem yoneticileri yapilandirmadan
         // okunur ve ACILISTA dogrulanir: gecersiz bir adres ilk giriste degil simdi fark edilir.

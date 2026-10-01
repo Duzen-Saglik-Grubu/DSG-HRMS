@@ -294,7 +294,7 @@ export interface paths {
                         "application/json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Deger turune veya araligina uymuyor; hicbir sey kaydedilmedi. */
+                /** @description Deger turune veya araligina uymuyor ya da 2FA etki onayi verilmedi; hicbir sey kaydedilmedi. */
                 422: {
                     headers: {
                         [name: string]: unknown;
@@ -305,6 +305,63 @@ export interface paths {
                 };
             };
         };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/parameters/two-factor-impact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Iki adimli dogrulama acilirsa giris yapamayacak aktif hesap sahiplerinin sayisi
+         *     (SYG-KMLK-035). Kisilerin kendisi donmez, yalnizca sayi.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Etki. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TwoFactorImpactResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`system.parameter.view`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -2248,6 +2305,16 @@ export interface components {
              */
             expiresAt: string;
         };
+        /** @description 2FA'nin acilmasinin etkisi (SYG-KMLK-035). */
+        TwoFactorImpactResponse: {
+            /**
+             * Format: int32
+             * @description Hicbir dogrulama kanali olmayan aktif hesap sahibi sayisi.
+             */
+            affectedCount: number | string;
+            /** @description Acmak icin onay gerekiyor mu (PRM-KML-15). */
+            confirmationRequired: boolean;
+        };
         /** @description Iki adimli dogrulama sonucu. */
         TwoFactorVerificationResponse: {
             /** @description Sonuc. */
@@ -2258,6 +2325,11 @@ export interface components {
         UpdateParameterRequest: {
             /** @description Yeni deger; turune gore dogrulanir. */
             value: string;
+            /**
+             * @description Etkisi gosterilip onaylandi mi; yalnizca 2FA'yi acarken gerekir (SYG-KMLK-035).
+             * @default false
+             */
+            confirmed: boolean;
         };
         /**
          * @description Dogrulama kanali.

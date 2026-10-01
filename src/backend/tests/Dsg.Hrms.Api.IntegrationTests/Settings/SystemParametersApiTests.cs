@@ -159,6 +159,50 @@ public sealed class SystemParametersApiTests : IClassFixture<RegistrationApiFixt
         entry.Changes.ShouldNotContain(Convert.ToBase64String(Png));
     }
 
+    // ------------------------------------------------------------------ 2FA etki uyarisi (SYG-KMLK-035)
+
+    [Fact]
+    public async Task Enabling_two_factor_shows_the_impact_and_requires_confirmation()
+    {
+        using var client = _fixture.CreateClient();
+        var admin = await SignInAsync(client, "mehmet.kaya@duzen.com.tr");
+        (await GetAsync(client, $"{Parameters}/two-factor-impact", admin)).Body.GetProperty("affectedCount").GetInt32().ShouldBe(0);
+
+        // Kisi 2'nin e-postasi LOGO'da silindi, telefonu yok: 2FA acilirsa giris yapamaz.
+        await _fixture.WithDbAsync(context => context.Set<Person>()
+            .Where(p => p.NationalId == NationalId(2))
+            .ExecuteUpdateAsync(set => set.SetProperty(p => p.Email, (string?)null)));
+        (await GetAsync(client, $"{Parameters}/two-factor-impact", admin)).Body.GetProperty("affectedCount").GetInt32().ShouldBe(1);
+
+        var refused = await PutJsonAsync(client, $"{Parameters}/PRM-KML-08", admin, new { value = "true" });
+        refused.Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        refused.Body.GetProperty("detail").GetString()!.ShouldContain("1 aktif hesap sahibi giriş yapamaz");
+
+        (await PutJsonAsync(client, $"{Parameters}/PRM-KML-08", admin, new { value = "true", confirmed = true })).Status.ShouldBe(HttpStatusCode.NoContent);
+        (await PutJsonAsync(client, $"{Parameters}/PRM-KML-08", admin, new { value = "false" })).Status.ShouldBe(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task Confirmation_is_not_required_when_the_warning_is_turned_off()
+    {
+        using var client = _fixture.CreateClient();
+        var admin = await SignInAsync(client, "mehmet.kaya@duzen.com.tr");
+
+        (await PutJsonAsync(client, $"{Parameters}/PRM-KML-15", admin, new { value = "false" })).Status.ShouldBe(HttpStatusCode.NoContent);
+        (await GetAsync(client, $"{Parameters}/two-factor-impact", admin)).Body.GetProperty("confirmationRequired").GetBoolean().ShouldBeFalse();
+
+        (await PutJsonAsync(client, $"{Parameters}/PRM-KML-08", admin, new { value = "true" })).Status.ShouldBe(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task Impact_requires_permission()
+    {
+        using var client = _fixture.CreateClient();
+        var user = await SignInAsync(client, "ahmet.yilmaz@duzen.com.tr");
+
+        (await GetAsync(client, $"{Parameters}/two-factor-impact", user)).Status.ShouldBe(HttpStatusCode.Forbidden);
+    }
+
     // ------------------------------------------------------------------ yardimcilar
 
     private async Task CreateAccountAsync(int index) =>
