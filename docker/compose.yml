@@ -58,6 +58,9 @@ services:
       # IP basina hiz siniri SYG-KMLK-059) X-Forwarded-For basligindan YALNIZCA bu agdan
       # gelen isteklerde okunur: Docker kopru aglari (#87).
       ReverseProxy__TrustedNetworks: '172.16.0.0/12'
+      # Gelistirme yigininda sertifika yoktur; HTTPS zorunlulugu (SYG-KMLK-063) kapalidir.
+      # appsettings.Development.json imaja girmedigi icin ayar burada da verilir.
+      Security__RequireHttps: 'false'
       # Sir parametrelerin (SMTP ve NetGSM parolalari) sifreleme anahtari
       # (SYG-KMLK-075). Bos birakilirsa sirlar ekrandan girilemez, yalnizca ortam
       # degiskeninden okunur. Deger sir dosyasinda durur; veritabaninda DEGIL.

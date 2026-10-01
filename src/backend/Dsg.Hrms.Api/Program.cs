@@ -86,6 +86,11 @@ try
     // ErrorHandlingRegistration icinde yazilidir.
     app.UseHrmsErrorHandling();
 
+    // API yalnizca HTTPS ile gelen istege hizmet verir (SYG-KMLK-063). Sema ters vekilden
+    // okundugu icin UseForwardedHeaders'tan, red Problem Details donsun diye hata
+    // isleyiciden SONRA gelir.
+    app.UseHrmsHttpsRequirement(builder.Configuration);
+
     // API sozlesmesi: frontend tipleri bu belgeden uretilir (ADR-0010 §1).
     app.UseHrmsOpenApi();
 

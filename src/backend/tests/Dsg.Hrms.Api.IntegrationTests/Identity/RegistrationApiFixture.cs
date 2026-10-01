@@ -66,14 +66,18 @@ public class RegistrationApiFixture : IAsyncLifetime
         await _container.DisposeAsync();
     }
 
-    public HttpClient CreateClient(string? forwardedFor = null)
+    /// <summary>
+    /// Istemci olusturur. Varsayilan olarak istek HTTPS ile gelir (TLS'in nginx yerine test
+    /// sunucusunda sonlandigi durum); <paramref name="https"/> <c>false</c> ise duz HTTP.
+    /// </summary>
+    public HttpClient CreateClient(string? forwardedFor = null, bool https = true)
     {
         // Cerezler test icinde elle yonetilir: yenileme jetonu cerezi "Secure" isaretlidir ve
         // eski bir cerezi bilerek tekrar gondermek gerekir (SYG-KMLK-040).
         var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             HandleCookies = false,
-            BaseAddress = new Uri("https://localhost"),
+            BaseAddress = new Uri(https ? "https://localhost" : "http://localhost"),
         });
         if (forwardedFor is not null)
         {
@@ -227,6 +231,12 @@ public class RegistrationApiFixture : IAsyncLifetime
         public void Advance(TimeSpan by) => _now += by;
     }
 
+    /// <summary>
+    /// Istegin dogrudan baglanan adresini belirleyen test basligi. Yoksa istek ters vekilden
+    /// (nginx, <see cref="ProxyAddress"/>) geliyormus gibi gorunur.
+    /// </summary>
+    public const string RemoteAddressHeader = "X-Test-Remote-Address";
+
     /// <summary>Istegin ters vekilden (nginx) geliyormus gibi gorunmesini saglar.</summary>
     private sealed class ProxyAddressStartupFilter : IStartupFilter
     {
@@ -234,7 +244,9 @@ public class RegistrationApiFixture : IAsyncLifetime
         {
             app.Use((context, nextMiddleware) =>
             {
-                context.Connection.RemoteIpAddress = ProxyAddress;
+                context.Connection.RemoteIpAddress = context.Request.Headers.TryGetValue(RemoteAddressHeader, out var address)
+                    ? IPAddress.Parse(address.ToString())
+                    : ProxyAddress;
                 return nextMiddleware();
             });
             next(app);

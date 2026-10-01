@@ -63,6 +63,10 @@ services:
       # IP basina hiz siniri SYG-KMLK-059) X-Forwarded-For basligindan YALNIZCA bu agdan
       # gelen isteklerde okunur: Docker kopru aglari (#87).
       ReverseProxy__TrustedNetworks: '172.16.0.0/12'
+      # API yalnizca HTTPS ile gelen istege hizmet verir (SYG-KMLK-063). Sema nginx'in
+      # X-Forwarded-Proto basligindan, yalnizca yukaridaki agdan gelen isteklerde okunur.
+      # Sertifika eksik kalip nginx duz HTTP'ye duserse API istekleri 403 ile reddeder.
+      Security__RequireHttps: 'true'
       # Sir parametrelerin (SMTP ve NetGSM parolalari) sifreleme anahtari
       # (SYG-KMLK-075). Bos birakilirsa sirlar ekrandan girilemez, yalnizca ortam
       # degiskeninden okunur. Deger sir dosyasinda durur; veritabaninda DEGIL.
