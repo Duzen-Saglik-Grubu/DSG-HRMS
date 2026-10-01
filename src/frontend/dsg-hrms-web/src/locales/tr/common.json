@@ -221,7 +221,22 @@
       "deactivateDone": "{{name}} adlı kişinin hesabı pasife alındı.",
       "activateDone": "{{name}} adlı kişinin hesabı aktifleştirildi.",
       "emptyTitle": "Kayıt bulunamadı",
-      "emptyText": "Arama metnini değiştirin. Sicil numarasının başını veya ad ya da soyadın bir bölümünü yazabilirsiniz."
+      "emptyText": "Arama metnini değiştirin. Sicil numarasının başını veya ad ya da soyadın bir bölümünü yazabilirsiniz.",
+      "invite": "Bağlantı gönder",
+      "inviteTitle": "Parola oluşturma bağlantısı gönder",
+      "inviteText": "{{name}} adlı kişinin LOGO'da tanımlı kurumsal e-posta adresine tek kullanımlık bir parola oluşturma bağlantısı gönderilecek. Bağlantı sınırlı süre geçerlidir; daha önce gönderilen bağlantılar geçersizleşir.",
+      "inviteDone": "{{name}} adlı kişinin kurumsal e-posta adresine bağlantı gönderildi. Bağlantı saat {{time}} olana kadar geçerli."
+    },
+    "invite": {
+      "title": "Parolanızı belirleyin",
+      "greeting": "Merhaba {{name}}, hesabınızı oluşturmak için bir parola belirleyin.",
+      "greetingReset": "Merhaba {{name}}, hesabınız için yeni bir parola belirleyin.",
+      "intro": "Parolanızı belirlediğinizde hesabınız oluşturulur; kurumsal e-posta adresiniz ve bu parolayla giriş yapabilirsiniz.",
+      "introReset": "Yeni parolanızı belirlediğinizde açık olan tüm oturumlarınız kapatılır.",
+      "submit": "Parolayı kaydet",
+      "done": "Parolanız kaydedildi. Kurumsal e-posta adresiniz ve yeni parolanızla giriş yapabilirsiniz.",
+      "invalid": "Bu bağlantı geçersiz, daha önce kullanılmış ya da süresi dolmuş. Yeni bir bağlantı için İnsan Kaynakları birimine başvurun veya parolanızı kendiniz sıfırlayın.",
+      "useReset": "Parolamı kendim sıfırlamak istiyorum"
     }
   },
   "session": {

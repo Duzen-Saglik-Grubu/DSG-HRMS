@@ -323,6 +323,222 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/identity/accounts/{personId}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Kisiye tek kullanimlik parola olusturma baglantisi gonderir.
+         * @description Baglanti yalnizca kisinin LOGO'daki kurumsal e-postasina gider; IK adres giremez.
+         *     Kisinin onceki baglantilari gecersizlesir.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["InvitationRequest"];
+                    "text/json": components["schemas"]["InvitationRequest"];
+                    "application/*+json": components["schemas"]["InvitationRequest"];
+                };
+            };
+            responses: {
+                /** @description Baglanti gonderim kuyruguna alindi. */
+                202: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvitationSentResponse"];
+                    };
+                };
+                /** @description Gerekce girilmedi. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`identity.invite.create`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi bulunamadi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Davet kapali veya kisinin uygun kurumsal e-postasi, aktif calisma kaydi yok ya da hesabi pasif. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/invitations/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Baglantinin gecerli olup olmadigini okur. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["InvitationTokenRequest"];
+                    "text/json": components["schemas"]["InvitationTokenRequest"];
+                    "application/*+json": components["schemas"]["InvitationTokenRequest"];
+                };
+            };
+            responses: {
+                /** @description Baglanti gecerli. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvitationInfoResponse"];
+                    };
+                };
+                /** @description Baglanti gecersiz, kullanilmis veya suresi dolmus. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/invitations/acceptance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Parolayi belirler. Hesap yoksa olusturulur; varsa parola yenilenir ve acik oturumlar
+         *     kapanir. Baglanti tek kullanimliktir.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AcceptInvitationRequest"];
+                    "text/json": components["schemas"]["AcceptInvitationRequest"];
+                    "application/*+json": components["schemas"]["AcceptInvitationRequest"];
+                };
+            };
+            responses: {
+                /** @description Parola belirlendi; kullanici giris yapabilir. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Parola kurallara uymuyor (`errors.password`). */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Hesap kullanima kapali. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Baglanti gecersiz, kullanilmis veya suresi dolmus. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/password-resets": {
         parameters: {
             query?: never;
@@ -1342,6 +1558,13 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description Parola belirleme istegi. */
+        AcceptInvitationRequest: {
+            /** @description Baglantidaki jeton. */
+            token: string;
+            /** @description Parola. */
+            password: string;
+        };
         /** @description Istihdam. */
         AccountEmploymentResponse: {
             /** @description Sicil numarasi. */
@@ -1404,6 +1627,36 @@ export interface components {
         CompleteRegistrationRequest: {
             /** @description Parola. */
             password: string;
+        };
+        /** @description Baglanti bilgisi. */
+        InvitationInfoResponse: {
+            /** @description Kisinin adi (karsilama icin). */
+            firstName: string;
+            /** @description Hesap var mi; varsa parola yenilenir, yoksa hesap olusur. */
+            accountExists: boolean;
+            /**
+             * Format: date-time
+             * @description Gecerlilik sonu.
+             */
+            expiresAt: string;
+        };
+        /** @description Davet gonderim istegi. */
+        InvitationRequest: {
+            /** @description Gerekce (zorunlu; denetim izine yazilir, SYG-KMLK-053). */
+            reason: string;
+        };
+        /** @description Davet gonderildi. */
+        InvitationSentResponse: {
+            /**
+             * Format: date-time
+             * @description Baglantinin gecerlilik sonu.
+             */
+            expiresAt: string;
+        };
+        /** @description Baglanti sorgusu. */
+        InvitationTokenRequest: {
+            /** @description Baglantidaki jeton. */
+            token: string;
         };
         /** @description Sayfalanmis yanit (ADR-0010 §4). */
         PagedResponseOfAccountSummaryResponse: {

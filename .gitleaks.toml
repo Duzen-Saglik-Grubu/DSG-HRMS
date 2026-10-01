@@ -21,6 +21,12 @@ description = "Testlerde kullanilan SAHTE kimlik bilgileri"
 # gecerli degildir. Bkz. HealthCheckTests.Health_response_never_leaks_connection_details
 regexes = [
   '''CokGizliParola123''',
+
+  # Davet sayfasi testinin eski sahte jetonu (#107, commit 6affe68). Yalnizca test
+  # dosyasindaydi ve hicbir sistemde gecerli degildi; deger sonraki commit'te dusuk
+  # entropili bir degerle degistirildi. Istisna, PR gecmisindeki o commit'in taramadan
+  # gecebilmesi icindir ve YALNIZCA bu harfi harfine degeri kapsar.
+  '''abcDEF123_-xyz''',
 ]
 
 paths = [

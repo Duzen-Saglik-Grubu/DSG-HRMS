@@ -39,6 +39,12 @@ const AccountsPage = lazy(async () => {
   return { default: page.AccountsPage };
 });
 
+const InvitePage = lazy(async () => {
+  const page = await import('@/features/identity/pages/InvitePage');
+
+  return { default: page.InvitePage };
+});
+
 const RegistrationPage = lazy(async () => {
   const page = await import('@/features/identity/pages/RegistrationPage');
 
@@ -61,6 +67,14 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<RouteFallback />}>
         <ForgotPasswordPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: routes.invite,
+    element: (
+      <Suspense fallback={<RouteFallback />}>
+        <InvitePage />
       </Suspense>
     ),
   },

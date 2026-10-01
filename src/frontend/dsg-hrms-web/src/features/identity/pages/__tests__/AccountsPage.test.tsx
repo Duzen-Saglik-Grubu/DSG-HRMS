@@ -6,6 +6,7 @@ import { permissions } from '@/shared/auth/permissions';
 import { renderWithProviders } from '@/test/render';
 import { setSession } from '@/test/session';
 import { accountsApi, type AccountSummary } from '../../api/accountsApi';
+import { invitationApi } from '../../api/invitationApi';
 import { AccountsPage } from '../AccountsPage';
 
 /** IK hesap islemleri (SYG-KMLK-057, 073). Veriler SENTETIKTIR. */
@@ -45,7 +46,7 @@ describe('AccountsPage', () => {
     vi.restoreAllMocks();
     await setSession({
       status: 'authenticated',
-      permissions: [permissions.accountView, permissions.accountUpdate],
+      permissions: [permissions.accountView, permissions.accountUpdate, permissions.inviteCreate],
     });
     vi.spyOn(accountsApi, 'search').mockResolvedValue(page([ACTIVE, PASSIVE, NONE]));
   });
@@ -84,7 +85,13 @@ describe('AccountsPage', () => {
 
     expect(within(active).getByRole('button', { name: 'Pasife al' })).toBeInTheDocument();
     expect(within(passive).getByRole('button', { name: 'Aktifleştir' })).toBeInTheDocument();
-    expect(within(none).queryByRole('button')).not.toBeInTheDocument();
+    expect(
+      within(none).queryByRole('button', { name: /Pasife al|Aktifleştir/ }),
+    ).not.toBeInTheDocument();
+    expect(within(none).getByRole('button', { name: 'Bağlantı gönder' })).toBeInTheDocument();
+    expect(
+      within(passive).queryByRole('button', { name: 'Bağlantı gönder' }),
+    ).not.toBeInTheDocument();
   });
 
   it('pasife alma gerekce ister, gonderir ve sonucu bildirir', async () => {
@@ -131,6 +138,43 @@ describe('AccountsPage', () => {
     expect(await within(dialog).findByRole('alert')).toHaveTextContent(
       'Aktif çalışma kaydı olmayan kişinin hesabı aktifleştirilemez.',
     );
+  });
+
+  it('baglanti gerekceyle gonderilir ve gecerlilik saati bildirilir (SYG-KMLK-051, 053)', async () => {
+    const send = vi
+      .spyOn(invitationApi, 'send')
+      .mockResolvedValue({ expiresAt: new Date(2026, 8, 30, 15, 45).toISOString() });
+    const user = userEvent.setup();
+    renderWithProviders(<AccountsPage />);
+
+    const row = (await screen.findByText('Ali Can')).closest('tr')!;
+    await user.click(within(row).getByRole('button', { name: 'Bağlantı gönder' }));
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Parola oluşturma bağlantısı gönder',
+    });
+    expect(
+      within(dialog).getByText(/LOGO'da tanımlı kurumsal e-posta adresine/),
+    ).toBeInTheDocument();
+
+    await user.type(within(dialog).getByLabelText(/Gerekçe/), 'Telefonu yok');
+    await user.click(within(dialog).getByRole('button', { name: 'Bağlantı gönder' }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Bağlantı saat 15:45 olana kadar geçerli.',
+    );
+    expect(send).toHaveBeenCalledWith('p-3', 'Telefonu yok');
+  });
+
+  it('davet izni yoksa baglanti dugmesi gorunmez', async () => {
+    await setSession({
+      status: 'authenticated',
+      permissions: [permissions.accountView, permissions.accountUpdate],
+    });
+    renderWithProviders(<AccountsPage />);
+
+    await screen.findByText('Ali Can');
+
+    expect(screen.queryByRole('button', { name: 'Bağlantı gönder' })).not.toBeInTheDocument();
   });
 
   it('degistirme izni yoksa eylem dugmeleri gorunmez', async () => {
