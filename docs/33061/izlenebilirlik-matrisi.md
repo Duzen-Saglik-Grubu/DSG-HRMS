@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-10-01
+**Son güncelleme:** 2026-10-02
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 
@@ -157,7 +157,7 @@ gelecektir.
 | 23 | `REQ-KMLK-023` Hatalı girişte "kullanıcı adı veya parola hatalı" denir; hangisinin ya… | SYG-KMLK-032 | `ADR-0006` §5 | SYG-032 (aynı yanıt; var olmayan kullanıcı için de parola özeti) · PR #94 | `SessionApiTests` | — |
 | 24 | `REQ-KMLK-024` 5 başarısız giriş denemesinden sonra hesap 15 dakika kilitlenir (param… | SYG-KMLK-033 | `ADR-0006` §5 | SYG-033 (girilen e-posta başına 5 hatada 15 dk kilit; doğru parola da reddedilir) · PR #94 | `SessionApiTests`, `SessionDomainTests` | — |
 | 25 | `REQ-KMLK-025` Giriş sonrası ikinci doğrulama adımı (2FA) GELİŞTİRİLİR; varsayılan ol… | SYG-KMLK-034 | `ADR-0006` §7 | SYG-034 (2FA parametreyle; üyelikle aynı kod altyapısı) · PR #94; iki adımlı giriş ekranı (kanal ve kod adımları üyelikle ortak) · PR #96 | `SessionApiTests`; `LoginPage.test.tsx` | — |
-| 26 | `REQ-KMLK-026` Oturum 15 dakikalık erişim jetonu ve 8 saatlik yenileme jetonu ile yön… | SYG-KMLK-037, 038, 040, 063 | `ADR-0006` §8 | kısmen: SYG-037 (JWT 15 dk, yenileme jetonu HttpOnly/Secure/SameSite=Strict çerez, 8 sa üst sınır), 038 (hareketsizlik 30 dk; yenileme saymaz), 040 (her kullanımda yenileme, yeniden kullanımda tüm oturumlar kapanır) · PR #94; istemci: erişim jetonu yalnızca bellekte, açılışta çerezle geri getirme, sekme içinde tek yenileme ve sekmeler arasında kilitle sıralı yenileme (jeton tekrarı yaşanmaz), kullanıcı etkileşimine göre sinyal, hareketsizlik uyarısı · PR #96 — 063 sonraki iş | `SessionApiTests`, `SessionDomainTests`; `sessionManager.test.ts`, `clientAuth.test.ts`, `SessionActivity.test.tsx` | — |
+| 26 | `REQ-KMLK-026` Oturum 15 dakikalık erişim jetonu ve 8 saatlik yenileme jetonu ile yön… | SYG-KMLK-037, 038, 040, 063 | `ADR-0006` §8 | SYG-037 (JWT 15 dk, yenileme jetonu HttpOnly/Secure/SameSite=Strict çerez, 8 sa üst sınır), 038 (hareketsizlik 30 dk; yenileme saymaz), 040 (her kullanımda yenileme, yeniden kullanımda tüm oturumlar kapanır) · PR #94; istemci: erişim jetonu yalnızca bellekte, açılışta çerezle geri getirme, sekme içinde tek yenileme ve sekmeler arasında kilitle sıralı yenileme (jeton tekrarı yaşanmaz), kullanıcı etkileşimine göre sinyal, hareketsizlik uyarısı · PR #96; SYG-063 (API, HTTPS ile gelmeyen `/api/` isteğini reddeder; şema yalnızca güvenilen vekilden okunur; sertifika eksikse kapalıya düşer, `KR-093`) · PR #116 | `SessionApiTests`, `SessionDomainTests`; `sessionManager.test.ts`, `clientAuth.test.ts`, `SessionActivity.test.tsx`, `HttpsRequirementApiTests` | — |
 | 27 | `REQ-KMLK-027` Çıkış yapıldığında oturum sunucu tarafında da sonlandırılır. | SYG-KMLK-043 | `ADR-0006` §8 | SYG-043 (çıkışta sunucuda iptal) · PR #94; çıkış menüsü, açık diğer sekmeler de girişe döner, sorgu önbelleği boşaltılır · PR #96 | `SessionApiTests`; `sessionManager.test.ts`, `RequireSession.test.tsx` | — |
 | 28 | `REQ-KMLK-028` Parola en az 6 karakter olmalıdır; karmaşıklık (büyük/küçük harf, raka… | SYG-KMLK-044, 075, 076 | `ADR-0008` §7; `ADR-0006` §6 | SYG-075 (parametre deposu, şifreli sırlar) · PR #84; SYG-044 (uzunluk, karmaşıklık, NFKC) · PR #88; SYG-076 (yalnızca T3 parametreleri; türe ve aralığa göre doğrulama, Türkçe iletiler; sırlar yalnızca yazılabilir; `system.parameter.view/update`) · PR #110 | `ParameterCatalogTests`, `SystemParameterStoreTests`, `AesGcmSecretProtectorTests`; `PasswordPolicyTests`; `SystemParametersApiTests`, `ParametersPage.test.tsx` | — |
 | 29 | `REQ-KMLK-029` Yaygın sızıntı listesinde bulunan parolalar kabul edilmez; kontrol çev… | SYG-KMLK-045 | `ADR-0006` §6 | SYG-045 (143.672 kayıtlık açık lisanslı liste, kurum ve kişi sözcükleri) · PR #88 | `PasswordPolicyTests`, `PasswordInfrastructureTests`, `RegistrationApiTests` | — |
@@ -231,3 +231,4 @@ dâhil edilmedi. **26.09.2026: zinciri PR #76 ile tamamlandı** (§4.1).
 | 2026-09-30 | 1.7 | §5: parametre ekranı ve kurumsal logo halkaları eklendi (REQ-KMLK-012, 028, 048, 056; #109, PR #110) | Bilgi İşlem |
 | 2026-10-01 | 1.8 | §5: 2FA etki uyarısı halkası eklendi (REQ-KMLK-052; #111, PR #112) | Bilgi İşlem |
 | 2026-10-01 | 1.9 | §5: zorunlu parola değişimi halkaları eklendi (REQ-KMLK-030, 055; #113, PR #114) | Bilgi İşlem |
+| 2026-10-02 | 2.0 | §5: REQ-KMLK-026 halkası tamamlandı, SYG-063 HTTPS zorunluluğu (#115, PR #116) | Bilgi İşlem |

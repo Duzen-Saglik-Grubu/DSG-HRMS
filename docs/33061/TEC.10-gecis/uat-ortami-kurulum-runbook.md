@@ -1,7 +1,7 @@
 # UAT Ortamı — Kurulum ve Dağıtım Runbook'u
 
 **Belge kimliği:** TEC.10-RB-001
-**Son güncelleme:** 2026-09-26
+**Son güncelleme:** 2026-10-02
 **İlgili süreçler:** TEC.10 (Geçiş), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-024`, `KR-038`, `KR-065`
 
@@ -455,6 +455,17 @@ docker network inspect dsg-hrms-uat_default --format '{{(index .IPAM.Config 0).S
 Aralık dışındaysa denetim izine ve IP başına hız sınırına (SYG-KMLK-059) nginx'in adresi
 yazılır; `ReverseProxy__TrustedNetworks` ağın alt ağına göre güncellenir.
 
+**HTTPS zorunluluğu (#115):** API yalnızca HTTPS ile gelen `/api/` isteklerine hizmet verir
+(`Security__RequireHttps`, SYG-KMLK-063). Şemayı da aynı ağdan gelen `X-Forwarded-Proto`
+başlığından okur. Bu yüzden ağ aralık dışındaysa **tüm API istekleri** `403 https-required`
+ile reddedilir. Sertifika eksik kalıp nginx düz HTTP kipine düştüğünde de durum aynıdır:
+API şifresiz hizmet vermez. Sağlık uçları (`/health/…`) denetim dışıdır.
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' -X POST http://127.0.0.1:5299/api/v1/identity/sessions
+# Beklenen: 403 (dogrudan, sifresiz istek)
+```
+
 ### 10.5 SMTP sunucusu sertifikası
 
 Gönderici sunucu sertifikasını **doğrular**; doğrulama kapatılmaz. SMTP adresi,
@@ -565,3 +576,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-09-29 | 1.3 | §12: sunucu saati eşitlemesi (#103) | Bilgi İşlem |
 | 2026-09-30 | 1.4 | §12.1: NTS kapalı, düz NTP ile eşitleme ayarı; §12.2 doğrulama (#103) | Bilgi İşlem |
 | 2026-09-30 | 1.5 | §11.1: davet bağlantısının adresi (#107) | Bilgi İşlem |
+| 2026-10-02 | 1.6 | §10.4: HTTPS zorunluluğu ve doğrulaması (#115) | Bilgi İşlem |
