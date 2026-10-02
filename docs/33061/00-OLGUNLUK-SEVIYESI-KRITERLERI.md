@@ -1,7 +1,7 @@
 # Olgunluk Seviyesi Kriterleri ve Öz Değerlendirme
 
 **Belge kimliği:** 33061-OSK
-**Son güncelleme:** 2026-09-18
+**Son güncelleme:** 2026-10-02
 **Hedef:** TS ISO/IEC TS 33061 kapsamındaki süreçlerde **Yetenek Seviyesi 2 (Yönetilen Süreç)**
 **Dayanak:** TS ISO/IEC TS 33061 (süreç boyutu) + TS ISO/IEC 33020 (ölçüm çerçevesi, Madde 5)
 
@@ -127,27 +127,31 @@ kanıtın fiilen mevcut olmasına göre yapılır — "yapılacak" olan sayılma
 
 | Süreç | PA 1.1 | PA 2.1 | PA 2.2 | Seviye | Not |
 |---|---|---|---|---|---|
-| MAN.4 Risk yönetimi | **F** | L | L | **2** | 18 risk; ölçülüyor, düzeltiliyor, kapanıyor |
-| MAN.1 Proje planlama | L | L | L | 1 | Plan ve RACI **onay bekliyor** → MAN.1(c) eksik |
-| MAN.5 Konfigürasyon yönetimi | L− | L | L | 1 | Konfigürasyon öğeleri belgesi ve denetim yok; CHANGELOG bayat |
-| MAN.6 Bilgi yönetimi | L− | P+ | L− | 1 | Bilgi kayıt defteri, saklama/imha düzeni yok |
-| MAN.8 Kalite güvence | L | L | L | 1 | Ürün değerlendirmesi güçlü; süreç değerlendirmesi ilk kez 18.09'da yapıldı |
-| TEC.5 Tasarım tanımlama | L | L | L | 1 | 16 ADR + OpenAPI; izlenebilirlik yok |
-| TEC.7 Gerçekleştirme | L+ | L | L | 1 | Çalışan iskelet; gereksinim ↔ kod bağı yok |
-| TEC.8 Entegrasyon | L | L | P+ | 1 | UAT yığını çalışıyor; dış arayüzler ve rapor yok |
-| TEC.9 Doğrulama | L+ | L | L− | 1 | 168 test, kontroller kırılarak kanıtlandı; izlenebilirlik yok |
-| TEC.10 Geçiş | L− | L | L | 1 | UAT kuruldu ve TLS ile yayında; göç ve eğitim sırası gelmedi |
-| MAN.2 Proje değerlendirme ve kontrol | P+ | P+ | L | 0 | Ölçütler ölçülmüyor; dönemsel durum raporu yok |
-| TEC.2 Paydaş ihtiyaç ve gereksinimleri | P+ | P+ | L− | 0 | Modül gereksinimleri İK toplantılarıyla gelecek (`KR-068`) |
-| TEC.13 Bakım | P− | P | P | 0 | Üretim yok; yalnızca hata issue'ları |
-| TEC.3 Sistem/yazılım gereksinimleri | N | — | — | 0 | Sırası gelmedi |
-| TEC.11 Geçerleme | N | — | — | 0 | Sırası gelmedi — kabul edilecek modül yok |
+| MAN.1 Proje planlama | L− | L− | P+ | 1 | Plan ve RACI 07.09'dan beri değişmedi, onaysız |
+| MAN.2 Proje değerlendirme ve kontrol | P | P | P | 0 | Durum raporu yok; ölçütler ölçülmüyor |
+| MAN.4 Risk yönetimi | L+ | L− | L− | 1 | T3 boyunca güncellenmedi; `KR-078` risk kabulü kayıt dışı |
+| MAN.5 Konfigürasyon yönetimi | P+ | L− | L− | 0 | Etiket, Release, dağıtım kaydı yok; CHANGELOG 08.09 |
+| MAN.6 Bilgi yönetimi | P+ | P | P+ | 0 | Bilgi kayıt defteri, saklama/imha yok; klasör kaybı (30.09) |
+| MAN.8 Kalite güvence | L− | P+ | L− | 1 | Ürün değerlendirmesi güçlü; kayıtlı inceleme yok; 18.09 bulguları issue'ya çevrilmedi |
+| TEC.2 Paydaş ihtiyaç ve gereksinimleri | L+ | L | L | 1 | 56 onaylı gereksinim, toplantı kaydı, yaklaşım belgesi |
+| TEC.3 Sistem/yazılım gereksinimleri | L+ | L− | L− | 1 | 79 SYG, 24 analiz bulgusu; baseline onayı yok; KPÖ'lerin çoğu ölçülmedi |
+| TEC.5 Tasarım tanımlama | L | P+ | P+ | 1 | SYG → tasarım tahsisi yok; ADR yönetişimi bozuldu |
+| TEC.7 Gerçekleştirme | L | L− | L− | 1 | Çalışan T3; SYG-060/061/062 eksik |
+| TEC.8 Entegrasyon | L | L− | P+ | 1 | Arayüzler canlı sınandı; yaklaşım ve rapor yok |
+| TEC.9 Doğrulama | L | L | P+ | 1 | 973 test; doğrulama raporu ve gereksinim başına sonuç kaydı yok |
+| TEC.10 Geçiş | L− | P+ | L− | 1 | UAT işletiliyor; sürüm kimliksiz dağıtım |
+| TEC.11 Geçerleme | P | P | P | 0 | Kabul kriterleri var; plan, senaryo, form yok |
+| TEC.13 Bakım | P+ | P | P+ | 0 | Hata kayıtları örnek nitelikte; bakım stratejisi yok |
 
-**Dayanak:** `MAN.8-kalite-guvence/raporlar/2026-09-18-surec-gozden-gecirme-raporu.md`
+**Dayanak:** `MAN.8-kalite-guvence/raporlar/2026-10-02-t3-surec-denetimi.md` (T3 sonu). Önceki: `MAN.8-kalite-guvence/raporlar/2026-09-18-surec-gozden-gecirme-raporu.md`
 
-> **Seviye 2'nin önündeki en büyük tek engel:** `izlenebilirlik-matrisi.md` hiç
-> oluşturulmadı. Sekiz sürecin çıktı listesinde izlenebilirlik maddesi bulunuyor;
-> matris olmadan hiçbiri `F` alamaz (bkz. rapor, BULGU-01).
+> **Seviye 2'nin önündeki engeller (02.10.2026):** İzlenebilirlik matrisi kuruldu (18.09'daki
+> en büyük engel kapandı). Bugünkü engeller şunlar:
+> (1) Yönetim süreçleri (MAN.1/2/4/5/6) modül çevrimi boyunca işletilmiyor.
+> (2) Sürüm ve baseline kaydı yok.
+> (3) 13 sürecin yaklaşım belgesi yok.
+> (4) Bağımsız inceleme kaydı yok.
+> Ayrıntı: T3 sonu denetimi, §4 ve §6.
 
 > **Ölçek kuralı:** Bu tabloda **yalnızca N/P/L/F** kullanılır. Aşama kapanış belgeleri
 > kendi sözlüğünü ("Kurulmuş", "İşletiliyor" gibi) üretmez; bu tabloya atıf yapar.
@@ -181,3 +185,4 @@ Seviye 2. PA 1.1 ≥ L ise Seviye 1. Aksi hâlde Seviye 0.
 |---|---|---|---|
 | 2026-09-04 | 0.1 | TS ISO/IEC 33020 incelemesi sonrası ilk oluşturma | Bilgi İşlem |
 | 2026-09-18 | 0.2 | §6 öz değerlendirme tablosu ilk kez gerçek kanıtla güncellendi; 15 süreç derecelendirildi (MAN.8 süreç gözden geçirmesi) | Bilgi İşlem |
+| 2026-10-02 | 0.3 | §6 T3 sonu süreç denetimiyle güncellendi (MAN.8-SGR-2026-10-02, #117) | Bilgi İşlem |
