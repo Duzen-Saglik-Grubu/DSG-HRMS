@@ -2,6 +2,9 @@ using Dsg.Hrms.Domain.Personnel;
 
 namespace Dsg.Hrms.Domain.Tests.Personnel;
 
+/// <summary>
+/// E-posta ve telefonun senkronizasyonda normallestirilmesi (SYG-KMLK-009).
+/// </summary>
 public sealed class ContactNormalizerTests
 {
     [Theory]
