@@ -7,6 +7,7 @@ using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Application.Identity.Registration;
 using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Settings;
+using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -39,6 +40,7 @@ public sealed partial class SessionService
     private readonly AccessControlService _access;
     private readonly ISystemParameters _parameters;
     private readonly IDateTimeProvider _clock;
+    private readonly ISecurityEventLog _events;
     private readonly ILogger<SessionService> _logger;
 
     /// <summary>Yeni ornek olusturur.</summary>
@@ -52,6 +54,7 @@ public sealed partial class SessionService
         AccessControlService access,
         ISystemParameters parameters,
         IDateTimeProvider clock,
+        ISecurityEventLog events,
         ILogger<SessionService> logger)
     {
         _store = store;
@@ -63,6 +66,7 @@ public sealed partial class SessionService
         _access = access;
         _parameters = parameters;
         _clock = clock;
+        _events = events;
         _logger = logger;
     }
 
@@ -108,6 +112,7 @@ public sealed partial class SessionService
 
         if (throttle.IsLocked(now))
         {
+            _events.Record(SecurityEventType.SignInFailed, candidate?.Account.Id, candidate?.Person.Id, "locked");
             await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             LogLocked(_logger);
             throw new SignInLockedException(lockoutMinutes);
@@ -121,9 +126,11 @@ public sealed partial class SessionService
             {
                 // Kilitlenme denetim izine duser (SYG-KMLK-058); hesap yoksa yalnizca sayac kilitlenir.
                 candidate?.Account.RecordLockout(lockedUntil.Value);
+                _events.Record(SecurityEventType.AccountLocked, candidate?.Account.Id, candidate?.Person.Id, "sign-in");
                 LogLockedNow(_logger, candidate?.Account.Id);
             }
 
+            _events.Record(SecurityEventType.SignInFailed, candidate?.Account.Id, candidate?.Person.Id, "invalid-credentials");
             await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             throw new InvalidCredentialsException();
         }
@@ -133,6 +140,7 @@ public sealed partial class SessionService
 
         if (candidate.Account.Status != AccountStatus.Active || !candidate.HasActiveEmployment)
         {
+            _events.Record(SecurityEventType.SignInFailed, candidate.Account.Id, candidate.Person.Id, "account-disabled");
             await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             LogDisabled(_logger, candidate.Account.Id);
             throw new AccountDisabledException();
@@ -148,7 +156,7 @@ public sealed partial class SessionService
             return new SignInResult(null, challenge.PublicId, channels, challenge.ExpiresAt);
         }
 
-        var session = await OpenSessionAsync(candidate, ipAddress, now, cancellationToken).ConfigureAwait(false);
+        var session = await OpenSessionAsync(candidate, ipAddress, now, "password", cancellationToken).ConfigureAwait(false);
         return new SignInResult(session, null, RegistrationChannels.None, null);
     }
 
@@ -222,7 +230,7 @@ public sealed partial class SessionService
         }
 
         challenge.Complete();
-        var session = await OpenSessionAsync(candidate, ipAddress ?? challenge.IpAddress, now, cancellationToken).ConfigureAwait(false);
+        var session = await OpenSessionAsync(candidate, ipAddress ?? challenge.IpAddress, now, "two-factor", cancellationToken).ConfigureAwait(false);
         return (VerificationResult.Verified, session);
     }
 
@@ -262,6 +270,7 @@ public sealed partial class SessionService
                 open.End(SessionEndReason.TokenReuse, now);
             }
 
+            _events.Record(SecurityEventType.TokenReuseDetected, session.UserAccountId, null);
             await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             LogTokenReuse(_logger, session.UserAccountId);
             throw new SessionEndedException(SessionEndReason.TokenReuse);
@@ -368,6 +377,7 @@ public sealed partial class SessionService
         var lockoutMinutes = await _parameters.GetIntegerAsync(ParameterCatalog.LockoutMinutes, cancellationToken).ConfigureAwait(false);
         if (throttle.IsLocked(now))
         {
+            _events.Record(SecurityEventType.PasswordChangeFailed, account.Id, person.Id, "locked");
             await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             throw new SignInLockedException(lockoutMinutes);
         }
@@ -379,9 +389,11 @@ public sealed partial class SessionService
             if (lockedUntil is not null)
             {
                 account.RecordLockout(lockedUntil.Value);
+                _events.Record(SecurityEventType.AccountLocked, account.Id, person.Id, "password-change");
                 LogLockedNow(_logger, account.Id);
             }
 
+            _events.Record(SecurityEventType.PasswordChangeFailed, account.Id, person.Id, "invalid-current-password");
             await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new PasswordChangeResult(CurrentPasswordInvalid: true, []);
         }
@@ -405,6 +417,7 @@ public sealed partial class SessionService
 
         account.SetPassword(_passwordHasher.Hash(normalizedNew), now);
         session.AdoptSecurityStamp(account.SecurityStamp);
+        _events.Record(SecurityEventType.PasswordChanged, account.Id, person.Id);
         throttle.Reset(now);
 
         foreach (var other in await _store.GetOpenSessionsAsync(account.Id, cancellationToken).ConfigureAwait(false))
@@ -460,7 +473,7 @@ public sealed partial class SessionService
     private static bool IsUsable(SignInCandidate candidate) =>
         candidate.Account.Status == AccountStatus.Active && candidate.HasActiveEmployment;
 
-    private async Task<SessionTokens> OpenSessionAsync(SignInCandidate candidate, string? ipAddress, DateTimeOffset now, CancellationToken cancellationToken)
+    private async Task<SessionTokens> OpenSessionAsync(SignInCandidate candidate, string? ipAddress, DateTimeOffset now, string method, CancellationToken cancellationToken)
     {
         // Tek aktif oturum (SYG-KMLK-041): yeni giris, onceki acik oturumlari kapatir.
         if (await _parameters.GetBooleanAsync(ParameterCatalog.SingleActiveSession, cancellationToken).ConfigureAwait(false))
@@ -478,6 +491,7 @@ public sealed partial class SessionService
         var session = UserSession.Start(
             candidate.Account.Id, candidate.Account.SecurityStamp, ipAddress, now, TimeSpan.FromHours(maxHours), passwordChange);
         _store.Add(session);
+        _events.Record(SecurityEventType.SignInSucceeded, candidate.Account.Id, candidate.Person.Id, method);
 
         // Ilk sistem yoneticisi kurulum yapilandirmasiyla belirlenir (SYG-KMLK-074); atama
         // oturumla birlikte kaydedilir.

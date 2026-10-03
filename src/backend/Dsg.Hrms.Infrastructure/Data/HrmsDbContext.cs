@@ -50,6 +50,12 @@ public class HrmsDbContext : DbContext
     /// </remarks>
     public DbSet<AccessLogEntry> AccessLog => Set<AccessLogEntry>();
 
+    /// <summary>
+    /// Kimlik olaylari (SYG-KMLK-060). Yalnizca <b>okuma ve ekleme</b> icindir; guncelleme ve
+    /// silme veritabani tetikleyicisiyle engellenir (KR-060).
+    /// </summary>
+    public DbSet<SecurityEventEntry> SecurityEvents => Set<SecurityEventEntry>();
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

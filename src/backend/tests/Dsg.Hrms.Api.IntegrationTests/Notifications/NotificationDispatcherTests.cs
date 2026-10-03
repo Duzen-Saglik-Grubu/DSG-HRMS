@@ -1,5 +1,7 @@
+using Dsg.Hrms.Api.IntegrationTests.Settings;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Notifications;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Notifications;
 using Dsg.Hrms.Infrastructure.Data;
 using Dsg.Hrms.Infrastructure.Notifications;
@@ -26,6 +28,8 @@ public sealed class NotificationDispatcherTests : IAsyncLifetime, IDisposable
     private readonly IEmailSender _email = Substitute.For<IEmailSender>();
     private readonly ISmsSender _sms = Substitute.For<ISmsSender>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly INotificationExemptions _exemptions = Substitute.For<INotificationExemptions>();
+    private readonly FakeSystemParameters _parameters = new();
     private readonly CapturingLoggerProvider _logs = new();
     private readonly ILoggerFactory _loggerFactory;
 
@@ -60,6 +64,8 @@ public sealed class NotificationDispatcherTests : IAsyncLifetime, IDisposable
         services.AddScoped(_ => new HrmsDbContext(_options));
         services.AddSingleton(_email);
         services.AddSingleton(_sms);
+        services.AddSingleton(_exemptions);
+        services.AddSingleton<ISystemParameters>(_parameters);
         _provider = services.BuildServiceProvider();
     }
 
@@ -237,6 +243,35 @@ public sealed class NotificationDispatcherTests : IAsyncLifetime, IDisposable
 
         await dispatcher.StopAsync(CancellationToken.None);
         (await SingleDeliveryAsync()).Status.ShouldBe(DeliveryStatus.Sent);
+    }
+
+    // ------------------------------------------------------------------ bildirim istisnasi (SYG-KMLK-062, KR-056)
+
+    [Fact]
+    public async Task Transactional_messages_reach_an_exempt_person_while_PRM_BLD_03_is_on()
+    {
+        _exemptions.IsExemptAsync(default, default, default, default).ReturnsForAnyArgs(true);
+        _email.SendAsync(default!, default!, default!, default).ReturnsForAnyArgs(SendResult.Sent("250"));
+
+        await ProcessAsync(Send, EmailMessage());
+
+        // Istisna sorulmaz bile: islemsel ileti istisnadan muaftir.
+        await _exemptions.DidNotReceiveWithAnyArgs().IsExemptAsync(default, default, default, default);
+        (await SingleDeliveryAsync()).Status.ShouldBe(DeliveryStatus.Sent);
+    }
+
+    [Fact]
+    public async Task Turning_PRM_BLD_03_off_applies_the_exemption_to_transactional_messages_too()
+    {
+        _parameters.With(ParameterCatalog.TransactionalMessagesBypassExemption, "false");
+        _exemptions.IsExemptAsync(7, NotificationChannel.Sms, Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns(true);
+
+        await ProcessAsync(Send, SmsMessage());
+
+        await _sms.DidNotReceiveWithAnyArgs().SendAsync(default!, default!, default, default);
+        var delivery = await SingleDeliveryAsync();
+        delivery.Status.ShouldBe(DeliveryStatus.Suppressed);
+        delivery.ResultCode.ShouldBe(NotificationDispatcher.ExemptResultCode);
     }
 
     [Fact]

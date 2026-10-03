@@ -1,5 +1,6 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Notifications;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Notifications;
 using Dsg.Hrms.Infrastructure.Data;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,6 +48,9 @@ public sealed partial class NotificationDispatcher : BackgroundService
         _logger = logger;
     }
 
+    /// <summary>Bildirim istisnasi nedeniyle gonderilmeyen iletinin sonuc kodu.</summary>
+    public const string ExemptResultCode = "Exempt";
+
     /// <summary>Yeniden deneme beklemeleri. Testlerde kisaltilir.</summary>
     public IReadOnlyList<TimeSpan> RetryDelays { get; init; } = DefaultRetryDelays;
 
@@ -61,6 +65,13 @@ public sealed partial class NotificationDispatcher : BackgroundService
         {
             LogSuppressed(_logger, message.Channel, message.Purpose, message.MaskedRecipient, _options.DeliveryMode);
             await RecordAsync(scope, message, DeliveryStatus.Suppressed, _options.DeliveryMode.ToString(), null, 0).ConfigureAwait(false);
+            return;
+        }
+
+        if (await IsExemptAsync(scope.ServiceProvider, message, cancellationToken).ConfigureAwait(false))
+        {
+            LogExempt(_logger, message.Channel, message.Purpose, message.PersonId);
+            await RecordAsync(scope, message, DeliveryStatus.Suppressed, ExemptResultCode, null, 0).ConfigureAwait(false);
             return;
         }
 
@@ -96,6 +107,34 @@ public sealed partial class NotificationDispatcher : BackgroundService
 
         var status = result.Outcome == SendOutcome.Sent ? DeliveryStatus.Sent : DeliveryStatus.Failed;
         await RecordAsync(scope, message, status, result.ResultCode, result.ExternalId, attempts).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Kisi bu kanalda bildirim istisnasi kapsaminda mi (KR-056, SYG-KMLK-062).
+    /// </summary>
+    /// <remarks>
+    /// Islemsel iletiler (kod, sifirlama, davet) PRM-BLD-03 acikken istisnaya HIC sorulmaz:
+    /// istisnadaki kisi kod alamasaydi sisteme giremezdi. Istisna kaynagi kayitli degilse (Y1
+    /// Bildirim Merkezi gelmeden once) istisna yoktur.
+    /// </remarks>
+    private static async Task<bool> IsExemptAsync(IServiceProvider services, OutboundMessage message, CancellationToken cancellationToken)
+    {
+        var exemptions = services.GetService<INotificationExemptions>();
+        if (exemptions is null)
+        {
+            return false;
+        }
+
+        if (message.Purpose.IsTransactional())
+        {
+            var parameters = services.GetRequiredService<ISystemParameters>();
+            if (await parameters.GetBooleanAsync(ParameterCatalog.TransactionalMessagesBypassExemption, cancellationToken).ConfigureAwait(false))
+            {
+                return false;
+            }
+        }
+
+        return await exemptions.IsExemptAsync(message.PersonId, message.Channel, message.QueuedAt, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -188,4 +227,7 @@ public sealed partial class NotificationDispatcher : BackgroundService
     [LoggerMessage(EventId = 3606, Level = LogLevel.Error,
         Message = "Ileti islenirken beklenmeyen hata: {Channel}.")]
     private static partial void LogUnexpected(ILogger logger, Exception exception, NotificationChannel channel);
+
+    [LoggerMessage(EventId = 3607, Level = LogLevel.Information, Message = "Ileti gonderilmedi (bildirim istisnasi): {Channel} {Purpose}, kisi {PersonId} (KR-056).")]
+    private static partial void LogExempt(ILogger logger, NotificationChannel channel, NotificationPurpose purpose, long? personId);
 }

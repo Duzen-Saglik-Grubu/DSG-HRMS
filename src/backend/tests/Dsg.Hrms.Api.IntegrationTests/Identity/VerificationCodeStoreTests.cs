@@ -68,7 +68,7 @@ public sealed class VerificationCodeStoreTests : IAsyncLifetime
         await using var context = new HrmsDbContext(_options);
         var service = new VerificationCodeService(
             new VerificationCodeStore(context), _hasher, _dispatch, new FakeSystemParameters(), _clock,
-            NullLogger<VerificationCodeService>.Instance);
+            Substitute.For<ISecurityEventLog>(), NullLogger<VerificationCodeService>.Instance);
         return await action(service);
     }
 
@@ -111,8 +111,8 @@ public sealed class VerificationCodeStoreTests : IAsyncLifetime
 
         await using var first = new HrmsDbContext(_options);
         await using var second = new HrmsDbContext(_options);
-        var firstService = new VerificationCodeService(new VerificationCodeStore(first), _hasher, _dispatch, new FakeSystemParameters(), _clock, NullLogger<VerificationCodeService>.Instance);
-        var secondService = new VerificationCodeService(new VerificationCodeStore(second), _hasher, _dispatch, new FakeSystemParameters(), _clock, NullLogger<VerificationCodeService>.Instance);
+        var firstService = new VerificationCodeService(new VerificationCodeStore(first), _hasher, _dispatch, new FakeSystemParameters(), _clock, Substitute.For<ISecurityEventLog>(), NullLogger<VerificationCodeService>.Instance);
+        var secondService = new VerificationCodeService(new VerificationCodeStore(second), _hasher, _dispatch, new FakeSystemParameters(), _clock, Substitute.For<ISecurityEventLog>(), NullLogger<VerificationCodeService>.Instance);
 
         // Ikisi de kodu "Issued" olarak yukler.
         (await first.Set<VerificationCode>().SingleAsync()).Status.ShouldBe(VerificationCodeStatus.Issued);

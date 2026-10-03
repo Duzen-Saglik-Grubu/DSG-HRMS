@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Notifications;
 using Dsg.Hrms.Application.Settings;
+using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Notifications;
 using Microsoft.Extensions.Logging;
@@ -27,6 +28,7 @@ public sealed partial class VerificationCodeService
     private readonly INotificationDispatch _queue;
     private readonly ISystemParameters _parameters;
     private readonly IDateTimeProvider _clock;
+    private readonly ISecurityEventLog _events;
     private readonly ILogger<VerificationCodeService> _logger;
 
     /// <summary>Yeni ornek olusturur.</summary>
@@ -36,6 +38,7 @@ public sealed partial class VerificationCodeService
         INotificationDispatch queue,
         ISystemParameters parameters,
         IDateTimeProvider clock,
+        ISecurityEventLog events,
         ILogger<VerificationCodeService> logger)
     {
         _store = store;
@@ -43,6 +46,7 @@ public sealed partial class VerificationCodeService
         _queue = queue;
         _parameters = parameters;
         _clock = clock;
+        _events = events;
         _logger = logger;
     }
 
@@ -86,6 +90,7 @@ public sealed partial class VerificationCodeService
         var entity = VerificationCode.Issue(request.PersonId, request.Purpose, request.Channel, now.AddMinutes(lifetime), maxAttempts);
         entity.SetHash(_hasher.Hash(entity.PublicId, code));
         _store.Add(entity);
+        _events.Record(SecurityEventType.VerificationCodeSent, null, request.PersonId, $"{PurposeCode(request.Purpose)}:{ChannelCode(request.Channel)}");
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         var message = request.Channel == VerificationChannel.Email
@@ -122,6 +127,11 @@ public sealed partial class VerificationCodeService
         var matches = input.Length > 0 && input.All(char.IsAsciiDigit) && _hasher.Matches(entity.PublicId, input, entity.CodeHash);
 
         var result = entity.Verify(matches, _clock.UtcNow);
+        _events.Record(
+            result == VerificationResult.Verified ? SecurityEventType.VerificationSucceeded : SecurityEventType.VerificationFailed,
+            null,
+            entity.PersonId,
+            $"{PurposeCode(entity.Purpose)}:{ResultCode(result)}");
 
         try
         {
@@ -148,6 +158,26 @@ public sealed partial class VerificationCodeService
         var upper = (int)Math.Pow(10, length);
         return RandomNumberGenerator.GetInt32(upper).ToString(new string('0', length), CultureInfo.InvariantCulture);
     }
+
+    /// <summary>Kimlik olayinda amacin kodu (SYG-KMLK-060).</summary>
+    public static string PurposeCode(VerificationPurpose purpose) => purpose switch
+    {
+        VerificationPurpose.Registration => "registration",
+        VerificationPurpose.PasswordReset => "password-reset",
+        _ => "two-factor",
+    };
+
+    /// <summary>Kimlik olayinda dogrulama sonucunun kodu (SYG-KMLK-060).</summary>
+    public static string ResultCode(VerificationResult result) => result switch
+    {
+        VerificationResult.Verified => "verified",
+        VerificationResult.Mismatch => "mismatch",
+        VerificationResult.Expired => "expired",
+        VerificationResult.AttemptsExceeded => "attempts-exceeded",
+        _ => "not-usable",
+    };
+
+    private static string ChannelCode(VerificationChannel channel) => channel == VerificationChannel.Email ? "email" : "sms";
 
     private static NotificationPurpose ToNotificationPurpose(VerificationPurpose purpose) => purpose switch
     {
