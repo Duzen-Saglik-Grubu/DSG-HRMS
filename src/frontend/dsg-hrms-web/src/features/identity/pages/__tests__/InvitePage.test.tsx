@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -52,6 +53,54 @@ describe('InvitePage', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('Parolanız kaydedildi.');
     expect(accept).toHaveBeenCalledWith(TOKEN, 'Mavi deniz 42 kez');
     expect(screen.getByRole('link', { name: 'Giriş yap' })).toHaveAttribute('href', '/login');
+  });
+
+  it('ilk cizimde agac askiya alinip yeniden kurulsa da jetonu kaybetmez (#137)', async () => {
+    // Uygulamada sayfa tembel yuklenir ve Suspense icindedir. Ilk cizimde bir bilesen askiya
+    // alinirsa React islenmemis agaci atar ve sayfayi bastan baglar. Jeton ilk baglamada
+    // adresten silinseydi ikinci baglama onu bulamaz, baglanti "gecersiz" gorunurdu.
+    const lookup = vi
+      .spyOn(invitationApi, 'lookup')
+      .mockResolvedValue({ firstName: 'Mehmet', accountExists: false, expiresAt: FUTURE() });
+    let ready = false;
+    const pending = new Promise<void>((resolve) =>
+      setTimeout(() => {
+        ready = true;
+        resolve();
+      }, 10),
+    );
+    function SuspendOnce() {
+      if (!ready) {
+        // Suspense protokolu: bilesen promise firlatarak askiya alinir (tembel yukleme gibi).
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
+        throw pending;
+      }
+      return null;
+    }
+    openWith(`#token=${TOKEN}`);
+    renderWithProviders(
+      <Suspense fallback={null}>
+        <InvitePage />
+        <SuspendOnce />
+      </Suspense>,
+    );
+
+    expect(
+      await screen.findByText('Merhaba Mehmet, hesabınızı oluşturmak için bir parola belirleyin.'),
+    ).toBeInTheDocument();
+    expect(lookup).toHaveBeenCalledWith(TOKEN);
+    expect(window.location.hash).toBe('');
+  });
+
+  it('e-posta istemcisinin kodladigi adresteki jetonu da okur', async () => {
+    const lookup = vi
+      .spyOn(invitationApi, 'lookup')
+      .mockResolvedValue({ firstName: 'Mehmet', accountExists: false, expiresAt: FUTURE() });
+    openWith(`#token%3D${TOKEN}`);
+    renderWithProviders(<InvitePage />);
+
+    expect(await screen.findByText(/Merhaba Mehmet/)).toBeInTheDocument();
+    expect(lookup).toHaveBeenCalledWith(TOKEN);
   });
 
   it('hesabi olan kisiye oturumlarinin kapanacagini soyler', async () => {
