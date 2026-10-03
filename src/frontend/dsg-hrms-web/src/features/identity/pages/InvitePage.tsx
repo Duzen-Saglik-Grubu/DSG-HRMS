@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
@@ -16,18 +16,24 @@ import { PasswordStep } from '../components/registration/PasswordStep';
 import { FlowError } from '../components/verification/FlowError';
 
 /**
- * Baglantidaki jetonu okur ve adresten SILER.
+ * Baglantidaki jetonu okur. Adresi DEGISTIRMEZ.
  *
- * Jeton adresin `#` kismindadir: tarayici bu kismi sunucuya gondermez. Sayfa acilir acilmaz
- * adresten de kaldirilir; tarayici gecmisinde ve ekran paylasiminda gorunmez.
+ * Jeton adresin `#` kismindadir: tarayici bu kismi sunucuya gondermez. E-posta istemcisi
+ * veya ag gecidi adresi kodlamis olabilir (`%3D`); kod cozulerek okunur.
+ *
+ * Okuma yan etkisiz OLMALIDIR: React, ilk cizimde agactaki bir bilesen askiya alinirsa
+ * islenmemis agaci atar ve baslaticiyi yeniden cagirir. Jeton burada adresten silinseydi
+ * ikinci cagri bos adres bulur ve gecerli baglanti "gecersiz" gorunurdu (#137).
  */
-function takeToken(): string | null {
-  const match = /(?:^#|&)token=([A-Za-z0-9_-]+)/.exec(window.location.hash);
-  if (window.location.hash) {
-    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+function readToken(): string | null {
+  let hash = window.location.hash;
+  try {
+    hash = decodeURIComponent(hash);
+  } catch {
+    // Bozuk kodlama: adres oldugu gibi okunur.
   }
 
-  return match?.[1] ?? null;
+  return /(?:^#|&)token=([A-Za-z0-9_-]+)/.exec(hash)?.[1] ?? null;
 }
 
 /**
@@ -38,7 +44,19 @@ function takeToken(): string | null {
  */
 export function InvitePage() {
   const { t } = useTranslation();
-  const [token] = useState(takeToken);
+  const [token] = useState(readToken);
+
+  // Jeton, sayfa ekrana yerlestikten SONRA adresten kaldirilir: tarayici gecmisinde ve ekran
+  // paylasiminda gorunmez. Yonlendiricinin gecmis kaydi (state) korunur.
+  useEffect(() => {
+    if (window.location.hash) {
+      window.history.replaceState(
+        window.history.state,
+        '',
+        window.location.pathname + window.location.search,
+      );
+    }
+  }, []);
   const [done, setDone] = useState(false);
 
   const settings = useQuery({
