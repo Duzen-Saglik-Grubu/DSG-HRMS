@@ -161,7 +161,7 @@ public sealed partial class InvitationApiTests : IClassFixture<RegistrationApiFi
         var (entry, senderId, hash) = await _fixture.WithDbAsync(async context =>
         {
             var invitation = await context.Set<AccountInvitation>().SingleAsync();
-            var log = await context.ChangeLog.SingleAsync(e => e.EntityName == nameof(AccountInvitation) && e.Operation == AuditOperation.Insert);
+            var log = await context.ChangeLog.SingleAsync(e => e.EntityName == nameof(AccountInvitation) && e.EntityId == invitation.PublicId && e.Operation == AuditOperation.Insert);
             var sender = await context.Set<UserAccount>().Where(a => a.Id == log.UserAccountId).Select(a => a.PersonId).SingleAsync();
             return (log, sender, invitation.TokenHash);
         });
@@ -182,6 +182,36 @@ public sealed partial class InvitationApiTests : IClassFixture<RegistrationApiFi
     }
 
     // ------------------------------------------------------------------ yardimcilar
+
+    [Fact]
+    public async Task Sending_and_accepting_are_recorded_as_identity_events_with_the_actor()
+    {
+        // SYG-KMLK-060: davet baglantisi olaylari; gonderen IK kullanicisi aktor olarak yazilir.
+        var since = _fixture.Clock.UtcNow;
+        var token = await HrTokenAsync();
+        using var client = _fixture.CreateClient();
+        await PostAsync(client, $"{Accounts}/{await PersonIdAsync(2)}/invitations", token, new { reason = "Telefonu yok, SMS alamıyor" });
+        var invite = TokenOf(_fixture.Messages.All.Single().MessageBody);
+        await PostAsync(client, $"{Invitations}/acceptance", null, new { token = invite, password = NewPassword });
+
+        var (hrAccount, person2) = await _fixture.WithDbAsync(async context =>
+        {
+            var hrPerson = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(1));
+            var hr = await context.Set<UserAccount>().SingleAsync(a => a.PersonId == hrPerson.Id);
+            var person = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(2));
+            return (hr.Id, person.Id);
+        });
+        var events = await _fixture.WithDbAsync(context => context.Set<SecurityEventEntry>()
+            .Where(e => e.OccurredAt >= since && (e.EventType == SecurityEventType.InvitationSent || e.EventType == SecurityEventType.InvitationAccepted))
+            .OrderBy(e => e.Id)
+            .ToListAsync());
+
+        events.Select(e => (e.EventType, e.PersonId, e.ActorUserAccountId, e.Detail)).ShouldBe(
+        [
+            (SecurityEventType.InvitationSent, (long?)person2, (long?)hrAccount, (string?)null),
+            (SecurityEventType.InvitationAccepted, person2, null, "account-created"),
+        ]);
+    }
 
     [GeneratedRegex("#token=([A-Za-z0-9_-]+)")]
     private static partial Regex TokenPattern();

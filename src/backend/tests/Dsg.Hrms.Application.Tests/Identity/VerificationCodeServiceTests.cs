@@ -3,6 +3,7 @@ using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Notifications;
 using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Application.Tests.Settings;
+using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Notifications;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -21,6 +22,7 @@ public sealed class VerificationCodeServiceTests
     private readonly INotificationDispatch _dispatch = Substitute.For<INotificationDispatch>();
     private readonly FakeSystemParameters _parameters = new();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly ISecurityEventLog _events = Substitute.For<ISecurityEventLog>();
 
     public VerificationCodeServiceTests()
     {
@@ -29,7 +31,7 @@ public sealed class VerificationCodeServiceTests
     }
 
     private VerificationCodeService CreateService() =>
-        new(_store, _hasher, _dispatch, _parameters, _clock, NullLogger<VerificationCodeService>.Instance);
+        new(_store, _hasher, _dispatch, _parameters, _clock, _events, NullLogger<VerificationCodeService>.Instance);
 
     private static VerificationRequest Email(long personId = 1, VerificationPurpose purpose = VerificationPurpose.Registration) =>
         new(personId, purpose, VerificationChannel.Email, "ahmet.yilmaz@duzen.com.tr");
@@ -38,6 +40,29 @@ public sealed class VerificationCodeServiceTests
         new(personId, VerificationPurpose.Registration, VerificationChannel.Sms, "5321234567");
 
     private string LastCode() => _hasher.LastCode!;
+
+    // ------------------------------------------------------------------ kimlik olaylari (SYG-KMLK-060)
+
+    [Fact]
+    public async Task Issuing_records_a_code_sent_event_without_the_code_or_recipient()
+    {
+        await CreateService().IssueAsync(Sms(personId: 7), CancellationToken.None);
+
+        _events.Received(1).Record(SecurityEventType.VerificationCodeSent, null, 7, "registration:sms");
+    }
+
+    [Fact]
+    public async Task Verification_records_success_and_failure_with_the_result()
+    {
+        var service = CreateService();
+        var issued = await service.IssueAsync(Email(personId: 7, purpose: VerificationPurpose.PasswordReset), CancellationToken.None);
+
+        await service.VerifyAsync(issued.CodeId!.Value, "000000" == LastCode() ? "111111" : "000000", CancellationToken.None);
+        await service.VerifyAsync(issued.CodeId!.Value, LastCode(), CancellationToken.None);
+
+        _events.Received(1).Record(SecurityEventType.VerificationFailed, null, 7, "password-reset:mismatch");
+        _events.Received(1).Record(SecurityEventType.VerificationSucceeded, null, 7, "password-reset:verified");
+    }
 
     // ------------------------------------------------------------------ uretim
 

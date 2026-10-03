@@ -78,6 +78,12 @@ Kaydedilecek olaylar:
 Dışa aktarma kayıtlarında **kaç kişinin verisinin** dışarı çıktığı da tutulur; bu,
 olası bir veri sızıntısı incelemesinin ilk sorusudur.
 
+### 3.1 Kimlik olayı kaydı
+
+*Gerçekleştirme (03.10.2026, `KR-094`, #119):* Giriş, kod, parola, oturum ve davet olayları
+`audit.security_event` tablosunda tutulur (SYG-KMLK-060). Kayıt kişisel veri taşımaz. Olay
+işle aynı işlemde yazılır, kayıt değiştirilemez (`KR-060`).
+
 ### 4. Maskeleme — zorunlu kural
 
 Aşağıdaki alanlar **hiçbir log veya denetim kaydında düz metin olarak yer almaz**:
@@ -187,3 +193,4 @@ veri sızıntısı incelemesi mümkün olur.
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-10 | 0.2 | §4 maskeleme biçimleri kesinleştirildi (telefon, IBAN); gerçekleştirme `KR-059` ile iki katmanlı yapıldı | Bilgi İşlem |
+| 2026-10-03 | 0.3 | §3.1 kimlik olayı kaydı gerçekleştirme notu (`KR-094`, #119) | Bilgi İşlem |

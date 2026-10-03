@@ -54,6 +54,8 @@ public static class InfrastructureRegistration
         services.AddScoped<AuditFieldsInterceptor>();
         services.AddScoped<AuditTrailInterceptor>();
         services.AddScoped<IAccessLogger, AccessLogger>();
+        services.AddScoped<SessionEndAuditInterceptor>();
+        services.AddScoped<ISecurityEventLog, SecurityEventLog>();
 
         AddDatabase(services, configuration, environment);
         AddSystemParameters(services, configuration);
@@ -224,7 +226,8 @@ public static class InfrastructureRegistration
             // donusumu once yapilir; denetim izi bu son durumu kaydeder.
             builder.AddInterceptors(
                 provider.GetRequiredService<AuditFieldsInterceptor>(),
-                provider.GetRequiredService<AuditTrailInterceptor>());
+                provider.GetRequiredService<AuditTrailInterceptor>(),
+                provider.GetRequiredService<SessionEndAuditInterceptor>());
 
             if (options.DetailedLoggingEnabled)
             {

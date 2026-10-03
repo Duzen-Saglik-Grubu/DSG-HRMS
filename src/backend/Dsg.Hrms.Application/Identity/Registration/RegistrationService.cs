@@ -4,6 +4,7 @@ using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Application.Identity.Sessions;
 using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Settings;
+using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -45,6 +46,7 @@ public sealed partial class RegistrationService
     private readonly IPasswordHasher _passwordHasher;
     private readonly ISystemParameters _parameters;
     private readonly IDateTimeProvider _clock;
+    private readonly ISecurityEventLog _events;
     private readonly ILogger<RegistrationService> _logger;
 
     /// <summary>Yeni ornek olusturur.</summary>
@@ -61,6 +63,7 @@ public sealed partial class RegistrationService
         IPasswordHasher passwordHasher,
         ISystemParameters parameters,
         IDateTimeProvider clock,
+        ISecurityEventLog events,
         ILogger<RegistrationService> logger)
     {
         _store = store;
@@ -71,6 +74,7 @@ public sealed partial class RegistrationService
         _passwordHasher = passwordHasher;
         _parameters = parameters;
         _clock = clock;
+        _events = events;
         _logger = logger;
     }
 
@@ -97,6 +101,11 @@ public sealed partial class RegistrationService
         // Eslesme yoksa izin verilen tum kanallar sunulur (SYG-KMLK-016).
         var attempt = RegistrationAttempt.Start(nationalIdHash, matched?.PersonId, ipAddress, matched?.Channels ?? allowed, now, request.Purpose);
         _store.Add(attempt);
+        _events.Record(
+            SecurityEventType.RegistrationStarted,
+            null,
+            attempt.PersonId,
+            $"{VerificationCodeService.PurposeCode(attempt.Purpose)}:{(attempt.IsMatch ? "matched" : "unmatched")}");
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         LogStarted(_logger, attempt.PublicId, attempt.IsMatch);
@@ -194,6 +203,11 @@ public sealed partial class RegistrationService
         if (!attempt.IsMatch)
         {
             var decoy = attempt.VerifyDecoy(now);
+            _events.Record(
+                SecurityEventType.VerificationFailed,
+                null,
+                null,
+                $"{VerificationCodeService.PurposeCode(attempt.Purpose)}:unmatched");
             await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new RegistrationVerification(decoy, AccountExists: false);
         }
@@ -264,6 +278,7 @@ public sealed partial class RegistrationService
         var hash = _passwordHasher.Hash(PasswordPolicy.Normalize(password));
         _store.Add(UserAccount.Register(person.Id, hash, now));
         attempt.Complete();
+        _events.Record(SecurityEventType.AccountCreated, null, person.Id, "registration");
 
         // Es zamanli iki istekten ikincisi hesabin tekillik kisitina takilir (SYG-KMLK-021).
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -336,6 +351,7 @@ public sealed partial class RegistrationService
         }
 
         attempt.Complete();
+        _events.Record(SecurityEventType.PasswordReset, account.Id, person.Id);
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         LogPasswordReset(_logger, registrationId, account.Id);

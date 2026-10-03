@@ -10,6 +10,7 @@ using Dsg.Hrms.Application.Identity.Sessions;
 using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Notifications;
 using Dsg.Hrms.Application.Settings;
+using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Notifications;
 using Microsoft.Extensions.Logging;
@@ -74,6 +75,7 @@ public sealed partial class InvitationService
     private readonly INotificationDispatch _dispatch;
     private readonly ISystemParameters _parameters;
     private readonly IDateTimeProvider _clock;
+    private readonly ISecurityEventLog _events;
     private readonly ILogger<InvitationService> _logger;
 
     /// <summary>Yeni ornek olusturur.</summary>
@@ -89,6 +91,7 @@ public sealed partial class InvitationService
         INotificationDispatch dispatch,
         ISystemParameters parameters,
         IDateTimeProvider clock,
+        ISecurityEventLog events,
         ILogger<InvitationService> logger)
     {
         _store = store;
@@ -101,6 +104,7 @@ public sealed partial class InvitationService
         _dispatch = dispatch;
         _parameters = parameters;
         _clock = clock;
+        _events = events;
         _logger = logger;
     }
 
@@ -174,6 +178,7 @@ public sealed partial class InvitationService
             throw new TooManyRequestsException("İleti kuyruğu dolu. Lütfen biraz sonra tekrar deneyin.");
         }
 
+        _events.Record(SecurityEventType.InvitationSent, account?.Id, person.Id);
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         LogSent(_logger, person.Id, invitation.PublicId);
         return new InvitationSent(invitation.ExpiresAt);
@@ -243,6 +248,11 @@ public sealed partial class InvitationService
         }
 
         invitation.Use(now);
+        _events.Record(
+            SecurityEventType.InvitationAccepted,
+            candidate.Account?.Id,
+            person.Id,
+            candidate.Account is null ? "account-created" : "password-reset");
 
         // Es zamanli iki kabulde ikincisi hesabin tekillik kisitina takilir (SYG-KMLK-021).
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

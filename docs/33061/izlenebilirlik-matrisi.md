@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-10-02
+**Son güncelleme:** 2026-10-03
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 
@@ -171,9 +171,9 @@ gelecektir.
 | 37 | `REQ-KMLK-037` Hesap durum değişiklikleri (açılma, pasifleşme, kilitlenme) denetim iz… | SYG-KMLK-053, 058 | `ADR-0009` §2 | kısmen: SYG-058 (pasifleşme ve aktifleşme denetim izinde) · PR #84 — kilitlenme giriş işinde, 053 (davet) sonraki iş; SYG-058 kilitlenme ve kilit kalkması · PR #94 | `PersonnelSyncStoreTests`; `SessionApiTests` | — |
 | 38 | `REQ-KMLK-038` Üyelik denemeleri TCKN başına saatte 5, IP başına saatte 20 ile sınırl… | SYG-KMLK-059 | `ADR-0006` §5, `KR-085` | SYG-059 (TCKN ve IP başına saatlik sınır, 429; IP ters vekilden) · PR #88 | `RegistrationApiTests`, `ReverseProxyRegistrationTests` | — |
 | 39 | `REQ-KMLK-039` Kod gönderimi kişi başına 15 dakikada en fazla 3 kez yapılabilir; sını… | SYG-KMLK-059 | `ADR-0006` §5 | kısmen: SYG-059 (kişi başına 15 dakikada kod sınırı, olay günlüğü) · PR #86 — 429 yanıtı ve üyelik deneme sınırları üyelik işinde; SYG-059 (üyelikte TCKN özetine göre kod sınırı, 429) · PR #88 | `VerificationCodeServiceTests`, `VerificationCodeStoreTests`; `RegistrationApiTests` | — |
-| 40 | `REQ-KMLK-040` Tüm kimlik olayları (giriş, başarısız giriş, kilitlenme, kod gönderimi… | SYG-KMLK-005, 010, 060 | `ADR-0003` §4, `ADR-0009` | kısmen: SYG-005 (çalışma kaydı), 010 (günlük, `/health/sync`) · PR #75, #76 — SYG-060 (kimlik olayları) sonraki işler | `PersonnelSyncServiceTests`, `PersonnelSyncStoreTests`, `PersonnelSyncHealthCheckTests` | — |
-| 41 | `REQ-KMLK-041` Kişisel veriler günlük kayıtlarında maskelenir (TCKN 123*901, telefon … | SYG-KMLK-026, 061 | `ADR-0009` §4, `KR-083` | kısmen: SYG-026 (kod ve alıcı günlüğe yazılmaz, alıcı maskeli) · PR #86 — 061 kimlik olayları işinde | `NotificationDispatcherTests` | — |
-| 42 | `REQ-KMLK-042` Doğrulama kodu ve parola sıfırlama iletileri bildirim istisnasından MU… | SYG-KMLK-062 | — | — | — | — |
+| 40 | `REQ-KMLK-040` Tüm kimlik olayları (giriş, başarısız giriş, kilitlenme, kod gönderimi… | SYG-KMLK-005, 010, 060 | `ADR-0003` §4, `ADR-0009` §3.1, `KR-094` | SYG-005 (çalışma kaydı), 010 (günlük, `/health/sync`) · PR #75, #76; SYG-060 (kimlik olayları `audit.security_event`: üyelik, kod, giriş, kilitlenme, parola, oturum sonu, jeton tekrarı, davet; kullanıcı, IP, izleme kimliği; değiştirilemez) · PR #140 | `PersonnelSyncServiceTests`, `PersonnelSyncStoreTests`, `PersonnelSyncHealthCheckTests`; `SecurityEventApiTests`, `InvitationApiTests`, `VerificationCodeServiceTests` | — |
+| 41 | `REQ-KMLK-041` Kişisel veriler günlük kayıtlarında maskelenir (TCKN 123*901, telefon … | SYG-KMLK-026, 061 | `ADR-0009` §4, `KR-083` | SYG-026 (kod ve alıcı günlüğe yazılmaz, alıcı maskeli) · PR #86; SYG-061 (kimlik akışları uçtan uca çalıştırılıp günlük dosyasında TCKN, e-posta, telefon, kod ve parola aranır) · PR #140 | `NotificationDispatcherTests`, `IdentityLogMaskingTests` | — |
+| 42 | `REQ-KMLK-042` Doğrulama kodu ve parola sıfırlama iletileri bildirim istisnasından MU… | SYG-KMLK-062 | `KR-056`, `KR-094` | SYG-062 (ileti amaçları işlemsel olarak sınıflandırıldı; dağıtıcıda istisna kancası, işlemsel iletiler PRM-BLD-03 açıkken istisnaya sorulmaz; istisnanın kendisi Y1'de) · PR #140 | `NotificationPurposeRulesTests`, `NotificationDispatcherTests` | — |
 | 43 | `REQ-KMLK-043` Tüm ekranlar ve hata mesajları Türkçedir; teknik terim kullanılmaz. | SYG-KMLK-064, 071 | `ADR-0010`, `KR-084`; `ADR-0015` | kısmen: SYG-071 (`/api/v1/identity/`, OpenAPI, Problem Details) · PR #88 — 064 (ekranlar) sonraki iş; SYG-064 (üyelik ekranları ve sunucu iletileri Türkçe, i18n) · PR #91; giriş ekranı ve oturum sonu iletileri · PR #96 | `RegistrationApiTests`; `LoginPage.test.tsx` | — |
 | 44 | `REQ-KMLK-044` Giriş ve üyelik ekranları telefon ve tablette de kullanılabilir. | SYG-KMLK-065 | `ADR-0015` | kısmen: SYG-065 (düzen 360 px'ten itibaren tek sütun, sabit genişlik yok) · PR #91; giriş ekranı aynı düzende · PR #96 — ölçüm kabulde (Gösterim) | — | — |
 | 45 | `REQ-KMLK-045` Ekranlar klavye ile kullanılabilir; form alanlarının etiketi vardır. | SYG-KMLK-066 | `ADR-0015` §7 | kısmen: SYG-066 (etiketli alanlar, klavyeyle akış, adım başlığına odak) · PR #91; giriş ekranı · PR #96 | `RegistrationPage.test.tsx`, `LoginPage.test.tsx` | — |
@@ -232,3 +232,4 @@ dâhil edilmedi. **26.09.2026: zinciri PR #76 ile tamamlandı** (§4.1).
 | 2026-10-01 | 1.8 | §5: 2FA etki uyarısı halkası eklendi (REQ-KMLK-052; #111, PR #112) | Bilgi İşlem |
 | 2026-10-01 | 1.9 | §5: zorunlu parola değişimi halkaları eklendi (REQ-KMLK-030, 055; #113, PR #114) | Bilgi İşlem |
 | 2026-10-02 | 2.0 | §5: REQ-KMLK-026 halkası tamamlandı, SYG-063 HTTPS zorunluluğu (#115, PR #116) | Bilgi İşlem |
+| 2026-10-03 | 2.1 | §5: REQ-KMLK-040, 041, 042 halkaları tamamlandı: SYG-060, 061, 062 (#119, PR #140) | Bilgi İşlem |
