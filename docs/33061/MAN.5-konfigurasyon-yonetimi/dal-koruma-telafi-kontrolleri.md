@@ -87,6 +87,9 @@ denetler:
    - Otomatik olarak bir **düzeltici faaliyet issue'su** açılır
      (`tur:duzeltici-faaliyet`, `surec:MAN.5`, `oncelik:yuksek`),
    - Commit'in kimliği, yazarı, mesajı ve tarihi kayda geçer.
+3. **Denetim yapılamazsa** (GitHub API hatası): adım 3 kez yeniden dener; yine yapılamazsa
+   `[DÜZELTİCİ] Dal koruma denetimi yapılamadı` issue'su açılır. 28.09.2026'da denetim geçici
+   bir API hatasıyla çöktü ve bu, issue açılmadığı için fark edilmedi (olay O-1, #129).
 
 | Özellik | Değer |
 |---|---|
@@ -206,3 +209,4 @@ denetimde sorulduğunda bu belge gösterilecektir.
 | 2026-09-08 | 0.1 | Kısıtın tespiti ve telafi edici kontrollerin tanımlanması | Bilgi İşlem |
 | 2026-09-09 | 0.2 | Kalıcı çözüm kararı işlendi: Free planda kalınacak, telafi kontrolleri kalıcıdır (`KR-055`); `R-16` kabul edildi | Bilgi İşlem |
 | 2026-10-04 | 0.3 | §3.5 inceleme onayı denetimi (`KR-096`, #128) | Bilgi İşlem |
+| 2026-10-04 | 0.4 | §3.3: yeniden deneme ve "denetim yapılamadı" kaydı (#129) | Bilgi İşlem |

@@ -1,0 +1,89 @@
+name: main kirmizi denetimi
+
+# AMAC (#129)
+# main dalinda CI veya API sozlesme denetimi basarisiz oldugunda ZORUNLU bir
+# [HATA] issue'su acar. 30.09.2026'da bir guvenlik acigi (CVE-2026-84782) nedeniyle
+# main ~21 saat kirmizi kaldi ve bu durum hicbir yerde kayda gecmedi; duzeltme
+# ilgisiz bir ozellik PR'inin icinde geldi.
+#
+# Kural (CONTRIBUTING §1.1): main kirmiziyken yeni ozellik birlestirilmez; once
+# duzeltme PR'i birlestirilir ve issue kapatilir.
+
+on:
+  workflow_run:
+    workflows: ["CI", "API sozlesme denetimi"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  issues: write
+  actions: read
+
+jobs:
+  record:
+    name: Basarisiz main calismasini kayda gecir
+    if: github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Issue ac veya mevcut issue'ya ekle
+        uses: actions/github-script@v7
+        with:
+          retries: 3
+          script: |
+            const run = context.payload.workflow_run;
+            const sha = run.head_sha;
+            const title = `[HATA] main kırmızı: ${run.name}`;
+
+            // Ayni is akisi icin acik bir kayit varsa yeni issue acilmaz; calisma eklenir.
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'tur:hata',
+              per_page: 100,
+            });
+            const existing = open.find(i => i.title === title);
+
+            const line = `| ${run.updated_at} | ${sha.substring(0, 7)} | ${run.html_url} |`;
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body: `Yeni başarısız çalışma:\n\n| Zaman | Commit | Çalışma |\n|---|---|---|\n${line}`,
+              });
+              core.info(`Mevcut kayda eklendi: #${existing.number}`);
+              return;
+            }
+
+            const commitTitle = (run.head_commit?.message ?? '').split('\n')[0];
+            const created = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body: [
+                '## Belirti',
+                '',
+                `\`main\` dalında **${run.name}** iş akışı başarısız oldu.`,
+                '',
+                '| Zaman | Commit | Çalışma |',
+                '|---|---|---|',
+                line,
+                '',
+                `Commit: ${commitTitle}`,
+                '',
+                '## Kural (CONTRIBUTING §1.1)',
+                '',
+                '- `main` kırmızıyken yeni özellik birleştirilmez.',
+                '- Düzeltme ayrı bir PR ile yapılır ve bu issue\'yu kapatır.',
+                '- Neden, etki ve tekrarı önleyen önlem bu issue\'ya yazılır.',
+                '',
+                '## Yapılması gerekenler',
+                '',
+                '- [ ] Neden bulundu',
+                '- [ ] Düzeltme PR\'ı birleştirildi ve `main` yeniden yeşil',
+                '- [ ] Tekrarı önleyen önlem yazıldı',
+              ].join('\n'),
+              labels: ['tur:hata', 'oncelik:yuksek', 'surec:TEC.13'],
+            });
+            core.info(`Kayıt açıldı: #${created.data.number}`);

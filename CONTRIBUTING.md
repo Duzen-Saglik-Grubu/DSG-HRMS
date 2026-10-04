@@ -42,6 +42,19 @@ Gerekçe: Değişikliğin *neyi*, *neden* değiştirdiği ve *kim tarafından* o
 kaydedilmiş olur. Dokümanların da bu akıştan geçmesi bilinçli bir karardır — 33061
 açısından bir doküman değişikliği de kontrol edilmesi gereken bir değişikliktir.
 
+### 1.1 `main` kırmızıyken (#129)
+
+`main` dalında CI veya API sözleşme denetimi başarısız olursa `main-failure-check.yml`
+otomatik olarak `[HATA] main kırmızı: …` issue'su açar. Aynı iş akışı için açık bir kayıt
+varsa yeni başarısızlık o kayda eklenir.
+
+- `main` kırmızıyken yeni özellik **birleştirilmez**.
+- Düzeltme ayrı bir PR ile yapılır ve issue'yu kapatır; ilgisiz bir özellik PR'ının içine konmaz.
+- Neden, etki ve tekrarı önleyen önlem issue'ya yazılır.
+
+Gerekçe: 30.09.2026'da `main` bir güvenlik açığı nedeniyle yaklaşık 21 saat kırmızı kaldı ve
+bu hiçbir yerde kayda geçmedi; düzeltme bir özellik PR'ının içinde geldi.
+
 ---
 
 ## 2. İş akışı
@@ -462,8 +475,10 @@ Ayrıntı: `docs/00-DOKUMAN-HARITASI.md` §4
 | `MINOR` | Yeni modül veya yetenek |
 | `MAJOR` | `v1.0.0` = üretime geçiş; sonrasında kırıcı değişiklik |
 
-Kabul edilen her modül bir **etiket (tag)** ve bir **baseline** üretir (MAN.5).
-Sürüm notları `CHANGELOG.md` dosyasında tutulur.
+Kabul edilen her modül bir **MINOR sürüm**, bir **etiket (tag)** ve bir **baseline** üretir
+(MAN.5, `KR-097`). Kabule sunulan sürüm `vX.Y.0-rc.N` ön sürüm etiketini alır; UAT'ye bu
+etiketten kurulur (`docker/deploy-uat.sh`) ve kabul formu bu etikete atıf yapar. Etiketler
+açıklamalıdır ve `CHANGELOG.md`'deki bölümle eşleşir.
 
 ---
 
@@ -511,3 +526,4 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 | 2026-09-26 | 1.0 | §3.2 kapsam dışına "uygulanmış migration adları" istisnası eklendi (PR #75 incelemesi) | Bilgi İşlem |
 | 2026-09-26 | 1.1 | §3.2: kod dosyası adları istisnası kaldırıldı; kod dosyası adları da İngilizce (#81) | Bilgi İşlem |
 | 2026-10-04 | 1.2 | §5 ve §6: tek kişilik düzende onay yorumu (`KR-096`, #128) | Bilgi İşlem |
+| 2026-10-04 | 1.3 | §1.1 `main` kırmızıyken kuralı (#129); §9 kabul adayı etiketi (`KR-097`) | Bilgi İşlem |
