@@ -6,11 +6,16 @@
 # kapsamli iyi testten kotudur; testin NEYI dogruladigina kod incelemesinde
 # bakilir. Bu betik yalnizca tabanin altina dusulmedigini garanti eder.
 #
-# Kullanim: coverage-check.sh <cobertura.xml>
+# Kullanim: coverage-check.sh <birlesik-cobertura.xml> [ham-kapsam-dizini]
+#
+# Ham kapsam dizini verilirse her test projesinin kendi kapsam dosyasini
+# urettigi de denetlenir (#89): eksik bir dosya birlesik raporu sessizce
+# dusururdu ve esik hatasi gercek nedeni gizlerdi.
 
 set -euo pipefail
 
 report="${1:?Cobertura raporu yolu verilmedi}"
+raw_dir="${2:-}"
 
 OVERALL_THRESHOLD=75
 DOMAIN_THRESHOLD=90
@@ -18,6 +23,18 @@ DOMAIN_THRESHOLD=90
 if [[ ! -f "$report" ]]; then
   echo "::error::Kapsam raporu bulunamadi: $report"
   exit 1
+fi
+
+if [[ -n "$raw_dir" ]]; then
+  expected=$(find src/backend/tests -name '*Tests.csproj' | wc -l)
+  # Yalnizca toplayicinin kendi klasorleri (<guid>/coverage.cobertura.xml); trx kaydedicisinin
+  # In/ altina yazdigi kopyalar sayilmaz.
+  actual=$(find "$raw_dir" -mindepth 2 -maxdepth 2 -name 'coverage.cobertura.xml' | wc -l)
+  echo "Kapsam dosyasi     : ${actual} (test projesi: ${expected})"
+  if (( actual != expected )); then
+    echo "::error::Her test projesi kapsam dosyasi uretmeli: ${actual} dosya, ${expected} proje (#89)"
+    exit 1
+  fi
 fi
 
 # Cobertura 'line-rate' degeri 0-1 arasindadir; yuzdeye cevrilir.

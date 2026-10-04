@@ -57,24 +57,32 @@ jobs:
         run: dotnet format src/backend/Dsg.Hrms.slnx --verify-no-changes --no-restore
 
       # KAPI 3 - Testler: tamami gecmeli (mimari testleri dâhil - KAPI 5).
+      #
+      # --collect ZORUNLUDUR (#89): yalnizca --settings ile coverlet'in SUREC ICI
+      # toplayicisi yuklenmez. Disaridaki toplayici isabetleri test sureci kapanirken
+      # okur; cok kisa suren bir test projesinde (Domain: <1 sn) veri yazilmadan surec
+      # biterse kapsam 0 isabet gorunur ve ayni commit farkli sonuc verir.
+      # LogFilePrefix: her test projesi kendi trx dosyasini yazar (onceden ayni ad
+      # kullanildigi icin yalnizca sonuncunun sonucu kaliyordu).
       - name: Testler ve kapsam olcumu
         run: |
           dotnet test src/backend/Dsg.Hrms.slnx \
             --no-build \
+            --collect:"XPlat Code Coverage" \
             --settings src/backend/coverlet.runsettings \
             --results-directory artifacts/coverage \
-            --logger 'trx;LogFileName=test-sonuclari.trx'
+            --logger 'trx;LogFilePrefix=test-sonuclari'
 
       # KAPI 4 - Kapsam esigi: genel %75, Domain %90 (ADR-0011 §1).
       - name: Kapsam raporu
         run: |
           dotnet reportgenerator \
-            "-reports:artifacts/coverage/**/coverage.cobertura.xml" \
+            "-reports:artifacts/coverage/*/coverage.cobertura.xml" \
             "-targetdir:artifacts/coverage-report" \
             "-reporttypes:TextSummary;Cobertura;MarkdownSummaryGithub"
 
       - name: Kapsam esigini denetle
-        run: ./.github/scripts/coverage-check.sh artifacts/coverage-report/Cobertura.xml
+        run: ./.github/scripts/coverage-check.sh artifacts/coverage-report/Cobertura.xml artifacts/coverage
 
       - name: Kapsam ozetini is akisina yaz
         if: always()
@@ -85,9 +93,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-ve-kapsam
+          # Ham kapsam dosyalari da saklanir: kapsam beklenmedik bicimde degisirse
+          # hangi test projesinin verisinin eksik oldugu gorulebilir (#89).
           path: |
             artifacts/coverage-report/
             artifacts/coverage/**/*.trx
+            artifacts/coverage/*/coverage.cobertura.xml
           if-no-files-found: warn
 
   # ------------------------------------------------------------------

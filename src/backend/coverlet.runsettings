@@ -9,7 +9,12 @@
 <RunSettings>
   <DataCollectionRunSettings>
     <DataCollectors>
-      <DataCollector friendlyName="XPlat code coverage">
+      <!--
+        Ad, CI'daki dotnet test - -collect:"XPlat Code Coverage" ile HARFI HARFINE ayni
+        olmalidir (#89). Farkli yazilirsa (orn. "code" kucuk) iki ayri toplayici calisir ve
+        her test projesi iki kapsam dosyasi uretir; bu ayarlar da yalnizca birine uygulanir.
+      -->
+      <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
 
