@@ -4,7 +4,7 @@
 **Süreç:** TEC.3 — Sistem/Yazılım Gereksinimlerinin Tanımlanması
 **Modül:** T3 Kimlik Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-KMLK.md` (23.09.2026'da İK onaylı, 56 gereksinim)
-**Son güncelleme:** 2026-10-01
+**Son güncelleme:** 2026-10-03
 **Sahibi:** Bilgi İşlem
 
 > **Paydaş gereksinimi *ne* istendiğini söyler; bu belge sistemin bunu *hangi
@@ -282,7 +282,7 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 
 | Kimlik | Gereksinim | Tür | Kaynak | Doğrulama | Parametre |
 |---|---|---|---|---|---|
-| **SYG-KMLK-077** | Giriş isteğinin yanıt süresi, 50 eş zamanlı kullanıcıda 95. yüzdelikte 1 saniyenin altındadır (parola özetleme süresi dâhil). | Performans | REQ-KMLK-022 | Analiz | — |
+| **SYG-KMLK-077** | Giriş isteğinin yanıt süresi, girişleri mesai başına yayılan 50 kullanıcıda (60 saniyede 50 giriş) 95. yüzdelikte 1 saniyenin altındadır. 50 giriş isteği **aynı anda** geldiğinde 95. yüzdelik 5 saniyenin altında kalır. Süreler parola özetlemesi dahildir. | Performans | REQ-KMLK-022 | Analiz | — |
 | **SYG-KMLK-078** | Tam bir LOGO senkronizasyonu (bugünkü hacim ≈1.540 kart) 60 saniyenin altında tamamlanır. Böylece istihdamı biten kişinin hesabı en geç periyot + 1 dakika içinde kapanır. | Performans | REQ-KMLK-034 | Analiz | PRM-ENT-07 |
 | **SYG-KMLK-079** | Doğrulama kodu, e-posta ve SMS için istekten itibaren 95. yüzdelikte 60 saniye içinde alıcının sunucusuna / operatöre teslim edilir. Teslim edilemeyen ileti yeniden denenir ve sonucu kaydedilir. | Performans | REQ-KMLK-001, REQ-KMLK-016, REQ-KMLK-021 | Analiz | — |
 
@@ -292,7 +292,7 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 
 | Kimlik | Ölçüt | Hedef | Nasıl ölçülür | İlgili SYG |
 |---|---|---|---|---|
-| **KPÖ-KMLK-1** | Giriş yanıt süresi | p95 < 1 sn (50 eş zamanlı kullanıcı) | UAT'de yük testi | SYG-KMLK-077, 049 |
+| **KPÖ-KMLK-1** | Giriş yanıt süresi | p95 < 1 sn (60 sn'ye yayılan 50 giriş); p95 < 5 sn (aynı anda 50 giriş) | UAT'de yük testi | SYG-KMLK-077, 049 |
 | **KPÖ-KMLK-2** | Üyelik eşleştirmesinde yanıt süresi farkı | Eşleşen/eşleşmeyen medyan farkı < 20 ms (1.000 istek) | Otomatik test | SYG-KMLK-015 |
 | **KPÖ-KMLK-3** | Tam senkronizasyon süresi | < 60 sn (≈1.540 kart) | Çalışma kaydındaki süre | SYG-KMLK-078, 005 |
 | **KPÖ-KMLK-4** | Doğrulama kodu ulaşma süresi | E-posta ve SMS için p95 < 60 sn | Gönderim kaydı / NetGSM raporu | SYG-KMLK-079 |
@@ -340,6 +340,7 @@ yazılıdır; kapanmamış olanlar ⏳ ile işaretlidir.
 | AN-22 | SYG-KMLK-040 "kullanılmış jeton tekrar sunulursa tüm oturumlar kapanır" der; SYG-KMLK-041 ise yeni girişte önceki oturumu kapatır. Kapatılan eski sekme elindeki jetonla tekrar denerse, SYG-040'ın harfi yeni cihazdaki meşru oturumu da kapatırdı. | Yeniden kullanım yalnızca jetonun oturumu **hâlâ açıkken** çalınma sayılır ve tüm oturumlar kapanır. Oturum zaten kapalıysa istek kapanma nedeniyle reddedilir; diğer oturumlara dokunulmaz (`KR-086`, #92). | ✅ |
 | AN-23 | SYG-KMLK-038 hareketsizliği **kullanıcı etkileşimine** göre ölçer; sunucu etkileşimi yalnızca etkinlik sinyali ucundan (SYG-KMLK-039) öğrenebilir. SYG-KMLK-039'un son cümlesi ("istemci sinyali yalnızca medya oynarken ve sekme görünürken gönderir") harfiyen uygulansaydı, etkileşimle çalışan kullanıcının oturumu 30 dakikada kapanırdı. | Cümle, **etkileşim olmadan** gönderilen sinyali sınırlar. İstemci, görünür sekmede kullanıcı etkileşimi (tıklama, tuş, kaydırma, dokunma) olduğunda ve görünür sekmede medya oynarken sinyal gönderir; dakikada en fazla 1. Görünmeyen sekme, fare hareketi ve arka plan istekleri sinyal göndermez (`KR-087`, #95). | ✅ |
 | AN-24 | SYG-KMLK-046 değişimin **ne sıklıkta** isteneceğini söylemez; Y4 taslak kataloğunda da süre parametresi yoktur. SYG-KMLK-050 "ilk giriş"in kapsamını söylemez: S-02 kararı "üyelikte belirlenen parola yeterli" gerekçesiyle parametreyi varsayılan kapalı tutar; açıldığında kimlerin değiştireceği belirsizdir. | (1) Süre yeni parametredir: `PRM-KML-21`, varsayılan 90 gün (30–365). (2) Parametre açıkken hiç giriş yapmamış **her** hesap değiştirir; parolasını üyelikte kendisi belirleyenler de dahildir. Kural açılmadan önce giriş yapmış hesaplar etkilenmez. (3) İkisi de girişte değerlendirilir ve oturumda tutulur. Değişim yapılana kadar yalnızca parola değiştirme ve oturum uçları kullanılabilir; bu kural sunucuda uygulanır (Doğuş Uçanok, 01.10.2026; `KR-092`, #113). | ✅ |
+| AN-25 | SYG-KMLK-077 "50 eş zamanlı kullanıcı" der. UAT ölçümünde (02.10.2026) iki ayrı sorun çıktı. (1) Giriş ucuna, üyelik için tasarlanmış 1 saniyelik en kısa yanıt süresi uygulanmıştı (PR #94); bu durumda hedef hiçbir donanımda karşılanamaz. (2) "Eş zamanlı" sözcüğü 50 isteğin **aynı anda** gelmesi olarak okunursa, 2 çekirdekli sunucuda SYG-KMLK-049'un parola özeti alt sınırı (100 ms) korunarak hedef karşılanamaz: 50 × ≈180 ms / 2 çekirdek ≈ 4,5 sn. | (1) Alt sınır giriş ucundan kaldırıldı. Var olmayan kullanıcı için de özet hesaplandığından (SYG-KMLK-032) süreler zaten ayırt edilemez. (2) "Eş zamanlı kullanıcı", girişleri mesai başına yayılan 50 kullanıcı (60 saniyede 50 giriş) olarak tanımlandı. 50 isteğin aynı anda geldiği durum için ayrıca p95 < 5 sn üst sınırı kondu (Doğuş Uçanok, 03.10.2026; `KR-095`, #120). | ✅ |
 | AN-16 | Denetim izi ve erişim kaydı saklama süreleri (`PRM-KVK-01`, `02`) karar bekliyor. | T3'ü engellemez: kayıtlar üretilir, silme işi karar verildiğinde eklenir. | ⏳ KVKK kararı bekliyor |
 
 **Paydaşa geri bildirim (BP3):** AN-01, onaylı bir kabul kriterinin (REQ-KMLK-004)
@@ -464,3 +465,4 @@ madde `İptal` notuyla kalır.
 | 2026-09-28 | 0.8 | AN-22 eklendi: kapanmış oturumun jeton tekrarı (`KR-086`, #92) | Bilgi İşlem |
 | 2026-09-28 | 0.9 | AN-23 eklendi: etkinlik sinyalinin kapsamı (`KR-087`, #95); §7 kurumsal görsel durumu güncellendi | Bilgi İşlem |
 | 2026-10-01 | 1.0 | SYG-KMLK-046 ve 050 netleştirildi; `PRM-KML-21` eklendi; AN-24 (`KR-092`, #113) | Bilgi İşlem |
+| 2026-10-03 | 1.1 | SYG-KMLK-077 ve KPÖ-KMLK-1 netleştirildi; AN-25 (`KR-095`, #120) | Bilgi İşlem |

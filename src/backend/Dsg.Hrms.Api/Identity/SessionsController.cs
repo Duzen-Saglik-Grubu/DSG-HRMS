@@ -38,12 +38,16 @@ public sealed class SessionsController : ControllerBase
     }
 
     /// <summary>Kurumsal e-posta ve parolayla giris (SYG-KMLK-031…034).</summary>
+    /// <remarks>
+    /// Uyelikteki en kisa yanit suresi (SYG-KMLK-015) burada UYGULANMAZ: var olmayan kullanici
+    /// icin de parola ozeti hesaplandigindan (SYG-KMLK-032) sureler zaten ayirt edilemez; alt
+    /// sinir yalnizca SYG-KMLK-077 hedefini imkansiz kilardi (#120).
+    /// </remarks>
     /// <response code="200">Oturum acildi veya iki adimli dogrulama gerekiyor.</response>
     /// <response code="401">E-posta veya parola hatali (hesap olsa da olmasa da ayni yanit).</response>
     /// <response code="403">Hesap kullanima kapali.</response>
     /// <response code="429">Cok fazla hatali deneme; e-posta gecici olarak kilitli.</response>
     [HttpPost]
-    [MinimumResponseTime]
     [ProducesResponseType<SignInResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]

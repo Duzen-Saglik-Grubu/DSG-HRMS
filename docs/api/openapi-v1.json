@@ -1567,6 +1567,7 @@
           "Sessions"
         ],
         "summary": "Kurumsal e-posta ve parolayla giris (SYG-KMLK-031…034).",
+        "description": "Uyelikteki en kisa yanit suresi (SYG-KMLK-015) burada UYGULANMAZ: var olmayan kullanici\nicin de parola ozeti hesaplandigindan (SYG-KMLK-032) sureler zaten ayirt edilemez; alt\nsinir yalnizca SYG-KMLK-077 hedefini imkansiz kilardi (#120).",
         "requestBody": {
           "content": {
             "application/json": {

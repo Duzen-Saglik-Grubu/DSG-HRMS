@@ -1469,7 +1469,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Kurumsal e-posta ve parolayla giris (SYG-KMLK-031…034). */
+        /**
+         * Kurumsal e-posta ve parolayla giris (SYG-KMLK-031…034).
+         * @description Uyelikteki en kisa yanit suresi (SYG-KMLK-015) burada UYGULANMAZ: var olmayan kullanici
+         *     icin de parola ozeti hesaplandigindan (SYG-KMLK-032) sureler zaten ayirt edilemez; alt
+         *     sinir yalnizca SYG-KMLK-077 hedefini imkansiz kilardi (#120).
+         */
         post: {
             parameters: {
                 query?: never;
