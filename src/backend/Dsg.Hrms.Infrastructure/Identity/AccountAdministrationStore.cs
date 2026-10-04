@@ -26,6 +26,7 @@ public sealed class AccountAdministrationStore : IAccountAdministrationStore
         bool descending,
         PageRequest page,
         DateTimeOffset now,
+        long? currentAccountId,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(page);
@@ -81,7 +82,7 @@ public sealed class AccountAdministrationStore : IAccountAdministrationStore
 
         var accounts = await _context.Set<UserAccount>().AsNoTracking()
             .Where(a => ids.Contains(a.PersonId))
-            .Select(a => new { a.PersonId, a.Status, a.StatusReason, a.LockedUntil })
+            .Select(a => new { a.Id, a.PersonId, a.Status, a.StatusReason, a.LockedUntil })
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
@@ -99,7 +100,8 @@ public sealed class AccountAdministrationStore : IAccountAdministrationStore
                 row.LastName,
                 [.. employments.Where(e => e.PersonId == row.Id).Select(e => new AccountEmployment(e.RegistryCode, e.CompanyName, e.IsActive))],
                 state,
-                account?.StatusReason);
+                account?.StatusReason,
+                account is not null && account.Id == currentAccountId);
         }).ToList();
 
         return new PagedResult<AccountSummary>(items, page.Page, page.PageSize, total);
@@ -118,6 +120,20 @@ public sealed class AccountAdministrationStore : IAccountAdministrationStore
         var hasActiveEmployment = await _context.Set<Employment>().AnyAsync(e => e.PersonId == person.Id && e.IsActive, cancellationToken).ConfigureAwait(false);
 
         return (person, account, hasActiveEmployment);
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> IsLastActiveSystemAdministratorAsync(long accountId, CancellationToken cancellationToken)
+    {
+        var administrators =
+            from userRole in _context.Set<UserRole>().AsNoTracking()
+            join role in _context.Set<Role>().AsNoTracking() on userRole.RoleId equals role.Id
+            join account in _context.Set<UserAccount>().AsNoTracking() on userRole.UserAccountId equals account.Id
+            where role.Code == Role.SystemAdministratorCode && account.Status == AccountStatus.Active
+            select account.Id;
+
+        return await administrators.ContainsAsync(accountId, cancellationToken).ConfigureAwait(false)
+            && !await administrators.AnyAsync(id => id != accountId, cancellationToken).ConfigureAwait(false);
     }
 
     private static string EscapeLike(string value) =>

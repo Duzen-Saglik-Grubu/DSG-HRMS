@@ -114,7 +114,8 @@ public sealed class AccountsController : ControllerBase
             AccountStatusReason.Manual => AccountStatusReasonKind.Manual,
             AccountStatusReason.NewEmployment => AccountStatusReasonKind.NewEmployment,
             _ => null,
-        });
+        },
+        summary.IsCurrentUser);
 }
 
 /// <summary>Sayfalanmis yanit (ADR-0010 §4).</summary>
@@ -198,13 +199,15 @@ public enum SortOrder
 /// <param name="Employments">Istihdamlar (sicil ve firma).</param>
 /// <param name="State">Hesap durumu.</param>
 /// <param name="StatusReason">Durumun nedeni.</param>
+/// <param name="IsCurrentUser">Satir oturumdaki kullanicinin kendisi mi; kendi hesabi pasife alinamaz (#138).</param>
 public sealed record AccountSummaryResponse(
     Guid PersonId,
     string FirstName,
     string LastName,
     IReadOnlyList<AccountEmploymentResponse> Employments,
     AccountStateKind State,
-    AccountStatusReasonKind? StatusReason);
+    AccountStatusReasonKind? StatusReason,
+    bool IsCurrentUser);
 
 /// <summary>Istihdam.</summary>
 /// <param name="RegistryCode">Sicil numarasi.</param>

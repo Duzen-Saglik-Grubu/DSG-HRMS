@@ -2044,7 +2044,8 @@
           "lastName",
           "employments",
           "state",
-          "statusReason"
+          "statusReason",
+          "isCurrentUser"
         ],
         "type": "object",
         "properties": {
@@ -2082,6 +2083,10 @@
                 "$ref": "#/components/schemas/AccountStatusReasonKind"
               }
             ]
+          },
+          "isCurrentUser": {
+            "type": "boolean",
+            "description": "Satir oturumdaki kullanicinin kendisi mi; kendi hesabi pasife alinamaz (#138)."
           }
         },
         "description": "Listedeki kisi. Yalnizca ad, soyad, sicil ve firma (SYG-KMLK-073)."

@@ -15,6 +15,9 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ## [Yayımlanmamış]
 
+### Düzeltildi
+- Kullanıcı kendi hesabını pasife alamaz; aktif kalan son sistem yöneticisinin hesabı da pasife alınamaz. Önceden tek yönetici kendi hesabını pasife alıp sistemi yönetilemez bırakabiliyordu (#138)
+
 ---
 
 ## [0.2.0-rc.1] — 2026-10-04 · T3 Kimlik Yönetimi kabul adayı

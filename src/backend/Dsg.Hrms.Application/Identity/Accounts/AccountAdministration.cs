@@ -40,13 +40,15 @@ public sealed record AccountEmployment(string RegistryCode, string CompanyName, 
 /// <param name="Employments">Istihdamlar.</param>
 /// <param name="State">Hesap durumu.</param>
 /// <param name="StatusReason">Durumun nedeni (pasif veya elle aktiflestirilmisse).</param>
+/// <param name="IsCurrentUser">Satir, islemi yapan kullanicinin kendisi mi; ekran pasife alma dugmesini gostermez (#138).</param>
 public sealed record AccountSummary(
     Guid PersonId,
     string FirstName,
     string LastName,
     IReadOnlyList<AccountEmployment> Employments,
     AccountState State,
-    AccountStatusReason? StatusReason);
+    AccountStatusReason? StatusReason,
+    bool IsCurrentUser);
 
 /// <summary>Arama siralamasi.</summary>
 public enum AccountSort
@@ -71,10 +73,16 @@ public interface IAccountAdministrationStore
         bool descending,
         PageRequest page,
         DateTimeOffset now,
+        long? currentAccountId,
         CancellationToken cancellationToken);
 
     /// <summary>Kisiyi, hesabini (izlenen) ve aktif istihdami olup olmadigini bulur.</summary>
     Task<(Person Person, UserAccount? Account, bool HasActiveEmployment)?> FindAsync(Guid personId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Hesap Sistem Yoneticisi rolune sahip ve bu role sahip baska aktif hesap yok mu (#138).
+    /// </summary>
+    Task<bool> IsLastActiveSystemAdministratorAsync(long accountId, CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -95,6 +103,7 @@ public sealed partial class AccountAdministrationService
 {
     private readonly IAccountAdministrationStore _store;
     private readonly ISessionStore _sessions;
+    private readonly ICurrentUser _currentUser;
     private readonly IAccessLogger _accessLogger;
     private readonly IDateTimeProvider _clock;
     private readonly ILogger<AccountAdministrationService> _logger;
@@ -104,12 +113,14 @@ public sealed partial class AccountAdministrationService
     public AccountAdministrationService(
         IAccountAdministrationStore store,
         ISessionStore sessions,
+        ICurrentUser currentUser,
         IAccessLogger accessLogger,
         IDateTimeProvider clock,
         ILogger<AccountAdministrationService> logger)
     {
         _store = store;
         _sessions = sessions;
+        _currentUser = currentUser;
         _accessLogger = accessLogger;
         _clock = clock;
         _logger = logger;
@@ -126,7 +137,7 @@ public sealed partial class AccountAdministrationService
         ArgumentNullException.ThrowIfNull(page);
 
         var trimmed = string.IsNullOrWhiteSpace(term) ? null : term.Trim();
-        var result = await _store.SearchAsync(trimmed, sort, descending, page, _clock.UtcNow, cancellationToken).ConfigureAwait(false);
+        var result = await _store.SearchAsync(trimmed, sort, descending, page, _clock.UtcNow, _currentUser.UserId, cancellationToken).ConfigureAwait(false);
 
         await _accessLogger.LogAsync(
             AccessRecord.List(nameof(Person), result.Items.Count, new Dictionary<string, string?> { ["q"] = trimmed, ["page"] = page.Page.ToString(System.Globalization.CultureInfo.InvariantCulture) }),
@@ -139,13 +150,31 @@ public sealed partial class AccountAdministrationService
     /// Hesabi gerekceyle elle pasife alir; acik oturumlar hemen kapanir (SYG-KMLK-054, 057).
     /// </summary>
     /// <exception cref="NotFoundException">Kisi yoksa.</exception>
-    /// <exception cref="BusinessRuleException">Kisinin hesabi yoksa veya hesap zaten pasifse.</exception>
+    /// <exception cref="BusinessRuleException">
+    /// Kisinin hesabi yoksa, hesap zaten pasifse, hesap islemi yapanin kendisininse veya
+    /// aktif kalan son sistem yoneticisininse.
+    /// </exception>
+    /// <remarks>
+    /// Son iki kural sistemin yonetilemez hale gelmesini onler (#138): pasif hesap giris
+    /// yapamaz ve hesabi yeniden aktiflestirecek baska yonetici yoksa yalnizca veritabanina
+    /// dogrudan mudahaleyle geri donulebilir.
+    /// </remarks>
     public async Task DeactivateAsync(Guid personId, string reason, CancellationToken cancellationToken)
     {
         var (_, account, _) = await FindWithAccountAsync(personId, cancellationToken).ConfigureAwait(false);
         if (account.Status == AccountStatus.Passive)
         {
             throw new BusinessRuleException("Hesap zaten pasif.");
+        }
+
+        if (account.Id == _currentUser.UserId)
+        {
+            throw new BusinessRuleException("Kendi hesabınızı pasife alamazsınız. Gerekirse başka bir yetkili kullanıcıdan isteyin.");
+        }
+
+        if (await _store.IsLastActiveSystemAdministratorAsync(account.Id, cancellationToken).ConfigureAwait(false))
+        {
+            throw new BusinessRuleException("Bu kişi aktif kalan son sistem yöneticisi; hesabı pasife alınırsa sistemi yönetecek kimse kalmaz. Önce başka bir kişiye Sistem Yöneticisi rolü verilmelidir.");
         }
 
         account.DeactivateManually(reason);

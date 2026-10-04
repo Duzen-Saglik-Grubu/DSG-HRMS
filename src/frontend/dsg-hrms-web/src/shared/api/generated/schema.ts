@@ -1978,6 +1978,8 @@ export interface components {
             /** @description Hesap durumu. */
             state: components["schemas"]["AccountStateKind"];
             statusReason: null | components["schemas"]["AccountStatusReasonKind"];
+            /** @description Satir oturumdaki kullanicinin kendisi mi; kendi hesabi pasife alinamaz (#138). */
+            isCurrentUser: boolean;
         };
         /** @description Oturum icinde parola degisikligi istegi (SYG-KMLK-048). */
         ChangePasswordRequest: {

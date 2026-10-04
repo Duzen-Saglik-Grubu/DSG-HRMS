@@ -17,6 +17,7 @@ const ACTIVE: AccountSummary = {
   employments: [{ registryCode: '00012', companyName: 'Düzen Laboratuvarlar', isActive: true }],
   state: 'active',
   statusReason: null,
+  isCurrentUser: false,
 };
 
 const PASSIVE: AccountSummary = {
@@ -26,6 +27,7 @@ const PASSIVE: AccountSummary = {
   employments: [{ registryCode: '00034', companyName: 'Düzen Laboratuvarlar', isActive: false }],
   state: 'passive',
   statusReason: 'employmentEnded',
+  isCurrentUser: false,
 };
 
 const NONE: AccountSummary = {
@@ -35,6 +37,7 @@ const NONE: AccountSummary = {
   employments: [{ registryCode: '00056', companyName: 'Düzen Laboratuvarlar', isActive: true }],
   state: 'none',
   statusReason: null,
+  isCurrentUser: false,
 };
 
 function page(items: AccountSummary[]) {
@@ -92,6 +95,16 @@ describe('AccountsPage', () => {
     expect(
       within(passive).queryByRole('button', { name: 'Bağlantı gönder' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('kendi hesabi icin pasife alma sunmaz', async () => {
+    // #138: yonetici kendi hesabini pasife alip sistem disinda kalmamali.
+    vi.mocked(accountsApi.search).mockResolvedValue(page([{ ...ACTIVE, isCurrentUser: true }]));
+    renderWithProviders(<AccountsPage />);
+
+    const own = (await screen.findByText('Ayşe Demir')).closest('tr')!;
+    expect(within(own).queryByRole('button', { name: 'Pasife al' })).not.toBeInTheDocument();
+    expect(within(own).getByText('Kendi hesabınız')).toBeInTheDocument();
   });
 
   it('pasife alma gerekce ister, gonderir ve sonucu bildirir', async () => {
