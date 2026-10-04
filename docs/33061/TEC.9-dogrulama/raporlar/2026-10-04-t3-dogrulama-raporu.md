@@ -122,12 +122,12 @@ adımları kabulde telefonla denenecek (#124).
 | Konteyner taraması (trivy) | ✅ | CI (api, web) |
 | Migration kontrolü | ✅ | CI "Bekleyen model değişikliği yok" |
 | Biçim (`dotnet format`, Prettier) | ✅ | CI |
-| **Kod gözden geçirme: en az bir onay** | ⚠️ | PR'lar kullanıcı tarafından incelenip onaylanıyor, ancak GitHub'da onay kaydı oluşmuyor (açan ve birleştiren aynı hesap). Telafi edici kontrol: #128 |
+| Kod gözden geçirme: en az bir onay | ✅ (1.2) | 65 PR'ın onayı geriye dönük kayda geçti (`MAN.8-kalite-guvence/kayitlar/2026-10-04-pr-onay-kaydi.md`). Bundan sonra onay yorumu CI'da denetleniyor (`KR-096`, #128) |
 | Gereksinim izlenebilirliği (proje ek kapısı) | ✅ | REQ → SYG → test, CI'da |
 
 **Önerilen karar: KOŞULLU GEÇTİ.**
 - Otomatik kapıların tamamı geçti.
-- **Koşul 1:** Kod gözden geçirme kapısının kanıtı #128 ile kayıt altına alınır.
+- **Koşul 1:** ~~Kod gözden geçirme kanıtı~~ — karşılandı (#128, 1.2).
 - **Koşul 2:** ~~Uçtan uca test eksiği~~ — karşılandı (#146, 1.1).
 - **Koşul 3:** SYG-064 incelemesi kabul öncesinde yapılır (#124).
 
@@ -143,7 +143,7 @@ adımları kabulde telefonla denenecek (#124).
 |---|---|---|---|
 | 1 | ~~Uçtan uca test yok~~ | **Kapandı (1.1):** 7 senaryo her PR'da çalışıyor. Davet senaryosu, düzeltme öncesi kodla çalıştırıldığında #137'yi yakaladı | #146 |
 | 2 | SYG-064 (Türkçe, teknik terimsiz iletiler) yalnızca kısmen testli | Kabulde görülebilecek dil sorunları | #124 (kabul öncesi metin incelemesi) |
-| 3 | Kod gözden geçirme onayı GitHub'da kayıtlı değil | PA 2.2 (d) kanıtı zayıf | #128 |
+| 3 | ~~Kod gözden geçirme onayı GitHub'da kayıtlı değil~~ | **Kapandı (1.2):** geriye dönük kayıt ve CI denetimi | #128 |
 | 4 | CI kayıtları 90 gün saklanıyor | Ham test kanıtı kaybolur; bu rapor kalıcı özettir | #136 |
 | 5 | Gösterim yöntemli 3 SYG (028, 068, 073) | Testle doğrulandı; gösterim İK'ya kabulde | #124 |
 
@@ -239,3 +239,4 @@ adımları kabulde telefonla denenecek (#124).
 |---|---|---|---|
 | 2026-10-04 | 1.0 | İlk sürüm: T3 doğrulama raporu ve G2 kapı kaydı (#123) | Bilgi İşlem |
 | 2026-10-04 | 1.1 | Uçtan uca testler eklendi (#146): §3, §5 koşul 2, §6 madde 1 | Bilgi İşlem |
+| 2026-10-04 | 1.2 | Kod gözden geçirme kanıtı (#128): §5 koşul 1, §6 madde 3 | Bilgi İşlem |

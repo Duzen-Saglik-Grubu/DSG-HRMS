@@ -95,7 +95,7 @@ Pull Request, aşağıdakilerin tamamı geçmeden birleştirilemez:
 | Konteyner taraması | `trivy` — kritik açık yok |
 | Migration kontrolü | Bekleyen model değişikliği yok |
 | Biçim | `dotnet format` ve Prettier temiz |
-| Kod gözden geçirme | En az bir onay |
+| Kod gözden geçirme | En az bir onay. Tek kişilik düzende PR'a birleştirmeden önce yazılan onay yorumu; `main`'de denetlenir (`KR-096`) |
 
 Kapılar **uyarı değil, engeldir.** Geçici olarak devre dışı bırakılması gerekirse
 gerekçesi PR'da yazılır ve `duzeltici-faaliyet` etiketli bir issue açılır (MAN.8).
@@ -170,3 +170,4 @@ dönmek ise kalite kaybı demektir.
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-09 | 0.2 | İddia kütüphanesi FluentAssertions yerine Shouldly (`KR-057`) | Bilgi İşlem |
+| 2026-10-04 | 0.3 | §6 kod gözden geçirme kapısının tek kişilik düzende kanıtı (`KR-096`, #128) | Bilgi İşlem |
