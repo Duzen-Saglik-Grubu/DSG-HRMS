@@ -16,3 +16,4 @@ doğrulama geçtikten sonra ekler; satır PR ile commit edilir. Aynı bilgi sunu
 
 | Zaman (UTC) | Sürüm | Commit | Dağıtan |
 |---|---|---|---|
+| 2026-10-04T18:47:00Z | v0.2.0-rc.1 | `6cfeef0` | Doğuş Uçanok |

@@ -34,7 +34,7 @@ T3'ün, İK'nın 23.09.2026'da onayladığı gereksinimleri **gerçek kullanımd
 | | |
 |---|---|
 | Ortam | UAT — https://insankaynaklaritest.duzen.com.tr (gerçek LOGO verisi, `KR-024`) |
-| Sürüm | Kabul adayı **etiketli** sürüm. Etiket ve dağıtım kaydı #125 ile kurulacak; forma etiket yazılır |
+| Sürüm | **`v0.2.0-rc.1`** (commit `6cfeef0`), UAT'ye 04.10.2026'da kuruldu (`TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`). Oturumdan önce çalışan sürüm yeniden doğrulanır; forma etiket yazılır |
 | İletiler | UAT izin listesi kipinde (`AllowList`, `KR-083`): yalnızca listedeki adreslere ve numaralara e-posta ve SMS gider. **Katılımcıların kurumsal e-postaları ve cep telefonları oturumdan önce listeye eklenir** (`NOTIFICATIONS_ALLOWED_RECIPIENTS`), oturumdan sonra çıkarılır |
 | Cihazlar | Masaüstü tarayıcı + en az bir cep telefonu (REQ-KMLK-044) |
 | Süre | Yaklaşık 2 saat (senaryolar 75 dk, kanıt gösterimi 30 dk, değerlendirme 15 dk) |
@@ -47,7 +47,7 @@ Kabul oturumu ancak aşağıdakilerin tamamı sağlanınca yapılır:
 
 - [x] **G2 "Geliştirme tamam"** kapısı geçti (T3 doğrulama raporu §5; 04.10.2026)
 - [x] **SYG-KMLK-064 metin incelemesi** kararı verildi ve onaylanan düzeltmeler uygulandı (04.10.2026, #152)
-- [ ] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (#125)
+- [x] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (`v0.2.0-rc.1`, 04.10.2026; #125, #157)
 - [ ] Katılımcılar İK tarafından belirlendi; adresleri ve numaraları UAT izin listesine eklendi
 - [ ] Katılımcılara kısa kullanım notu verildi (`T3-kullanim-notu.md`, #154)
 - [ ] Bilinen açık `[HATA]` kaydı yok veya her biri kabul öncesinde İK'ya bildirildi
@@ -263,3 +263,4 @@ Kabul kararından önce düzeltilmesi gerekenler İK ile birlikte belirlenir.
 | 2026-10-04 | 0.1 | İlk taslak (#124) | Bilgi İşlem |
 | 2026-10-04 | 0.2 | §4: SYG-064 giriş ölçütü karşılandı (#152) | Bilgi İşlem |
 | 2026-10-04 | 0.3 | §4: kullanım notu #154 ile hazırlandı (#130 yerine); G2 giriş ölçütü karşılandı | Bilgi İşlem |
+| 2026-10-04 | 0.4 | §3, §4: kabul adayı `v0.2.0-rc.1` etiketlendi ve UAT'ye kuruldu (#157) | Bilgi İşlem |
