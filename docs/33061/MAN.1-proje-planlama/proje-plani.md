@@ -117,9 +117,9 @@ gerçekçi olmaz ve MAN.2 izlemesini anlamsızlaştırır.
 |---|---|---|
 | **A0 — Hazırlık** | Doküman altyapısı, ADR'ler, kapsam ✅ *(tamamlanıyor)* | Onaylı vizyon-kapsam ve plan |
 | **A1 — İskelet** | Solution yapısı, CI/CD, Docker, GitHub kurulumu, kalite kapıları | `v0.1.0` |
-| **A2 — Temel** | T1 Personel · T2 Organizasyon · T3 Kimlik ★ · T4 Rol/Yetki · T5 Kullanıcı | `v0.2.0` — **ilk kullanıcı teslimi** |
-| **A3 — Yatay altyapı** | Y1–Y5, Y8, Y10 (bildirim, denetim, referans veri, sistem, iş akışı, raporlama, çalışma takvimi) | `v0.3.0` |
-| **A4+ — İş modülleri** | İK önceliklendirmesine göre, modül başına bir sürüm | `v0.4.0`, `v0.5.0` … |
+| **A2 — Temel** | T1 Personel · T2 Organizasyon · T3 Kimlik ★ · T4 Rol/Yetki · T5 Kullanıcı | Modül başına bir sürüm (`KR-097`): T3 → `v0.2.0` — **ilk kullanıcı teslimi**; kalanlar kabul sırasıyla `v0.3.0` … |
+| **A3 — Yatay altyapı** | Y1–Y5, Y8, Y10 (bildirim, denetim, referans veri, sistem, iş akışı, raporlama, çalışma takvimi) | Modül başına bir sürüm |
+| **A4+ — İş modülleri** | İK önceliklendirmesine göre, modül başına bir sürüm | Modül başına bir sürüm |
 | **AS — Geçiş** | Veri göçü denemeleri, kesim, devreye alma | `v1.0.0` |
 
 > **A2 sonunda personel sisteme girebilir hâle gelir** ancak henüz iş yapamaz. Bu, İK'ya
@@ -276,3 +276,4 @@ MAN.2 kapsamında yürütülür.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-07 | 0.1 | İlk taslak | Bilgi İşlem |
+| 2026-10-04 | 0.2 | §3 aşama tablosu: modül başına sürüm (`KR-097`, #125) | Bilgi İşlem |

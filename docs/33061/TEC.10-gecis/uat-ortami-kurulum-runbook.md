@@ -1,9 +1,9 @@
 # UAT Ortamı — Kurulum ve Dağıtım Runbook'u
 
 **Belge kimliği:** TEC.10-RB-001
-**Son güncelleme:** 2026-10-02
+**Son güncelleme:** 2026-10-04
 **İlgili süreçler:** TEC.10 (Geçiş), MAN.5 (Konfigürasyon Yönetimi)
-**İlgili kararlar:** `KR-024`, `KR-038`, `KR-065`
+**İlgili kararlar:** `KR-024`, `KR-038`, `KR-065`, `KR-097`
 
 > Elle yapılan bir kurulum, ikinci kez yapıldığında farklı çıkar. Bu belge kurulumun
 > **tekrarlanabilir** olmasını sağlar; ayrıca kurulumu yapan kişi dışındakilerin de
@@ -99,15 +99,40 @@ chmod 600 /opt/dsg-hrms/secrets/.env.uat
 
 ## 3. Dağıtım (her sürümde)
 
+Dağıtım `./docker/deploy-uat.sh` ile yapılır; betik aşağıdaki adımların hepsini sırasıyla
+uygular. Adımlar, betiğin ne yaptığını anlamak ve gerektiğinde elle uygulamak içindir.
+
+### 3.0 Sürümü seç
+
+```bash
+# Kabul oturumu için: etiketli sürüm (KR-097)
+git checkout v0.2.0-rc.1
+# Ara dağıtım için: main'in son hâli
+git checkout main && git pull
+```
+
+Betik iki koşul arar:
+- **Kod commit edilmiş olmalı.** `src`, `docker`, `global.json` ve `assets` altında commit edilmemiş değişiklik varsa dağıtım durur.
+- **Commit GitHub'a gönderilmiş olmalı.** Böylece UAT'de çalışan her sürüm depoda bulunur.
+
+Etiketsiz bir commit de dağıtılabilir; betik bu durumda uyarı verir. Kabul oturumu yalnızca
+etiketli sürümle yapılır.
+
 ### 3.1 Kaynağı aktar
 
 ```bash
 # Geliştirici makinesinde, depo kökünde:
-tar czf - --exclude=node_modules --exclude=bin --exclude=obj --exclude=dist \
-    --exclude=coverage --exclude=logs src docker global.json assets \
+git archive --format=tar.gz HEAD src docker global.json assets \
   | ssh root@192.168.3.202 'rm -rf /opt/dsg-hrms/src /opt/dsg-hrms/docker \
       && mkdir -p /opt/dsg-hrms && tar xzf - -C /opt/dsg-hrms'
 ```
+
+> **Neden `git archive`:** Yalnızca commit'teki dosyalar gider. Çalışma kopyasındaki yerel
+> dosyalar (`docker/.env`, `appsettings.Local.json`) sunucuya ulaşmaz. Önceki yöntem
+> (`tar`) bunları da taşıyordu: 04.10.2026'ya kadar geliştirici makinesindeki `docker/.env`
+> her dağıtımda sunucuya kopyalandı (#125). Yığın `--env-file` ile yalnızca UAT sır
+> dosyasını okuduğu için bu kopya kullanılmadı. Bir sonraki dağıtım `docker/` dizinini
+> silerek kopyayı da kaldırır.
 
 > **Bu adım `docker/` dizinini SİLER.** Bu yüzden ortam dosyası oraya konmaz;
 > `/opt/dsg-hrms/secrets/.env.uat` altında, aktarımın dokunmadığı bir yerde durur
@@ -118,8 +143,18 @@ tar czf - --exclude=node_modules --exclude=bin --exclude=obj --exclude=dist \
 
 ```bash
 cd /opt/dsg-hrms
-docker build -f src/backend/Dsg.Hrms.Api/Dockerfile -t dsg-hrms-api:uat src/backend
-docker build -t dsg-hrms-web:uat src/frontend/dsg-hrms-web
+# SURUM: git describe --tags --always, COMMIT: git rev-parse HEAD (geliştirici makinesinde)
+docker build -f src/backend/Dsg.Hrms.Api/Dockerfile -t dsg-hrms-api:uat -t dsg-hrms-api:$SURUM \
+  --label org.opencontainers.image.revision=$COMMIT --label org.opencontainers.image.version=$SURUM src/backend
+docker build -t dsg-hrms-web:uat -t dsg-hrms-web:$SURUM \
+  --label org.opencontainers.image.revision=$COMMIT --label org.opencontainers.image.version=$SURUM src/frontend/dsg-hrms-web
+```
+
+İmaj, hangi commit'ten derlendiğini etiketinde taşır. Çalışan sürüm şöyle okunur:
+
+```bash
+docker inspect --format '{{index .Config.Labels "org.opencontainers.image.version"}} {{index .Config.Labels "org.opencontainers.image.revision"}}' dsg-hrms-uat-api
+cat /opt/dsg-hrms/VERSION
 ```
 
 > Backend derlemesi 2 çekirdekli sunucuda **10–20 dakika** sürer. Uzun sürerse
@@ -141,7 +176,7 @@ scp /tmp/sema.sql root@192.168.3.202:/opt/dsg-hrms/sema.sql
 
 # Sunucuda:
 cd /opt/dsg-hrms/docker
-set -a && . ./.env.uat && set +a
+set -a && . /opt/dsg-hrms/secrets/.env.uat && set +a
 docker exec -i dsg-hrms-uat-postgres \
   psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 < /opt/dsg-hrms/sema.sql
 ```
@@ -155,6 +190,18 @@ docker exec -i dsg-hrms-uat-postgres \
 cd /opt/dsg-hrms/docker
 docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/secrets/.env.uat up -d
 ```
+
+### 3.5 Dağıtımı kaydet
+
+Doğrulama (§4) geçince betik dağıtımı iki yere yazar:
+
+| Kayıt | Yer | İçerik |
+|---|---|---|
+| Sunucu | `/opt/dsg-hrms/deployments.log`; son sürüm `/opt/dsg-hrms/VERSION` | Zaman (UTC), sürüm, commit, dağıtan |
+| Depo | `docs/33061/TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md` | Aynı bilgi; betik satırı ekler, PR ile commit edilir |
+
+Betik, çalışan konteynerlerin etiketindeki commit'i dağıtılan commit'le karşılaştırır.
+Eşleşmezse, yani eski imaj ayakta kalmışsa, dağıtım başarısız sayılır ve kayıt yazılmaz.
 
 ---
 
@@ -577,3 +624,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-09-30 | 1.4 | §12.1: NTS kapalı, düz NTP ile eşitleme ayarı; §12.2 doğrulama (#103) | Bilgi İşlem |
 | 2026-09-30 | 1.5 | §11.1: davet bağlantısının adresi (#107) | Bilgi İşlem |
 | 2026-10-02 | 1.6 | §10.4: HTTPS zorunluluğu ve doğrulaması (#115) | Bilgi İşlem |
+| 2026-10-04 | 1.7 | §3: sürüm seçimi, git archive ile aktarım, imajda commit etiketi, dağıtım kaydı; §3.3 sır dosyası yolu düzeltildi (#125) | Bilgi İşlem |
