@@ -30,7 +30,7 @@
 
 **Sonuç:** T3'ün 79 sistem gereksiniminden 76'sı doğrulandı (SYG-064 düzeltmelerle tamamlandı, 1.4).
 SYG-028, 068 ve 073 testle doğrulandı; gösterim yöntemi gereği İK'ya kabulde
-gösterilecek. G2 kapısı için önerilen karar §5'tedir.
+gösterilecek. G2 kapısı 04.10.2026'da GEÇTİ olarak kayda geçti (§5).
 
 ---
 
@@ -135,7 +135,7 @@ adımları kabulde telefonla denenecek (#124).
 
 | Karar | Tarih | Karar veren |
 |---|---|---|
-| _Bekliyor_ | | Doğuş Uçanok (Bilgi İşlem) |
+| **GEÇTİ** | 04.10.2026 | Doğuş Uçanok (Bilgi İşlem) |
 
 ---
 
@@ -244,3 +244,4 @@ adımları kabulde telefonla denenecek (#124).
 | 2026-10-04 | 1.2 | Kod gözden geçirme kanıtı (#128): §5 koşul 1, §6 madde 3 | Bilgi İşlem |
 | 2026-10-04 | 1.3 | SYG-064 metin incelemesi yapıldı (#124) | Bilgi İşlem |
 | 2026-10-04 | 1.4 | SYG-064 düzeltmeleri (#152): §1, §5 koşul 3, §6 madde 2 | Bilgi İşlem |
+| 2026-10-04 | 1.5 | §5: G2 kararı GEÇTİ (Doğuş Uçanok) | Bilgi İşlem |
