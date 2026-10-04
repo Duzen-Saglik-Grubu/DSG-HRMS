@@ -37,6 +37,7 @@ public enum ParameterType
 /// <param name="Max">Tam sayi icin ust sinir.</param>
 /// <param name="Pattern">Metnin veya her liste ogesinin uymasi gereken ifade.</param>
 /// <param name="AllowedItems">Liste ogesi icin izin verilen degerler.</param>
+/// <param name="FormatHint">Bicime uymayan degerde kullaniciya soylenen bicim, orn. "sunucu:port biçiminde olmalıdır (örneğin mail.duzen.com.tr:587)" (SYG-KMLK-064, B-09).</param>
 public sealed record ParameterDefinition(
     string Key,
     string ConfigurationKey,
@@ -46,7 +47,8 @@ public sealed record ParameterDefinition(
     int? Min = null,
     int? Max = null,
     Regex? Pattern = null,
-    IReadOnlyList<string>? AllowedItems = null)
+    IReadOnlyList<string>? AllowedItems = null,
+    string? FormatHint = null)
 {
     /// <summary>Sir parametre mi.</summary>
     public bool IsSecret => Type == ParameterType.Secret;
@@ -74,7 +76,7 @@ public sealed record ParameterDefinition(
             ParameterType.Toggle => ValidateBoolean(value),
             ParameterType.List => ValidateList(value),
             ParameterType.Text when Pattern is not null && !Pattern.IsMatch(value) =>
-                ParameterValidation.Invalid("Değer beklenen biçimde değil."),
+                ParameterValidation.Invalid(FormatHint is null ? "Değer beklenen biçimde değil." : $"Değer {FormatHint}."),
             _ => ParameterValidation.Valid(value),
         };
     }
@@ -125,7 +127,7 @@ public sealed record ParameterDefinition(
 
             if (Pattern is not null && !Pattern.IsMatch(item))
             {
-                return ParameterValidation.Invalid($"Geçersiz öğe: '{item}'.");
+                return ParameterValidation.Invalid(FormatHint is null ? $"Geçersiz öğe: '{item}'." : $"Geçersiz öğe: '{item}'. Her öğe {FormatHint}.");
             }
         }
 

@@ -36,7 +36,8 @@ public sealed class HttpsRequirementApiTests : IClassFixture<RegistrationApiFixt
         status.ShouldBe(HttpStatusCode.Forbidden);
         location.ShouldBeNull();
         body.GetProperty("type").GetString()!.ShouldEndWith("https-required");
-        body.GetProperty("detail").GetString()!.ShouldContain("HTTPS");
+        body.GetProperty("detail").GetString()!.ShouldContain("güvenli bağlantı");
+        body.GetProperty("detail").GetString()!.ShouldNotContain("HTTPS"); // teknik terim yok (SYG-KMLK-064, B-06)
     }
 
     [Fact]

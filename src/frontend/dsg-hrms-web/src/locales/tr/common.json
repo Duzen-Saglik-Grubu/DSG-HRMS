@@ -10,7 +10,6 @@
   },
   "status": {
     "loading": "Yükleniyor…",
-    "error": "Bir sorun oluştu",
     "emptyList": "Henüz kayıt yok"
   },
   "error": {

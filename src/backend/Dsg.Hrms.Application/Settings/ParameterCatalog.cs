@@ -41,7 +41,7 @@ public static partial class ParameterCatalog
     /// <summary>SMTP sunucusu ve portu (<c>sunucu:port</c>).</summary>
     public static readonly ParameterDefinition SmtpServer = new(
         "PRM-ENT-04", $"{Section}:SmtpServer", ParameterType.Text, "SMTP sunucusu ve portu (sunucu:port)",
-        Pattern: HostAndPort());
+        Pattern: HostAndPort(), FormatHint: "sunucu:port biçiminde olmalıdır (örneğin mail.duzen.com.tr:587)");
 
     /// <summary>SMTP kullanici adi (gonderen hesap).</summary>
     public static readonly ParameterDefinition SmtpUserName = new(
@@ -66,7 +66,7 @@ public static partial class ParameterCatalog
     /// <summary>Kabul edilen kurumsal e-posta alan adlari.</summary>
     public static readonly ParameterDefinition AcceptedEmailDomains = new(
         "PRM-KML-01", $"{Section}:AcceptedEmailDomains", ParameterType.List, "Kabul edilen kurumsal e-posta alan adlari",
-        "duzen.com.tr,zeytinim.com,labpt.com.tr", Pattern: DomainName());
+        "duzen.com.tr,zeytinim.com,labpt.com.tr", Pattern: DomainName(), FormatHint: "bir alan adı olmalıdır (örneğin duzen.com.tr)");
 
     /// <summary>Uyelik ve parola sifirlamada kullanilacak kanallar.</summary>
     public static readonly ParameterDefinition VerificationChannels = new(

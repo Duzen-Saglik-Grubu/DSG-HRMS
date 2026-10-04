@@ -46,7 +46,7 @@ T3'ün, İK'nın 23.09.2026'da onayladığı gereksinimleri **gerçek kullanımd
 Kabul oturumu ancak aşağıdakilerin tamamı sağlanınca yapılır:
 
 - [ ] **G2 "Geliştirme tamam"** kapısı geçti (T3 doğrulama raporu §5)
-- [ ] **SYG-KMLK-064 metin incelemesi** kararı verildi ve onaylanan düzeltmeler uygulandı
+- [x] **SYG-KMLK-064 metin incelemesi** kararı verildi ve onaylanan düzeltmeler uygulandı (04.10.2026, #152)
 - [ ] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (#125)
 - [ ] Katılımcılar İK tarafından belirlendi; adresleri ve numaraları UAT izin listesine eklendi
 - [ ] Katılımcılara kısa kullanım notu verildi (#130 kapsamında hazırlanır)
@@ -261,3 +261,4 @@ Kabul kararından önce düzeltilmesi gerekenler İK ile birlikte belirlenir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-04 | 0.1 | İlk taslak (#124) | Bilgi İşlem |
+| 2026-10-04 | 0.2 | §4: SYG-064 giriş ölçütü karşılandı (#152) | Bilgi İşlem |

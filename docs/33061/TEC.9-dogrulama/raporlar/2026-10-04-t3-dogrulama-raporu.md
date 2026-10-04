@@ -23,12 +23,12 @@
 | Testle doğrulanan | 71 (yöntem: Test) |
 | Ölçümle doğrulanan | 3 (yöntem: Analiz; SYG-077, 078, 079) |
 | Testle desteklenen inceleme / gösterim | 5 (006, 064 İnceleme; 028, 068, 073 Gösterim) |
-| Açık nokta | 1 kısmi (SYG-064); 3 gösterim kabulde (TEC.11) |
-| Backend testi | 767 geçti (Domain 136, Application 280, Infrastructure 75, Mimari 10, Entegrasyon 266) |
+| Açık nokta | 3 gösterim kabulde (TEC.11); SYG-064 kapandı (1.4) |
+| Backend testi | 768 geçti (Domain 136, Application 281, Infrastructure 75, Mimari 10, Entegrasyon 266) |
 | Ön yüz testi | 232 geçti |
 | Kod kapsamı | Backend genel **%92,9** (eşik %75), Domain **%98,9** (eşik %90), ön yüz satır **%88,5** |
 
-**Sonuç:** T3'ün 79 sistem gereksiniminden 75'i doğrulandı. SYG-064 kısmen doğrulandı.
+**Sonuç:** T3'ün 79 sistem gereksiniminden 76'sı doğrulandı (SYG-064 düzeltmelerle tamamlandı, 1.4).
 SYG-028, 068 ve 073 testle doğrulandı; gösterim yöntemi gereği İK'ya kabulde
 gösterilecek. G2 kapısı için önerilen karar §5'tedir.
 
@@ -113,7 +113,7 @@ adımları kabulde telefonla denenecek (#124).
 | Kapı (ADR-0011 §6) | Durum | Kanıt |
 |---|---|---|
 | Derleme (uyarı yok) | ✅ | CI 37197387185 |
-| Birim ve entegrasyon testleri | ✅ | 767 + 232 geçti |
+| Birim ve entegrasyon testleri | ✅ | 768 + 232 geçti |
 | Kapsam eşiği (genel %75, Domain %90) | ✅ | %92,9 / %98,9 |
 | Mimari testi | ✅ | 10 geçti |
 | Statik analiz (.NET, ESLint) | ✅ | CI |
@@ -129,7 +129,9 @@ adımları kabulde telefonla denenecek (#124).
 - Otomatik kapıların tamamı geçti.
 - **Koşul 1:** ~~Kod gözden geçirme kanıtı~~ — karşılandı (#128, 1.2).
 - **Koşul 2:** ~~Uçtan uca test eksiği~~ — karşılandı (#146, 1.1).
-- **Koşul 3:** SYG-064 incelemesi yapıldı (1.3); bulgular için karar bekleniyor.
+- **Koşul 3:** ~~SYG-064 bulguları~~ — karşılandı (#152, 1.4): 7 düzeltme uygulandı, 3 istisna kayda geçti.
+
+Üç koşul da karşılandı. **Önerilen karar artık: GEÇTİ.** Karar satırı karar verenindir.
 
 | Karar | Tarih | Karar veren |
 |---|---|---|
@@ -142,7 +144,7 @@ adımları kabulde telefonla denenecek (#124).
 | # | Nokta | Etki | İzleme |
 |---|---|---|---|
 | 1 | ~~Uçtan uca test yok~~ | **Kapandı (1.1):** 7 senaryo her PR'da çalışıyor. Davet senaryosu, düzeltme öncesi kodla çalıştırıldığında #137'yi yakaladı | #146 |
-| 2 | SYG-064 metin incelemesi yapıldı (1.3); 6 düzeltme ve 1 kaldırma önerisi, 3 istisna kararda | Düzeltmeler kabul öncesinde uygulanır | [metin incelemesi](2026-10-04-syg-064-metin-incelemesi.md) |
+| 2 | ~~SYG-064 metin bulguları~~ | **Kapandı (1.4):** düzeltmeler uygulandı ve testlendi; B-07, B-08, B-10 istisna; uygulama sırasında bulunan B-11 de düzeltildi | #152, [metin incelemesi](2026-10-04-syg-064-metin-incelemesi.md) 1.1 |
 | 3 | ~~Kod gözden geçirme onayı GitHub'da kayıtlı değil~~ | **Kapandı (1.2):** geriye dönük kayıt ve CI denetimi | #128 |
 | 4 | CI kayıtları 90 gün saklanıyor | Ham test kanıtı kaybolur; bu rapor kalıcı özettir | #136 |
 | 5 | Gösterim yöntemli 3 SYG (028, 068, 073) | Testle doğrulandı; gösterim İK'ya kabulde | #124 |
@@ -216,7 +218,7 @@ adımları kabulde telefonla denenecek (#124).
 | SYG-KMLK-061 | TCKN, telefon ve e-posta günlük kayıtlarında mevcut maskeleme altyapısıyla maskelenir… | Test | `IdentityLogMaskingTests` | ✅ Geçti |
 | SYG-KMLK-062 | Doğrulama kodu, parola sıfırlama ve davet iletileri bildirim istisnasından muaftır. | Test | `NotificationDispatcherTests`, `NotificationPurposeRulesTests` | ✅ Geçti |
 | SYG-KMLK-063 | Kimlik uç noktaları yalnızca HTTPS üzerinden hizmet verir; yenileme jetonu çerezi… | Test | `HttpsRequirementApiTests` | ✅ Geçti |
-| SYG-KMLK-064 | Tüm ekran metinleri ve hata iletileri Türkçedir, teknik terim içermez ve kullanıcıya ne… | İnceleme | `LoginPage.test.tsx`, `RegistrationPage.test.tsx` | ⚠️ İnceleme yapıldı (1.3): 10 bulgu, kararda — [metin incelemesi](2026-10-04-syg-064-metin-incelemesi.md) |
+| SYG-KMLK-064 | Tüm ekran metinleri ve hata iletileri Türkçedir, teknik terim içermez ve kullanıcıya ne… | İnceleme | `LoginPage.test.tsx`, `RegistrationPage.test.tsx` | ✅ İnceleme ve düzeltme (1.4): 11 bulgu kapandı — [metin incelemesi](2026-10-04-syg-064-metin-incelemesi.md) 1.1; İK teyidi KS-11 |
 | SYG-KMLK-065 | Giriş, üyelik ve parola ekranları 360 piksel genişlikten itibaren yatay kaydırma… | Test | `LoginPage.test.tsx`, `RegistrationPage.test.tsx`; gerçek tarayıcı ölçümü (§4.3) | ✅ Geçti — 360/390/768 px yatay kaydırma yok (her akışın ilk adımı) |
 | SYG-KMLK-066 | Ekranlar yalnızca klavyeyle eksiksiz kullanılabilir; her form alanının erişilebilir bir… | Test | `LoginPage.test.tsx`, `RegistrationPage.test.tsx` | ✅ Geçti |
 | SYG-KMLK-067 | Beklenmeyen hata ekranında kullanıcıya izleme kimliği gösterilir. | Test | `LoginPage.test.tsx`, `RegistrationPage.test.tsx` | ✅ Geçti |
@@ -241,3 +243,4 @@ adımları kabulde telefonla denenecek (#124).
 | 2026-10-04 | 1.1 | Uçtan uca testler eklendi (#146): §3, §5 koşul 2, §6 madde 1 | Bilgi İşlem |
 | 2026-10-04 | 1.2 | Kod gözden geçirme kanıtı (#128): §5 koşul 1, §6 madde 3 | Bilgi İşlem |
 | 2026-10-04 | 1.3 | SYG-064 metin incelemesi yapıldı (#124) | Bilgi İşlem |
+| 2026-10-04 | 1.4 | SYG-064 düzeltmeleri (#152): §1, §5 koşul 3, §6 madde 2 | Bilgi İşlem |

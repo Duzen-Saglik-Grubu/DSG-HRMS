@@ -105,14 +105,15 @@ public sealed class RegistrationsController : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> CompleteAsync(Guid registrationId, CompleteRegistrationRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CompleteAsync(Guid registrationId, CompleteRegistrationRequest request, [FromServices] PasswordPolicy passwordPolicy, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var violations = await _registrations.CompleteAsync(registrationId, request.Password, cancellationToken);
         if (violations.Count > 0)
         {
-            throw new ValidationException(violations.Select(v => new ValidationFailure("password", PasswordMessages.For(v))));
+            var minLength = await passwordPolicy.MinimumLengthAsync(cancellationToken);
+            throw new ValidationException(violations.Select(v => new ValidationFailure("password", PasswordMessages.For(v, minLength))));
         }
 
         return StatusCode(StatusCodes.Status201Created);
@@ -140,9 +141,11 @@ public sealed class RegistrationsController : ControllerBase
 public static class PasswordMessages
 {
     /// <summary>Ihlalin iletisi.</summary>
-    public static string For(PasswordViolation violation) => violation switch
+    /// <param name="violation">Ihlal.</param>
+    /// <param name="minLength">Parolanin en az karakter sayisi (PRM-KML-05); iletide soylenir (SYG-KMLK-064, B-02).</param>
+    public static string For(PasswordViolation violation, int minLength) => violation switch
     {
-        PasswordViolation.TooShort => "Parola çok kısa.",
+        PasswordViolation.TooShort => string.Create(System.Globalization.CultureInfo.InvariantCulture, $"Parola en az {minLength} karakter olmalıdır."),
         PasswordViolation.TooLong => "Parola en fazla 128 karakter olabilir.",
         PasswordViolation.NotComplex => "Parola büyük harf, küçük harf, rakam ve simge içermelidir.",
         PasswordViolation.Common => "Bu parola çok yaygın ve kolay tahmin edilir. Daha az bilinen bir parola seçin.",

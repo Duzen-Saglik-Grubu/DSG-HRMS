@@ -1,4 +1,5 @@
 using Dsg.Hrms.Application.Common.Abstractions;
+using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Application.Identity.Registration;
 using Dsg.Hrms.Domain.Identity;
 using FluentValidation;
@@ -107,14 +108,15 @@ public sealed class PasswordResetsController : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> ResetAsync(Guid resetId, ResetPasswordRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> ResetAsync(Guid resetId, ResetPasswordRequest request, [FromServices] PasswordPolicy passwordPolicy, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var violations = await _registrations.ResetPasswordAsync(resetId, request.Password, cancellationToken);
         if (violations.Count > 0)
         {
-            throw new ValidationException(violations.Select(v => new ValidationFailure("password", PasswordMessages.For(v))));
+            var minLength = await passwordPolicy.MinimumLengthAsync(cancellationToken);
+            throw new ValidationException(violations.Select(v => new ValidationFailure("password", PasswordMessages.For(v, minLength))));
         }
 
         return NoContent();

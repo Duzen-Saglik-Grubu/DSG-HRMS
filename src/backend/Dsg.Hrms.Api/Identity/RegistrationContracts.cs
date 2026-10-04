@@ -150,7 +150,7 @@ public sealed class VerifyCodeRequestValidator : AbstractValidator<VerifyCodeReq
     {
         RuleFor(r => r.Code)
             .NotEmpty().WithMessage("Doğrulama kodunu girin.")
-            .MaximumLength(12).WithMessage("Doğrulama kodu geçerli değil.");
+            .MaximumLength(12).WithMessage("Doğrulama kodu yalnızca rakamlardan oluşur. E-posta veya SMS ile gelen kodu girin.");
     }
 }
 
