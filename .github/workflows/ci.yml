@@ -150,8 +150,21 @@ jobs:
       - name: Tip denetimi
         run: npm run typecheck
 
+      # JUnit ciktisi test sayilarini kalici ozete tasir (#136).
       - name: Testler ve kapsam
-        run: npm run test:coverage
+        run: npm run test:coverage -- --reporter=default --reporter=junit --outputFile.junit=coverage/junit.xml
+
+      # Kanit ozeti icin (.github/scripts/ci-evidence-summary.mjs). Basarisizlikta da
+      # yuklenir: hangi testin dustugu yapittan okunabilir.
+      - name: Test ve kapsam sonuclarini sakla
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: on-yuz-test-ve-kapsam
+          path: |
+            src/frontend/dsg-hrms-web/coverage/junit.xml
+            src/frontend/dsg-hrms-web/coverage/cobertura-coverage.xml
+          if-no-files-found: warn
 
       - name: Derleme
         run: npm run build
