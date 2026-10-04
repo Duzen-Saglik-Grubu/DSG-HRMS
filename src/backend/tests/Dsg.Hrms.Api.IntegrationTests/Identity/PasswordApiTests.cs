@@ -223,6 +223,11 @@ public sealed class PasswordApiTests : IClassFixture<RegistrationApiFixture>, IA
         same.Status.ShouldBe(HttpStatusCode.BadRequest);
         same.Body.GetProperty("errors").GetProperty("newPassword")[0].GetString().ShouldBe("Yeni parola mevcut parolanızdan farklı olmalıdır.");
 
+        // SYG-KMLK-064, B-02: ileti kac karakter gerektigini soyler (PRM-KML-05 varsayilani 6).
+        var tooShort = await ChangeAsync(client, token, OldPassword, "Ab1");
+        tooShort.Status.ShouldBe(HttpStatusCode.BadRequest);
+        tooShort.Body.GetProperty("errors").GetProperty("newPassword")[0].GetString().ShouldBe("Parola en az 6 karakter olmalıdır.");
+
         var common = await ChangeAsync(client, token, OldPassword, "123456");
         common.Status.ShouldBe(HttpStatusCode.BadRequest);
         common.Body.GetProperty("errors").TryGetProperty("newPassword", out _).ShouldBeTrue();

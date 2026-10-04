@@ -175,7 +175,7 @@ public sealed partial class InvitationService
 
         if (!queued)
         {
-            throw new TooManyRequestsException("İleti kuyruğu dolu. Lütfen biraz sonra tekrar deneyin.");
+            throw new TooManyRequestsException("Şu anda çok fazla istek var. Lütfen birkaç dakika sonra tekrar deneyin.");
         }
 
         _events.Record(SecurityEventType.InvitationSent, account?.Id, person.Id);

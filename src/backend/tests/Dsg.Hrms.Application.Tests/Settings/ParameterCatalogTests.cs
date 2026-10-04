@@ -168,6 +168,16 @@ public sealed partial class ParameterCatalogTests
     }
 
     [Fact]
+    public void Format_errors_tell_the_expected_format()
+    {
+        // SYG-KMLK-064, B-09: "beklenen bicimde degil" yerine bicimi soyler.
+        ParameterCatalog.SmtpServer.Validate("mail.duzen.com.tr").Error.ShouldBe(
+            "Değer sunucu:port biçiminde olmalıdır (örneğin mail.duzen.com.tr:587).");
+        ParameterCatalog.AcceptedEmailDomains.Validate("duzen.com.tr,gecersiz alan").Error!.ShouldContain(
+            "Her öğe bir alan adı olmalıdır (örneğin duzen.com.tr).");
+    }
+
+    [Fact]
     public void Free_text_is_trimmed()
     {
         ParameterCatalog.SupportContact.Validate("  Bilgi Islem - dahili 1234 ").CanonicalValue

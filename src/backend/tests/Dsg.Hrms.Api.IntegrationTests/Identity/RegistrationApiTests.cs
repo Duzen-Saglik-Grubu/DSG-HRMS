@@ -354,7 +354,7 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
     [InlineData("Yilmaz1985", "adınızdan")]
     [InlineData("ahmet.yilmaz", "adınızdan")]
     [InlineData("duzen2026", "kurum")]
-    [InlineData("kisa", "kısa")]
+    [InlineData("kisa", "en az 6 karakter")]
     public async Task Weak_passwords_are_rejected_with_a_field_error(string password, string expected)
     {
         using var client = _fixture.CreateClient();

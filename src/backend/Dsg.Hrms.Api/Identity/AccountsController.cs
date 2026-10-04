@@ -265,8 +265,8 @@ public sealed class AccountSearchRequestValidator : AbstractValidator<AccountSea
             .InclusiveBetween(1, PagedResult<object>.MaxPageSize)
             .WithMessage($"Sayfa boyutu 1 ile {PagedResult<object>.MaxPageSize} arasında olmalıdır.");
         RuleFor(r => r.Q).MaximumLength(100).WithMessage("Arama metni en fazla 100 karakter olabilir.");
-        RuleFor(r => r.Sort).IsInEnum();
-        RuleFor(r => r.Order).IsInEnum();
+        RuleFor(r => r.Sort).IsInEnum().WithMessage("Geçersiz sıralama alanı.");
+        RuleFor(r => r.Order).IsInEnum().WithMessage("Geçersiz sıralama yönü.");
     }
 }
 

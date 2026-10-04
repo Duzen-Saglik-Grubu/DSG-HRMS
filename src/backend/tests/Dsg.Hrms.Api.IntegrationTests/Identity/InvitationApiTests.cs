@@ -178,7 +178,13 @@ public sealed partial class InvitationApiTests : IClassFixture<RegistrationApiFi
         using var client = _fixture.CreateClient();
 
         (await PostAsync(client, $"{Invitations}/lookup", null, new { token = "yok-boyle-bir-jeton" })).Status.ShouldBe(HttpStatusCode.NotFound);
-        (await PostAsync(client, $"{Invitations}/lookup", null, new { token = "" })).Status.ShouldBe(HttpStatusCode.BadRequest);
+        // Bos veya bozuk baglanti: Turkce ve ne yapilacagini soyleyen ileti (SYG-KMLK-064, B-03, B-11).
+        foreach (var token in new[] { "", new string('a', 101) })
+        {
+            var (status, body) = await PostAsync(client, $"{Invitations}/lookup", null, new { token });
+            status.ShouldBe(HttpStatusCode.BadRequest);
+            body.GetProperty("errors").GetProperty("token")[0].GetString()!.ShouldStartWith("Bu bağlantı geçersiz. Yeni bir bağlantı için");
+        }
     }
 
     // ------------------------------------------------------------------ yardimcilar

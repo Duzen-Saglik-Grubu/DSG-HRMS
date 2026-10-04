@@ -1,6 +1,7 @@
 using Dsg.Hrms.Application.Common.Security;
 using Dsg.Hrms.Application.Identity.Authorization;
 using Dsg.Hrms.Application.Identity.Invitations;
+using Dsg.Hrms.Application.Identity.Passwords;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
@@ -91,14 +92,15 @@ public sealed class InvitationsController : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AcceptAsync(AcceptInvitationRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> AcceptAsync(AcceptInvitationRequest request, [FromServices] PasswordPolicy passwordPolicy, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var violations = await _invitations.AcceptAsync(request.Token, request.Password, cancellationToken);
         if (violations.Count > 0)
         {
-            throw new ValidationException(violations.Select(v => new ValidationFailure("password", PasswordMessages.For(v))));
+            var minLength = await passwordPolicy.MinimumLengthAsync(cancellationToken);
+            throw new ValidationException(violations.Select(v => new ValidationFailure("password", PasswordMessages.For(v, minLength))));
         }
 
         return NoContent();
@@ -148,6 +150,13 @@ public sealed record AcceptInvitationRequest([property: Secret] string Token, [p
     public override string ToString() => nameof(AcceptInvitationRequest);
 }
 
+/// <summary>Davet baglantisi iletileri (SYG-KMLK-064, B-03).</summary>
+internal static class InvitationMessages
+{
+    /// <summary>Bozuk veya kirpilmis baglanti; ekrandaki iletiyle ayni.</summary>
+    public const string InvalidLink = "Bu bağlantı geçersiz. Yeni bir bağlantı için İnsan Kaynakları birimine başvurun veya parolanızı kendiniz sıfırlayın.";
+}
+
 /// <summary>Davet gonderim istegi dogrulamasi.</summary>
 public sealed class InvitationRequestValidator : AbstractValidator<InvitationRequest>
 {
@@ -166,7 +175,9 @@ public sealed class InvitationTokenRequestValidator : AbstractValidator<Invitati
     /// <summary>Yeni ornek olusturur.</summary>
     public InvitationTokenRequestValidator()
     {
-        RuleFor(r => r.Token).NotEmpty().MaximumLength(100).WithMessage("Bağlantı geçersiz.");
+        RuleFor(r => r.Token)
+            .NotEmpty().WithMessage(InvitationMessages.InvalidLink)
+            .MaximumLength(100).WithMessage(InvitationMessages.InvalidLink);
     }
 }
 
@@ -176,7 +187,9 @@ public sealed class AcceptInvitationRequestValidator : AbstractValidator<AcceptI
     /// <summary>Yeni ornek olusturur.</summary>
     public AcceptInvitationRequestValidator()
     {
-        RuleFor(r => r.Token).NotEmpty().MaximumLength(100).WithMessage("Bağlantı geçersiz.");
+        RuleFor(r => r.Token)
+            .NotEmpty().WithMessage(InvitationMessages.InvalidLink)
+            .MaximumLength(100).WithMessage(InvitationMessages.InvalidLink);
         RuleFor(r => r.Password)
             .NotEmpty().WithMessage("Parolanızı girin.")
             .MaximumLength(512).WithMessage("Parola en fazla 128 karakter olabilir.");

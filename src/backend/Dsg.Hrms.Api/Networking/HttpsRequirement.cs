@@ -55,7 +55,7 @@ public static class HttpsRequirement
 
 /// <summary>Istek HTTPS ile gelmedi (SYG-KMLK-063).</summary>
 public sealed class HttpsRequiredException()
-    : HrmsException("Bu işlem yalnızca güvenli bağlantı (HTTPS) üzerinden yapılabilir.")
+    : HrmsException("Bu işlem yalnızca güvenli bağlantı üzerinden yapılabilir. Sisteme kurumun bildirdiği adresten girin.")
 {
     /// <inheritdoc />
     public override int StatusCode => 403;

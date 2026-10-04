@@ -48,6 +48,10 @@ try
         options.Filters.Add<ValidateRequestsFilter>();
     });
     builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+    // Dogrulama iletileri Turkce (SYG-KMLK-064). Her kural kendi iletisini yazar; ileti
+    // unutulursa varsayilan ileti sunucu kulturune gore Ingilizce donerdi (B-11).
+    ValidatorOptions.Global.LanguageManager.Culture = new System.Globalization.CultureInfo("tr");
     builder.Services.Configure<RegistrationTimingOptions>(builder.Configuration.GetSection(RegistrationTimingOptions.SectionName));
     builder.Services.AddHrmsReverseProxy(builder.Configuration);
 

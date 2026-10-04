@@ -50,6 +50,10 @@ public sealed class PasswordPolicy
         return password.Normalize(NormalizationForm.FormKC);
     }
 
+    /// <summary>Parolanin en az karakter sayisi (PRM-KML-05); kullaniciya gosterilen iletide kullanilir.</summary>
+    public async Task<int> MinimumLengthAsync(CancellationToken cancellationToken) =>
+        await _parameters.GetIntegerAsync(ParameterCatalog.MinPasswordLength, cancellationToken).ConfigureAwait(false);
+
     /// <summary>Parolayi denetler; ihlal yoksa bos liste doner.</summary>
     /// <param name="password">Kullanicinin girdigi parola.</param>
     /// <param name="personalWords">Kisinin adi, soyadi ve e-posta adresinin yerel kismi.</param>

@@ -5,7 +5,8 @@
 **Gereksinim:** SYG-KMLK-064 (REQ-KMLK-043): "Tüm ekran metinleri ve hata iletileri Türkçedir, teknik terim içermez ve kullanıcıya ne yapması gerektiğini söyler."
 **Kabul kriteri (REQ-KMLK-043):** "Hata mesajı ne yapılacağını söylüyor ('Bir hata oluştu' demiyor)."
 **İncelenen sürüm:** `main` @ `a4ffe01`
-**Tarih:** 2026-10-04 · **İnceleyen:** Bilgi İşlem · **Onaylayacak:** Doğuş Uçanok; nihai teyit İK kabulünde (TEC.11)
+**Tarih:** 2026-10-04 · **İnceleyen:** Bilgi İşlem · **Karar:** Doğuş Uçanok, 04.10.2026 (§4); nihai teyit İK kabulünde (TEC.11)
+**Durum:** Düzeltmeler uygulandı (#152); kapanış §5
 
 ---
 
@@ -67,15 +68,44 @@ durumlarında görünüyor.
 
 ---
 
-## 4. Karar beklenen
+## 4. Karar
 
-1. **B-01 ile B-06 ve B-09:** Önerilen metinlerle düzeltilsin mi? Onaylanırsa ayrı bir PR'da uygulanır ve testleri güncellenir.
-2. **B-07, B-08 ve B-10:** Kabul edilebilir istisna olarak kayda geçsin mi?
+**Doğuş Uçanok, 04.10.2026:**
 
-Karar sonrası durum T3 doğrulama raporuna (SYG-KMLK-064) işlenir. Nihai teyit İK kabulünde, kabul senaryosu KS-11 ile verilir.
+1. **B-01…B-06 ve B-09:** Önerilen metinlerle düzeltilsin. → Uygulandı (#152, §5).
+2. **B-07, B-08 ve B-10:** Kabul edilebilir istisna olarak kayda geçsin. → Gerekçeleri §3'teki tabloda; ek iş yok.
+
+Nihai teyit İK kabulünde, kabul senaryosu KS-11 ile verilir.
+
+## 5. Uygulama ve kapanış (#152)
+
+| # | Uygulanan metin | Kanıt (test) |
+|---|---|---|
+| B-01 | `status.error` kaldırıldı | Ön uç tip denetimi ve testleri (metnin kullanıldığı yer yok) |
+| B-02 | `Parola en az {n} karakter olmalıdır.` ({n} PRM-KML-05'ten okunur; üyelik, sıfırlama, davet ve parola değiştirmenin dördünde aynı) | `PasswordApiTests`, `RegistrationApiTests.Weak_passwords_are_rejected_with_a_field_error` |
+| B-03 | Önerilen metin; boş ve bozuk bağlantıda aynı ileti | `InvitationApiTests.Unknown_or_malformed_tokens_are_not_found` |
+| B-04 | Önerilen metin | Kural düzeyinde (metin sabiti) |
+| B-05 | Önerilen metin | Kural düzeyinde (metin sabiti) |
+| B-06 | Önerilen metin; "HTTPS" sözcüğü yok | `HttpsRequirementApiTests` (iletide "güvenli bağlantı" var, "HTTPS" yok) |
+| B-09 | SMTP: `Değer sunucu:port biçiminde olmalıdır (örneğin mail.duzen.com.tr:587).`; alan adı listesi: `Geçersiz öğe: '…'. Her öğe bir alan adı olmalıdır (örneğin duzen.com.tr).` | `ParameterCatalogTests.Format_errors_tell_the_expected_format` |
+
+### 5.1 Uygulama sırasında bulunan: B-11
+
+| # | Durum | Ölçüt | Yapılan |
+|---|---|---|---|
+| B-11 | Davet bağlantısı doğrulayıcısında boş değer kuralının iletisi yazılmamıştı; sıralama alanı ve yönü kurallarında da ileti yoktu. İleti yazılmayan kuralda doğrulama kütüphanesi varsayılan iletiyi sunucunun dil ayarına göre seçer, yani **İngilizce** dönebilirdi. | T, K | Eksik iletiler yazıldı. Kütüphanenin varsayılan dili de Türkçeye sabitlendi (`Program.cs`); ileride ileti unutulsa bile İngilizce dönmez. |
+
+B-11 §1'deki taramada görünmedi, çünkü tarama metni olan satırları arıyordu; metni **olmayan** kural bu
+yöntemle bulunamaz. Sonraki modüllerin metin incelemesinde iletisiz doğrulama kuralları da ayrıca
+taranır.
+
+**Sonuç:** SYG-KMLK-064 için Bilgi İşlem doğrulaması tamamlandı. Bütün kullanıcı iletileri Türkçe;
+teknik terim yalnızca Sistem Yöneticisi ekranında kalıyor (kabul edilmiş istisna). Hata iletileri
+kullanıcıya ne yapacağını söylüyor.
 
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-04 | 1.0 | İlk inceleme (#124) | Bilgi İşlem |
+| 2026-10-04 | 1.1 | Karar işlendi; düzeltmeler uygulandı, B-11 eklendi (#152) | Bilgi İşlem |

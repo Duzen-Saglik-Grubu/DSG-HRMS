@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Application.Identity.Sessions;
 using FluentValidation;
 using FluentValidation.Results;
@@ -39,7 +40,7 @@ public sealed class AccountController : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
-    public async Task<IActionResult> ChangePasswordAsync(ChangePasswordRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> ChangePasswordAsync(ChangePasswordRequest request, [FromServices] PasswordPolicy passwordPolicy, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -53,7 +54,8 @@ public sealed class AccountController : ControllerBase
 
         if (result.Violations.Count > 0)
         {
-            throw new ValidationException(result.Violations.Select(v => new ValidationFailure("newPassword", PasswordMessages.For(v))));
+            var minLength = await passwordPolicy.MinimumLengthAsync(cancellationToken);
+            throw new ValidationException(result.Violations.Select(v => new ValidationFailure("newPassword", PasswordMessages.For(v, minLength))));
         }
 
         return NoContent();
