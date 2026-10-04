@@ -15,6 +15,12 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ## [Yayımlanmamış]
 
+---
+
+## [0.2.0-rc.2] — 2026-10-04 · T3 Kimlik Yönetimi kabul adayı (2)
+
+`v0.2.0-rc.1`'in yerine İK kabulüne sunulan sürüm (#160).
+
 ### Düzeltildi
 - Kullanıcı kendi hesabını pasife alamaz; aktif kalan son sistem yöneticisinin hesabı da pasife alınamaz. Önceden tek yönetici kendi hesabını pasife alıp sistemi yönetilemez bırakabiliyordu (#138)
 
@@ -74,6 +80,6 @@ Modül başına bir MINOR sürüm (`KR-097`). Numaralar kabul sırasına göre v
 | Sürüm | İçerik | Durum |
 |---|---|---|
 | `v0.1.0` | Teknik iskelet (A1) | Etiketlendi (geriye dönük) |
-| `v0.2.0` | T3 Kimlik Yönetimi — ilk kullanıcı teslimi | Kabul adayı: `v0.2.0-rc.1` |
+| `v0.2.0` | T3 Kimlik Yönetimi — ilk kullanıcı teslimi | Kabul adayı: `v0.2.0-rc.2` |
 | `v0.3.0` … | A2'nin kalan modülleri (T1, T2, T4, T5), ardından yatay altyapı (A3) ve iş modülleri (A4+); her biri kabul edildiğinde | Planlandı |
 | `v1.0.0` | Üretime geçiş (AS) | Planlandı |
