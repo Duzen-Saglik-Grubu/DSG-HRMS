@@ -71,7 +71,7 @@ CI çalışmasının kayıtları GitHub'da 90 gün saklanır; bu rapor o kaydın
 | Yetki sızıntısı testi | ✅ | `AccessControlApiTests`, `AccountsApiTests`, `SystemParametersApiTests` (izinsiz istek `403`); `PasswordChangeRequirementApiTests` |
 | Maskeleme testi | ✅ | `IdentityLogMaskingTests` (günlük dosyası okunur), `SecurityEventApiTests`, `NotificationDispatcherTests` |
 | Ön yüz bileşen testleri | ✅ | 232 test |
-| Uçtan uca test (5–8 senaryo, Playwright) | ❌ **Yok** | ADR-0011 §1 öngörüyor; kurulmadı. Bkz. §6 |
+| Uçtan uca test (5–8 senaryo, Playwright) | ✅ (1.1) | 7 kimlik senaryosu: üyelik, giriş/çıkış, hatalı giriş, parola değiştirme, sıfırlama, İK daveti, yetki (#146). İlk sürümde yoktu |
 
 ---
 
@@ -128,7 +128,7 @@ adımları kabulde telefonla denenecek (#124).
 **Önerilen karar: KOŞULLU GEÇTİ.**
 - Otomatik kapıların tamamı geçti.
 - **Koşul 1:** Kod gözden geçirme kapısının kanıtı #128 ile kayıt altına alınır.
-- **Koşul 2:** Uçtan uca test eksiği (§6) T3 kabulü öncesinde ya kapatılır ya da gerekçeli bir kararla ertelenir.
+- **Koşul 2:** ~~Uçtan uca test eksiği~~ — karşılandı (#146, 1.1).
 - **Koşul 3:** SYG-064 incelemesi kabul öncesinde yapılır (#124).
 
 | Karar | Tarih | Karar veren |
@@ -141,7 +141,7 @@ adımları kabulde telefonla denenecek (#124).
 
 | # | Nokta | Etki | İzleme |
 |---|---|---|---|
-| 1 | Uçtan uca test (Playwright, 5–8 senaryo) yok; ADR-0011 §1 öngörüyor | #137 gibi tarayıcıya özgü hatalar CI'da yakalanmıyor | Yeni issue önerilir; karar G2'de |
+| 1 | ~~Uçtan uca test yok~~ | **Kapandı (1.1):** 7 senaryo her PR'da çalışıyor. Davet senaryosu, düzeltme öncesi kodla çalıştırıldığında #137'yi yakaladı | #146 |
 | 2 | SYG-064 (Türkçe, teknik terimsiz iletiler) yalnızca kısmen testli | Kabulde görülebilecek dil sorunları | #124 (kabul öncesi metin incelemesi) |
 | 3 | Kod gözden geçirme onayı GitHub'da kayıtlı değil | PA 2.2 (d) kanıtı zayıf | #128 |
 | 4 | CI kayıtları 90 gün saklanıyor | Ham test kanıtı kaybolur; bu rapor kalıcı özettir | #136 |
@@ -238,3 +238,4 @@ adımları kabulde telefonla denenecek (#124).
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-04 | 1.0 | İlk sürüm: T3 doğrulama raporu ve G2 kapı kaydı (#123) | Bilgi İşlem |
+| 2026-10-04 | 1.1 | Uçtan uca testler eklendi (#146): §3, §5 koşul 2, §6 madde 1 | Bilgi İşlem |

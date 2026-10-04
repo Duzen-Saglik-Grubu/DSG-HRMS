@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Uctan uca test ciktilari
+/test-results/
+/playwright-report/
+/blob-report/

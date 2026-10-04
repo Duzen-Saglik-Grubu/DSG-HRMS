@@ -327,3 +327,64 @@ jobs:
       # sonucunun kendisi ikinci bir sizinti kaynagi olurdu.
       - name: Sir taramasi
         run: gitleaks git --no-banner --redact --verbose .
+
+  # ------------------------------------------------------------------
+  # Uctan uca testler (ADR-0011 §1, #146)
+  # ------------------------------------------------------------------
+  # Gercek tarayici, gercek API, gercek veritabani. Yigin atilabilirdir:
+  # sentetik veri (docker/e2e/seed.sql), e-postalar Mailpit'te kalir, disari ileti
+  # cikmaz. Birim testlerinde gorunmeyen tarayici hatalari burada yakalanir (#137).
+  e2e:
+    name: Uctan uca testler
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: .NET kur
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: EF araclarini kur
+        run: dotnet tool install --global dotnet-ef --version 10.0.12
+
+      - name: Paketleri geri yukle
+        run: dotnet restore src/backend/Dsg.Hrms.slnx
+
+      - name: Node kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/frontend/dsg-hrms-web/package-lock.json
+
+      - name: Paketleri kur
+        working-directory: src/frontend/dsg-hrms-web
+        run: npm ci
+
+      - name: Tarayiciyi kur
+        working-directory: src/frontend/dsg-hrms-web
+        run: npx playwright install --with-deps chromium
+
+      - name: Yigini kur
+        run: bash docker/e2e/up.sh
+
+      - name: Uctan uca testler
+        working-directory: src/frontend/dsg-hrms-web
+        run: npm run e2e
+
+      - name: API gunlugu (hata durumunda)
+        if: failure()
+        run: E2E_CODE_HASH_KEY=x E2E_JWT_SIGNING_KEY=x E2E_PARAMETER_PROTECTION_KEY=x docker compose -f docker/compose.e2e.yml logs api | tail -200
+
+      - name: Raporu sakla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uctan-uca-raporu
+          path: |
+            src/frontend/dsg-hrms-web/playwright-report/
+            src/frontend/dsg-hrms-web/test-results/
+          if-no-files-found: ignore

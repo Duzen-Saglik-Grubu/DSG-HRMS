@@ -13,7 +13,9 @@ import prettier from 'eslint-config-prettier';
  * asinir ve geri donusu pahali hâle gelir.
  */
 export default tseslint.config(
-  { ignores: ['dist', 'coverage', 'src/shared/api/generated'] },
+  {
+    ignores: ['dist', 'coverage', 'src/shared/api/generated', 'playwright-report', 'test-results'],
+  },
 
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
@@ -22,7 +24,12 @@ export default tseslint.config(
       ecmaVersion: 2022,
       globals: globals.browser,
       parserOptions: {
-        project: ['./tsconfig.app.json', './tsconfig.node.json', './tsconfig.test.json'],
+        project: [
+          './tsconfig.app.json',
+          './tsconfig.node.json',
+          './tsconfig.test.json',
+          './tsconfig.e2e.json',
+        ],
         tsconfigRootDir: import.meta.dirname,
       },
     },

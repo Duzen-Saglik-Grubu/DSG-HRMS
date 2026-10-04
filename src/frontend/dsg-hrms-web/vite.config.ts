@@ -42,6 +42,8 @@ export default defineConfig({
   },
 
   test: {
+    // Uctan uca testler (e2e/) Playwright ile ayri calisir; Vitest yalnizca src/ altini alir.
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
