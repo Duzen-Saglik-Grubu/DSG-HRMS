@@ -6,6 +6,9 @@
 //   3. Sistem gereksinimi kimlikleri tekil ve sıralı; metin içi atıflar boşa düşmüyor.
 //   4. SYG belgesinin §8 ters tablosu ve izlenebilirlik matrisinin "Sistem gereksinimi"
 //      sütunu, SYG §4 ile AYNI eşlemeyi gösteriyor.
+//   5. Her sistem gereksinimi doğrulanmış: en az bir test dosyası onu anıyor. Doğrulama
+//      yöntemi Analiz, İnceleme veya Gösterim olanlar için TEC.9 doğrulama raporu da kanıttır.
+//      (#122: SYG-KMLK-060/061/062 bu denetim olmadığı için hiçbir kapıya takılmadan kaldı.)
 //
 // Neden otomatik? Eşleme üç yerde duruyor (SYG §4, SYG §8, matris). Elle tutulan üç
 // kopya, ilk değişiklikte birbirinden ayrılır ve izlenebilirlik varmış gibi görünür.
@@ -16,13 +19,62 @@
 //
 // Kullanım: node .github/scripts/requirement-traceability-check.mjs
 
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ROOT = 'docs/33061';
 const STAKEHOLDER_DIR = join(ROOT, 'TEC.2-paydas-ihtiyac-ve-gereksinimleri/paydas-gereksinimleri');
 const SYSTEM_DIR = join(ROOT, 'TEC.3-sistem-yazilim-gereksinimleri/gereksinimler');
 const MATRIX_PATH = join(ROOT, 'izlenebilirlik-matrisi.md');
+const REPORT_DIR = join(ROOT, 'TEC.9-dogrulama');
+const TEST_DIRS = ['src/backend/tests', 'src/frontend/dsg-hrms-web/src'];
+const NON_TEST_METHODS = ['Analiz', 'İnceleme', 'Gösterim'];
+
+/** Dizindeki dosyalar (derleme ve bağımlılık klasörleri hariç). */
+function walk(dir, accept, out = []) {
+  if (!existsSync(dir)) return out;
+  for (const name of readdirSync(dir)) {
+    if (['node_modules', 'bin', 'obj', 'dist', '.git'].includes(name)) continue;
+    const path = join(dir, name);
+    if (statSync(path).isDirectory()) walk(path, accept, out);
+    else if (accept(path)) out.push(path);
+  }
+  return out;
+}
+
+const isTestFile = (p) => p.endsWith('.cs') ? /tests[\\/]/.test(p) : /\.test\.tsx?$/.test(p);
+
+/**
+ * Metindeki SYG atıfları; kısaltmalar açılır: "SYG-KMLK-046, 050" -> 046, 050;
+ * "SYG-KMLK-031…034" ve "SYG-KMLK-051–053" -> aralık.
+ */
+export function referencedIds(text, module) {
+  const ids = new Set();
+  const prefix = `SYG-${module}-`;
+  for (const m of text.matchAll(new RegExp(`${prefix}(\\d{3})((?:\\s*(?:,|…|–)\\s*\\d{3})*)`, 'g'))) {
+    let previous = Number(m[1]);
+    ids.add(previous);
+    for (const t of m[2].matchAll(/(,|…|–)\s*(\d{3})/g)) {
+      const n = Number(t[2]);
+      if (t[1] === ',') ids.add(n);
+      else for (let k = previous; k <= n; k++) ids.add(k);
+      previous = n;
+    }
+  }
+  return new Set([...ids].map((n) => `${prefix}${String(n).padStart(3, '0')}`));
+}
+
+/** 5. denetim: her SYG bir teste (veya yöntemine uygun bir doğrulama raporuna) bağlı. */
+export function checkVerification(module, systemDoc, testTexts, reportTexts) {
+  const sygPrefix = `SYG-${module}-`;
+  const rows = [...systemDoc.matchAll(new RegExp(`^\\| \\*\\*(${sygPrefix}\\d{3})\\*\\* \\|(.*)$`, 'gm'))]
+    .map((m) => ({ id: m[1], method: (m[2].split(' | ')[3] ?? '').trim() }));
+  const inTests = new Set(testTexts.flatMap((t) => [...referencedIds(t, module)]));
+  const inReports = new Set(reportTexts.flatMap((t) => [...referencedIds(t, module)]));
+  return rows
+    .filter((r) => !inTests.has(r.id) && !(NON_TEST_METHODS.includes(r.method) && inReports.has(r.id)))
+    .map((r) => `${r.id}: doğrulama kanıtı yok (yöntem: ${r.method || '—'}; hiçbir test${NON_TEST_METHODS.includes(r.method) ? ' veya TEC.9 raporu' : ''} anmıyor)`);
+}
 
 /** "SYG-KMLK-013, 016" -> ["SYG-KMLK-013", "SYG-KMLK-016"]; "—" -> [] */
 function expandIds(cell, prefix) {
@@ -101,6 +153,8 @@ if (!modules.length) {
 }
 
 const matrixDoc = readFileSync(MATRIX_PATH, 'utf8');
+const testTexts = TEST_DIRS.flatMap((d) => walk(d, isTestFile)).map((p) => readFileSync(p, 'utf8'));
+const reportTexts = walk(REPORT_DIR, (p) => p.endsWith('.md')).map((p) => readFileSync(p, 'utf8'));
 let failures = 0;
 
 for (const module of modules) {
@@ -125,13 +179,27 @@ for (const module of modules) {
     }
   }
 
-  const errors = check(module, stakeholderDoc, systemDoc, matrixDoc);
+  // 5. denetimin kendisi: ilk SYG'nin bütün atıfları testlerden silinirse YAKALANMALI.
+  const firstSyg = new RegExp(`\\| \\*\\*(SYG-${module}-\\d{3})\\*\\*`).exec(systemDoc)?.[1];
+  if (firstSyg) {
+    const strip = (t) => [...referencedIds(t, module)].includes(firstSyg) ? '' : t;
+    if (!checkVerification(module, systemDoc, testTexts.map(strip), reportTexts.map(strip)).some((e) => e.startsWith(`${firstSyg}:`))) {
+      console.error(`✗ ${module}: doğrulama denetimi kendi sınamasını geçemedi — kanıtsız kalan ${firstSyg} yakalanmadı`);
+      failures++;
+      continue;
+    }
+  }
+
+  const errors = [
+    ...check(module, stakeholderDoc, systemDoc, matrixDoc),
+    ...checkVerification(module, systemDoc, testTexts, reportTexts),
+  ];
   if (errors.length) {
     console.error(`✗ ${module}: ${errors.length} sorun`);
     for (const e of errors) console.error(`    ${e}`);
     failures++;
   } else {
-    console.log(`✓ ${module}: her paydaş gereksinimi karşılanıyor; SYG §8 ve izlenebilirlik matrisi SYG §4 ile tutarlı`);
+    console.log(`✓ ${module}: her paydaş gereksinimi karşılanıyor; SYG §8 ve izlenebilirlik matrisi SYG §4 ile tutarlı; her sistem gereksinimi doğrulanmış`);
   }
 }
 
