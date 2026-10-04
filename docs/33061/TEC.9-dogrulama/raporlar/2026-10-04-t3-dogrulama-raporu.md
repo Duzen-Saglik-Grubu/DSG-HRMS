@@ -129,7 +129,7 @@ adımları kabulde telefonla denenecek (#124).
 - Otomatik kapıların tamamı geçti.
 - **Koşul 1:** ~~Kod gözden geçirme kanıtı~~ — karşılandı (#128, 1.2).
 - **Koşul 2:** ~~Uçtan uca test eksiği~~ — karşılandı (#146, 1.1).
-- **Koşul 3:** SYG-064 incelemesi kabul öncesinde yapılır (#124).
+- **Koşul 3:** SYG-064 incelemesi yapıldı (1.3); bulgular için karar bekleniyor.
 
 | Karar | Tarih | Karar veren |
 |---|---|---|
@@ -142,7 +142,7 @@ adımları kabulde telefonla denenecek (#124).
 | # | Nokta | Etki | İzleme |
 |---|---|---|---|
 | 1 | ~~Uçtan uca test yok~~ | **Kapandı (1.1):** 7 senaryo her PR'da çalışıyor. Davet senaryosu, düzeltme öncesi kodla çalıştırıldığında #137'yi yakaladı | #146 |
-| 2 | SYG-064 (Türkçe, teknik terimsiz iletiler) yalnızca kısmen testli | Kabulde görülebilecek dil sorunları | #124 (kabul öncesi metin incelemesi) |
+| 2 | SYG-064 metin incelemesi yapıldı (1.3); 6 düzeltme ve 1 kaldırma önerisi, 3 istisna kararda | Düzeltmeler kabul öncesinde uygulanır | [metin incelemesi](2026-10-04-syg-064-metin-incelemesi.md) |
 | 3 | ~~Kod gözden geçirme onayı GitHub'da kayıtlı değil~~ | **Kapandı (1.2):** geriye dönük kayıt ve CI denetimi | #128 |
 | 4 | CI kayıtları 90 gün saklanıyor | Ham test kanıtı kaybolur; bu rapor kalıcı özettir | #136 |
 | 5 | Gösterim yöntemli 3 SYG (028, 068, 073) | Testle doğrulandı; gösterim İK'ya kabulde | #124 |
@@ -216,7 +216,7 @@ adımları kabulde telefonla denenecek (#124).
 | SYG-KMLK-061 | TCKN, telefon ve e-posta günlük kayıtlarında mevcut maskeleme altyapısıyla maskelenir… | Test | `IdentityLogMaskingTests` | ✅ Geçti |
 | SYG-KMLK-062 | Doğrulama kodu, parola sıfırlama ve davet iletileri bildirim istisnasından muaftır. | Test | `NotificationDispatcherTests`, `NotificationPurposeRulesTests` | ✅ Geçti |
 | SYG-KMLK-063 | Kimlik uç noktaları yalnızca HTTPS üzerinden hizmet verir; yenileme jetonu çerezi… | Test | `HttpsRequirementApiTests` | ✅ Geçti |
-| SYG-KMLK-064 | Tüm ekran metinleri ve hata iletileri Türkçedir, teknik terim içermez ve kullanıcıya ne… | İnceleme | `LoginPage.test.tsx`, `RegistrationPage.test.tsx` | ⚠️ Kısmen — testler iletilerin bir kısmını doğruluyor; tüm metinlerin incelemesi kabul öncesi (#124) |
+| SYG-KMLK-064 | Tüm ekran metinleri ve hata iletileri Türkçedir, teknik terim içermez ve kullanıcıya ne… | İnceleme | `LoginPage.test.tsx`, `RegistrationPage.test.tsx` | ⚠️ İnceleme yapıldı (1.3): 10 bulgu, kararda — [metin incelemesi](2026-10-04-syg-064-metin-incelemesi.md) |
 | SYG-KMLK-065 | Giriş, üyelik ve parola ekranları 360 piksel genişlikten itibaren yatay kaydırma… | Test | `LoginPage.test.tsx`, `RegistrationPage.test.tsx`; gerçek tarayıcı ölçümü (§4.3) | ✅ Geçti — 360/390/768 px yatay kaydırma yok (her akışın ilk adımı) |
 | SYG-KMLK-066 | Ekranlar yalnızca klavyeyle eksiksiz kullanılabilir; her form alanının erişilebilir bir… | Test | `LoginPage.test.tsx`, `RegistrationPage.test.tsx` | ✅ Geçti |
 | SYG-KMLK-067 | Beklenmeyen hata ekranında kullanıcıya izleme kimliği gösterilir. | Test | `LoginPage.test.tsx`, `RegistrationPage.test.tsx` | ✅ Geçti |
@@ -240,3 +240,4 @@ adımları kabulde telefonla denenecek (#124).
 | 2026-10-04 | 1.0 | İlk sürüm: T3 doğrulama raporu ve G2 kapı kaydı (#123) | Bilgi İşlem |
 | 2026-10-04 | 1.1 | Uçtan uca testler eklendi (#146): §3, §5 koşul 2, §6 madde 1 | Bilgi İşlem |
 | 2026-10-04 | 1.2 | Kod gözden geçirme kanıtı (#128): §5 koşul 1, §6 madde 3 | Bilgi İşlem |
+| 2026-10-04 | 1.3 | SYG-064 metin incelemesi yapıldı (#124) | Bilgi İşlem |
