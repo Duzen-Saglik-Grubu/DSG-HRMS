@@ -217,6 +217,7 @@
       "reasonRequired": "Gerekçe girin.",
       "deactivate": "Pasife al",
       "activate": "Aktifleştir",
+      "self": "Kendi hesabınız",
       "deactivateTitle": "Hesabı pasife al",
       "activateTitle": "Hesabı aktifleştir",
       "deactivateText": "{{name}} adlı kişinin hesabı pasife alınacak ve açık oturumları hemen kapatılacak. Kişi, hesap yeniden aktifleştirilene kadar giriş yapamaz.",

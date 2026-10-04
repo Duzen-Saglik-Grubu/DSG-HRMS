@@ -67,7 +67,7 @@ public sealed class AccountsApiTests : IClassFixture<RegistrationApiFixture>, IA
 
         status.ShouldBe(HttpStatusCode.OK);
         var item = body.GetProperty("items").EnumerateArray().Single();
-        item.EnumerateObject().Select(p => p.Name).ShouldBe(["personId", "firstName", "lastName", "employments", "state", "statusReason"]);
+        item.EnumerateObject().Select(p => p.Name).ShouldBe(["personId", "firstName", "lastName", "employments", "state", "statusReason", "isCurrentUser"]);
         item.GetProperty("employments")[0].EnumerateObject().Select(p => p.Name).ShouldBe(["registryCode", "companyName", "isActive"]);
         item.GetProperty("employments")[0].GetProperty("registryCode").GetString().ShouldBe("00002");
         item.GetProperty("state").GetString().ShouldBe("active");
@@ -117,6 +117,9 @@ public sealed class AccountsApiTests : IClassFixture<RegistrationApiFixture>, IA
     {
         using var target = _fixture.CreateClient();
         var targetSession = await SignInResponseAsync(target, TargetEmail);
+        // Kisi 2 ilk sistem yoneticisidir (girisle atanir); son aktif yonetici pasife alinamadigi
+        // icin baska bir aktif yonetici de tanimlanir (#138).
+        await GrantRoleAsync(4, Role.SystemAdministratorCode);
         var token = await HrSignInAsync();
         using var client = _fixture.CreateClient();
         var personId = await PersonIdAsync(2);
@@ -169,6 +172,51 @@ public sealed class AccountsApiTests : IClassFixture<RegistrationApiFixture>, IA
     }
 
     [Fact]
+    public async Task Own_account_cannot_be_deactivated_and_is_marked_in_the_list()
+    {
+        // #138: yonetici kendi hesabini pasife alip sistem disinda kalmamali.
+        var token = await HrSignInAsync();
+        using var client = _fixture.CreateClient();
+
+        (await GetAsync(client, $"{Accounts}?q=00001", token)).Body.GetProperty("items")[0].GetProperty("isCurrentUser").GetBoolean().ShouldBeTrue();
+        (await GetAsync(client, $"{Accounts}?q=00002", token)).Body.GetProperty("items")[0].GetProperty("isCurrentUser").GetBoolean().ShouldBeFalse();
+
+        var (status, body) = await PostAsync(client, $"{Accounts}/{await PersonIdAsync(1)}/deactivation", token, new { reason = "Deneme" });
+        status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        body.GetProperty("detail").GetString().ShouldBe("Kendi hesabınızı pasife alamazsınız. Gerekirse başka bir yetkili kullanıcıdan isteyin.");
+        (await StateOfAsync(client, token, "00001")).ShouldBe(("active", null));
+    }
+
+    [Fact]
+    public async Task Last_active_system_administrator_cannot_be_deactivated()
+    {
+        // #138: aktif kalan son sistem yoneticisi pasife alinirsa sistemi yonetecek kimse kalmaz.
+        await GrantRoleAsync(2, Role.SystemAdministratorCode);
+        var token = await HrSignInAsync();
+        using var client = _fixture.CreateClient();
+        var administrator = await PersonIdAsync(2);
+
+        var refused = await PostAsync(client, $"{Accounts}/{administrator}/deactivation", token, new { reason = "Deneme" });
+        refused.Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        refused.Body.GetProperty("detail").GetString()!.ShouldStartWith("Bu kişi aktif kalan son sistem yöneticisi");
+
+        // Pasif yonetici sayilmaz: sistemi yonetemez.
+        await GrantRoleAsync(4, Role.SystemAdministratorCode);
+        await _fixture.WithDbAsync(async context =>
+        {
+            (await AccountOfAsync(context, 4)).DeactivateForEmploymentEnd();
+            return await context.SaveChangesAsync();
+        });
+        (await PostAsync(client, $"{Accounts}/{administrator}/deactivation", token, new { reason = "Deneme" })).Status
+            .ShouldBe(HttpStatusCode.UnprocessableEntity);
+
+        // Baska bir aktif yonetici varken pasife alinabilir.
+        await GrantRoleAsync(1, Role.SystemAdministratorCode);
+        (await PostAsync(client, $"{Accounts}/{administrator}/deactivation", token, new { reason = "Deneme" })).Status
+            .ShouldBe(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
     public async Task Listing_is_written_to_the_access_log()
     {
         var token = await HrSignInAsync();
@@ -202,6 +250,19 @@ public sealed class AccountsApiTests : IClassFixture<RegistrationApiFixture>, IA
         using var client = _fixture.CreateClient();
         return await SignInAsync(client, HrEmail);
     }
+
+    private Task<int> GrantRoleAsync(int index, string roleCode) =>
+        _fixture.WithDbAsync(async context =>
+        {
+            var account = await AccountOfAsync(context, index);
+            var role = await context.Set<Role>().SingleAsync(r => r.Code == roleCode);
+            if (!await context.Set<UserRole>().AnyAsync(r => r.UserAccountId == account.Id && r.RoleId == role.Id))
+            {
+                context.Add(UserRole.Assign(account.Id, role.Id));
+            }
+
+            return await context.SaveChangesAsync();
+        });
 
     private static async Task<(string? State, string? Reason)> StateOfAsync(HttpClient client, string token, string registryCode)
     {

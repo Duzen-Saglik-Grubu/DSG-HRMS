@@ -145,7 +145,13 @@ export function AccountsPage() {
                 {t('identity.accounts.activate')}
               </Button>
             ) : null}
-            {row.state === 'active' || row.state === 'locked' ? (
+            {(row.state === 'active' || row.state === 'locked') && row.isCurrentUser ? (
+              // Kendi hesabini pasife alan yonetici sistem disinda kalir (#138); sunucu da reddeder.
+              <Typography variant="body2" color="text.secondary" sx={{ alignSelf: 'center' }}>
+                {t('identity.accounts.self')}
+              </Typography>
+            ) : null}
+            {(row.state === 'active' || row.state === 'locked') && !row.isCurrentUser ? (
               <Button
                 size="small"
                 color="error"
