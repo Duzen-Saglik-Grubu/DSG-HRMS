@@ -86,6 +86,7 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 | Bilgi | Yer | Kim | Kontrol |
 |---|---|---|---|
 | Kabul planı | `TEC.11-gecerleme/<MODÜL>-kabul-plani.md` | Bilgi İşlem | PR ile; İK gözden geçirir |
+| Katılımcı notu | `TEC.11-gecerleme/<MODÜL>-kullanim-notu.md` | Bilgi İşlem | PR ile; İK gözden geçirir. Adım adım yönlendirme içermez |
 | İmzalı kabul formu | `kayitlar/<tarih>-<modül>-kabul-formu.md` (taranmış imzalı nüsha depo dışında, MAN.6 kaydında) | İK | Sürüm etiketi formda yazılı |
 | Kabul raporu | `raporlar/<tarih>-<modül>-kabul-raporu.md` | Bilgi İşlem | PR ile |
 | Kabulde bulunan sorunlar | GitHub issue (`[HATA]`, `surec:TEC.11`) | Bulan | Senaryo kimliğiyle |
@@ -113,3 +114,4 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-04 | 1.0 | İlk oluşturma (#124) | Bilgi İşlem |
+| 2026-10-04 | 1.1 | §6: katılımcı notu eklendi (#154) | Bilgi İşlem |
