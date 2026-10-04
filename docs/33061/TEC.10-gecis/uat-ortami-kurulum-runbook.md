@@ -18,8 +18,8 @@
 | **Sunucu** | `192.168.3.202` — Ubuntu 26.04 LTS · 2 çekirdek · 7,3 GB RAM · 87 GB disk |
 | **Adres** | **https://insankaynaklaritest.duzen.com.tr** — HTTP, HTTPS'e yönlendirilir |
 | **Uygulama dizini** | `/opt/dsg-hrms` (sırlar: `/opt/dsg-hrms/secrets/`, sertifika: `/opt/dsg-hrms/tls/`) |
-| **Erişim** | SSH anahtarı (`dsg-hrms-uat-deploy`) |
-| **Amaç** | İK kabul testi (`KR-024`) — **gerçek veri değil**, maskelenmiş kopya |
+| **Erişim** | SSH, parola ile (kalıcı anahtar tanımlı değil; parola girişinin kapatılması açık iş, R-25) |
+| **Amaç** | İK kabul testi (`KR-024`). **Gerçek personel verisiyle** çalışır: LOGO'dan okunur, maskelenmez; kabul testleri gerçek personelle yapılır. İleti gönderimi izin listesiyle sınırlıdır (§10.2). Risk ve önlemler: R-25 |
 | **Sertifika** | Let's Encrypt · **bitiş 16.12.2026** · yenileme **elle** (`KR-067`, `R-18`) |
 
 ### Yayımlanan portlar
@@ -242,11 +242,19 @@ curl -s -o /dev/null -w "%{http_code}\n" --max-time 5 http://192.168.3.202:5299/
 | Durdur | `docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/secrets/.env.uat down` |
 | **Veriyi de sil** | `... down -v` — **UAT verisi gider**, İK'ya haber verilmeden yapılmaz |
 
-**Yedek:** UAT verisi maskelenmiş test verisidir; düzenli yedeklenmez. İK kabul testi
-sırasında oluşturulan veri korunacaksa test öncesinde anlık kopya alınır:
+**Yedek (`KR-098`):** UAT veritabanı **düzenli yedeklenmez**. Veritabanında gerçek kişisel veri
+olduğu için kopya sayısı az tutulur. Kayıp durumunda personel verisi LOGO'dan yeniden çekilir;
+kişiler yeniden üye olur. Kabul kanıtları (kabul formu, raporlar) depodadır.
+
+Riskli bir işlemden (elle şema değişikliği, volume taşıma) **önce** elle kopya alınır.
+İşlem doğrulandıktan sonra kopya **silinir**:
 
 ```bash
-docker exec dsg-hrms-uat-postgres pg_dump -U postgres dsg_hrms_uat | gzip > /opt/dsg-hrms/yedek-$(date +%F).sql.gz
+cd /opt/dsg-hrms/docker && set -a && . /opt/dsg-hrms/secrets/.env.uat && set +a
+docker exec dsg-hrms-uat-postgres pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB" | gzip > /opt/dsg-hrms/yedek-$(date +%F).sql.gz
+chmod 600 /opt/dsg-hrms/yedek-*.sql.gz
+# Islem dogrulandiktan sonra:
+rm /opt/dsg-hrms/yedek-*.sql.gz
 ```
 
 ---
@@ -625,3 +633,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-09-30 | 1.5 | §11.1: davet bağlantısının adresi (#107) | Bilgi İşlem |
 | 2026-10-02 | 1.6 | §10.4: HTTPS zorunluluğu ve doğrulaması (#115) | Bilgi İşlem |
 | 2026-10-04 | 1.7 | §3: sürüm seçimi, git archive ile aktarım, imajda commit etiketi, dağıtım kaydı; §3.3 sır dosyası yolu düzeltildi (#125) | Bilgi İşlem |
+| 2026-10-04 | 1.8 | §1: erişim yöntemi ve veri sınıfı (gerçek veri) düzeltildi; §5 yedek kuralı (`KR-098`, #133) | Bilgi İşlem |

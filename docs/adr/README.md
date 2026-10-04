@@ -1,6 +1,6 @@
 # Mimari Karar Kayıtları (ADR)
 
-**Son güncelleme:** 2026-09-06
+**Son güncelleme:** 2026-10-04
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama) — *"Design rationale"* çıktısı
 
 ---
@@ -23,9 +23,14 @@ Bu proje için iki nedenle kritiktir:
 
 1. Her ADR `ADR-NNNN-<kisa-baslik>.md` biçiminde adlandırılır; numaralar yeniden
    kullanılmaz.
-2. **ADR'ler değiştirilmez, değiştirilir.** Bir karar geçersizleşirse ADR silinmez;
-   durumu `Değiştirildi` yapılır ve yerine geçen ADR'ye bağlantı verilir. Böylece
-   kararın geçmişi korunur.
+2. **Ek ve sınırlı değişiklik yerinde, karar değişikliği yeni ADR ile (`KR-099`).**
+   - Kararı **genişleten veya netleştiren** değişiklik (gerçekleştirme notu, yeni bir alt
+     kural, ölçülen değer) ADR'nin içinde yapılır. ADR'nin değişiklik geçmişine tarih,
+     sürüm ve ilgili `KR-NNN` yazılır.
+   - Kararı **tersine çeviren veya yerine başka bir çözüm koyan** değişiklik için yeni ADR
+     yazılır. Eski ADR silinmez; durumu `Yerini aldı: ADR-NNNN` yapılır. Böylece kararın
+     geçmişi korunur.
+   - Hangisi olduğu belirsizse yeni ADR yazılır.
 3. Her ADR, `docs/karar-kayit-defteri.md` içindeki ilgili `KR-NNN` kayıtlarına atıf
    yapar. Karar defteri **ne** karar verildiğini, ADR **neden** karar verildiğini tutar.
 4. Yeni ADR `docs/sablonlar/ADR-sablonu.md` şablonuyla oluşturulur.
@@ -46,23 +51,23 @@ değildir.
 
 ## Kayıtlı ADR'ler
 
-| No | Başlık | Durum | Konu |
-|---|---|---|---|
-| [ADR-0001](ADR-0001-teknoloji-yigini.md) | Teknoloji Yığını | Kabul Edildi | .NET 10 LTS, React 19, PostgreSQL; AutoMapper/MediatR/QuestPDF reddi |
-| [ADR-0002](ADR-0002-cozum-yapisi-ve-katmanli-mimari.md) | Çözüm Yapısı ve Katmanlı Mimari | Kabul Edildi | Modüler monolit, 4 katman, bağımlılık kuralları, mimari testi |
-| [ADR-0003](ADR-0003-logo-entegrasyon-stratejisi.md) | LOGO Entegrasyon Stratejisi | Kabul Edildi | Salt okuma, yalıtım katmanı, 15 dk snapshot senkronizasyon, şema sapma denetimi |
-| [ADR-0004](ADR-0004-veritabani-tasarim-standartlari.md) | Veritabanı Tasarım Standartları | Kabul Edildi | Adlandırma, tipler, soft delete, tarih aralıklı tablolar, migration kuralları |
-| [ADR-0005](ADR-0005-cekirdek-veri-modeli.md) | Çekirdek Veri Modeli | Kabul Edildi | Kişi/İstihdam ayrımı, tarih farkındalığı, yönetici grafı |
-| [ADR-0006](ADR-0006-kimlik-dogrulama-ve-oturum.md) | Kimlik Doğrulama, Üyelik ve Oturum | Kabul Edildi | Üyelik akışı, doğrulama kodu, parola politikası, JWT + yenileme jetonu |
-| [ADR-0007](ADR-0007-yetkilendirme-modeli.md) | Yetkilendirme Modeli | Kabul Edildi | Rol (eylem) × Kapsam (satır); `404` tercihi; yetki sızıntısı testi |
-| [ADR-0008](ADR-0008-sir-ve-yapilandirma-yonetimi.md) | Sır ve Yapılandırma Yönetimi | Kabul Edildi | User Secrets / ortam değişkeni, `gitleaks`, açılışta doğrulama |
-| [ADR-0009](ADR-0009-loglama-denetim-izi-ve-kvkk.md) | Loglama, Denetim İzi ve KVKK | Kabul Edildi | Üç kayıt türü, maskeleme, erişim kaydı, saklama ve imha |
-| [ADR-0010](ADR-0010-api-sozlesmesi-ve-hata-yonetimi.md) | API Sözleşmesi ve Hata Yönetimi | Kabul Edildi | OpenAPI, Problem Details, sayfalama, eşzamanlılık |
-| [ADR-0011](ADR-0011-test-stratejisi.md) | Test Stratejisi ve Kalite Kapıları | Kabul Edildi | Test piramidi, kapsam eşikleri, Testcontainers, CI kapıları |
-| [ADR-0012](ADR-0012-bildirim-altyapisi.md) | Bildirim Altyapısı | Kabul Edildi | E-posta/SMS/uygulama içi, NetGSM standart servisi, dayanıklılık |
-| [ADR-0013](ADR-0013-dosya-saklama.md) | Dosya Saklama ve Güvenlik Taraması | Kabul Edildi | NAS + `IFileStorage`, ClamAV, yükleme/indirme denetimleri |
-| [ADR-0014](ADR-0014-raporlama-ve-disa-aktarma.md) | Raporlama ve Dışa Aktarma | Kabul Edildi | ClosedXML + PDFsharp, `export` izni, dışa aktarma kaydı |
-| [ADR-0015](ADR-0015-frontend-mimarisi.md) | Frontend Mimarisi ve Arayüz İlkeleri | Kabul Edildi | Modül bazlı yapı, TanStack Query, ortak bileşenler, kullanılabilirlik |
+| No | Başlık | Durum | Son değişiklik | Konu |
+|---|---|---|---|---|
+| [ADR-0001](ADR-0001-teknoloji-yigini.md) | Teknoloji Yığını | Kabul Edildi | 2026-09-09 (0.2) | .NET 10 LTS, React 19, PostgreSQL; AutoMapper/MediatR/QuestPDF reddi |
+| [ADR-0002](ADR-0002-cozum-yapisi-ve-katmanli-mimari.md) | Çözüm Yapısı ve Katmanlı Mimari | Kabul Edildi | 2026-09-06 (0.1) | Modüler monolit, 4 katman, bağımlılık kuralları, mimari testi |
+| [ADR-0003](ADR-0003-logo-entegrasyon-stratejisi.md) | LOGO Entegrasyon Stratejisi | Kabul Edildi | 2026-09-26 (0.2) | Salt okuma, yalıtım katmanı, 15 dk snapshot senkronizasyon, şema sapma denetimi |
+| [ADR-0004](ADR-0004-veritabani-tasarim-standartlari.md) | Veritabanı Tasarım Standartları | Kabul Edildi | 2026-09-06 (0.1) | Adlandırma, tipler, soft delete, tarih aralıklı tablolar, migration kuralları |
+| [ADR-0005](ADR-0005-cekirdek-veri-modeli.md) | Çekirdek Veri Modeli | Kabul Edildi | 2026-09-06 (0.1) | Kişi/İstihdam ayrımı, tarih farkındalığı, yönetici grafı |
+| [ADR-0006](ADR-0006-kimlik-dogrulama-ve-oturum.md) | Kimlik Doğrulama, Üyelik ve Oturum | Kabul Edildi | 2026-10-01 (1.0) | Üyelik akışı, doğrulama kodu, parola politikası, JWT + yenileme jetonu |
+| [ADR-0007](ADR-0007-yetkilendirme-modeli.md) | Yetkilendirme Modeli | Kabul Edildi | 2026-09-29 (0.2) | Rol (eylem) × Kapsam (satır); `404` tercihi; yetki sızıntısı testi |
+| [ADR-0008](ADR-0008-sir-ve-yapilandirma-yonetimi.md) | Sır ve Yapılandırma Yönetimi | Kabul Edildi | 2026-09-26 (0.2) | User Secrets / ortam değişkeni, `gitleaks`, açılışta doğrulama |
+| [ADR-0009](ADR-0009-loglama-denetim-izi-ve-kvkk.md) | Loglama, Denetim İzi ve KVKK | Kabul Edildi | 2026-10-03 (0.3) | Üç kayıt türü, maskeleme, erişim kaydı, saklama ve imha |
+| [ADR-0010](ADR-0010-api-sozlesmesi-ve-hata-yonetimi.md) | API Sözleşmesi ve Hata Yönetimi | Kabul Edildi | 2026-09-06 (0.1) | OpenAPI, Problem Details, sayfalama, eşzamanlılık |
+| [ADR-0011](ADR-0011-test-stratejisi.md) | Test Stratejisi ve Kalite Kapıları | Kabul Edildi | 2026-10-04 (0.3) | Test piramidi, kapsam eşikleri, Testcontainers, CI kapıları |
+| [ADR-0012](ADR-0012-bildirim-altyapisi.md) | Bildirim Altyapısı | Kabul Edildi | 2026-09-27 (0.3) | E-posta/SMS/uygulama içi, NetGSM standart servisi, dayanıklılık |
+| [ADR-0013](ADR-0013-dosya-saklama.md) | Dosya Saklama ve Güvenlik Taraması | Kabul Edildi | 2026-09-06 (0.1) | NAS + `IFileStorage`, ClamAV, yükleme/indirme denetimleri |
+| [ADR-0014](ADR-0014-raporlama-ve-disa-aktarma.md) | Raporlama ve Dışa Aktarma | Kabul Edildi | 2026-09-06 (0.1) | ClosedXML + PDFsharp, `export` izni, dışa aktarma kaydı |
+| [ADR-0015](ADR-0015-frontend-mimarisi.md) | Frontend Mimarisi ve Arayüz İlkeleri | Kabul Edildi | 2026-09-06 (0.1) | Modül bazlı yapı, TanStack Query, ortak bileşenler, kullanılabilirlik |
 
 ---
 
@@ -88,8 +93,15 @@ değerlendirilmelidir:
 
 | ADR | Varsayım | Değişirse |
 |---|---|---|
-| ADR-0006 | Uygulama **yalnızca yerel ağda** çalışacak | İnternete açılırsa **2FA kararı yeniden değerlendirilir** |
+| ADR-0006 | Uygulama **yalnızca yerel ağda** çalışacak | İnternete açılırsa 2FA'nın varsayılan olarak **açık** olması değerlendirilir. 2FA geliştirildi ve parametreyle açılabilir (`KR-069`, PRM-KML-08); varsayılan kapalı |
 | ADR-0003 | LOGO tablo yapısı sabit; tek `LH_001_PERSON` tablosu var | Firma bazlı tablo eklenirse eşleme yaklaşımı gözden geçirilir |
 | ADR-0012 | NetGSM hesabında OTP paketi yok | Paket tanımlanırsa doğrulama kodları OTP servisine taşınabilir |
 | ADR-0014 | Rapor hacmi 50.000 satırın altında | Aşılırsa arka planda üretim modeline geçilir |
 | ADR-0001 | Kullanılan paketlerin lisansları izin verici | Bir paket ticari lisansa geçerse alternatif değerlendirilir |
+
+## Değişiklik Geçmişi
+
+| Tarih | Sürüm | Değişiklik | Yapan |
+|---|---|---|---|
+| 2026-09-06 | 0.1 | İlk oluşturma; ADR-0001…ADR-0015 dizini | Bilgi İşlem |
+| 2026-10-04 | 0.2 | Kural 2: ek ve sınırlı değişiklik yerinde, karar değişikliği yeni ADR ile (`KR-099`); dizine son değişiklik sütunu; ADR-0006 gözden geçirme tetikleyicisi 2FA geliştirmesine göre güncellendi (#133) | Bilgi İşlem |
