@@ -1,0 +1,78 @@
+# Uctan uca test yigini (#146, ADR-0011 §1).
+#
+# Kullanim (depo kokunde): bash docker/e2e/up.sh   — kurar, sema ve sentetik veriyi yukler
+#                          bash docker/e2e/down.sh — her seyi siler
+#
+# Bu yigin GELISTIRME ve UAT yiginlarindan TAMAMEN AYRIDIR: ayri ad, ayri portlar, ayri
+# veritabani. Icinde gercek veri yoktur (docker/e2e/seed.sql) ve iletiler disari cikmaz:
+# e-posta Mailpit'e gider, SMS saglayicisi tanimli degildir.
+#
+#   Web      http://localhost:8090
+#   Mailpit  http://localhost:8025 (yakalanan e-postalar)
+
+name: dsg-hrms-e2e
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: dsg_hrms
+      POSTGRES_USER: postgres
+      # Yalnizca bu atilabilir yigin icin; disari acilmaz.
+      POSTGRES_PASSWORD: e2e-yalnizca-test
+      LANG: tr_TR.utf8
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d dsg_hrms']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 'true'
+      MP_SMTP_AUTH_ALLOW_INSECURE: 'true'
+    ports:
+      - '127.0.0.1:8025:8025'
+
+  api:
+    build:
+      context: ../src/backend
+      dockerfile: Dsg.Hrms.Api/Dockerfile
+    image: dsg-hrms-api:e2e
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Database__Hrms: 'Host=postgres;Port=5432;Database=dsg_hrms;Username=postgres;Password=e2e-yalnizca-test'
+      ApplicationLogging__FilePath: '/app/logs/dsg-hrms-.json'
+      ReverseProxy__TrustedNetworks: '172.16.0.0/12'
+      # Yigin duz HTTP ile calisir; sertifika yoktur.
+      Security__RequireHttps: 'false'
+      # Anahtarlar her calistirmada rastgele uretilir (docker/e2e/up.sh); depoda durmaz.
+      Identity__CodeHashKey: ${E2E_CODE_HASH_KEY:?up.sh ile calistirin}
+      Identity__JwtSigningKey: ${E2E_JWT_SIGNING_KEY:?up.sh ile calistirin}
+      ParameterProtection__Key: ${E2E_PARAMETER_PROTECTION_KEY:?up.sh ile calistirin}
+      AccessControl__BootstrapAdministrators: 'e2e.yonetici@duzen.com.tr'
+      Identity__PublicBaseUrl: 'http://localhost:8090'
+      Notifications__DeliveryMode: Send
+      Parameters__SmtpServer: 'mailpit:1025'
+      Parameters__SmtpUserName: 'e2e@duzen.com.tr'
+      Parameters__SmtpPassword: 'e2e'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'curl --fail --silent http://127.0.0.1:8080/health/live || exit 1']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  web:
+    build:
+      context: ../src/frontend/dsg-hrms-web
+    image: dsg-hrms-web:e2e
+    ports:
+      - '127.0.0.1:8090:8080'
+    depends_on:
+      api:
+        condition: service_healthy

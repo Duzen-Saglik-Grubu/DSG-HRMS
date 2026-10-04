@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.9-YAK
 **Süreç:** TEC.9 — Doğrulama
-**Son güncelleme:** 2026-10-04
+**Son güncelleme:** 2026-10-04 (1.1)
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -64,7 +64,7 @@ Her sistem gereksiniminin yöntemi `SYG-<MODÜL>.md`'deki "Doğrulama" sütunund
 | **İnceleme** | Belge, metin veya kapsam kuralları | Ölçüte karşı satır satır gözden geçirme. Mümkünse sonuç bir testle sabitlenir (örn. SYG-KMLK-006). | Bulgu yok ya da bulgular kapatıldı | İnceleme kaydı veya doğrulama raporu |
 | **Gösterim** | Kullanıcının göreceği davranış (ekran düzeni, akış) | Çalışan sistemde gösterim. Testle desteklenir; nihai gösterim kabulde (TEC.11) yapılır. | Gösterim beklenen davranışı sergiler | Kabul kaydı |
 
-**Gerçek tarayıcıda ölçülmesi gerekenler:** Sayfa düzeni ve tarayıcı davranışı jsdom'da ölçülemez (örn. yatay kaydırma, adres çubuğu). Bunlar Edge başsız kipinde, Chrome DevTools Protocol ile ölçülür ve doğrulama raporuna yazılır. Uçtan uca test altyapısı (ADR-0011 §1, Playwright) kurulana kadar bu yöntem kullanılır.
+**Gerçek tarayıcıda doğrulama:** Kritik kullanıcı akışları uçtan uca testlerle (Playwright, `src/frontend/dsg-hrms-web/e2e/`) her PR'da sınanır. Testler ayrı ve atılabilir bir yığında çalışır (`docker/compose.e2e.yml`): sentetik veri, e-postalar Mailpit'te kalır. Sayfa düzeni gibi testle sabitlenmemiş ölçümler (örn. yatay kaydırma) Edge başsız kipinde yapılır ve doğrulama raporuna yazılır.
 
 ---
 
@@ -78,7 +78,7 @@ Her sistem gereksiniminin yöntemi `SYG-<MODÜL>.md`'deki "Doğrulama" sütunund
 | Mailpit | Gerçek SMTP konuşması | Var |
 | UAT ortamı | Analiz yöntemli ölçümler | Var (runbook: TEC.10) |
 | Edge başsız + CDP | Gerçek tarayıcı ölçümleri | Var (betik geliştirici makinesinde) |
-| Playwright | Uçtan uca test (ADR-0011 §1) | **Yok** (T3 doğrulama raporu §6) |
+| Playwright + uçtan uca yığın | Uçtan uca test (ADR-0011 §1): 7 kimlik senaryosu | Var (#146); yerelde `bash docker/e2e/up.sh` ve `npm run e2e` |
 
 ---
 
@@ -127,3 +127,4 @@ Bu belge her modül sonu süreç denetiminde (MAN.8) gözden geçirilir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-04 | 1.0 | İlk oluşturma (#123) | Bilgi İşlem |
+| 2026-10-04 | 1.1 | Uçtan uca testler kuruldu (#146): §3 ve §4 | Bilgi İşlem |
