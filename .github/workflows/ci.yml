@@ -128,6 +128,12 @@ jobs:
       - name: Paketleri kur
         run: npm ci
 
+      # On yuz bagimlilik guvenligi (#149). .NET tarafindaki "Guvenlik acigi olan paket
+      # yok" kapisi npm paketlerini taramaz; yuksek ve ustu acik ENGELDIR. Gelistirme
+      # araclari da dahildir: CI ve gelistirici makinesinde calisirlar.
+      - name: Bagimlilik guvenligi
+        run: npm audit --audit-level=high
+
       - name: Bicim denetimi
         run: npm run format:check
 
