@@ -105,6 +105,13 @@ denetler:
 - CI kalite kapıları PR üzerinde çalışır — **ancak birleştirme için zorunlu
   kılınamaz**.
 
+### 3.5 Tespit edici — inceleme onayı (`KR-096`, #128)
+
+PR'ı açan ve birleştiren aynı hesap olduğu için GitHub "Approve" kaydı oluşmaz.
+- **Kural:** İnceleyen, birleştirmeden önce PR'a "İnceledim ve onaylıyorum." yorumunu yazar.
+- **Denetim:** `branch-protection-check.yml`, `main`'e gelen her commit'te birleştirilen PR'da birleştirmeden önce yazılmış bir onay yorumu arar. Bulamazsa `[DÜZELTİCİ]` issue'su açar.
+- **Geçmiş:** 04.10.2026'ya kadarki onaylar `MAN.8-kalite-guvence/kayitlar/2026-10-04-pr-onay-kaydi.md`'de kayıtlıdır.
+
 ---
 
 ## 4. Kalıcı çözüm — değerlendirme ve karar
@@ -198,3 +205,4 @@ denetimde sorulduğunda bu belge gösterilecektir.
 |---|---|---|---|
 | 2026-09-08 | 0.1 | Kısıtın tespiti ve telafi edici kontrollerin tanımlanması | Bilgi İşlem |
 | 2026-09-09 | 0.2 | Kalıcı çözüm kararı işlendi: Free planda kalınacak, telafi kontrolleri kalıcıdır (`KR-055`); `R-16` kabul edildi | Bilgi İşlem |
+| 2026-10-04 | 0.3 | §3.5 inceleme onayı denetimi (`KR-096`, #128) | Bilgi İşlem |

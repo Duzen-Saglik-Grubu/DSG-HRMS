@@ -323,7 +323,7 @@ Refs: #42
 | Milestone | **Zorunlu** — PR ve issue aynı aşamaya (A0/A1/A2/A3/AS) bağlanır |
 | Boyut | Hedef **< 400 satır** değişiklik; büyükse bölünür |
 | CI | Tüm kalite kapıları geçmeli |
-| İnceleme | En az **1 onay** |
+| İnceleme | En az **1 onay**. Tek kişilik düzende onay, **birleştirmeden önce** PR'a "İnceledim ve onaylıyorum." yorumu olarak yazılır; CI bunu `main`'de denetler (`KR-096`). Onay yorumunu yalnızca inceleyen yazar |
 | Birleştirme | **Squash merge** — `main` geçmişi okunabilir kalır |
 | Dal | Birleştirme sonrası **silinir** |
 
@@ -392,7 +392,7 @@ Bir iş, aşağıdakilerin **tamamı** sağlanmadan "bitti" sayılmaz:
 - [ ] Yeni bir mimari karar alındıysa **ADR yazıldı**
 - [ ] Sır sızıntısı yok (`gitleaks` temiz)
 - [ ] CI'daki tüm kalite kapıları geçti
-- [ ] Kod incelemesi yapıldı ve onaylandı
+- [ ] Kod incelemesi yapıldı ve onay **PR'a yorum olarak** yazıldı (`KR-096`)
 
 > Bu liste, ADR-0011 §2 ve §6'nın operasyonel karşılığıdır ve MAN.8 kapsamında
 > kalite kriteri sayılır.
@@ -510,3 +510,4 @@ Sürüm notları `CHANGELOG.md` dosyasında tutulur.
 | 2026-09-25 | 0.9 | §3 dal adı kuralının CI'da denetlendiği yazıldı (düzeltici faaliyet #67) | Bilgi İşlem |
 | 2026-09-26 | 1.0 | §3.2 kapsam dışına "uygulanmış migration adları" istisnası eklendi (PR #75 incelemesi) | Bilgi İşlem |
 | 2026-09-26 | 1.1 | §3.2: kod dosyası adları istisnası kaldırıldı; kod dosyası adları da İngilizce (#81) | Bilgi İşlem |
+| 2026-10-04 | 1.2 | §5 ve §6: tek kişilik düzende onay yorumu (`KR-096`, #128) | Bilgi İşlem |

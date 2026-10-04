@@ -42,6 +42,50 @@ jobs:
             if (mergedPrs.length > 0) {
               const pr = mergedPrs[0];
               core.info(`UYGUN: commit ${sha.substring(0,7)} #${pr.number} ile geldi.`);
+
+              // Inceleme onayi (KR-096, #128). Tek kisilik duzende PR'i acan ve
+              // birlestiren ayni hesap oldugu icin GitHub "Approve" kaydi olusmaz.
+              // Telafi: inceleyen, BIRLESTIRMEDEN ONCE PR'a "onayliyorum" yorumu
+              // yazar. Yorum yoksa veya birlestirmeden sonra yazildiysa duzeltici
+              // faaliyet acilir.
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                per_page: 100,
+              });
+              const mergedAt = new Date(pr.merged_at);
+              const approval = comments.find(c =>
+                /onayl[ıi]yorum/i.test(c.body) && new Date(c.created_at) <= mergedAt);
+
+              if (approval) {
+                core.info(`UYGUN: #${pr.number} onay yorumu ${approval.created_at} (${approval.user.login}).`);
+                return;
+              }
+
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[DÜZELTİCİ] #${pr.number} onay yorumu olmadan birleştirildi`,
+                body: [
+                  '## Tespit edilen uygunsuzluk',
+                  '',
+                  `#${pr.number} birleştirilmeden önce PR'a inceleme onayı yorumu yazılmamıştır (\`KR-096\`, CONTRIBUTING §5).`,
+                  '',
+                  '| Alan | Değer |',
+                  '|---|---|',
+                  `| PR | #${pr.number} — ${pr.title} |`,
+                  `| Birleştirme | ${pr.merged_at} |`,
+                  `| Commit | ${sha} |`,
+                  '',
+                  '## Yapılması gerekenler',
+                  '',
+                  '- [ ] PR incelendi; onay ve tarihi bu issue\'ya yazıldı',
+                  '- [ ] Neden atlandığı yazıldı',
+                ].join('\n'),
+                labels: ['tur:duzeltici-faaliyet', 'surec:MAN.8', 'oncelik:orta'],
+              });
+              core.setFailed(`#${pr.number} onay yorumu olmadan birleştirildi. Düzeltici faaliyet issue'su açıldı.`);
               return;
             }
 
