@@ -106,7 +106,7 @@ Her senaryo **katılımcının kendisi tarafından** uygulanır. Bilgi İşlem a
 
 **Kapsadığı gereksinimler:** REQ-KMLK-002, 004
 
-> **İK'ya ayrıca gösterilecek kalan risk (AN-01, `KR-078`):** Cep telefonu olmayan kişide eşleşme varsa yalnızca e-posta kanalı, eşleşme yoksa iki kanal görünür. Bu fark, üç bilginin de doğru olduğunu dolaylı olarak ele verir. Risk 25.09.2026'da Bilgi İşlem tarafından kabul edildi; RACI'ye göre kabul yetkisi Üst Yönetim'dedir (#126). Kabul formunda ayrıca işaretlenir.
+> **İK'ya ayrıca gösterilecek kalan risk (AN-01, `KR-078`):** Cep telefonu olmayan kişide eşleşme varsa yalnızca e-posta kanalı, eşleşme yoksa iki kanal görünür. Bu fark, üç bilginin de doğru olduğunu dolaylı olarak ele verir. Risk 25.09.2026'da Bilgi İşlem tarafından kabul edildi. Risk defterinde R-19 olarak kayıtlıdır; puanı 2'dir. Puan 6'nın altında olduğu için RACI'ye göre kabul yetkisi Bilgi İşlem'dedir (#126). Kabul formunda ayrıca işaretlenir.
 
 ### KS-05 — Doğrulama kodu kuralları
 **Kim:** Personel 2 · **Cihaz:** Masaüstü
@@ -279,3 +279,4 @@ Kabul kararından önce düzeltilmesi gerekenler İK ile birlikte belirlenir.
 | 2026-10-04 | 0.5 | §3, §4: kabul adayı `v0.2.0-rc.2` (#138 düzeltmesi; #160) | Bilgi İşlem |
 | 2026-10-04 | 0.6 | §3, §4: `v0.2.0-rc.2` UAT'ye kuruldu (#160) | Bilgi İşlem |
 | 2026-10-04 | 0.7 | §6.1: İK'nın teyit edeceği yorumlar T-01 (AN-23) ve T-02 (AN-24) (#135) | Bilgi İşlem |
+| 2026-10-04 | 0.8 | KS-04 notu: kalan risk R-19 olarak kayıtlı, kabul yetkisi (#126) | Bilgi İşlem |
