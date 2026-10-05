@@ -58,7 +58,7 @@ Sonraki tüm modüller bu altyapının üzerinde çalışır.
 | Öğe | Ne yapar | Konum (ADR-0002, ADR-0015) |
 |---|---|---|
 | Kimlik ekranları | Giriş, üyelik, kod doğrulama, parola, İK hesap işlemleri, parametre | `src/frontend/dsg-hrms-web/src/features/identity/` |
-| Kimlik API'si | Üyelik, oturum, parola, davet, hesap işlemleri, senkronizasyon tetikleme | `Dsg.Hrms.Api` — `/api/v1/kimlik/` |
+| Kimlik API'si | Üyelik, oturum, parola, davet, hesap işlemleri, senkronizasyon tetikleme | `Dsg.Hrms.Api` — `/api/v1/identity/` (AN-21) |
 | Kimlik uygulama hizmetleri | İş kuralları: eşleştirme, kanal seçimi, kod, oturum, kilit, parola politikası | `Dsg.Hrms.Application` |
 | Kişi / istihdam modeli | Kişi (TCKN tekil) ve istihdam (sicil tekil) kayıtları — `KR-077` sınırında | `Dsg.Hrms.Domain` |
 | LOGO senkronizasyon işi | Periyodik ve elle tetiklenen salt-okunur aktarım | `Dsg.Hrms.Infrastructure` (arka plan hizmeti) |
@@ -356,12 +356,12 @@ değiştirmez, yalnızca belirsiz kalan noktayı tek anlama indirir.
 
 | Sistem | Ne için | Durum |
 |---|---|---|
-| LOGO salt-okunur veritabanı hesabı | Senkronizasyon | ✅ Mevcut; `DENY` elle doğrulandı. Otomatik test T3'te yazılacak (SYG-KMLK-003) |
+| LOGO salt-okunur veritabanı hesabı | Senkronizasyon | ✅ Mevcut; yazma reddi CI'da her çalışmada sınanıyor (SYG-KMLK-003, PR #76) |
 | UAT sunucusu ve TLS | Kabul ortamı | ✅ Mevcut (`KR-067`); sertifika 16.12.2026'ya kadar geçerli |
 | PostgreSQL, CI kapıları | Veri, doğrulama | ✅ Mevcut (A1) |
-| NetGSM hesabı | SMS | ⏳ HRMS için kimlik bilgileri UAT'ye tanımlanacak |
-| Kurum SMTP hesabı | E-posta | ⏳ HRMS için kimlik bilgileri UAT'ye tanımlanacak |
-| Yaygın parola listesi | SYG-KMLK-045 | ⏳ Kaynak ve lisans T3 geliştirmesinde seçilecek |
+| NetGSM hesabı | SMS | ✅ UAT'ye tanımlı; gönderim izin listesi kipinde (`KR-083`) |
+| Kurum SMTP hesabı | E-posta | ✅ UAT'ye tanımlı; sunucu sertifikası 11.10.2026'da yenilenmeli (R-20) |
+| Yaygın parola listesi | SYG-KMLK-045 | ✅ SecLists (MIT lisansı), ≈144 bin kayıt, uygulamaya gömülü (PR #88; kaynak: `Infrastructure/Identity/Passwords/README.md`) |
 | Kurumsal görsel | SYG-KMLK-068 | ✅ S-13 kararı gereği kodla üretildi (PR #91) |
 
 ---
@@ -467,3 +467,4 @@ madde `İptal` notuyla kalır.
 | 2026-10-01 | 1.0 | SYG-KMLK-046 ve 050 netleştirildi; `PRM-KML-21` eklendi; AN-24 (`KR-092`, #113) | Bilgi İşlem |
 | 2026-10-03 | 1.1 | SYG-KMLK-077 ve KPÖ-KMLK-1 netleştirildi; AN-25 (`KR-095`, #120) | Bilgi İşlem |
 | 2026-10-04 | 1.2 | AN-23 ve AN-24: İK teyidinin kabulde alınacağı yazıldı (#135) | Bilgi İşlem |
+| 2026-10-04 | 1.3 | §2.2 API yolu `/api/v1/identity/`; §7 destekleyici sistemlerin durumu güncellendi (#133) | Bilgi İşlem |
