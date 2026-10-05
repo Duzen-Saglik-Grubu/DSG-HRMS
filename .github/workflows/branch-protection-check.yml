@@ -25,8 +25,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Commit'in bir Pull Request ile geldigini dogrula
+        id: audit
         uses: actions/github-script@v7
         with:
+          # GitHub API'sinin gecici hatalari denetimi dusurmesin (#129): 28.09.2026'da
+          # "Unexpected end of JSON input" ile denetim yapilamadan basarisiz olmustu.
+          retries: 3
           script: |
             const sha = context.sha;
 
@@ -85,6 +89,7 @@ jobs:
                 ].join('\n'),
                 labels: ['tur:duzeltici-faaliyet', 'surec:MAN.8', 'oncelik:orta'],
               });
+              core.setOutput('issue_opened', 'true');
               core.setFailed(`#${pr.number} onay yorumu olmadan birleştirildi. Düzeltici faaliyet issue'su açıldı.`);
               return;
             }
@@ -147,6 +152,41 @@ jobs:
               labels: ['tur:duzeltici-faaliyet', 'surec:MAN.5', 'oncelik:yuksek'],
             });
 
+            core.setOutput('issue_opened', 'true');
             core.setFailed(
               `main dalına PR olmadan commit geldi: ${shortSha}. Düzeltici faaliyet issue'su açıldı.`
             );
+
+      # Denetim yeniden denemelere ragmen YAPILAMADIYSA bu da kayda gecer (#129).
+      # Aksi halde basarisiz bir calisma, denetlenmemis bir commit'i sessizce
+      # gecirmis olurdu (28.09.2026, calisma 36471125839).
+      - name: Denetim yapilamadiysa duzeltici faaliyet ac
+        if: failure() && steps.audit.outputs.issue_opened != 'true'
+        uses: actions/github-script@v7
+        with:
+          retries: 3
+          script: |
+            const sha = context.sha;
+            const run = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[DÜZELTİCİ] Dal koruma denetimi yapılamadı (${sha.substring(0, 7)})`,
+              body: [
+                '## Tespit edilen durum',
+                '',
+                `\`main\`'e gelen commit için dal koruma denetimi (PR ile gelme ve inceleme onayı) **yapılamadı**.`,
+                'Commit\'in uygun olup olmadığı bilinmiyor.',
+                '',
+                '| Alan | Değer |',
+                '|---|---|',
+                `| Commit | ${sha} |`,
+                `| Çalışma | ${run} |`,
+                '',
+                '## Yapılması gerekenler',
+                '',
+                '- [ ] Çalışma yeniden çalıştırıldı veya commit\'in PR\'ı ve onay yorumu elle doğrulandı',
+                '- [ ] Sonuç ve hatanın nedeni bu issue\'ya yazıldı',
+              ].join('\n'),
+              labels: ['tur:duzeltici-faaliyet', 'surec:MAN.5', 'oncelik:orta'],
+            });
