@@ -87,7 +87,8 @@ Her sistem gereksiniminin yöntemi `SYG-<MODÜL>.md`'deki "Doğrulama" sütunund
 | Bilgi | Yer | Biçim | Kim |
 |---|---|---|---|
 | Test kodu | `src/backend/tests/`, `src/frontend/**/__tests__/` | Gereksinim kimliğini anar | PR sahibi |
-| CI çalışma kaydı | GitHub Actions | Otomatik; 90 gün saklanır | CI |
+| CI çalışma kaydı ve yapıtları | GitHub Actions (`test-ve-kapsam`, `on-yuz-test-ve-kapsam`) | Otomatik; 90 gün saklanır | CI |
+| CI kanıt özeti | `kayitlar/<tarih>-<sürüm>-ci-kanit-ozeti.md` | Test projesi başına sayılar, derleme başına kapsam; `.github/scripts/ci-evidence-summary.mjs` ile üretilir | Bilgi İşlem |
 | Ölçüm raporu | `raporlar/<tarih>-<modül>-performans-olcumu.md` | Yöntem, ham sonuç, hedef, yan etkiler | Bilgi İşlem |
 | Doğrulama raporu ve G2 kaydı | `raporlar/<tarih>-<modül>-dogrulama-raporu.md` | §2.2 | Bilgi İşlem |
 | Hata kaydı | GitHub issue (`[HATA]`, `surec:TEC.13`) | Belirti, kök neden, düzeltme, regresyon testi | Bulan |
@@ -99,7 +100,11 @@ Her sistem gereksiniminin yöntemi `SYG-<MODÜL>.md`'deki "Doğrulama" sütunund
 
 - **Değişiklik yolu:** Raporlar ve bu belge yalnızca PR ile değişir. Her belgenin bir değişiklik geçmişi vardır.
 - **Raporların değişmezliği:** Bir rapordaki sonuç sonradan değişirse (örn. yeniden ölçüm) rapor silinmez. Yeni sürüm eklenir ve eski sonuç tabloda korunur.
-- **Kalıcı özet:** CI kayıtları 90 gün sonra silindiği için doğrulama raporu, CI çalışma numarasını ve sayıları kalıcı olarak yazar.
+- **Kalıcı özet (#136):** CI kayıtları ve yapıtları 90 gün sonra silinir. Bu yüzden her **kabul adayı etiketinde** ve **modül kapanışında**, etiketli commit'in CI çalışmasından kanıt özeti üretilir ve PR ile depoya alınır:
+  ```bash
+  node .github/scripts/ci-evidence-summary.mjs <calisma-no> docs/33061/TEC.9-dogrulama/kayitlar/<tarih>-<surum>-ci-kanit-ozeti.md "<surum> — CI kanit ozeti"
+  ```
+  Doğrulama raporu özete atıf yapar. Yapıtın süresi dolmuşsa betik bunu "yapıt yok" olarak yazar; eksik kanıt gizlenmez.
 - **Kişisel veri:** Ölçüm ve test kayıtlarında gerçek kişisel veri bulunmaz (ADR-0011 §5).
 
 ---
@@ -128,3 +133,4 @@ Bu belge her modül sonu süreç denetiminde (MAN.8) gözden geçirilir.
 |---|---|---|---|
 | 2026-10-04 | 1.0 | İlk oluşturma (#123) | Bilgi İşlem |
 | 2026-10-04 | 1.1 | Uçtan uca testler kuruldu (#146): §3 ve §4 | Bilgi İşlem |
+| 2026-10-04 | 1.2 | §5, §6: CI kanıt özeti ve kalıcı arşiv kuralı (#136) | Bilgi İşlem |
