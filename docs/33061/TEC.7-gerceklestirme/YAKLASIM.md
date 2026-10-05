@@ -142,7 +142,7 @@ Doküman haritası, gerçekleştirme raporunun karşılığı olarak `CHANGELOG.
 
 | No | Açık nokta | Bağlantı |
 |---|---|---|
-| 1 | **Modül sınırı otomatik korunmuyor.** Mimari testi modülleri `.Modules.` ad alanında arıyor; kod `Dsg.Hrms.Application.Identity` gibi bu katman olmadan yerleşik, bu yüzden test boş geçiyor. ADR-0002'deki klasör düzeni ile kod ayrışmış | TEC.5 YAKLASIM §8 madde 1 |
+| 1 | ~~Modül sınırı otomatik korunmuyor~~ — **Kapandı (05.10.2026, #171):** ADR-0016 | ADR-0016 |
 | 2 | **PR boyutu kuralı tutulmuyor.** CONTRIBUTING §5 "< 400 satır" der; T3'te sekiz PR +2.383 ile +5.103 satır arasındaydı (#75, #84, #86, #88, #94, #99, #108, #110). Kural ya gerçekçi hâle getirilmeli ya iş paketleri bölünmeli | Denetim MAN.8-5 |
 | 3 | Matris §2.1 "kod yolu + PR" ister; T3 satırları çoğunlukla yalnızca PR numarası veriyor | Denetim TEC.7-6 |
 | 4 | PR şablonundaki örnek kimlik hâlâ `REQ-KIMLIK-07`; doğrusu `SYG-KMLK-nnn` | Denetim TEC.7-6 |
@@ -160,3 +160,4 @@ değiştiren bir değişiklikte gözden geçirilir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
+| 2026-10-05 | 1.1 | §8 madde 1 kapandı: ADR-0016 (#171) | Bilgi İşlem |

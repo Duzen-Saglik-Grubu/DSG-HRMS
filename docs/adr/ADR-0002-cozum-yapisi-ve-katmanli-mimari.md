@@ -1,6 +1,6 @@
 # ADR-0002 — Çözüm Yapısı ve Katmanlı Mimari
 
-**Durum:** Kabul Edildi
+**Durum:** Kabul Edildi — modül düzeni ve modül sınırının denetimi **ADR-0016 ile değiştirildi** (05.10.2026)
 **Tarih:** 2026-09-06
 **Karar defteri karşılığı:** `KR-012`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
@@ -128,3 +128,4 @@ mümkündür. Katman yapısından dönmek ise pratikte yeniden yazım demektir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-10-05 | 0.2 | Durum: modül düzeni ve modül sınırı denetimi ADR-0016 ile değiştirildi (`KR-099`, #171) | Bilgi İşlem |

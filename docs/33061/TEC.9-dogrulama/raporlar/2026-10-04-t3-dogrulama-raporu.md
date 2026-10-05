@@ -115,7 +115,7 @@ adımları kabulde telefonla denenecek (#124).
 | Derleme (uyarı yok) | ✅ | CI 37197387185 |
 | Birim ve entegrasyon testleri | ✅ | 768 + 232 geçti |
 | Kapsam eşiği (genel %75, Domain %90) | ✅ | %92,9 / %98,9 |
-| Mimari testi | ✅ | 10 geçti |
+| Mimari testi | ✅ | 10 geçti. **Not (1.6):** Bu testlerden modül yalıtım kuralı o tarihte hiçbir tipi denetlemiyordu (#171); katman kuralları denetleniyordu. 05.10.2026'dan beri modül sınırı da denetleniyor (ADR-0016, 11 test) |
 | Statik analiz (.NET, ESLint) | ✅ | CI |
 | Sır taraması (gitleaks) | ✅ | CI |
 | Bağımlılık güvenliği | ✅ | CI |
@@ -245,3 +245,4 @@ adımları kabulde telefonla denenecek (#124).
 | 2026-10-04 | 1.3 | SYG-064 metin incelemesi yapıldı (#124) | Bilgi İşlem |
 | 2026-10-04 | 1.4 | SYG-064 düzeltmeleri (#152): §1, §5 koşul 3, §6 madde 2 | Bilgi İşlem |
 | 2026-10-04 | 1.5 | §5: G2 kararı GEÇTİ (Doğuş Uçanok) | Bilgi İşlem |
+| 2026-10-05 | 1.6 | §5: mimari testi satırına modül yalıtım kuralının boş geçtiği notu (#171) | Bilgi İşlem |
