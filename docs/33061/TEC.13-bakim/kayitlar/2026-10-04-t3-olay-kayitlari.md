@@ -47,7 +47,7 @@ Bu belge onları geriye dönük olarak kaydeder. 04.10.2026'dan sonra:
 |---|---|
 | **Ne oldu** | E-posta gönderimi geliştirilirken (#85) `mail.duzen.com.tr:587` portunun kendinden imzalı, `CN=localhost` adlı ve süresi 07.03.2026'da **dolmuş** bir sertifika sunduğu görüldü. Gönderici sertifikayı doğruladığı için e-posta kanalı `Unhealthy` oldu; e-postayla kod gönderilemedi. |
 | **Neden** | Postfix, web sunucusundaki geçerli `mail.duzen.com.tr` sertifikası yerine eski bir sertifikayı kullanıyordu. Sertifikanın süresi altı ay önce dolmuştu; neden daha önce fark edilmediği kayıtlı değil. |
-| **Düzeltme** | Sertifika doğrulaması kapatılmadı. Postfix'in sertifika ayarları sunucu tarafında geçerli sertifikayı gösterecek şekilde düzeltildi. Düzeltme tarihi kayda geçmedi; e-posta kanalı 03.10.2026'daki davet gönderimlerinde çalışıyordu. Doğrulama komutu runbook §10.5'tedir. |
+| **Düzeltme** | Sertifika doğrulaması kapatılmadı. Postfix'in sertifika ayarları sunucu tarafında, 01.10.2026'da geçerli sertifikayı gösterecek şekilde düzeltildi. UAT `/health/notifications` 02.10.2026'da `email: Healthy` döndü (T3 süreç denetimi, Ek C düzeltme notu). 05.10.2026'da 587 portu `CN=mail.duzen.com.tr` sertifikasını sunuyor. Doğrulama komutu runbook §10.5'tedir. |
 | **Açık kalan** | Geçerli sertifikanın süresi 11.10.2026'da doluyor. Yenilendikten sonra Postfix de yeniden yüklenmelidir. Risk: R-20. |
 
 ## Değişiklik Geçmişi
@@ -55,3 +55,4 @@ Bu belge onları geriye dönük olarak kaydeder. 04.10.2026'dan sonra:
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-04 | 1.0 | İlk oluşturma: O-1…O-4 geriye dönük kayıtları (#129) | Bilgi İşlem |
+| 2026-10-05 | 1.1 | O-4: düzeltme tarihi (01.10.2026) ve doğrulaması eklendi (#134) | Bilgi İşlem |
