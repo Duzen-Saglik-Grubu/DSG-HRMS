@@ -220,6 +220,18 @@ Bu gereksinimler kullanıcı arayüzünden gözlenemez. Kanıtları T3 doğrulam
 | KG-07 | 2FA'nın açık ve kapalı hâlinin otomatik testi | REQ-KMLK-053 | `SessionApiTests` |
 | KG-08 | Eşleşen ve eşleşmeyen üyelik isteklerinin yanıt süresi farkı (< 20 ms) | REQ-KMLK-004 | `RegistrationTimingTests` (KPÖ-KMLK-2) |
 
+### 6.1 İK'nın teyit edeceği yorumlar (#135)
+
+Onaylı gereksinimler iki noktada ayrıntı vermiyordu. Bilgi İşlem bu boşlukları geliştirme
+sırasında aşağıdaki gibi yorumladı. Yorumlar kabul oturumunda İK'ya anlatılır; İK'nın kararı
+kabul formuna yazılır. İK farklı karar verirse değişiklik kabul öncesinde veya iş listesinde
+ele alınır.
+
+| # | Konu | Bilgi İşlem'in yorumu | Gösterildiği senaryo | Kaynak |
+|---|---|---|---|---|
+| T-01 | Hareketsizlik neye göre sayılır? | 30 dakikalık hareketsizlik süresi, kişinin açık sekmede **tıklama, tuşa basma, kaydırma veya dokunma** yapmadığı süredir. Sekmede video oynarken de kişi etkin sayılır. Fareyi yalnızca gezdirmek, başka bir sekmede veya programda çalışmak etkinlik sayılmaz. | KS-07 | REQ-KMLK-054; AN-23, `KR-087` |
+| T-02 | Parola değişimi açılırsa kimleri, ne sıklıkla etkiler? | Şu anda ikisi de **kapalı**. (1) Periyodik değişim açılırsa süre 90 gündür; 30 ile 365 gün arasında ayarlanabilir. (2) İlk girişte değişim açılırsa, sisteme hiç giriş yapmamış **herkes** ilk girişinde parolasını değiştirir; üyelikte parolasını kendisi belirleyenler de buna dahildir. Kural açılmadan önce giriş yapmış olanlar etkilenmez. (3) Parolasını değiştirmesi gereken kişi, değiştirene kadar sistemin başka bir ekranını kullanamaz. | KS-08, KS-10 | REQ-KMLK-030, 055; AN-24, `KR-092` |
+
 ---
 
 ## 7. Kapsam kontrolü
@@ -246,7 +258,7 @@ Bu gereksinimler kullanıcı arayüzünden gözlenemez. Kanıtları T3 doğrulam
 - **Ret:** Koşul belirlenemiyorsa.
 - **"Olmalı" gereksinimler (045, 046, 055, 056):** Karşılanmayanlar forma yazılır ve iş listesine alınır.
 
-Karar `docs/sablonlar/kabul-formu.md` şablonuyla kayda geçer. Form, sürüm etiketini ve AN-01 kalan riskinin İK'ya gösterildiğini içerir.
+Karar `docs/sablonlar/kabul-formu.md` şablonuyla kayda geçer. Form, sürüm etiketini, AN-01 kalan riskinin İK'ya gösterildiğini ve §6.1'deki yorumlar için İK'nın kararını içerir.
 
 ---
 
@@ -266,3 +278,4 @@ Kabul kararından önce düzeltilmesi gerekenler İK ile birlikte belirlenir.
 | 2026-10-04 | 0.4 | §3, §4: kabul adayı `v0.2.0-rc.1` etiketlendi ve UAT'ye kuruldu (#157) | Bilgi İşlem |
 | 2026-10-04 | 0.5 | §3, §4: kabul adayı `v0.2.0-rc.2` (#138 düzeltmesi; #160) | Bilgi İşlem |
 | 2026-10-04 | 0.6 | §3, §4: `v0.2.0-rc.2` UAT'ye kuruldu (#160) | Bilgi İşlem |
+| 2026-10-04 | 0.7 | §6.1: İK'nın teyit edeceği yorumlar T-01 (AN-23) ve T-02 (AN-24) (#135) | Bilgi İşlem |

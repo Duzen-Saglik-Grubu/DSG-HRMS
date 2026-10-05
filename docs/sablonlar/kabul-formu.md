@@ -45,6 +45,14 @@
 |---|---|---|
 | <ör. kabul kriterini tam karşılamayan bilinen bir durum ve kalan riski> | Evet / Hayır | |
 
+## 4.1 İK'nın teyit ettiği yorumlar
+
+<!-- Kabul planinda gereksinim yorumu varsa (orn. T3 plani §6.1) her biri bir satir. -->
+
+| Yorum | İK'nın kararı (Uygun / Değiştirilsin) | Not |
+|---|---|---|
+| <ör. T-01> | | |
+
 ## 5. Gözlemler (kullanım kolaylığı)
 
 - …
