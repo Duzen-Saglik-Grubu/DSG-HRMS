@@ -48,6 +48,10 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    // Ekran testleri gercek kullanici etkilesimi taklit eder (yazma, takvim secimi).
+    // Yerelde 1-2 sn suren test, paylasilan CI makinesinde 3-4 kat yavas calisip
+    // varsayilan 5 sn sinirini asti (#182). Sinir sonsuz bekleme degil, yavas makine payidir.
+    testTimeout: 15_000,
     coverage: {
       provider: 'v8',
       // Hic test edilmemis dosyalar da olcume GIRER. Aksi hâlde test yazilmayan
