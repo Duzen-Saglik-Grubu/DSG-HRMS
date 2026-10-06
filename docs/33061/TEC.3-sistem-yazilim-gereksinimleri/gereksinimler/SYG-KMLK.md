@@ -360,7 +360,7 @@ değiştirmez, yalnızca belirsiz kalan noktayı tek anlama indirir.
 | UAT sunucusu ve TLS | Kabul ortamı | ✅ Mevcut (`KR-067`); sertifika 16.12.2026'ya kadar geçerli |
 | PostgreSQL, CI kapıları | Veri, doğrulama | ✅ Mevcut (A1) |
 | NetGSM hesabı | SMS | ✅ UAT'ye tanımlı; gönderim izin listesi kipinde (`KR-083`) |
-| Kurum SMTP hesabı | E-posta | ✅ UAT'ye tanımlı; sunucu sertifikası 11.10.2026'da yenilenmeli (R-20) |
+| Kurum SMTP hesabı | E-posta | ✅ UAT'ye tanımlı; sunucu sertifikası 27.03.2027'ye kadar geçerli (R-20) |
 | Yaygın parola listesi | SYG-KMLK-045 | ✅ SecLists (MIT lisansı), ≈144 bin kayıt, uygulamaya gömülü (PR #88; kaynak: `Infrastructure/Identity/Passwords/README.md`) |
 | Kurumsal görsel | SYG-KMLK-068 | ✅ S-13 kararı gereği kodla üretildi (PR #91) |
 
@@ -468,3 +468,4 @@ madde `İptal` notuyla kalır.
 | 2026-10-03 | 1.1 | SYG-KMLK-077 ve KPÖ-KMLK-1 netleştirildi; AN-25 (`KR-095`, #120) | Bilgi İşlem |
 | 2026-10-04 | 1.2 | AN-23 ve AN-24: İK teyidinin kabulde alınacağı yazıldı (#135) | Bilgi İşlem |
 | 2026-10-04 | 1.3 | §2.2 API yolu `/api/v1/identity/`; §7 destekleyici sistemlerin durumu güncellendi (#133) | Bilgi İşlem |
+| 2026-10-06 | 1.4 | §7: SMTP sertifikasının yeni bitişi (#179) | Bilgi İşlem |

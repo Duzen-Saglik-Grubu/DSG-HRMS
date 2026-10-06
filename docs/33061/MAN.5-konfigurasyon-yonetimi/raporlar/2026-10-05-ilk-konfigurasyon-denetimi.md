@@ -58,7 +58,7 @@ Sonuç bu raporun bir sonraki sürümüne D-11 ve D-12 olarak yazılır.
 
 ## 4. Gözlemler
 
-- **G-0 (1.1, 06.10.2026):** Sunucuda listede olmayan bir öğe bulundu: Webmin 2.200, 10000 portunda ağa açık (KÖ-35). Denetim listedeki öğeleri sınıyordu; listede olmayanı ancak sunucudaki dinleyen portlara bakınca gördü. Sonraki denetimlere "dinleyen portlar listeyle aynı mı" maddesi eklenir.
+(m) => m
 
 - **G-1:** Kabul edildiğinde (`v0.2.0`) aynı denetim tekrarlanır. Kabul edilen commit `rc.2` ile aynıysa D-02…D-05 yeniden yapılmaz; etiketin aynı commit'i gösterdiği denetlenir.
 - **G-2:** D-04 denetimi şu an elle yapılıyor. Değişken eklenip örnek dosya unutulursa ilk kurulumu yapan kişi eksik değişkeni ancak açılış hatasıyla görür. CI'a alınması düşünülebilir.
@@ -69,3 +69,4 @@ Sonuç bu raporun bir sonraki sürümüne D-11 ve D-12 olarak yazılır.
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk denetim (#132) | Bilgi İşlem |
 | 2026-10-06 | 1.1 | D-11, D-12 sınandı (uygun); G-0 Webmin bulgusu (#177) | Bilgi İşlem |
+| 2026-10-06 | 1.2 | G-0: Webmin kaldırıldı (#179) | Bilgi İşlem |
