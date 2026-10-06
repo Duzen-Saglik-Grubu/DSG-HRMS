@@ -54,7 +54,7 @@ değildir.
 | No | Başlık | Durum | Son değişiklik | Konu |
 |---|---|---|---|---|
 | [ADR-0001](ADR-0001-teknoloji-yigini.md) | Teknoloji Yığını | Kabul Edildi | 2026-09-09 (0.2) | .NET 10 LTS, React 19, PostgreSQL; AutoMapper/MediatR/QuestPDF reddi |
-| [ADR-0002](ADR-0002-cozum-yapisi-ve-katmanli-mimari.md) | Çözüm Yapısı ve Katmanlı Mimari | Kabul Edildi | 2026-09-06 (0.1) | Modüler monolit, 4 katman, bağımlılık kuralları, mimari testi |
+| [ADR-0002](ADR-0002-cozum-yapisi-ve-katmanli-mimari.md) | Çözüm Yapısı ve Katmanlı Mimari | Kabul Edildi; modül düzeni → ADR-0016 | 2026-10-05 (0.2) | Modüler monolit, 4 katman, bağımlılık kuralları, mimari testi |
 | [ADR-0003](ADR-0003-logo-entegrasyon-stratejisi.md) | LOGO Entegrasyon Stratejisi | Kabul Edildi | 2026-09-26 (0.2) | Salt okuma, yalıtım katmanı, 15 dk snapshot senkronizasyon, şema sapma denetimi |
 | [ADR-0004](ADR-0004-veritabani-tasarim-standartlari.md) | Veritabanı Tasarım Standartları | Kabul Edildi | 2026-09-06 (0.1) | Adlandırma, tipler, soft delete, tarih aralıklı tablolar, migration kuralları |
 | [ADR-0005](ADR-0005-cekirdek-veri-modeli.md) | Çekirdek Veri Modeli | Kabul Edildi | 2026-09-06 (0.1) | Kişi/İstihdam ayrımı, tarih farkındalığı, yönetici grafı |
@@ -68,6 +68,7 @@ değildir.
 | [ADR-0013](ADR-0013-dosya-saklama.md) | Dosya Saklama ve Güvenlik Taraması | Kabul Edildi | 2026-09-06 (0.1) | NAS + `IFileStorage`, ClamAV, yükleme/indirme denetimleri |
 | [ADR-0014](ADR-0014-raporlama-ve-disa-aktarma.md) | Raporlama ve Dışa Aktarma | Kabul Edildi | 2026-09-06 (0.1) | ClosedXML + PDFsharp, `export` izni, dışa aktarma kaydı |
 | [ADR-0015](ADR-0015-frontend-mimarisi.md) | Frontend Mimarisi ve Arayüz İlkeleri | Kabul Edildi | 2026-09-06 (0.1) | Modül bazlı yapı, TanStack Query, ortak bileşenler, kullanılabilirlik |
+| [ADR-0016](ADR-0016-modul-siniri-denetimi.md) | Modül Sınırının Denetimi | Kabul Edildi | 2026-10-05 (0.1) | Bildirilen bağımlılık tablosu; ölçülen ve bildirilen bağımlılıkların birebir karşılaştırılması |
 
 ---
 
@@ -105,3 +106,4 @@ değerlendirilmelidir:
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma; ADR-0001…ADR-0015 dizini | Bilgi İşlem |
 | 2026-10-04 | 0.2 | Kural 2: ek ve sınırlı değişiklik yerinde, karar değişikliği yeni ADR ile (`KR-099`); dizine son değişiklik sütunu; ADR-0006 gözden geçirme tetikleyicisi 2FA geliştirmesine göre güncellendi (#133) | Bilgi İşlem |
+| 2026-10-05 | 0.3 | ADR-0016 eklendi; ADR-0002 durumu (#171) | Bilgi İşlem |

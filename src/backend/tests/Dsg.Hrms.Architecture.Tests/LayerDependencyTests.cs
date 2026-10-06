@@ -155,66 +155,130 @@ public sealed class LayerDependencyTests
     }
 
     // ------------------------------------------------------------------
-    // Kural 5: Modul yalitimi.
+    // Kural 5: Modul yalitimi (#171).
+    //
+    // Moduller her katmanin dogrudan altindaki ad alanidir
+    // (Dsg.Hrms.<Katman>.<Modul>). ADR-0002'deki Modules/<Modul>/Abstractions
+    // duzeni uygulanmadi; onceki test o ad alanini aradigi icin HICBIR tipi
+    // denetlemeden geciyordu. Bugunku kural: moduller arasi her bagimlilik asagidaki
+    // tabloda gerekcesiyle BILDIRILIR. Test, olculen bagimlilik kumesini tabloyla
+    // birebir karsilastirir:
+    //   - bildirilmemis yeni bagimlilik -> test duser (sinir asindi)
+    //   - tabloda olup kodda olmayan bagimlilik -> test duser (tablo bayatladi)
     // ------------------------------------------------------------------
 
-    [Fact]
-    public void Modules_should_not_depend_on_each_others_internals()
+    /// <summary>Is modulleri: her katmanin dogrudan altindaki ad alanlari.</summary>
+    private static readonly string[] Modules = ["Identity", "Personnel", "Organization", "Notifications", "Settings", "Audit"];
+
+    /// <summary>
+    /// Modul olmayan ortak veya teknik ad alanlari. Yeni bir ust ad alani ya modul ya da
+    /// ortak olarak siniflandirilmadikca test duser; boylece yeni modul sessizce denetim
+    /// disinda kalmaz.
+    /// </summary>
+    private static readonly string[] SharedNamespaces = ["Common", "Data", "Configuration", "Logging", "Time", "Logo"];
+
+    /// <summary>Bildirilen moduller arasi bagimliliklar (katman: kaynak -> hedef) ve gerekceleri.</summary>
+    private static readonly Dictionary<string, string> AllowedModuleDependencies = new(StringComparer.Ordinal)
     {
-        // Bir modul, baska bir modulun yalnizca acikca yayimladigi arayuzleri
-        // kullanabilir (Modules/<Modul>/Abstractions). Diger her sey icseldir.
-        //
-        // Modul bulunmadigi surece bu test bos gecer; ilk modul eklendiginde
-        // kendiliginden anlamli hâle gelir.
-        var violations = new List<string>();
+        // Istihdam bir firmaya baglidir (ADR-0005).
+        ["Domain: Personnel -> Organization"] = "istihdam-firma iliskisi",
+        ["Application: Personnel -> Organization"] = "senkronizasyon firma ve birimleri yazar",
+        ["Infrastructure: Personnel -> Organization"] = "senkronizasyon deposu",
 
-        foreach (var assembly in new[] { DomainAssembly, ApplicationAssembly, InfrastructureAssembly })
-        {
-            var moduleNames = FindModuleNames(assembly);
+        // Kimlik, kisinin LOGO'dan gelen bilgileriyle dogrulanir (SYG-KMLK-013, 031).
+        ["Application: Identity -> Personnel"] = "uyelik ve giriste kisi ve istihdam",
+        ["Infrastructure: Identity -> Personnel"] = "hesap islemleri ve uyelik sorgulari",
+        ["Infrastructure: Identity -> Organization"] = "hesap islemleri listesinde firma adi (SYG-KMLK-073)",
 
-            foreach (var module in moduleNames)
-            {
-                var otherModules = moduleNames
-                    .Where(m => m != module)
-                    .Select(m => $"{assembly.GetName().Name}.Modules.{m}")
-                    .ToArray();
+        // Istihdam bitince hesap pasife alinir (KR-015, SYG-KMLK-054). Identity <-> Personnel
+        // karsilikli bagimliligi BILINCLIDIR: T1 cekirdegi T3 icinde yazildi (KR-077).
+        ["Application: Personnel -> Identity"] = "senkronizasyonda hesap yasam dongusu",
+        ["Infrastructure: Personnel -> Identity"] = "senkronizasyonda hesap yasam dongusu",
 
-                if (otherModules.Length == 0)
-                {
-                    continue;
-                }
+        // Parametreler (SYG-KMLK-075) ve iletim (SYG-KMLK-026…030) ortak hizmettir.
+        ["Application: Identity -> Settings"] = "kimlik parametreleri",
+        ["Application: Identity -> Notifications"] = "dogrulama kodu ve davet iletisi",
+        ["Application: Personnel -> Settings"] = "senkronizasyon periyodu",
+        ["Infrastructure: Personnel -> Settings"] = "senkronizasyon periyodu",
+        ["Infrastructure: Notifications -> Settings"] = "SMTP ve NetGSM parametreleri",
+    };
 
-                var result = Types.InAssembly(assembly)
-                    .That().ResideInNamespace($"{assembly.GetName().Name}.Modules.{module}")
-                    .ShouldNot().HaveDependencyOnAny(otherModules)
-                    .GetResult();
+    [Fact]
+    public void Every_top_level_namespace_is_classified_as_module_or_shared()
+    {
+        var unclassified = LayerAssemblies
+            .SelectMany(a => TopLevelNamespaces(a).Select(ns => $"{LayerName(a)}.{ns}"))
+            .Where(ns => !Modules.Contains(ns.Split('.')[1]) && !SharedNamespaces.Contains(ns.Split('.')[1]))
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
 
-                if (!result.IsSuccessful)
-                {
-                    violations.AddRange(result.FailingTypeNames.Select(t => $"{module}: {t}"));
-                }
-            }
-        }
+        unclassified.ShouldBeEmpty(
+            "Yeni ust ad alani modul (Modules) veya ortak (SharedNamespaces) olarak siniflandirilmali; " +
+            "aksi halde modul siniri denetlenmez (#171).");
+    }
 
-        violations.ShouldBeEmpty(
-            "Moduller arasi dogrudan erisim yasaktir; yalnizca yayimlanan arayuzler " +
-            "uzerinden konusulur (ADR-0002, Kural 5).");
+    [Fact]
+    public void Module_dependencies_match_the_declared_table()
+    {
+        var measured = MeasureModuleDependencies();
+
+        // Test bos gecmemeli: bugun bildirilen bagimliliklar olculebiliyor olmali.
+        measured.ShouldNotBeEmpty("Moduller arasi hicbir bagimlilik olculmedi; test bir seyi denetlemiyor olabilir (#171).");
+
+        var undeclared = measured.Keys.Except(AllowedModuleDependencies.Keys).Select(k => $"{k}: {measured[k]}").ToList();
+        undeclared.ShouldBeEmpty(
+            "Bildirilmemis moduller arasi bagimlilik (ADR-0002, Kural 5). Bilincliyse gerekcesiyle " +
+            "AllowedModuleDependencies tablosuna eklenir; degilse bagimlilik kaldirilir.");
+
+        var stale = AllowedModuleDependencies.Keys.Except(measured.Keys).ToList();
+        stale.ShouldBeEmpty("Tabloda olup kodda artik bulunmayan bagimlilik; tablodan cikarilmali.");
     }
 
     // ------------------------------------------------------------------
     // Yardimcilar
     // ------------------------------------------------------------------
 
-    private static string[] FindModuleNames(Assembly assembly)
-    {
-        var prefix = $"{assembly.GetName().Name}.Modules.";
+    private static Assembly[] LayerAssemblies => [DomainAssembly, ApplicationAssembly, InfrastructureAssembly];
 
+    private static string LayerName(Assembly assembly) => assembly.GetName().Name!["Dsg.Hrms.".Length..];
+
+    private static IEnumerable<string> TopLevelNamespaces(Assembly assembly)
+    {
+        var prefix = $"{assembly.GetName().Name}.";
         return assembly.GetTypes()
             .Select(t => t.Namespace)
             .Where(ns => ns is not null && ns.StartsWith(prefix, StringComparison.Ordinal))
             .Select(ns => ns![prefix.Length..].Split('.')[0])
-            .Distinct(StringComparer.Ordinal)
-            .ToArray();
+            .Distinct(StringComparer.Ordinal);
+    }
+
+    /// <summary>"Katman: kaynak -> hedef" anahtariyla, bagimliligi tasiyan ornek tip adi.</summary>
+    private static Dictionary<string, string> MeasureModuleDependencies()
+    {
+        var edges = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var assembly in LayerAssemblies)
+        {
+            foreach (var from in Modules)
+            {
+                foreach (var to in Modules.Where(m => m != from))
+                {
+                    // Hedef modulun TUM katmanlari: Application.Identity'nin Domain.Personnel'e
+                    // bagimliligi da moduller arasi bagimliliktir.
+                    var targets = LayerAssemblies.Select(a => $"{a.GetName().Name}.{to}").ToArray();
+                    var result = Types.InAssembly(assembly)
+                        .That().ResideInNamespace($"{assembly.GetName().Name}.{from}")
+                        .ShouldNot().HaveDependencyOnAny(targets)
+                        .GetResult();
+
+                    if (!result.IsSuccessful)
+                    {
+                        edges[$"{LayerName(assembly)}: {from} -> {to}"] = result.FailingTypeNames[0];
+                    }
+                }
+            }
+        }
+
+        return edges;
     }
 
     /// <summary>

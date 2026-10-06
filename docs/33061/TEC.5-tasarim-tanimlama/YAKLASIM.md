@@ -164,7 +164,7 @@ riskleri R-05 ve R-23 olarak izlenir.
 
 | No | Açık nokta | Bağlantı |
 |---|---|---|
-| 1 | **Modül yalıtım testi fiilen boş geçiyor.** `Modules_should_not_depend_on_each_others_internals` modülleri `<Katman>.Modules.<Modül>` ad alanında arar; kod ise `Dsg.Hrms.Application.Identity` gibi `Modules` olmadan yerleşmiş. ADR-0002'nin `Modules/<Modül>/Abstractions/` düzeni uygulanmadı ve bu sapma ADR'de yazılı değil. Ya ADR-0002'ye gerçekleştirme notu ya teste yeni ad alanı kuralı gerekir | ADR-0002, `LayerDependencyTests.cs` |
+| 1 | ~~Modül yalıtım testi fiilen boş geçiyor~~ — **Kapandı (05.10.2026, #171):** test kodun gerçek düzenine uyarlandı; modüller arası bağımlılıklar gerekçeli bir tabloda bildiriliyor ve ölçülen kümeyle birebir karşılaştırılıyor (ADR-0016, `KR-100`) | ADR-0016 |
 | 2 | SYG → tasarım öğesi tahsis tablosu yok; matrisin "Tasarım" sütunu REQ düzeyinde | Denetim TEC.5-3 |
 | 3 | Tasarım gözden geçirme raporu hiç üretilmedi; tasarımı koddan bağımsız gözden geçiren adım yok | Denetim TEC.5-6 |
 | 4 | Depoda diyagram yok (hesap/oturum durumu, üyelik akışı); `docs/mimari/entegrasyon-arayuzleri.md` yok | Denetim TEC.5-5 |
@@ -182,3 +182,4 @@ geçirilir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
+| 2026-10-05 | 1.1 | §8 madde 1 kapandı: ADR-0016 (#171) | Bilgi İşlem |
