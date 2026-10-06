@@ -104,7 +104,7 @@ RACI'de MAN.6'nın sorumlusu ve hesap vereni Bilgi İşlem'dir. İK ve KVKK Soru
 - **Gizlilik:** Depo özeldir. "Gizli" sınıftaki kümeler (UAT veritabanı, sır dosyası, LOGO düzeltme listeleri, izin listesi, yazışma arşivi) depoya girmez. `gitleaks` sır sızıntısını CI'da yakalar.
 - **Telif:** Lisanslı standartlar (`docs/TSE_ISO_IEC_TS_33061/`, `docs/TS_ISO_IEC_33020/`) `.gitignore`'dadır. Metinleri belgelere kopyalanmaz; yalnızca madde numarasıyla atıf yapılır (`R-11`).
 - **Bilgi kaybına karşı:** `git stash -u` ve `git clean -d` kullanılmaz; ara çalışma dalda WIP commit'i olarak saklanır ve dallar sık sık GitHub'a gönderilir (`R-26`). 30.09.2026'daki klasör kaybı `git stash -u` ile oldu (`TEC.13-bakim/kayitlar/2026-10-04-t3-olay-kayitlari.md`).
-- **Defterin güncelliği:** Modül sonu süreç denetiminde (MAN.8) defter, depo dışı konumlarla karşılaştırılır.
+- **Defterin güncelliği:** Modül sonu süreç denetiminde (MAN.8) defter, depo dışı konumlarla karşılaştırılır (onay: Doğuş Uçanok, 05.10.2026; `KR-101`).
 
 ---
 
@@ -142,3 +142,4 @@ Bu belge ve bilgi kayıt defteri her modül sonu süreç denetiminde (MAN.8) gö
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
+| 2026-10-06 | 1.1 | Defterin modül sonu denetiminde sınanması onaylandı (`KR-101`, #177) | Bilgi İşlem |

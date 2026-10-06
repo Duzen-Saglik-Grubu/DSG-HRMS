@@ -73,7 +73,7 @@ karşılaştırması, sapmalar, ölçütler ve alınan dersler. Kayıt `kayitlar
 `proje-plani.md` §8 ve §9, Üst Yönetime **dönemsel** yazılı durum raporu öngörür ama
 dönemi tanımlamaz. Bu belge dönemi şöyle tanımlar:
 
-- **Her modül kapanışında** ve **en geç ayda bir.** Bu, risk gözden geçirmesinin sıklığıyla aynıdır (`risk-kayit-defteri.md`); iki iş birlikte yapılır.
+- **Her modül kapanışında** ve **en geç ayda bir** (onay: Doğuş Uçanok, 05.10.2026; `KR-101`). Bu, risk gözden geçirmesinin sıklığıyla aynıdır (`risk-kayit-defteri.md`); iki iş birlikte yapılır.
 
 Raporun içeriği:
 
@@ -177,3 +177,4 @@ gözden geçirilir. Rapor dönemi pratikte işlemiyorsa burada değiştirilir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
+| 2026-10-06 | 1.1 | §2.5 durum raporu sıklığı onaylandı (`KR-101`, #177) | Bilgi İşlem |

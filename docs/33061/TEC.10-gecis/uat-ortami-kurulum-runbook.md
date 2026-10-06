@@ -1,7 +1,7 @@
 # UAT Ortamı — Kurulum ve Dağıtım Runbook'u
 
 **Belge kimliği:** TEC.10-RB-001
-**Son güncelleme:** 2026-10-04
+**Son güncelleme:** 2026-10-06
 **İlgili süreçler:** TEC.10 (Geçiş), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-024`, `KR-038`, `KR-065`, `KR-097`
 
@@ -18,7 +18,7 @@
 | **Sunucu** | `192.168.3.202` — Ubuntu 26.04 LTS · 2 çekirdek · 7,3 GB RAM · 87 GB disk |
 | **Adres** | **https://insankaynaklaritest.duzen.com.tr** — HTTP, HTTPS'e yönlendirilir |
 | **Uygulama dizini** | `/opt/dsg-hrms` (sırlar: `/opt/dsg-hrms/secrets/`, sertifika: `/opt/dsg-hrms/tls/`) |
-| **Erişim** | SSH, parola ile (kalıcı anahtar tanımlı değil; parola girişinin kapatılması açık iş, R-25) |
+| **Erişim** | SSH anahtarı (`~/.ssh/dsg-hrms-uat`, geliştirici makinesi). Parola ile giriş, erişimin tamamen kaybolmaması için bilerek açık; parola yazışmaya girmez (`KR-102`, #174) |
 | **Amaç** | İK kabul testi (`KR-024`). **Gerçek personel verisiyle** çalışır: LOGO'dan okunur, maskelenmez; kabul testleri gerçek personelle yapılır. İleti gönderimi izin listesiyle sınırlıdır (§10.2). Risk ve önlemler: R-25 |
 | **Sertifika** | Let's Encrypt · **bitiş 16.12.2026** · yenileme **elle** (`KR-067`, `R-18`) |
 
@@ -214,8 +214,9 @@ Dağıtım, aşağıdakilerin tamamı geçmeden **tamamlanmış sayılmaz**:
 docker ps --format "{{.Names}}\t{{.Status}}"
 
 # Ağdan — web ve sağlık ucu
-curl -s -o /dev/null -w "%{http_code}\n" http://insankaynaklaritest.duzen.com.tr/
-curl -s http://insankaynaklaritest.duzen.com.tr/health/ready
+curl -s -o /dev/null -w "%{http_code}\n" https://insankaynaklaritest.duzen.com.tr/
+curl -s https://insankaynaklaritest.duzen.com.tr/health/ready
+curl -s -o /dev/null -w "%{http_code}\n" http://insankaynaklaritest.duzen.com.tr/   # 301 beklenir
 
 # Ağdan — API ve veritabanı DIŞARI KAPALI olmalı
 curl -s -o /dev/null -w "%{http_code}\n" --max-time 5 http://192.168.3.202:5299/health/live  # 000 beklenir
@@ -224,7 +225,8 @@ curl -s -o /dev/null -w "%{http_code}\n" --max-time 5 http://192.168.3.202:5299/
 | Kontrol | Beklenen |
 |---|---|
 | Üç konteyner | `healthy` |
-| `http://insankaynaklaritest.duzen.com.tr/` | `200` |
+| `https://insankaynaklaritest.duzen.com.tr/` | `200` |
+| `http://…` (düz HTTP) | `301` → HTTPS |
 | `/health/ready` | `{"status":"Healthy", ... "postgresql":"Healthy"}` |
 | Eşleşmeyen yol (SPA geri dönüşü) | `200` |
 | Güvenlik başlıkları | `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` |
@@ -266,13 +268,14 @@ rm /opt/dsg-hrms/yedek-*.sql.gz
 | Veritabanı ve API dışarı kapalı | ✅ Yapıldı |
 | Sırlar sunucuda üretiliyor, depoda yok | ✅ Yapıldı |
 | Konteynerler root olmayan kullanıcıyla çalışıyor | ✅ (`KR-065`) |
-| **SSH parola ile girişin kapatılması** | ⚠️ **Öneriliyor** — anahtar kuruldu, parola hâlâ açık |
-| **Sunucu parolasının değiştirilmesi** | ⚠️ **Öneriliyor** — kurulum sırasında paylaşıldı |
+| SSH anahtarla erişim | ✅ 06.10.2026 (#174). Parola ile giriş **bilerek açık** (`KR-102`) |
+| Sunucu parolasının değiştirilmesi | ✅ 06.10.2026 (Doğuş Uçanok) |
 | **HTTPS (TLS)** | ✅ Yapıldı — Let's Encrypt, 17.09.2026 (`KR-067`) |
 | **Sertifikanın süresinin dolması** | ⚠️ **İzleniyor** (`R-18`) — yenileme elle; bitiş **16.12.2026** |
 | **HSTS** | ⛔ Bilinçli olarak kapalı — gerekçe §7 |
-| Güvenlik duvarı (ufw) | ⚠️ Açık — yalnızca 22 ve 80'e izin verilmesi önerilir |
-| Kimlik doğrulama | ⏳ T3 Kimlik Yönetimi ile gelecek; şu an uygulamada oturum yok |
+| Güvenlik duvarı | ⚠️ `ufw` kurulu değil (06.10.2026). Dışarıya açık portlar: 22, 80, 443 ve **10000 (Webmin)**; API 5299 ve veritabanı 5434 yalnızca yerel |
+| **Webmin (10000)** | ⚠️ **Belgelenmemişti** — 06.10.2026'da bulundu; karar bekleniyor (#177) |
+| Kimlik doğrulama | ✅ T3 Kimlik Yönetimi (`v0.2.0-rc.2`) |
 
 ---
 
@@ -634,3 +637,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-10-02 | 1.6 | §10.4: HTTPS zorunluluğu ve doğrulaması (#115) | Bilgi İşlem |
 | 2026-10-04 | 1.7 | §3: sürüm seçimi, git archive ile aktarım, imajda commit etiketi, dağıtım kaydı; §3.3 sır dosyası yolu düzeltildi (#125) | Bilgi İşlem |
 | 2026-10-04 | 1.8 | §1: erişim yöntemi ve veri sınıfı (gerçek veri) düzeltildi; §5 yedek kuralı (`KR-098`, #133) | Bilgi İşlem |
+| 2026-10-06 | 1.9 | §1 erişim (SSH anahtarı); §4 doğrulama HTTPS'e göre; §6 güvenlik notları güncellendi, Webmin bulgusu (#177) | Bilgi İşlem |
