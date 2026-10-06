@@ -61,13 +61,13 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 | BK-22 | UAT izin listesi | `Masaüstü\HRMS\DSG-HRMS_UAT_Izin_Listesi.txt` | Bilgi İşlem | **Gizli**: e-posta adresleri ve telefon numaraları | Kabul oturumları sürdükçe | **Öneri:** Kabul oturumundan sonra listedeki kişiler çıkarılır (`KR-083`) |
 | BK-23 | T3 İK inceleme seti | `Masaüstü\HRMS\T3_Kabul_IK_Inceleme\` | Bilgi İşlem | Kurum içi | Kabul kararına kadar | Asılları depodadır; kabulden sonra silinebilir |
 | BK-24 | İmzalı kabul formları (taranmış) | **Belirlenecek** (kurum içi güvenli konum; TEC.11 YAKLASIM §6) | İK | Kurum içi: ad ve imza | **Öneri:** Sistemin ömrü boyunca (belgelendirme kanıtı) | — |
-| BK-25 | Geliştirme yardımcısıyla yazışma arşivi | Geliştirici makinesi, `claude/` (`.gitignore`'da) | Bilgi İşlem | **Gizli**: kararların ve onayların ham kaydı; **içinde düz metin sunucu parolası var** | **Öneri:** Kararlar karar defterine, onaylar onay kaydına aktarıldıktan sonra arşiv olarak | **Açık iş (Ö-1):** Parolalar arşivden temizlenmeli |
+| BK-25 | Geliştirme yardımcısıyla yazışma arşivi | Geliştirici makinesi, `claude/` (`.gitignore`'da) | Bilgi İşlem | **Gizli**: kararların ve onayların ham kaydı; parolalar 05.10.2026'da temizlendi | **Öneri:** Kararlar karar defterine, onaylar onay kaydına aktarıldıktan sonra arşiv olarak | Parolalar 05.10.2026'da temizlendi (Ö-1). Arşive yeni parola yazılmaz |
 
 ## 5. Açık işler
 
 | # | İş | Neden | Sahibi |
 |---|---|---|---|
-| Ö-1 | Yazışma arşivinden (BK-25) parolaların temizlenmesi; UAT sunucu parolasının değiştirilip SSH'nin anahtarla yapılması | UAT `root` parolası her sunucu işinde yazışmaya düz metin olarak yazılıyor. Parola bu arşivde ve yardımcının oturum dökümlerinde kalıcı olarak duruyor. Parola girişi açık olduğu için (R-25) bu parola sunucuya tam erişim demektir | Bilgi İşlem |
+| Ö-1 | ~~Yazışma arşivinden parolaların temizlenmesi; UAT sunucu parolasının değiştirilip SSH'nin anahtarla yapılması~~ **Kapandı (06.10.2026):** arşivden 24 parola temizlendi (UAT 21, LOGO, eski İK veritabanı, SMTP); SSH anahtarla; `root` parolası değiştirildi; parola girişi bilerek açık (`KR-102`, #174). Kalan: parola, yardımcının bu oturuma ait dökümünde duruyor; parola değiştirildiği için geçersiz | UAT `root` parolası her sunucu işinde yazışmaya düz metin olarak yazılıyor. Parola bu arşivde ve yardımcının oturum dökümlerinde kalıcı olarak duruyor. Parola girişi açık olduğu için (R-25) bu parola sunucuya tam erişim demektir | Bilgi İşlem |
 | Ö-2 | "Öneri" olarak işaretlenen saklama ve imha sürelerinin KVKK Sorumlusu tarafından onaylanması | RACI: saklama süreleri KVKK Sorumlusu'nda; ADR-0009 §6 açık iş | KVKK Sorumlusu |
 | Ö-3 | İmzalı kabul formlarının (BK-24) saklanacağı konumun belirlenmesi | T3 kabul oturumundan önce gerekli | İK + Bilgi İşlem |
 
@@ -76,3 +76,4 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#131) | Bilgi İşlem |
+| 2026-10-06 | 1.1 | Ö-1 kapandı; BK-25 güncellendi (#177) | Bilgi İşlem |

@@ -67,7 +67,8 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 | KÖ-31 | UAT TLS sertifikası | `/opt/dsg-hrms/tls/` | Bilgi İşlem | `renew-tls.sh` ile 90 günde bir, elle (`KR-067`, R-18). Bitiş: 16.12.2026 |
 | KÖ-32 | NTP kaynakları | `/etc/chrony/sources.d/dsg-hrms-ntp.sources` | Bilgi İşlem | Elle, runbook NTP bölümü (#103, R-21) |
 | KÖ-33 | Docker Engine ve işletim sistemi | UAT sunucusu (Ubuntu 26.04) | Bilgi İşlem | Elle, runbook §2.1 |
-| KÖ-34 | SSH erişimi | UAT sunucusu | Bilgi İşlem | Elle. Parola girişi açık (R-25 açık iş) |
+| KÖ-34 | SSH erişimi | UAT sunucusu `/root/.ssh/authorized_keys`; geliştirici makinesinde `~/.ssh/dsg-hrms-uat` | Bilgi İşlem | Elle. Anahtarla erişim; parola girişi bilerek açık (`KR-102`, #174) |
+| KÖ-35 | Webmin yönetim paneli | UAT sunucusu, 10000 portu (ağa açık), sürüm 2.200 | **Belirsiz** | 06.10.2026'da bulundu; belgelenmemişti. Karar bekleniyor (#177) |
 
 ### 3.3 Dış hizmetler ve kurum altyapısı
 
@@ -97,3 +98,4 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#132) | Bilgi İşlem |
+| 2026-10-06 | 1.1 | KÖ-34 SSH anahtarı; KÖ-35 Webmin eklendi (#177) | Bilgi İşlem |

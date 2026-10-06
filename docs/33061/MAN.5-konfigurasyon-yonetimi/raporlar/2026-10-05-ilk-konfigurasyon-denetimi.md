@@ -17,8 +17,8 @@
 | | Sayı |
 |---|---|
 | Denetim maddesi | 12 |
-| Uygun | **10** |
-| Bu denetimde sınanamadı (sunucu erişimi gerekiyor) | 2 — bir sonraki sunucu işinde (§3) |
+| Uygun | **12** |
+| Bu denetimde sınanamadı | 0 — D-11 ve D-12, 06.10.2026'da sınandı (1.1) |
 | Uygunsuzluk | **0** |
 
 Kabul adayı `v0.2.0-rc.2` için etiket, CHANGELOG, imaj, dağıtım kaydı ve CI kanıtı
@@ -41,8 +41,8 @@ erişim gerektirdiği için bu denetimde sınanamadı.
 | D-08 | E-posta sunucusu sertifikası kayıttaki tarihte (KÖ-43) | `openssl s_client -starttls smtp` (05.10.2026) | ✅ `CN=mail.duzen.com.tr`, bitiş 11.10.2026 23:59 GMT; R-20 ile aynı |
 | D-09 | Dış arayüzler sağlıklı (KÖ-40…42) | UAT `/health/ready`, `/health/notifications`, `/health/sync` (05.10.2026) | ✅ Hepsi `Healthy` (`TEC.8-entegrasyon/raporlar/2026-10-05-t3-entegrasyon-raporu.md`) |
 | D-10 | Git kancaları geliştirme makinesinde etkin (KÖ-15) | `git config core.hooksPath` | ✅ `.githooks` |
-| D-11 | NTP eşitlemesi çalışıyor (KÖ-32) | `timedatectl` (`System clock synchronized: yes`) | ⏳ Sınanamadı: sunucu erişimi gerekiyor |
-| D-12 | Sır dosyasının yeri ve izni (KÖ-30) | `stat -c '%a %n' /opt/dsg-hrms/secrets/.env.uat` → `600` | ⏳ Sınanamadı: sunucu erişimi gerekiyor. Dosyanın varlığı 04.10.2026'daki dağıtımda betik tarafından denetlendi |
+| D-11 | NTP eşitlemesi çalışıyor (KÖ-32) | `timedatectl` (06.10.2026) | ✅ `System clock synchronized: yes`, `NTP service: active` |
+| D-12 | Sır dosyasının yeri ve izni (KÖ-30) | `stat -c '%a %U %n'` (06.10.2026) | ✅ `600 root /opt/dsg-hrms/secrets/.env.uat` |
 
 ## 3. Bir sonraki sunucu işinde yapılacaklar
 
@@ -58,6 +58,8 @@ Sonuç bu raporun bir sonraki sürümüne D-11 ve D-12 olarak yazılır.
 
 ## 4. Gözlemler
 
+- **G-0 (1.1, 06.10.2026):** Sunucuda listede olmayan bir öğe bulundu: Webmin 2.200, 10000 portunda ağa açık (KÖ-35). Denetim listedeki öğeleri sınıyordu; listede olmayanı ancak sunucudaki dinleyen portlara bakınca gördü. Sonraki denetimlere "dinleyen portlar listeyle aynı mı" maddesi eklenir.
+
 - **G-1:** Kabul edildiğinde (`v0.2.0`) aynı denetim tekrarlanır. Kabul edilen commit `rc.2` ile aynıysa D-02…D-05 yeniden yapılmaz; etiketin aynı commit'i gösterdiği denetlenir.
 - **G-2:** D-04 denetimi şu an elle yapılıyor. Değişken eklenip örnek dosya unutulursa ilk kurulumu yapan kişi eksik değişkeni ancak açılış hatasıyla görür. CI'a alınması düşünülebilir.
 
@@ -66,3 +68,4 @@ Sonuç bu raporun bir sonraki sürümüne D-11 ve D-12 olarak yazılır.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk denetim (#132) | Bilgi İşlem |
+| 2026-10-06 | 1.1 | D-11, D-12 sınandı (uygun); G-0 Webmin bulgusu (#177) | Bilgi İşlem |
