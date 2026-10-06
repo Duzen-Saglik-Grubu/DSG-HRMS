@@ -2,8 +2,8 @@
 
 **Belge kimliği:** MAN.1-PP
 **Süreç:** MAN.1 — Proje Planlama
-**Sürüm:** 0.1 (taslak — üst yönetim onayı bekliyor)
-**Son güncelleme:** 2026-09-07
+**Sürüm:** 0.3 (revizyon — üst yönetim onayı bekliyor)
+**Son güncelleme:** 2026-10-06
 **Plan sahibi:** Bilgi İşlem Birim Sorumlusu
 **33061 karşılığı:** *Project objectives*, *Project constraints*, *Project plan*,
 *Project infrastructure needs*, *Project human resources needs*
@@ -53,14 +53,14 @@ tamamlar ve çevrim tamamlanmadan sonraki modüle geçilmez.
 │                                                                 │
 │  1. Gereksinim toplantısı (İK + P4)          → TEC.2            │
 │  2. Paydaş gereksinimleri yazılır ve kilitlenir → TEC.2         │
-│  3. Sistem gereksinimleri (REQ-...) türetilir → TEC.3           │
+│  3. Sistem gereksinimleri (SYG-...) türetilir → TEC.3           │
 │  4. Tasarım ve gerekirse ADR                  → TEC.5           │
 │  5. Geliştirme (dal → PR → inceleme)          → TEC.7           │
 │  6. Entegrasyon ve CI kapıları                → TEC.8           │
 │  7. Doğrulama: testler, kapsam, güvenlik      → TEC.9           │
-│  8. Sürüm etiketi (baseline) → UAT'ye dağıtım → MAN.5 / TEC.10  │
+│  8. Kabul adayı etiketi (-rc.N) → UAT'ye dağıtım → MAN.5/TEC.10 │
 │  9. Kabul testi (İK + temsilci personel)      → TEC.11          │
-│ 10. Kabul formu imzası                        → TEC.11          │
+│ 10. Kabul formu imzası → kabul etiketi (vX.Y.0) → TEC.11 / MAN.5│
 │ 11. Kapanış gözden geçirmesi + alınan dersler → MAN.2           │
 │ 12. Öz değerlendirme tablosu güncellenir      → MAN.8           │
 └─────────────────────────────────────────────────────────────────┘
@@ -139,7 +139,23 @@ gerçekçi olmaz ve MAN.2 izlemesini anlamsızlaştırır.
 | `MINOR` | Yeni modül veya yeni yetenek |
 | `MAJOR` | `v1.0.0` = üretime geçiş; sonrasında kırıcı değişiklik |
 
-Her kabul edilen modül bir **MINOR sürüm** ve bir **baseline** üretir (MAN.5).
+Her kabul edilen modül bir **MINOR sürüm** ve bir **baseline** üretir (MAN.5, `KR-097`).
+Kabule sunulan sürüm `vX.Y.0-rc.N` ön sürüm etiketini alır ve UAT'ye bu etiketten kurulur;
+kabulden sonra aynı commit `vX.Y.0` olarak etiketlenir. Numaralar kabul sırasına göre verilir.
+
+### 5.2 Gerçekleşen sıra
+
+| Aşama / modül | Durum | Sürüm |
+|---|---|---|
+| A0 — Hazırlık | ✅ Tamamlandı | — |
+| A1 — İskelet | ✅ Tamamlandı (12.09.2026) | `v0.1.0` |
+| A2 — T3 Kimlik | Geliştirme tamam (G2, 04.10.2026); İK kabulü bekliyor | `v0.2.0-rc.2` |
+| A2 — T1, T2, T4, T5 | İK gereksinim toplantısı bekliyor (`KR-068`) | kabul sırasıyla `v0.3.0` … |
+
+**T3 önce geliştirildi.** Diğer bütün modüller giriş ve yetkilendirmeye bağımlı olduğu için
+ilk modül Kullanıcı Girişi'dir (`KR-040`). T3'ün ihtiyaç duyduğu personel çekirdeği
+(kişi ve istihdam modeli, LOGO senkronizasyonu) T3 kapsamında kuruldu; T1'in ekranları ve
+işlevleri T1'in kendi gereksinim toplantısından sonra gelir (`KR-077`).
 
 ---
 
@@ -162,8 +178,8 @@ Her kabul edilen modül bir **MINOR sürüm** ve bir **baseline** üretir (MAN.5
 
 | Ortam | Amaç | Veri | Durum |
 |---|---|---|---|
-| **Geliştirme** | Günlük geliştirme | Sentetik | Yerel |
-| **UAT** | İK kabul testleri (`KR-024`) | Maskelenmiş gerçek veri | **Kurulacak** |
+| **Geliştirme** | Günlük geliştirme | Gerçek LOGO verisi (salt okunur); otomatik testlerde sentetik | Yerel |
+| **UAT** | İK kabul testleri (`KR-024`) | **Gerçek personel verisi**, maskelenmez; ileti gönderimi izin listesiyle sınırlı (`KR-083`, R-25) | ✅ Kuruldu (16.09.2026; TLS 17.09.2026) |
 | **Üretim** | Canlı kullanım | Gerçek | **Kurulacak** (Linux) |
 
 ### 6.3 Altyapı ihtiyaçları
@@ -171,14 +187,14 @@ Her kabul edilen modül bir **MINOR sürüm** ve bir **baseline** üretir (MAN.5
 | # | İhtiyaç | Durum | Sorumlu |
 |---|---|---|---|
 | B1 | LOGO salt-okunur erişim | ✅ Sağlandı | Bilgi İşlem |
-| B2 | Yeni PostgreSQL sunucusu (`KR-035`) | ⏳ Bekliyor | Bilgi İşlem |
-| B3 | UAT ortamı (ayrı Compose yığını + veritabanı) | ⏳ Bekliyor | Bilgi İşlem |
+| B2 | Yeni PostgreSQL sunucusu (`KR-035`) | ⏳ Üretim için bekliyor; UAT'de konteyner içinde PostgreSQL 17 | Bilgi İşlem |
+| B3 | UAT ortamı (ayrı Compose yığını + veritabanı) | ✅ Sağlandı (16.09.2026) | Bilgi İşlem |
 | B4 | Üretim sunucusu (Linux + Docker) | ⏳ Bekliyor | Bilgi İşlem |
 | B5 | NAS erişimi ve yedekleme düzeni | ⏳ Teyit bekliyor | Bilgi İşlem |
 | B6 | NetGSM API kullanıcısı | ✅ Sağlandı | Bilgi İşlem |
 | B7 | SMTP erişimi | ✅ Sağlandı | Bilgi İşlem |
-| B8 | GitHub deposu, Actions, Projects | ⏳ Kurulacak | Bilgi İşlem |
-| B9 | Veritabanı yedekleme ve geri yükleme düzeni | ⏳ Bekliyor | Bilgi İşlem |
+| B8 | GitHub deposu, Actions, Projects | ✅ Sağlandı. Sunucu tarafı dal koruma Free planda yok; telafi kontrolleri (`KR-055`, `KR-096`) | Bilgi İşlem |
+| B9 | Veritabanı yedekleme ve geri yükleme düzeni | ⏳ Üretim için bekliyor; UAT düzenli yedeklenmez (`KR-098`) | Bilgi İşlem |
 
 ### 6.4 Araçlar ve lisanslar
 
@@ -214,7 +230,7 @@ MAN.2 kapsamında yürütülür.
 |---|---|---|
 | Görev durumu izleme | Sürekli | GitHub Projects panosu |
 | Risk gözden geçirme | Her modül kapanışında, en geç ayda bir | `MAN.4/risk-kayit-defteri.md` |
-| Durum raporu | Dönemsel | `MAN.2/raporlar/YYYY-AA-durum-raporu.md` |
+| Durum raporu | Her modül kapanışında, en geç ayda bir (`KR-101`) | `MAN.2/raporlar/YYYY-AA-GG-durum-raporu.md` |
 | Modül kapanış gözden geçirmesi | Her modül sonunda | `MAN.2/kayitlar/` |
 | Öz değerlendirme (33061) | Her modül kapanışında, en geç 3 ayda bir | `33061/00-OLGUNLUK-SEVIYESI-KRITERLERI.md` §6 |
 | Kalite kapısı sonuçları | Her PR | GitHub Actions |
@@ -240,7 +256,7 @@ MAN.2 kapsamında yürütülür.
 |---|---|---|---|
 | İK Birimi | Gereksinim toplantısı | Modül başına | Yüz yüze |
 | İK Birimi + P4 + temsilci personel | Kabul testi | Modül başına | UAT ortamı |
-| Üst Yönetim | Durum raporu | Dönemsel | Yazılı rapor |
+| Üst Yönetim | Durum raporu | Her modül kapanışında, en geç ayda bir (`KR-101`) | Yazılı rapor |
 | KVKK Sorumlusu | Uyum konuları | İhtiyaç hâlinde | Yazılı görüş |
 | Tüm personel | Devreye alma bilgilendirmesi | Geçişte | E-posta + kılavuz |
 
@@ -263,9 +279,9 @@ MAN.2 kapsamında yürütülür.
 |---|---|---|
 | 1 | Planın üst yönetim tarafından onaylanması (MAN.1.BP3) | Üst Yönetim |
 | 2 | B2 — Yeni PostgreSQL sunucusunun sağlanması | Bilgi İşlem |
-| 3 | B3, B4 — UAT ve üretim ortamlarının kurulması | Bilgi İşlem |
+| 3 | ~~B3 — UAT ortamı~~ (✅ 16.09.2026); B4 — üretim ortamının kurulması | Bilgi İşlem |
 | 4 | B5 — NAS yedekleme düzeninin teyidi | Bilgi İşlem |
-| 5 | B8 — GitHub kurulumu (dal koruma, şablonlar, Projects) | Bilgi İşlem |
+| 5 | ~~B8 — GitHub kurulumu~~ (✅; dal koruma yerine telafi kontrolleri, `KR-055`) | Bilgi İşlem |
 | 6 | B9 — Yedekleme ve geri yükleme düzeninin tanımlanması (RPO/RTO) | Bilgi İşlem |
 | 7 | Başarı ölçütlerinin (§1) üst yönetimle teyidi | Bilgi İşlem |
 
@@ -277,3 +293,4 @@ MAN.2 kapsamında yürütülür.
 |---|---|---|---|
 | 2026-09-07 | 0.1 | İlk taslak | Bilgi İşlem |
 | 2026-10-04 | 0.2 | §3 aşama tablosu: modül başına sürüm (`KR-097`, #125) | Bilgi İşlem |
+| 2026-10-06 | 0.3 | **Plan revizyonu (#127):** başlıktaki sürüm (0.1 kalmıştı) geçmişle eşitlendi; §3 çevrim adımları SYG ve kabul adayı etiketi; §5.2 gerçekleşen sıra ve T3'ün öne alınması (`KR-040`, `KR-077`); §6.2 ortamlar (UAT kuruldu, gerçek veri); §6.3 B2, B3, B8, B9; §8–§9 durum raporu sıklığı (`KR-101`); §11 durumlar. Üst Yönetim onayına sunuldu | Bilgi İşlem |
