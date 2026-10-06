@@ -218,11 +218,11 @@ toplantısıyla başlar** (`KR-068`) — T1 dâhil.
       ↓
 2. İskelet ────────────────────────────────┐
       ↓                                     │
-3.T1 Personel → 3.T2 Organizasyon           │  Bu zincir kısaltılamaz;
-      ↓                                     │  her adım bir öncekine
-3.T3 Kimlik ★ → 3.T4 Rol/Yetki              │  bağımlıdır.
+3.T3 Kimlik ★ (+ T1 çekirdeği, KR-077)      │  T3 önce geliştirildi:
+      ↓                                     │  diğer modüller girişe
+3.T1 Personel · 3.T2 Organizasyon           │  bağımlı (KR-040).
       ↓                                     │
-3.T5 Kullanıcı                              │
+3.T4 Rol/Yetki → 3.T5 Kullanıcı             │
       ↓                                     │
 4.Y1 Bildirim · 4.Y2 Denetim · 4.Y3 Referans│
       ↓                                     │
@@ -312,3 +312,4 @@ Bu kural, aşağıdaki üç yanlışı birden engeller:
 | 2026-09-07 | 0.1 | İlk oluşturma — 7 aşama, 35 modül, kritik yol | Bilgi İşlem |
 | 2026-09-17 | 0.2 | Modül başlangıç koşulu eklendi: her modül kendi İK gereksinim toplantısıyla başlar (`KR-068`) | Bilgi İşlem |
 | 2026-09-18 | 0.3 | §5 milestone eşlemesi tamamlandı ve atama kuralı yazıldı; WBS 7 için `SK` milestone'u açıldı (BULGU-08) | Bilgi İşlem |
+| 2026-10-06 | 0.4 | §4 kritik yol gerçekleşen sıraya göre: T3 önce, T1 çekirdeği T3 içinde (`KR-040`, `KR-077`, #127) | Bilgi İşlem |

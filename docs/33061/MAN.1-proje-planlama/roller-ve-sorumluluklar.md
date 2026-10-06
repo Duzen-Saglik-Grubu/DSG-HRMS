@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.1-RS
 **Süreç:** MAN.1 — Proje Planlama
-**Son güncelleme:** 2026-09-07
+**Son güncelleme:** 2026-10-06
 **33061 karşılığı:** *Roles, responsibilities, accountabilities, and authorities*
 **Karşıladığı öznitelik maddeleri:** PA 2.1 (d) sorumluluk ve yetki tanımı, PA 2.1 (f) yetkinlik
 
@@ -114,11 +114,14 @@ Her satırda **tam bir A** bulunur — kimin karar verdiği belirsiz kalmaz.
 | Alan | Gereken | Durum | Kapatma yöntemi |
 |---|---|---|---|
 | .NET / ASP.NET Core | Yüksek | ✅ Mevcut | — |
-| .NET 10 yenilikleri | Orta | 🔄 Geliştiriliyor | Resmî dokümantasyon; iskelette uygulama |
+| .NET 10 yenilikleri | Orta | ✅ Mevcut | İskelet ve T3'te uygulandı |
 | EF Core + PostgreSQL | Yüksek | ✅ Mevcut | — |
 | React + TypeScript | Orta–Yüksek | ✅ Mevcut | — |
-| React 19 / TanStack Query | Orta | 🔄 Geliştiriliyor | İskelet aşamasında örnek modül |
-| Mapperly, Testcontainers | Orta | ⏳ Yeni | İskelette birer örnekle pekiştirme |
+| React 19 / TanStack Query | Orta | ✅ Mevcut | T3 ekranlarında uygulandı |
+| Testcontainers | Orta | ✅ Mevcut | PostgreSQL ve SQL Server ile entegrasyon testleri (T3) |
+| Mapperly | Düşük | ⏳ Kullanılmadı | Paket ekli; T3'te eşleme elle yazıldı. İlk gerektiğinde değerlendirilir |
+| Kimlik doğrulama ve oturum (JWT, yenileme jetonu, parola özetleme) | Yüksek | ✅ Mevcut | T3 (ADR-0006) |
+| Uçtan uca test (Playwright) | Orta | ✅ Mevcut | T3 sonunda kuruldu (#146) |
 | Docker / Linux işletim | Orta | ✅ Mevcut | — |
 | LOGO veri yapısı | Yüksek | ✅ Mevcut | Analiz belgeleriyle pekiştirildi |
 | KVKK gereklilikleri | Orta | 🔄 Geliştiriliyor | KVKK Sorumlusundan görüş (P6) |
@@ -146,7 +149,7 @@ Sorumluluk ve yetkiler şu kanallarla duyurulur ve kanıtlanır:
 | Kanal | Ne gösterir |
 |---|---|
 | Bu belge (depoda, sürümlenmiş) | Rol ve yetki tanımlarının yazılı olması |
-| GitHub dal koruma kuralları | Kimin `main`'e yazabildiği, inceleme zorunluluğu |
+| Dal koruma telafi kontrolleri ve PR onay yorumu | `main`'e PR dışı yazmanın ve onaysız birleştirmenin tespiti (`KR-055`, `KR-096`); sunucu tarafı dal koruma Free planda yok |
 | GitHub Issue/PR atamaları | Hangi işin kimde olduğu |
 | Kabul formları | Kabul kararının kim tarafından verildiği |
 | Vizyon-kapsam ve plan onayı | Proje onayının kim tarafından verildiği |
@@ -192,3 +195,4 @@ gizlemediği bir gerçektir ve üst yönetime raporlanan bir konudur.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-07 | 0.1 | İlk oluşturma — roller, RACI, yetkinlik yönetimi | Bilgi İşlem |
+| 2026-10-06 | 0.2 | §4.1 yetkinlik tablosu T3'e göre güncellendi; §5 dal koruma satırı gerçeğe göre düzeltildi. Üst Yönetim onayına sunuldu (#127) | Bilgi İşlem |
