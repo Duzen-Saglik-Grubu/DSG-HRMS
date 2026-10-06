@@ -68,7 +68,7 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 | KÖ-32 | NTP kaynakları | `/etc/chrony/sources.d/dsg-hrms-ntp.sources` | Bilgi İşlem | Elle, runbook NTP bölümü (#103, R-21) |
 | KÖ-33 | Docker Engine ve işletim sistemi | UAT sunucusu (Ubuntu 26.04) | Bilgi İşlem | Elle, runbook §2.1 |
 | KÖ-34 | SSH erişimi | UAT sunucusu `/root/.ssh/authorized_keys`; geliştirici makinesinde `~/.ssh/dsg-hrms-uat` | Bilgi İşlem | Elle. Anahtarla erişim; parola girişi bilerek açık (`KR-102`, #174) |
-| KÖ-35 | Webmin yönetim paneli | UAT sunucusu, 10000 portu (ağa açık), sürüm 2.200 | **Belirsiz** | 06.10.2026'da bulundu; belgelenmemişti. Karar bekleniyor (#177) |
+| KÖ-35 | ~~Webmin yönetim paneli~~ | — | — | **Kaldırıldı (06.10.2026, #179).** 06.10.2026'da belgelenmemiş olarak bulunmuştu; kullanılmıyordu |
 
 ### 3.3 Dış hizmetler ve kurum altyapısı
 
@@ -77,7 +77,7 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 | KÖ-40 | LOGO salt-okunur veritabanı hesabı | LOGO SQL Server | Bilgi İşlem | `DENY` yazma; CI'da benzer hesapla sınanır (PR #76) |
 | KÖ-41 | NetGSM hesabı ve gönderici başlığı | NetGSM | Bilgi İşlem | Başlık `DUZEN` (PRM-ENT-03) |
 | KÖ-42 | SMTP gönderen hesabı | `mail.duzen.com.tr` | Bilgi İşlem | PRM-ENT-05 |
-| KÖ-43 | E-posta sunucusu sertifikası (587) | `mail.duzen.com.tr` Postfix | Bilgi İşlem (e-posta yöneticisi) | Bitiş 11.10.2026; yenileme 08–09.10 (R-20) |
+| KÖ-43 | E-posta sunucusu sertifikası (587) | `mail.duzen.com.tr` Postfix | Bilgi İşlem (e-posta yöneticisi) | Sectigo; bitiş **27.03.2027**; bitişten 2–3 gün önce yenilenir, ardından Postfix yeniden yüklenir (R-20) |
 | KÖ-44 | DNS kayıtları | Kurum DNS'i: `insankaynaklaritest` A kaydı, DNS-01 TXT kaydı | Kurum DNS yöneticisi | TXT kaydı her yenilemede elle (R-18) |
 | KÖ-45 | GitHub depo ayarları | Depo: etiketler, milestone'lar, Actions izinleri, plan | Bilgi İşlem | Sunucu tarafı dal koruması yok (`KR-055`, R-16) |
 
@@ -99,3 +99,4 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#132) | Bilgi İşlem |
 | 2026-10-06 | 1.1 | KÖ-34 SSH anahtarı; KÖ-35 Webmin eklendi (#177) | Bilgi İşlem |
+| 2026-10-06 | 1.2 | KÖ-35 Webmin kaldırıldı; KÖ-43 yeni sertifika (#179) | Bilgi İşlem |

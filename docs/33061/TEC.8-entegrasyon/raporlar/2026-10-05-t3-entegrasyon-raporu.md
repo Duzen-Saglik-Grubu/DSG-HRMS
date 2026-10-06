@@ -19,7 +19,7 @@
 |---|---|---|---|---|---|
 | LOGO veritabanı | Okuma | ✅ Yazma reddi | ✅ 26.09'dan beri senkronizasyon | `/health/sync`: **Healthy** | — |
 | NetGSM (SMS) | Giden | ✅ 12 sonuç kodu | ✅ Gerçek SMS ulaştı (29.09) | `/health/notifications` sms: **Healthy** | Teslim durumu sorgusu (R-14) |
-| Kurum SMTP | Giden | ✅ Gerçek SMTP konuşması | ⚠️ 27.09 Unhealthy → 01.10 düzeldi | email: **Healthy**; sertifika **11.10.2026**'da bitiyor | Yenileme 08–09.10 (R-20) |
+| Kurum SMTP | Giden | ✅ Gerçek SMTP konuşması | ⚠️ 27.09 Unhealthy → 01.10 düzeldi | email: **Healthy**; sertifika 06.10.2026'da yenilenmiş bulundu, bitiş **27.03.2027** (1.1) | — |
 | Tarayıcı ↔ nginx ↔ API | Gelen | ✅ Vekil ve HTTPS kuralları, uçtan uca testler | ✅ Her dağıtımda öz denetim | `/health/ready`: **Healthy**; HTTP → HTTPS 301 | — |
 | API ↔ PostgreSQL | İç | ✅ Gerçek PostgreSQL, şema betiği | ✅ Her dağıtımda şema betiği | **Healthy** | — |
 
@@ -59,7 +59,7 @@ izleniyor: SMTP sertifikasının yenilenmesi (R-20) ve SMS teslim durumu sorgusu
 | **CI'da sınama** | `SmtpEmailSenderTests` (PR #86): Mailpit konteyneriyle gerçek SMTP konuşması; Türkçe şablon. Uçtan uca testler (#146) e-postayla gelen kodu ve davet bağlantısını Mailpit'ten okur. |
 | **UAT'de sınama** | 27.09.2026: **Unhealthy**. 587 portu süresi 07.03.2026'da dolmuş, kendinden imzalı bir sertifika sunuyordu (A-5). Sertifika 01.10.2026'da düzeltildi; 02.10.2026'da `email: Healthy`. 03.10.2026'da İK davet bağlantıları e-postayla ulaştı. |
 | **Bugün** | `email` **Healthy** (05.10.2026). 587 portu `CN=mail.duzen.com.tr` sertifikasını sunuyor; geçerlilik sonu **11.10.2026 23:59 GMT**. |
-| **Açık iş** | Sertifika 08–09.10.2026'da yenilenecek; ardından Postfix yeniden yüklenip runbook §10.5'teki denetim çalıştırılacak (R-20). |
+| **Açık iş** | ~~Sertifikanın yenilenmesi~~ — **Kapandı (1.1, 06.10.2026):** Sectigo, geçerlilik 04.10.2026–27.03.2027; 587 portunda doğrulama `0 (ok)`; email Healthy. Sonraki yenileme R-20'de izleniyor. |
 
 ### 2.4 Tarayıcı ↔ nginx ↔ API
 
@@ -114,3 +114,4 @@ saat). Bu yüzden üretim kurulumunda ortam öğelerinin listesi ve denetimi ger
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk sürüm (#134) | Bilgi İşlem |
+| 2026-10-06 | 1.1 | SMTP sertifikası yenilendi (#179) | Bilgi İşlem |

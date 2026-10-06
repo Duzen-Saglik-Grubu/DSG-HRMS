@@ -71,7 +71,7 @@ Defter şu durumlarda gözden geçirilir (`risk-kayit-defteri.md` §1):
 | Tetikleyici | Ne yapılır |
 |---|---|
 | Modül kapanışı | Tüm açık riskler; modülde ortaya çıkan yeni riskler |
-| Ayda bir | Puanı 6 ve üzeri riskler; tarihli önlemler (örn. `R-20` sertifika bitişi 11.10.2026) |
+| Ayda bir | Puanı 6 ve üzeri riskler; tarihli önlemler (örn. `R-20` sertifika bitişi 27.03.2027) |
 | Risk niteliğinde olay (kesinti, güvenlik bulgusu, ortam arızası) | Olay kaydıyla birlikte ilgili risk güncellenir veya yeni risk açılır |
 
 Son gözden geçirme 04.10.2026'dır (#126). Aylık sınır bu tarihten sayılır.
@@ -162,3 +162,4 @@ Bu belge her modül sonu süreç denetiminde (MAN.8) gözden geçirilir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
+| 2026-10-06 | 1.1 | §4 örnek: R-20 yeni bitiş tarihi (#179) | Bilgi İşlem |

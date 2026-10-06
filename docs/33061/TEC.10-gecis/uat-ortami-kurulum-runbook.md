@@ -273,8 +273,8 @@ rm /opt/dsg-hrms/yedek-*.sql.gz
 | **HTTPS (TLS)** | ✅ Yapıldı — Let's Encrypt, 17.09.2026 (`KR-067`) |
 | **Sertifikanın süresinin dolması** | ⚠️ **İzleniyor** (`R-18`) — yenileme elle; bitiş **16.12.2026** |
 | **HSTS** | ⛔ Bilinçli olarak kapalı — gerekçe §7 |
-| Güvenlik duvarı | ⚠️ `ufw` kurulu değil (06.10.2026). Dışarıya açık portlar: 22, 80, 443 ve **10000 (Webmin)**; API 5299 ve veritabanı 5434 yalnızca yerel |
-| **Webmin (10000)** | ⚠️ **Belgelenmemişti** — 06.10.2026'da bulundu; karar bekleniyor (#177) |
+| Güvenlik duvarı | ⚠️ `ufw` kurulu değil. Dışarıya açık portlar (06.10.2026): 22, 80, 443; API 5299 ve veritabanı 5434 yalnızca yerel |
+| Webmin (10000) | ✅ Kaldırıldı (06.10.2026, #179); belgelenmemişti ve kullanılmıyordu |
 | Kimlik doğrulama | ✅ T3 Kimlik Yönetimi (`v0.2.0-rc.2`) |
 
 ---
@@ -529,12 +529,9 @@ curl -s -o /dev/null -w '%{http_code}\n' -X POST http://127.0.0.1:5299/api/v1/id
 Gönderici sunucu sertifikasını **doğrular**; doğrulama kapatılmaz. SMTP adresi,
 sertifikadaki adla yazılır: `mail.duzen.com.tr:587`.
 
-27.09.2026 ölçümü (#85):
+Güncel durum (06.10.2026): 587 portu `CN=mail.duzen.com.tr` sertifikasını sunuyor; Sectigo, geçerlilik 04.10.2026–**27.03.2027**, doğrulama `0 (ok)`. Sertifika bitişten 2–3 gün önce yenilenir (R-20).
 
-| Port | Sertifika |
-|---|---|
-| 443 (web) | `CN=mail.duzen.com.tr`, Sectigo, geçerlilik sonu 11.10.2026 |
-| **587 (Postfix)** | Kendinden imzalı `CN=localhost`, süresi 07.03.2026'da **dolmuş** |
+Geçmiş: 27.09.2026 ölçümünde (#85) 587 portu kendinden imzalı `CN=localhost` ve süresi 07.03.2026'da dolmuş bir sertifika sunuyordu; 01.10.2026'da düzeltildi (olay O-4).
 
 Postfix geçerli sertifikayı kullanana kadar e-posta kanalı `Unhealthy` görünür ve
 e-postayla kod gönderilemez. Düzeltme sunucu tarafındadır: Postfix'in
@@ -638,3 +635,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-10-04 | 1.7 | §3: sürüm seçimi, git archive ile aktarım, imajda commit etiketi, dağıtım kaydı; §3.3 sır dosyası yolu düzeltildi (#125) | Bilgi İşlem |
 | 2026-10-04 | 1.8 | §1: erişim yöntemi ve veri sınıfı (gerçek veri) düzeltildi; §5 yedek kuralı (`KR-098`, #133) | Bilgi İşlem |
 | 2026-10-06 | 1.9 | §1 erişim (SSH anahtarı); §4 doğrulama HTTPS'e göre; §6 güvenlik notları güncellendi, Webmin bulgusu (#177) | Bilgi İşlem |
+| 2026-10-06 | 1.10 | §6: Webmin kaldırıldı, açık portlar; §10.5: SMTP sertifikasının güncel durumu (#179) | Bilgi İşlem |
