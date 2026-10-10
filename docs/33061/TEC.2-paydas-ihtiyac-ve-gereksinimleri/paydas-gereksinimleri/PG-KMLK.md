@@ -167,3 +167,4 @@ Sistem gereksinimi, tasarım, kod ve test halkaları, işin yapıldığı PR'da 
 | 2026-10-10 | 1.3 | **Değişiklik talebi #185:** REQ-KMLK-038 TCKN başına saatte 5 → 10; REQ-KMLK-039 15 dakikada 3 → 10 (parametre aralığı 1–15). Neden: UAT'de İK ile yapılan üyelik denemelerinde sınırlar çok çabuk engelledi (Doğuş Uçanok, 10.10.2026). RACI'ye göre kabul İK'dadır; teyit kabul oturumunda alınır | Bilgi İşlem |
 | 2026-10-10 | 1.4 | Değişiklik talebi #185 İK tarafından onaylandı (Doğuş Uçanok bildirdi, #187) | Bilgi İşlem |
 | 2026-10-10 | 1.5 | **Değişiklik talebi #190** (İK onaylı, 10.10.2026): 2FA kullanıcı tercihine bağlı; REQ-KMLK-025, 051, 052, 053 güncellendi | Bilgi İşlem |
+| 2026-10-11 | 1.6 | Değişiklik talebi #190 kapsamında İK'nın kurtarma işlemi (kodu alamayan kişinin 2FA'sını gerekçeyle kapatma; REQ-KMLK-052 ve 037 altında, SYG-KMLK-081) İK tarafından onaylandı (Doğuş Uçanok bildirdi, 11.10.2026) | Bilgi İşlem |
