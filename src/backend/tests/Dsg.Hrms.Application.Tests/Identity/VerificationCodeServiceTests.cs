@@ -250,6 +250,38 @@ public sealed class VerificationCodeServiceTests
         (await service.VerifyAsync(issued.CodeId!.Value, LastCode(), CancellationToken.None)).ShouldBe(VerificationResult.Expired);
     }
 
+    [Fact]
+    public async Task Code_of_another_person_or_purpose_is_not_usable_and_stays_intact()
+    {
+        // SYG-KMLK-080: iki adimli dogrulamayi acma kodu yalnizca kendi kisisi ve amaciyla kullanilir.
+        var service = CreateService();
+        var issued = await service.IssueAsync(Email(personId: 7, purpose: VerificationPurpose.PasswordReset), CancellationToken.None);
+        var code = LastCode();
+
+        (await service.VerifyAsync(issued.CodeId!.Value, code, 7, VerificationPurpose.TwoFactorSetup, CancellationToken.None))
+            .ShouldBe(VerificationResult.NotUsable);
+        (await service.VerifyAsync(issued.CodeId!.Value, code, 8, VerificationPurpose.PasswordReset, CancellationToken.None))
+            .ShouldBe(VerificationResult.NotUsable);
+
+        var stored = _store.Codes.Single();
+        stored.Status.ShouldBe(VerificationCodeStatus.Issued);
+        stored.FailedAttempts.ShouldBe(0);
+
+        (await service.VerifyAsync(issued.CodeId!.Value, code, 7, VerificationPurpose.PasswordReset, CancellationToken.None))
+            .ShouldBe(VerificationResult.Verified);
+    }
+
+    [Fact]
+    public async Task Two_factor_setup_code_has_its_own_purpose_and_message()
+    {
+        await CreateService().IssueAsync(Email(personId: 7, purpose: VerificationPurpose.TwoFactorSetup), CancellationToken.None);
+
+        _events.Received(1).Record(SecurityEventType.VerificationCodeSent, null, 7, "two-factor-setup:email");
+        var message = _sent.Single();
+        message.Purpose.ShouldBe(NotificationPurpose.TwoFactorSetupCode);
+        message.Subject.ShouldNotBeNull().ShouldContain("iki adımlı doğrulamayı açma");
+    }
+
     // ------------------------------------------------------------------ uretec
 
     [Fact]

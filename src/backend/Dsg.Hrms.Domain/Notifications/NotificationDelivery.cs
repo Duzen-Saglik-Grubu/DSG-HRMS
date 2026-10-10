@@ -113,6 +113,9 @@ public enum NotificationPurpose
 
     /// <summary>IK davetiyle parola olusturma baglantisi (SYG-KMLK-051).</summary>
     Invitation = 4,
+
+    /// <summary>Kullanicinin kendi iki adimli dogrulamasini acma kodu (SYG-KMLK-080).</summary>
+    TwoFactorSetupCode = 5,
 }
 
 /// <summary>Gonderim sonucu.</summary>

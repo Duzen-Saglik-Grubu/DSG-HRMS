@@ -70,6 +70,13 @@ public sealed class UserAccount : Entity, IAuditable
     /// </summary>
     public bool FirstPasswordChangePending { get; private set; }
 
+    /// <summary>
+    /// Kullanicinin kendi iki adimli dogrulama tercihi (SYG-KMLK-080). Varsayilan kapali.
+    /// Giriste kod yalnizca sistem parametresi (PRM-KML-08) ve bu tercih birlikte acikken
+    /// istenir.
+    /// </summary>
+    public bool TwoFactorEnabled { get; private set; }
+
     /// <inheritdoc />
     public DateTimeOffset CreatedAt { get; set; }
 
@@ -152,6 +159,40 @@ public sealed class UserAccount : Entity, IAuditable
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Iki adimli dogrulamayi kullanicinin kendi tercihiyle acar (SYG-KMLK-080). Degisiklik
+    /// olduysa <c>true</c> doner.
+    /// </summary>
+    /// <remarks>
+    /// Guvenlik damgasi YENILENMEZ: tercih bir sonraki giristen itibaren gecerlidir; acik
+    /// oturumlar kapanmaz.
+    /// </remarks>
+    public bool EnableTwoFactor()
+    {
+        if (TwoFactorEnabled)
+        {
+            return false;
+        }
+
+        TwoFactorEnabled = true;
+        return true;
+    }
+
+    /// <summary>
+    /// Iki adimli dogrulamayi kullanicinin kendi tercihiyle kapatir (SYG-KMLK-080).
+    /// Degisiklik olduysa <c>true</c> doner. Guvenlik damgasi yenilenmez.
+    /// </summary>
+    public bool DisableTwoFactor()
+    {
+        if (!TwoFactorEnabled)
+        {
+            return false;
+        }
+
+        TwoFactorEnabled = false;
+        return true;
     }
 
     /// <summary>Kilitlenmeyi kaydeder (SYG-KMLK-058).</summary>

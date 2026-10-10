@@ -190,6 +190,34 @@
         "expired": "Parolanızın kullanım süresi doldu. Devam etmek için yeni bir parola belirleyin."
       }
     },
+    "security": {
+      "title": "Hesap güvenliği",
+      "subtitle": "Girişte parolanıza ek olarak doğrulama kodu istenip istenmeyeceğini buradan seçebilirsiniz.",
+      "heading": "İki adımlı doğrulama",
+      "explain": "İki adımlı doğrulama açıkken girişte parolanızdan sonra e-posta veya SMS ile gelen bir kod girersiniz. Parolanız başkasının eline geçse bile bu kod olmadan hesabınıza giriş yapılamaz.",
+      "enabled": "İki adımlı doğrulama hesabınızda açık. Girişte parolanızdan sonra doğrulama kodu istenir.",
+      "disabled": "İki adımlı doğrulama hesabınızda kapalı. Girişte yalnızca parolanız istenir.",
+      "unavailable": "İki adımlı doğrulama şu anda sistemde kullanılmıyor. Kullanıma açıldığında bu sayfadan kendi hesabınız için açabilirsiniz.",
+      "unavailableEnabled": "İki adımlı doğrulama şu anda sistemde kullanılmadığı için girişte kod istenmiyor. Hesabınızdaki ayarı isterseniz kapatabilirsiniz.",
+      "noChannel": "İki adımlı doğrulamayı açmak için LOGO’da kurumsal e-posta adresinizin veya cep telefonu numaranızın kayıtlı olması gerekir. Bu bilgiler eksikse İnsan Kaynakları birimiyle iletişime geçin.",
+      "enable": {
+        "heading": "İki adımlı doğrulamayı aç",
+        "intro": "Mevcut parolanızı girin ve doğrulama kodunu nereden almak istediğinizi seçin. Kodu girdiğinizde iki adımlı doğrulama açılır.",
+        "submit": "Kodu gönder",
+        "codeIntro": "Doğrulama kodu seçtiğiniz yönteme gönderildi; birkaç dakika içinde gelir. Kodu girdiğinizde iki adımlı doğrulama hesabınızda açılır.",
+        "cancel": "Vazgeç",
+        "done": "İki adımlı doğrulama açıldı. Bir sonraki girişinizden itibaren parolanızdan sonra doğrulama kodu istenecek."
+      },
+      "disable": {
+        "heading": "İki adımlı doğrulamayı kapat",
+        "intro": "Kapatmak için mevcut parolanızı girin.",
+        "submit": "Kapat",
+        "confirmTitle": "İki adımlı doğrulama kapatılsın mı?",
+        "confirmText": "Kapatırsanız girişte yalnızca parolanız istenir ve hesabınız daha az korunur.",
+        "confirm": "Kapat",
+        "done": "İki adımlı doğrulama kapatıldı. Girişte yalnızca parolanız istenecek."
+      }
+    },
     "accounts": {
       "title": "Hesap işlemleri",
       "subtitle": "Personelin hesap durumunu görün; gerektiğinde hesabı gerekçeyle pasife alın veya yeniden aktifleştirin.",
@@ -259,7 +287,8 @@
       "text": "Bir süredir işlem yapmadınız. Oturumunuz güvenliğiniz için {{time}} içinde kapanacak.",
       "continue": "Oturumu sürdür"
     },
-    "changePassword": "Parolamı değiştir"
+    "changePassword": "Parolamı değiştir",
+    "accountSecurity": "Hesap güvenliği"
   },
   "system": {
     "parameters": {
@@ -325,9 +354,9 @@
       },
       "twoFactor": {
         "title": "İki adımlı doğrulamayı aç",
-        "text_zero": "Tüm aktif hesap sahiplerinin en az bir doğrulama kanalı var; iki adımlı doğrulama açıldığında herkes giriş yapabilir. Açmak istiyor musunuz?",
-        "text_one": "{{count}} aktif hesap sahibinin hiçbir doğrulama kanalı (e-posta veya cep telefonu) yok. İki adımlı doğrulama açılırsa bu kişi giriş yapamaz. Yine de açmak istiyor musunuz?",
-        "text_other": "{{count}} aktif hesap sahibinin hiçbir doğrulama kanalı (e-posta veya cep telefonu) yok. İki adımlı doğrulama açılırsa bu kişiler giriş yapamaz. Yine de açmak istiyor musunuz?",
+        "text_zero": "Kendi hesabında iki adımlı doğrulamayı açmış kimse yok; açıldığında kimsenin girişi değişmez. Kullanıcılar isterse kendi hesaplarında açabilir. Açmak istiyor musunuz?",
+        "text_one": "Kendi hesabında iki adımlı doğrulamayı açmış {{count}} kişi var. İki adımlı doğrulama açılırsa bu kişi bundan sonra girişte doğrulama kodu girecek. Açmak istiyor musunuz?",
+        "text_other": "Kendi hesabında iki adımlı doğrulamayı açmış {{count}} kişi var. İki adımlı doğrulama açılırsa bu kişiler bundan sonra girişte doğrulama kodu girecek. Açmak istiyor musunuz?",
         "confirm": "Aç"
       }
     },

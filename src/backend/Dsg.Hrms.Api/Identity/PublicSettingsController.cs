@@ -9,7 +9,8 @@ namespace Dsg.Hrms.Api.Identity;
 /// <remarks>
 /// <para>
 /// Yalnizca ekranda gosterilmek icin zaten herkese acik olan bilgiler doner: destek
-/// iletisim bilgisi ve parola kurallari. SIR veya kisisel veri DONMEZ; yeni bir alan
+/// iletisim bilgisi, parola kurallari ve iki adimli dogrulamanin kullanilip kullanilmadigi.
+/// SIR veya kisisel veri DONMEZ; yeni bir alan
 /// eklenirken bu kural korunur.
 /// </para>
 /// <para>
@@ -44,7 +45,8 @@ public sealed class PublicSettingsController : ControllerBase
                 Application.Identity.Passwords.PasswordPolicy.MaxLength,
                 await _parameters.GetBooleanAsync(ParameterCatalog.RequireComplexPassword, cancellationToken)),
             await _parameters.GetIntegerAsync(ParameterCatalog.VerificationCodeLength, cancellationToken),
-            await _branding.GetLogoVersionAsync(cancellationToken));
+            await _branding.GetLogoVersionAsync(cancellationToken),
+            await _parameters.GetBooleanAsync(ParameterCatalog.TwoFactorEnabled, cancellationToken));
 }
 
 /// <summary>Giris ve uyelik ekranlarinin ayarlari.</summary>
@@ -52,7 +54,8 @@ public sealed class PublicSettingsController : ControllerBase
 /// <param name="PasswordRules">Parola kurallari (ekranda yardim icin).</param>
 /// <param name="VerificationCodeLength">Dogrulama kodunun hane sayisi (PRM-KML-09).</param>
 /// <param name="LogoVersion">Yuklu kurumsal logonun surumu (PRM-GRN-01); yuklenmemisse bos ve varsayilan logo kullanilir.</param>
-public sealed record PublicSettingsResponse(string SupportContact, PasswordRulesResponse PasswordRules, int VerificationCodeLength, string? LogoVersion);
+/// <param name="TwoFactorAvailable">Iki adimli dogrulama sistemde kullaniliyor mu (PRM-KML-08); kullanici menusundeki hesap guvenligi sayfasi buna gore gosterilir (SYG-KMLK-080).</param>
+public sealed record PublicSettingsResponse(string SupportContact, PasswordRulesResponse PasswordRules, int VerificationCodeLength, string? LogoVersion, bool TwoFactorAvailable);
 
 /// <summary>Parola kurallari.</summary>
 /// <param name="MinLength">En az uzunluk (PRM-KML-05).</param>

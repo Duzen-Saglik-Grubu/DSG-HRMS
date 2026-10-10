@@ -7,35 +7,32 @@ namespace Dsg.Hrms.Application.Identity.Sessions;
 public interface ITwoFactorImpactStore
 {
     /// <summary>
-    /// Aktif hesabi ve aktif istihdami olan, verilen kanallarin hicbirinde kullanilabilir
-    /// iletisim bilgisi bulunmayan kisilerin sayisi.
+    /// Aktif hesabi ve aktif istihdami olan, kendi hesabinda iki adimli dogrulamayi acmis
+    /// kisilerin sayisi (SYG-KMLK-080).
     /// </summary>
-    /// <param name="emailAllowed">E-posta kanali kullanilabiliyor mu.</param>
-    /// <param name="smsAllowed">SMS kanali kullanilabiliyor mu.</param>
     /// <param name="cancellationToken">Iptal.</param>
-    Task<int> CountWithoutChannelAsync(bool emailAllowed, bool smsAllowed, CancellationToken cancellationToken);
+    Task<int> CountWithTwoFactorPreferenceAsync(CancellationToken cancellationToken);
 }
 
 /// <summary>2FA'nin acilmasinin etkisi.</summary>
-/// <param name="AffectedCount">Hicbir dogrulama kanali olmayan aktif hesap sahibi sayisi.</param>
-/// <param name="ConfirmationRequired">Acmadan once onay isteniyor mu (PRM-KML-15).</param>
+/// <param name="AffectedCount">Kendi hesabinda iki adimli dogrulamayi acmis, giriste kod girmeye baslayacak aktif hesap sahibi sayisi.</param>
+/// <param name="ConfirmationRequired">Acmadan once onay isteniyor mu: sayi sifirdan buyuk ve uyari acik (PRM-KML-15).</param>
 public sealed record TwoFactorImpactResult(int AffectedCount, bool ConfirmationRequired);
 
 /// <summary>
-/// Iki adimli dogrulama acilmadan once etki uyarisi (SYG-KMLK-035, REQ-KMLK-052).
+/// Iki adimli dogrulama acilmadan once etki uyarisi (SYG-KMLK-035, 080; REQ-KMLK-052).
 /// </summary>
 /// <remarks>
 /// <para>
-/// 2FA acikken hicbir dogrulama kanali bulunmayan kisi giris yapamaz. Bu kisilerin sayisi,
-/// parametre acilmadan ONCE yoneticiye gosterilir ve onay istenir: karar sonucunu gormeden
-/// verilmez. "Kanal yok" girisle AYNI kurala gore hesaplanir
-/// (<see cref="SessionService"/>): izin verilen kanallar (PRM-KML-02) arasinda kisinin
-/// e-postasi veya cep telefonu yoksa. Hicbir kanala izin verilmiyorsa giris e-postayi
-/// kullanir; sayim da oyle yapar.
+/// Iki adimli dogrulama kisinin kendi tercihidir (SYG-KMLK-080): sistem parametresi
+/// (PRM-KML-08) acilinca yalnizca kendi hesabinda tercihi ACIK olanlardan giriste kod istenir.
+/// Dogrulama kanali olmayan kisi tercihi acamadigi icin parametre kimsenin girisini
+/// engellemez. Bu nedenle etki, tercihi acik olan aktif hesap sahiplerinin sayisidir; parametre
+/// acilmadan ONCE yoneticiye gosterilir.
 /// </para>
 /// <para>
-/// Onay kurali SUNUCUDA denetlenir: istemci uyariyi atlasa da 2FA onaysiz acilmaz. Uyari
-/// parametresi (PRM-KML-15) kapatilirsa onay istenmez.
+/// Onay kurali SUNUCUDA denetlenir: istemci uyariyi atlasa da 2FA onaysiz acilmaz. Etkilenen
+/// kimse yoksa veya uyari parametresi (PRM-KML-15) kapaliysa onay istenmez.
 /// </para>
 /// </remarks>
 public sealed class TwoFactorImpactService
@@ -50,20 +47,16 @@ public sealed class TwoFactorImpactService
         _parameters = parameters;
     }
 
-    /// <summary>2FA acilirsa giris yapamayacak aktif hesap sahiplerinin sayisi.</summary>
+    /// <summary>2FA acilirsa giriste kod girmeye baslayacak aktif hesap sahiplerinin sayisi.</summary>
     public async Task<TwoFactorImpactResult> EvaluateAsync(CancellationToken cancellationToken)
     {
-        var channels = await _parameters.GetListAsync(ParameterCatalog.VerificationChannels, cancellationToken).ConfigureAwait(false);
-        var emailAllowed = channels.Contains("email") || !channels.Contains("sms");
-        var smsAllowed = channels.Contains("sms");
-
-        var count = await _store.CountWithoutChannelAsync(emailAllowed, smsAllowed, cancellationToken).ConfigureAwait(false);
+        var count = await _store.CountWithTwoFactorPreferenceAsync(cancellationToken).ConfigureAwait(false);
         var warn = await _parameters.GetBooleanAsync(ParameterCatalog.TwoFactorImpactWarning, cancellationToken).ConfigureAwait(false);
-        return new TwoFactorImpactResult(count, warn);
+        return new TwoFactorImpactResult(count, warn && count > 0);
     }
 
     /// <summary>
-    /// Parametre degisikligi 2FA'yi aciyorsa ve uyari aciksa onay ister.
+    /// Parametre degisikligi 2FA'yi aciyorsa ve onay gerekiyorsa onay ister.
     /// </summary>
     /// <exception cref="BusinessRuleException">Onay gerekiyor ve verilmediyse.</exception>
     public async Task EnsureConfirmedAsync(string key, string? value, bool confirmed, CancellationToken cancellationToken)
@@ -84,7 +77,7 @@ public sealed class TwoFactorImpactService
         if (impact.ConfirmationRequired)
         {
             throw new BusinessRuleException(
-                $"İki adımlı doğrulama açılırsa {impact.AffectedCount} aktif hesap sahibi giriş yapamaz (doğrulama kanalı yok). Açmak için etkiyi onaylayın.");
+                $"İki adımlı doğrulama açılırsa, kendi hesabında iki adımlı doğrulamayı açmış {impact.AffectedCount} kişi bundan sonra girişte kod girecek. Açmak için onaylayın.");
         }
     }
 }

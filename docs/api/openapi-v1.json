@@ -362,7 +362,7 @@
         "tags": [
           "SystemParameters"
         ],
-        "summary": "Iki adimli dogrulama acilirsa giris yapamayacak aktif hesap sahiplerinin sayisi\n(SYG-KMLK-035). Kisilerin kendisi donmez, yalnizca sayi.",
+        "summary": "Iki adimli dogrulama acilirsa giriste kod girmeye baslayacak, kendi hesabinda tercihi acik\naktif hesap sahiplerinin sayisi (SYG-KMLK-035, 080). Kisilerin kendisi donmez, yalnizca sayi.",
         "responses": {
           "200": {
             "description": "Etki.",
@@ -433,6 +433,252 @@
           },
           "400": {
             "description": "Mevcut parola hatali (`errors.currentPassword`) veya yeni parola kurallara uymuyor (`errors.newPassword`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Oturum kapali.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla hatali deneme; e-posta gecici olarak kilitli.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/account/two-factor": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Hesabin iki adimli dogrulama durumu (SYG-KMLK-080).",
+        "responses": {
+          "200": {
+            "description": "Durum.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Oturum kapali.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/account/two-factor/setup": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Iki adimli dogrulamayi acmayi baslatir: mevcut parola denetlenir ve secilen kanala kod gonderilir (SYG-KMLK-080).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorSetupRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorSetupRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorSetupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Kod gonderildi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorSetupResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Mevcut parola hatali (`errors.currentPassword`) veya istek gecersiz.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Oturum kapali.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Iki adimli dogrulama sistemde kapali, hesapta zaten acik veya secilen kanal kullanilamaz.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla hatali deneme veya cok fazla kod istendi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/account/two-factor/setup/verification": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Iki adimli dogrulamayi acma kodunu dogrular; dogruysa hesapta iki adimli dogrulama acilir (SYG-KMLK-080).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorSetupVerificationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorSetupVerificationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorSetupVerificationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Dogrulama sonucu; `verified` ise acildi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorSetupVerificationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Istek gecersiz.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Oturum kapali.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Iki adimli dogrulama sistemde kapatildi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity/account/two-factor/disable": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Hesapta iki adimli dogrulamayi kapatir; mevcut parola istenir (SYG-KMLK-080).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorDisableRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorDisableRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorDisableRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Kapatildi (zaten kapaliysa da).",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Mevcut parola hatali (`errors.currentPassword`) veya istek gecersiz.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2533,7 +2779,8 @@
           "supportContact",
           "passwordRules",
           "verificationCodeLength",
-          "logoVersion"
+          "logoVersion",
+          "twoFactorAvailable"
         ],
         "type": "object",
         "properties": {
@@ -2560,6 +2807,10 @@
               "string"
             ],
             "description": "Yuklu kurumsal logonun surumu (PRM-GRN-01); yuklenmemisse bos ve varsayilan logo kullanilir."
+          },
+          "twoFactorAvailable": {
+            "type": "boolean",
+            "description": "Iki adimli dogrulama sistemde kullaniliyor mu (PRM-KML-08); kullanici menusundeki hesap guvenligi sayfasi buna gore gosterilir (SYG-KMLK-080)."
           }
         },
         "description": "Giris ve uyelik ekranlarinin ayarlari."
@@ -2927,6 +3178,19 @@
         },
         "description": "Bekleyen iki adimli giris."
       },
+      "TwoFactorDisableRequest": {
+        "required": [
+          "currentPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "description": "Mevcut parola."
+          }
+        },
+        "description": "Iki adimli dogrulamayi kapatma istegi (SYG-KMLK-080)."
+      },
       "TwoFactorImpactResponse": {
         "required": [
           "affectedCount",
@@ -2940,15 +3204,111 @@
               "integer",
               "string"
             ],
-            "description": "Hicbir dogrulama kanali olmayan aktif hesap sahibi sayisi.",
+            "description": "Kendi hesabinda iki adimli dogrulamayi acmis aktif hesap sahibi sayisi; parametre acilinca giriste kod girerler.",
             "format": "int32"
           },
           "confirmationRequired": {
             "type": "boolean",
-            "description": "Acmak icin onay gerekiyor mu (PRM-KML-15)."
+            "description": "Acmak icin onay gerekiyor mu: sayi sifirdan buyuk ve uyari acik (PRM-KML-15)."
           }
         },
-        "description": "2FA'nin acilmasinin etkisi (SYG-KMLK-035)."
+        "description": "2FA'nin acilmasinin etkisi (SYG-KMLK-035, 080)."
+      },
+      "TwoFactorSetupRequest": {
+        "required": [
+          "currentPassword",
+          "channel"
+        ],
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "description": "Mevcut parola."
+          },
+          "channel": {
+            "description": "Kodun gonderilecegi kanal.",
+            "$ref": "#/components/schemas/VerificationChannelKind"
+          }
+        },
+        "description": "Iki adimli dogrulamayi acma istegi (SYG-KMLK-080)."
+      },
+      "TwoFactorSetupResponse": {
+        "required": [
+          "codeId",
+          "codeExpiresAt"
+        ],
+        "type": "object",
+        "properties": {
+          "codeId": {
+            "type": "string",
+            "description": "Kodun kimligi; dogrulamada geri gonderilir.",
+            "format": "uuid"
+          },
+          "codeExpiresAt": {
+            "type": "string",
+            "description": "Kodun gecerlilik sonu (geri sayim, SYG-KMLK-028).",
+            "format": "date-time"
+          }
+        },
+        "description": "Iki adimli dogrulamayi acma kodu gonderildi."
+      },
+      "TwoFactorSetupVerificationRequest": {
+        "required": [
+          "codeId",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "codeId": {
+            "type": "string",
+            "description": "Gonderilen kodun kimligi.",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string",
+            "description": "Girilen kod."
+          }
+        },
+        "description": "Iki adimli dogrulamayi acma kodunun dogrulama istegi."
+      },
+      "TwoFactorSetupVerificationResponse": {
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "description": "Sonuc; `verified` ise hesapta iki adimli dogrulama acildi.",
+            "$ref": "#/components/schemas/VerificationOutcome"
+          }
+        },
+        "description": "Iki adimli dogrulamayi acma kodunun dogrulama sonucu."
+      },
+      "TwoFactorStatusResponse": {
+        "required": [
+          "available",
+          "enabled",
+          "channels"
+        ],
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "description": "Iki adimli dogrulama sistemde kullaniliyor mu (PRM-KML-08); kullanilmiyorsa acilamaz."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Kullanicinin kendi tercihi acik mi; giriste kod ancak sistemde de aciksa istenir."
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationChannelKind"
+            },
+            "description": "Kisinin kullanabilecegi kanallar; bossa kayitli kurumsal e-posta veya cep telefonu yoktur ve acilamaz. Hedef donmez."
+          }
+        },
+        "description": "Hesabin iki adimli dogrulama durumu (SYG-KMLK-080)."
       },
       "TwoFactorVerificationResponse": {
         "required": [

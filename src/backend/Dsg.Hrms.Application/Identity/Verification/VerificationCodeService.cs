@@ -113,11 +113,43 @@ public sealed partial class VerificationCodeService
     /// Girilen kodu dogrular. Dogrulanan kod ayni islemde gecersizlesir; eszamanli iki
     /// istekten yalnizca biri <see cref="VerificationResult.Verified"/> alir (SYG-KMLK-027).
     /// </summary>
-    public async Task<VerificationResult> VerifyAsync(Guid codeId, string? code, CancellationToken cancellationToken)
+    public Task<VerificationResult> VerifyAsync(Guid codeId, string? code, CancellationToken cancellationToken) =>
+        VerifyCoreAsync(codeId, code, expected: null, cancellationToken);
+
+    /// <summary>
+    /// Girilen kodu, kodun verilen kisiye ve amaca ait oldugunu da denetleyerek dogrular
+    /// (SYG-KMLK-080). Baska bir kisinin veya baska bir akisin kodu
+    /// <see cref="VerificationResult.NotUsable"/> doner; o koda deneme sayilmaz ve kod
+    /// degismez.
+    /// </summary>
+    /// <param name="codeId">Kodun dis kimligi.</param>
+    /// <param name="code">Girilen kod.</param>
+    /// <param name="personId">Kodun ait olmasi gereken kisi.</param>
+    /// <param name="purpose">Kodun beklenen amaci.</param>
+    /// <param name="cancellationToken">Iptal.</param>
+    public Task<VerificationResult> VerifyAsync(
+        Guid codeId,
+        string? code,
+        long personId,
+        VerificationPurpose purpose,
+        CancellationToken cancellationToken) =>
+        VerifyCoreAsync(codeId, code, (personId, purpose), cancellationToken);
+
+    private async Task<VerificationResult> VerifyCoreAsync(
+        Guid codeId,
+        string? code,
+        (long PersonId, VerificationPurpose Purpose)? expected,
+        CancellationToken cancellationToken)
     {
         var entity = await _store.FindAsync(codeId, cancellationToken).ConfigureAwait(false);
         if (entity is null)
         {
+            return VerificationResult.NotUsable;
+        }
+
+        if (expected is { } owner && (entity.PersonId != owner.PersonId || entity.Purpose != owner.Purpose))
+        {
+            LogForeignCode(_logger, codeId);
             return VerificationResult.NotUsable;
         }
 
@@ -164,6 +196,7 @@ public sealed partial class VerificationCodeService
     {
         VerificationPurpose.Registration => "registration",
         VerificationPurpose.PasswordReset => "password-reset",
+        VerificationPurpose.TwoFactorSetup => "two-factor-setup",
         _ => "two-factor",
     };
 
@@ -183,6 +216,7 @@ public sealed partial class VerificationCodeService
     {
         VerificationPurpose.Registration => NotificationPurpose.RegistrationCode,
         VerificationPurpose.PasswordReset => NotificationPurpose.PasswordResetCode,
+        VerificationPurpose.TwoFactorSetup => NotificationPurpose.TwoFactorSetupCode,
         _ => NotificationPurpose.TwoFactorCode,
     };
 
@@ -205,6 +239,10 @@ public sealed partial class VerificationCodeService
     [LoggerMessage(EventId = 3504, Level = LogLevel.Warning,
         Message = "Dogrulama kodu {CodeId} icin eszamanli istek; bu istek reddedildi (SYG-KMLK-027).")]
     private static partial void LogConflict(ILogger logger, Guid codeId);
+
+    [LoggerMessage(EventId = 3505, Level = LogLevel.Warning,
+        Message = "Dogrulama kodu {CodeId} baska bir kisiye veya akisa ait; kullanilmadi (SYG-KMLK-080).")]
+    private static partial void LogForeignCode(ILogger logger, Guid codeId);
 }
 
 /// <summary>Kod uretim istegi.</summary>

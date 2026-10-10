@@ -344,8 +344,10 @@ public sealed class SessionApiTests : IClassFixture<RegistrationApiFixture>, IAs
     [Fact]
     public async Task Two_factor_on_requires_a_code_and_uses_the_shared_code_infrastructure()
     {
-        // SYG-KMLK-036: 2FA kapaliyken giris tek adimdir (diger testler); acikken iki adim.
+        // SYG-KMLK-036, 080: 2FA kapaliyken giris tek adimdir (diger testler); sistemde ve
+        // kullanicinin kendi tercihinde acikken iki adim.
         await SetParameterAsync(ParameterCatalog.TwoFactorEnabled, "true");
+        await EnableTwoFactorPreferenceAsync();
         using var client = _fixture.CreateClient();
 
         var signIn = await SignInAsync(client);
@@ -375,6 +377,7 @@ public sealed class SessionApiTests : IClassFixture<RegistrationApiFixture>, IAs
     public async Task Two_factor_challenge_expires()
     {
         await SetParameterAsync(ParameterCatalog.TwoFactorEnabled, "true");
+        await EnableTwoFactorPreferenceAsync();
         using var client = _fixture.CreateClient();
         var id = (await SignInAsync(client)).Body.GetProperty("challenge").GetProperty("challengeId").GetString();
 
@@ -387,9 +390,38 @@ public sealed class SessionApiTests : IClassFixture<RegistrationApiFixture>, IAs
     public async Task Two_factor_wrong_password_is_rejected_before_any_code()
     {
         await SetParameterAsync(ParameterCatalog.TwoFactorEnabled, "true");
+        await EnableTwoFactorPreferenceAsync();
         using var client = _fixture.CreateClient();
 
         (await SignInAsync(client, Email, "Yanlis parola 1")).Status.ShouldBe(HttpStatusCode.Unauthorized);
+        _fixture.Messages.All.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task System_two_factor_on_but_user_preference_off_signs_in_with_a_single_step()
+    {
+        // SYG-KMLK-080: tercih varsayilan kapali; sistem parametresi tek basina kod istetmez.
+        await SetParameterAsync(ParameterCatalog.TwoFactorEnabled, "true");
+        using var client = _fixture.CreateClient();
+
+        var signIn = await SignInAsync(client);
+
+        signIn.Body.GetProperty("status").GetString().ShouldBe("signedIn");
+        signIn.Cookie.ShouldNotBeNull();
+        _fixture.Messages.All.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task User_preference_on_but_system_two_factor_off_signs_in_with_a_single_step()
+    {
+        // SYG-KMLK-080: sistemde kapaliyken kimseden kod istenmez.
+        await EnableTwoFactorPreferenceAsync();
+        using var client = _fixture.CreateClient();
+
+        var signIn = await SignInAsync(client);
+
+        signIn.Body.GetProperty("status").GetString().ShouldBe("signedIn");
+        signIn.Cookie.ShouldNotBeNull();
         _fixture.Messages.All.ShouldBeEmpty();
     }
 
@@ -398,6 +430,13 @@ public sealed class SessionApiTests : IClassFixture<RegistrationApiFixture>, IAs
     private sealed record SignInOutcome(HttpStatusCode Status, JsonElement Body, string? SetCookie, string? Cookie);
 
     private sealed record RefreshOutcome(HttpStatusCode Status, string Type, string Detail, string? Cookie, string? AccessToken);
+
+    private Task<int> EnableTwoFactorPreferenceAsync() =>
+        _fixture.WithDbAsync(async context =>
+        {
+            (await context.Set<UserAccount>().SingleAsync()).EnableTwoFactor();
+            return await context.SaveChangesAsync();
+        });
 
     private async Task CreateAccountAsync(int index) =>
         await _fixture.WithServicesAsync(async services =>

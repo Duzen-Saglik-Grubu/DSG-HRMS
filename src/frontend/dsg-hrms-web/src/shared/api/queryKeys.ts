@@ -13,6 +13,7 @@ export const queryKeys = {
   },
   identity: {
     publicSettings: ['identity', 'public-settings'] as const,
+    twoFactor: ['identity', 'two-factor'] as const,
     accounts: ['identity', 'accounts'] as const,
     accountList: (params: object) => ['identity', 'accounts', params] as const,
     invitation: (token: string | null) => ['identity', 'invitation', token] as const,

@@ -20,6 +20,7 @@ public sealed class NotificationPurposeRulesTests
     [InlineData(NotificationPurpose.PasswordResetCode)]
     [InlineData(NotificationPurpose.TwoFactorCode)]
     [InlineData(NotificationPurpose.Invitation)]
+    [InlineData(NotificationPurpose.TwoFactorSetupCode)]
     public void Identity_messages_are_transactional(NotificationPurpose purpose)
     {
         purpose.IsTransactional().ShouldBeTrue();

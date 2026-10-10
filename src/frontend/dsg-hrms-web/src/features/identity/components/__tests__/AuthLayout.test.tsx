@@ -11,6 +11,7 @@ function settings(logoVersion: string | null) {
     passwordRules: { minLength: 6, maxLength: 128, requireComplexity: false },
     verificationCodeLength: 6,
     logoVersion,
+    twoFactorAvailable: false,
   };
 }
 

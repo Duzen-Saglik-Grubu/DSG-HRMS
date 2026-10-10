@@ -33,6 +33,12 @@ const ChangePasswordPage = lazy(async () => {
   return { default: page.ChangePasswordPage };
 });
 
+const AccountSecurityPage = lazy(async () => {
+  const page = await import('@/features/identity/pages/AccountSecurityPage');
+
+  return { default: page.AccountSecurityPage };
+});
+
 const AccountsPage = lazy(async () => {
   const page = await import('@/features/identity/pages/AccountsPage');
 
@@ -113,6 +119,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<RouteFallback />}>
             <ChangePasswordPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: routes.accountSecurity,
+        element: (
+          <Suspense fallback={<RouteFallback />}>
+            <AccountSecurityPage />
           </Suspense>
         ),
       },

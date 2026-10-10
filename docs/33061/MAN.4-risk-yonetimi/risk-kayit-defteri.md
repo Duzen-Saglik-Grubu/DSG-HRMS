@@ -211,7 +211,7 @@ raporunda ayrıca ele alınır.
 | 6 | 8 | R-01, R-03, R-04, R-05, R-06, R-15, R-20, R-25 |
 | 4 | 6 | R-08, R-09, R-14, R-16, R-23, R-24 |
 | 3 | 1 | R-02 |
-| 2 | 4 | R-19, R-21, R-22, R-26 |
+| 2 | 5 | R-19, R-21, R-22, R-26, R-27 |
 | Kapandı | 6 | R-07, R-10, R-11, R-12, R-13, R-17 |
 
 **Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-15, R-18, R-20, R-25
@@ -337,6 +337,17 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **Önlem** | (1) `git stash -u` ve `git clean -d` kullanılmaz; ara çalışma dalda WIP commit'i olarak saklanır. (2) Boş klasörler `.gitkeep` ile izlenir. (3) Dallar sık sık GitHub'a gönderilir. (4) Olay kaydı #129'da yazılır. |
 | **Durum** | İzleniyor |
 
+### R-27 — Doğrulama kanallarını kaybeden kullanıcının iki adımlı girişte kalması
+| | |
+|---|---|
+| **Kategori** | Kullanılabilirlik |
+| **Açıklama** | 2FA kullanıcı tercihine bağlıdır (`KR-104`, #190). Kendi 2FA'sını açmış bir kullanıcı hem kurumsal e-postasını hem cep telefonunu kaybederse (numara değişti, e-posta kapandı) kod alamaz ve giriş yapamaz. Ayrı bir kurtarma akışı yoktur; parola sıfırlama da 2FA'yı kapatmaz. |
+| **O / E / Puan** | 1 / 2 / **2** |
+| **Puan gerekçesi** | **Olasılık 1:** İki kanalın birden aynı anda kaybedilmesi gerekir ve 2FA varsayılan kapalıdır. **Etki 2:** Tek kişi etkilenir; veri kaybı yoktur. |
+| **Sahibi** | Bilgi İşlem |
+| **Önlem** | (1) İletişim bilgisi LOGO'da güncellenince senkronizasyonla HRMS'e gelir; kişi yeni kanalıyla kod alabilir. (2) Son çare: Sistem Yöneticisi PRM-KML-08'i geçici olarak kapatır; bu herkes için 2FA'yı kapatır. (3) İhtiyaç doğarsa yetkili bir kullanıcının kişinin 2FA'sını kapatabileceği bir işlem değerlendirilir. |
+| **Durum** | İzleniyor (#190) |
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
@@ -352,3 +363,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-06 | 1.1 | Kabul edilen riskler satırında R-16 düzeltildi (Bilgi İşlem, `KR-055`); R-25 önlem 5–6: SSH kararı ve Webmin bulgusu (#177) | Bilgi İşlem |
 | 2026-10-06 | 1.2 | R-20: sertifika yenilendi (bitiş 27.03.2027), durum İzleniyor; R-25: Webmin kaldırıldı (#179) | Bilgi İşlem |
 | 2026-10-10 | 1.3 | R-25 Üst Yönetim tarafından kabul edildi (`KR-103`, #127) | Bilgi İşlem |
+| 2026-10-10 | 1.4 | R-27 eklendi: kanallarını kaybeden kullanıcının 2FA ile girişte kalması (#190) | Bilgi İşlem |

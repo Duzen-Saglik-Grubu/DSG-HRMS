@@ -146,7 +146,10 @@ public sealed partial class SessionService
             throw new AccountDisabledException();
         }
 
-        if (await _parameters.GetBooleanAsync(ParameterCatalog.TwoFactorEnabled, cancellationToken).ConfigureAwait(false))
+        // Kod yalnizca sistem parametresi (PRM-KML-08) ve kullanicinin kendi tercihi birlikte
+        // acikken istenir (SYG-KMLK-034, 080).
+        if (candidate.Account.TwoFactorEnabled
+            && await _parameters.GetBooleanAsync(ParameterCatalog.TwoFactorEnabled, cancellationToken).ConfigureAwait(false))
         {
             var channels = await TwoFactorChannelsAsync(candidate, cancellationToken).ConfigureAwait(false);
             var challenge = LoginChallenge.Start(candidate.Account.Id, channels, ipAddress, now);
@@ -353,48 +356,14 @@ public sealed partial class SessionService
         ArgumentNullException.ThrowIfNull(newPassword);
 
         var now = _clock.UtcNow;
-        var session = await _store.FindSessionAsync(sessionId, cancellationToken).ConfigureAwait(false);
-        if (session is null || !session.IsOpen)
-        {
-            throw new SessionEndedException(session?.EndReason);
-        }
-
-        var candidate = await _store.FindByAccountIdAsync(session.UserAccountId, cancellationToken).ConfigureAwait(false)
-            ?? throw new SessionEndedException(SessionEndReason.AccountChanged);
+        var (session, candidate) = await OpenSessionCandidateAsync(sessionId, cancellationToken).ConfigureAwait(false);
         var account = candidate.Account;
         var person = candidate.Person;
 
-        // Hesabin giris e-postasi yoksa sayac oturum kimligine baglanir; kilit yine isler.
-        var throttleKey = _identifierHasher.HashIdentifier(
-            person.Email is null ? $"session:{sessionId}" : LoginIdentifier(person.Email));
-        var throttle = await _store.FindThrottleAsync(throttleKey, cancellationToken).ConfigureAwait(false);
+        var throttle = await VerifyCurrentPasswordAsync(
+            sessionId, candidate, currentPassword, PasswordCheck.PasswordChange, now, cancellationToken).ConfigureAwait(false);
         if (throttle is null)
         {
-            throttle = LoginThrottle.For(throttleKey, now);
-            _store.Add(throttle);
-        }
-
-        var lockoutMinutes = await _parameters.GetIntegerAsync(ParameterCatalog.LockoutMinutes, cancellationToken).ConfigureAwait(false);
-        if (throttle.IsLocked(now))
-        {
-            _events.Record(SecurityEventType.PasswordChangeFailed, account.Id, person.Id, "locked");
-            await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            throw new SignInLockedException(lockoutMinutes);
-        }
-
-        if (account.PasswordHash is null || !_passwordHasher.Verify(account.PasswordHash, PasswordPolicy.Normalize(currentPassword)))
-        {
-            var maxFailures = await _parameters.GetIntegerAsync(ParameterCatalog.MaxFailedLogins, cancellationToken).ConfigureAwait(false);
-            var lockedUntil = throttle.RegisterFailure(maxFailures, TimeSpan.FromMinutes(lockoutMinutes), now);
-            if (lockedUntil is not null)
-            {
-                account.RecordLockout(lockedUntil.Value);
-                _events.Record(SecurityEventType.AccountLocked, account.Id, person.Id, "password-change");
-                LogLockedNow(_logger, account.Id);
-            }
-
-            _events.Record(SecurityEventType.PasswordChangeFailed, account.Id, person.Id, "invalid-current-password");
-            await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new PasswordChangeResult(CurrentPasswordInvalid: true, []);
         }
 
@@ -402,7 +371,8 @@ public sealed partial class SessionService
         var violations = new List<PasswordViolation>(
             await _passwordPolicy.ValidateAsync(newPassword, RegistrationService.PersonalWords(person.FirstName, person.LastName, person.Email), cancellationToken)
                 .ConfigureAwait(false));
-        if (violations.Count == 0 && _passwordHasher.Verify(account.PasswordHash, normalizedNew))
+        // Mevcut parola yukarida dogrulandi; ozet bos degildir.
+        if (violations.Count == 0 && _passwordHasher.Verify(account.PasswordHash!, normalizedNew))
         {
             violations.Add(PasswordViolation.SameAsCurrent);
         }
@@ -559,6 +529,18 @@ public sealed partial class SessionService
 
     private async Task<RegistrationChannels> TwoFactorChannelsAsync(SignInCandidate candidate, CancellationToken cancellationToken)
     {
+        var channels = await ContactChannelsAsync(candidate, cancellationToken).ConfigureAwait(false);
+
+        // Giris e-postasi her zaman vardir; kanal parametresi hicbirine izin vermiyorsa e-posta kullanilir.
+        return channels == RegistrationChannels.None ? RegistrationChannels.Email : channels;
+    }
+
+    /// <summary>
+    /// Izin verilen kanallar (PRM-KML-02) arasinda kisinin iletisim bilgisi olanlar. Hicbiri
+    /// yoksa <see cref="RegistrationChannels.None"/>.
+    /// </summary>
+    private async Task<RegistrationChannels> ContactChannelsAsync(SignInCandidate candidate, CancellationToken cancellationToken)
+    {
         var allowed = RegistrationChannels.None;
         foreach (var item in await _parameters.GetListAsync(ParameterCatalog.VerificationChannels, cancellationToken).ConfigureAwait(false))
         {
@@ -576,8 +558,105 @@ public sealed partial class SessionService
             channels |= RegistrationChannels.Sms;
         }
 
-        // Giris e-postasi her zaman vardir; kanal parametresi hicbirine izin vermiyorsa e-posta kullanilir.
-        return channels == RegistrationChannels.None ? RegistrationChannels.Email : channels;
+        return channels;
+    }
+
+    /// <summary>Acik oturumu ve hesabini bulur.</summary>
+    /// <exception cref="SessionEndedException">Oturum kapaliysa veya hesap bulunamazsa.</exception>
+    private async Task<(UserSession Session, SignInCandidate Candidate)> OpenSessionCandidateAsync(Guid sessionId, CancellationToken cancellationToken)
+    {
+        var session = await _store.FindSessionAsync(sessionId, cancellationToken).ConfigureAwait(false);
+        if (session is null || !session.IsOpen)
+        {
+            throw new SessionEndedException(session?.EndReason);
+        }
+
+        var candidate = await _store.FindByAccountIdAsync(session.UserAccountId, cancellationToken).ConfigureAwait(false)
+            ?? throw new SessionEndedException(SessionEndReason.AccountChanged);
+        return (session, candidate);
+    }
+
+    /// <summary>
+    /// Oturum icindeki islemlerde mevcut parolayi denetler (SYG-KMLK-048, 080). Yanlis parola
+    /// giris sayacina eklenir; sinir asilinca e-posta, giristeki gibi kilitlenir (SYG-KMLK-033).
+    /// </summary>
+    /// <param name="sessionId">Oturum; hesabin giris e-postasi yoksa sayac buna baglanir.</param>
+    /// <param name="candidate">Hesap.</param>
+    /// <param name="currentPassword">Girilen mevcut parola.</param>
+    /// <param name="check">Denetimin yapildigi islem; kimlik olayinin turu ve ayrintisi buna gore secilir.</param>
+    /// <param name="now">Simdiki an.</param>
+    /// <param name="cancellationToken">Iptal.</param>
+    /// <returns>Parola dogruysa sayac (cagiran sifirlar); yanlissa <c>null</c> (degisiklikler kaydedildi).</returns>
+    /// <exception cref="SignInLockedException">Hatali deneme siniri asildiysa.</exception>
+    private async Task<LoginThrottle?> VerifyCurrentPasswordAsync(
+        Guid sessionId,
+        SignInCandidate candidate,
+        string currentPassword,
+        PasswordCheck check,
+        DateTimeOffset now,
+        CancellationToken cancellationToken)
+    {
+        var account = candidate.Account;
+        var person = candidate.Person;
+        var isPasswordChange = check == PasswordCheck.PasswordChange;
+        var prefix = check switch
+        {
+            PasswordCheck.EnableTwoFactor => "enable:",
+            PasswordCheck.DisableTwoFactor => "disable:",
+            _ => string.Empty,
+        };
+
+        // Hesabin giris e-postasi yoksa sayac oturum kimligine baglanir; kilit yine isler.
+        var throttleKey = _identifierHasher.HashIdentifier(
+            person.Email is null ? $"session:{sessionId}" : LoginIdentifier(person.Email));
+        var throttle = await _store.FindThrottleAsync(throttleKey, cancellationToken).ConfigureAwait(false);
+        if (throttle is null)
+        {
+            throttle = LoginThrottle.For(throttleKey, now);
+            _store.Add(throttle);
+        }
+
+        var lockoutMinutes = await _parameters.GetIntegerAsync(ParameterCatalog.LockoutMinutes, cancellationToken).ConfigureAwait(false);
+        if (throttle.IsLocked(now))
+        {
+            _events.Record(
+                isPasswordChange ? SecurityEventType.PasswordChangeFailed : SecurityEventType.TwoFactorChangeFailed, account.Id, person.Id, prefix + "locked");
+            await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            throw new SignInLockedException(lockoutMinutes);
+        }
+
+        if (account.PasswordHash is not null && _passwordHasher.Verify(account.PasswordHash, PasswordPolicy.Normalize(currentPassword)))
+        {
+            return throttle;
+        }
+
+        var maxFailures = await _parameters.GetIntegerAsync(ParameterCatalog.MaxFailedLogins, cancellationToken).ConfigureAwait(false);
+        var lockedUntil = throttle.RegisterFailure(maxFailures, TimeSpan.FromMinutes(lockoutMinutes), now);
+        if (lockedUntil is not null)
+        {
+            account.RecordLockout(lockedUntil.Value);
+            _events.Record(SecurityEventType.AccountLocked, account.Id, person.Id, isPasswordChange ? "password-change" : "two-factor");
+            LogLockedNow(_logger, account.Id);
+        }
+
+        _events.Record(
+            isPasswordChange ? SecurityEventType.PasswordChangeFailed : SecurityEventType.TwoFactorChangeFailed,
+            account.Id,
+            person.Id,
+            prefix + "invalid-current-password");
+        await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return null;
+    }
+
+    /// <summary>
+    /// Mevcut parolanin hangi islem icin denetlendigi. Kimlik olayinin turu yalnizca metot
+    /// govdesinde secilir: Audit modulunun tipi imzalarda yer almaz (ADR-0002, Kural 5).
+    /// </summary>
+    private enum PasswordCheck
+    {
+        PasswordChange,
+        EnableTwoFactor,
+        DisableTwoFactor,
     }
 
     private async Task<LoginChallenge> FindUsableChallengeAsync(Guid challengeId, DateTimeOffset now, CancellationToken cancellationToken)

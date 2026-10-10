@@ -19,6 +19,7 @@ public static class NotificationPurposeRules
         NotificationPurpose.PasswordResetCode => true,
         NotificationPurpose.TwoFactorCode => true,
         NotificationPurpose.Invitation => true,
+        NotificationPurpose.TwoFactorSetupCode => true,
         _ => throw new ArgumentOutOfRangeException(nameof(purpose), purpose, "Ileti amaci siniflandirilmamis (SYG-KMLK-062)."),
     };
 }

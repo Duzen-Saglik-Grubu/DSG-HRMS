@@ -255,4 +255,23 @@ public sealed class UserAccountTests
 
         account.RequiredPasswordChange(true, TimeSpan.FromDays(90), Registered.AddDays(100)).ShouldBe(PasswordChangeReason.FirstSignIn);
     }
+
+    [Fact]
+    public void Two_factor_preference_is_off_by_default_and_toggles_without_rotating_the_stamp()
+    {
+        // SYG-KMLK-080: tercih varsayilan kapali; degisince acik oturumlar kapanmaz.
+        var account = UserAccount.Register(1, "hash", Registered);
+        var stamp = account.SecurityStamp;
+        account.TwoFactorEnabled.ShouldBeFalse();
+
+        account.EnableTwoFactor().ShouldBeTrue();
+        account.TwoFactorEnabled.ShouldBeTrue();
+        account.EnableTwoFactor().ShouldBeFalse();
+
+        account.DisableTwoFactor().ShouldBeTrue();
+        account.TwoFactorEnabled.ShouldBeFalse();
+        account.DisableTwoFactor().ShouldBeFalse();
+
+        account.SecurityStamp.ShouldBe(stamp);
+    }
 }

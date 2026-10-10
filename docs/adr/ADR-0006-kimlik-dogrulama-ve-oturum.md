@@ -176,6 +176,14 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
   uyarı verilir. Aksi hâlde bu kişiler (2026-09-22 ölçümüyle 2 aktif personel, `R-08`) sisteme **giremez**
   hâle gelir ve nedeni anlaşılmaz.
 
+
+> **Gerçekleştirme notu (`KR-104`, #190, 10.10.2026):** Parametre (PRM-KML-08) 2FA'yı
+> yalnızca **kullanıma açar**. Her kullanıcı kendi hesabında açar; varsayılan kapalıdır.
+> Açmak için mevcut parola ve seçilen kanala gönderilen kodun doğrulanması gerekir
+> (`VerificationPurpose.TwoFactorSetup`; kod kişiye ve amaca bağlı denetlenir). Kanalı
+> olmayan kullanıcı 2FA'yı açamadığı için "kanalı olmayanlar kilitlenir" riski kalktı;
+> parametre açılırken uyarı artık tercihi açık kişileri sayar. Kurtarma akışı yoktur
+> (R-27). Kod altyapısı tek kalır (§3).
 ### 8. Oturum yönetimi
 
 | Konu | Karar |
@@ -280,3 +288,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | 2026-09-29 | 0.8 | §6: parola sıfırlama ve oturum içinde değişiklik gerçekleştirme notu (`KR-088`, #98) | Bilgi İşlem |
 | 2026-09-30 | 0.9 | §4: İK davet bağlantısı gerçekleştirme notu (`KR-090`, #107) | Bilgi İşlem |
 | 2026-10-01 | 1.0 | §6: zorunlu parola değişimi gerçekleştirme notu (`KR-092`, #113) | Bilgi İşlem |
+| 2026-10-10 | 1.1 | §7: kullanıcı tercihine bağlı 2FA gerçekleştirme notu (`KR-104`, #190) | Bilgi İşlem |

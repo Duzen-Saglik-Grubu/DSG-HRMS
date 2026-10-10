@@ -55,6 +55,7 @@ public static class VerificationMessages
         VerificationPurpose.Registration => "üyelik doğrulama",
         VerificationPurpose.PasswordReset => "parola sıfırlama",
         VerificationPurpose.TwoFactor => "giriş doğrulama",
+        VerificationPurpose.TwoFactorSetup => "iki adımlı doğrulamayı açma",
         _ => "doğrulama",
     };
 }

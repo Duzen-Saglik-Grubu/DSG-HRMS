@@ -133,7 +133,7 @@ describe('ParametersPage', () => {
     await waitFor(() => expect(update).toHaveBeenCalledWith('PRM-KML-08', 'true'));
   });
 
-  it('2FA acilmadan once etkilenecek kisi sayisini gosterir ve onay ister (SYG-KMLK-035)', async () => {
+  it('2FA acilmadan once etkilenecek kisi sayisini gosterir ve onay ister (SYG-KMLK-035, 080)', async () => {
     vi.spyOn(parametersApi, 'twoFactorImpact').mockResolvedValue({
       affectedCount: 2,
       confirmationRequired: true,
@@ -144,8 +144,11 @@ describe('ParametersPage', () => {
 
     await user.click(await screen.findByLabelText('İki adımlı doğrulama (2FA)'));
     const dialog = await screen.findByRole('dialog', { name: 'İki adımlı doğrulamayı aç' });
+    // Kendi hesabinda tercihi acik olanlar artik giriste kod girecek; kimse kilitlenmez.
     expect(
-      within(dialog).getByText(/2 aktif hesap sahibinin hiçbir doğrulama kanalı/),
+      within(dialog).getByText(
+        /iki adımlı doğrulamayı açmış 2 kişi var.*bu kişiler bundan sonra girişte doğrulama kodu girecek/,
+      ),
     ).toBeInTheDocument();
     expect(update).not.toHaveBeenCalled();
 

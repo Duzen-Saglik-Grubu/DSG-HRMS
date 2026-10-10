@@ -102,4 +102,16 @@ public enum SecurityEventType
 
     /// <summary>Parola olusturma baglantisi kullanildi (ayrinti: hesap olusturuldu veya parola yenilendi).</summary>
     InvitationAccepted = 15,
+
+    /// <summary>Kullanici kendi hesabinda iki adimli dogrulamayi acti (SYG-KMLK-080).</summary>
+    TwoFactorEnabled = 16,
+
+    /// <summary>Kullanici kendi hesabinda iki adimli dogrulamayi kapatti (SYG-KMLK-080).</summary>
+    TwoFactorDisabled = 17,
+
+    /// <summary>
+    /// Iki adimli dogrulama tercihinin degisikligi mevcut parola hatali oldugu icin reddedildi
+    /// (SYG-KMLK-080; ayrinti: acma veya kapatma).
+    /// </summary>
+    TwoFactorChangeFailed = 18,
 }

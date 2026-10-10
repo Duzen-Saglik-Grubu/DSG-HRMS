@@ -29,7 +29,7 @@ matrisinin §5 sütunu, §4 ile aynı eşlemeyi göstermelidir.
 
 | | |
 |---|---:|
-| Sistem gereksinimi | **79** |
+| Sistem gereksinimi | **80** |
 | Karşılanan paydaş gereksinimi | **56 / 56** |
 | Tür — İşlevsel | 46 |
 | Tür — Performans | 3 |
@@ -77,7 +77,7 @@ Sonraki tüm modüller bu altyapının üzerinde çalışır.
 
 ### 2.4 Sınırlar
 
-**Kapsamdadır:** §4'teki 79 gereksinim. Bunlara, onaylı gereksinimlerin **ön koşulu**
+**Kapsamdadır:** §4'teki 80 gereksinim. Bunlara, onaylı gereksinimlerin **ön koşulu**
 olan dört altyapı dâhildir: kişi/istihdam modeli ve senkronizasyon (`KR-077`), eylem
 yetkisi altyapısı (SYG-KMLK-074), parametre deposu (SYG-KMLK-075, 076) ve İK hesap
 işlemleri ekranı (SYG-KMLK-073).
@@ -199,9 +199,9 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 | **SYG-KMLK-031** | Giriş kimliği **kurumsal e-posta adresidir**; karşılaştırma büyük/küçük harf duyarsızdır. Sicil numarası veya TCKN ile giriş kabul edilmez. | İşlevsel | REQ-KMLK-022 | Test | — |
 | **SYG-KMLK-032** | Hatalı girişte, kullanıcının var olup olmadığından bağımsız olarak aynı ileti ve aynı durum kodu döndürülür. Var olmayan kullanıcı için de parola doğrulama işlemi yapılır, böylece yanıt süreleri ayırt edilemez. | İşlevsel olmayan | REQ-KMLK-023 | Test | — |
 | **SYG-KMLK-033** | Başarısız giriş sayısı sınırı aştığında (varsayılan 5) giriş, parametredeki süre boyunca (varsayılan 15 dakika) reddedilir; bu sürede doğru parola da kabul edilmez. Sayaç, hesabın var olup olmadığından bağımsız olarak **girilen e-posta adresine** göre tutulur. | İşlevsel | REQ-KMLK-024 | Test | PRM-KML-03, PRM-KML-04 |
-| **SYG-KMLK-034** | İki adımlı doğrulama parametreyle açılıp kapatılır (varsayılan **kapalı**). Açıkken, parola doğrulandıktan sonra kod adımı istenir; kod, üyelikle aynı altyapıyı ve aynı kuralları (uzunluk, süre, deneme sınırı, özetli saklama, tek kullanım) kullanır. | İşlevsel | REQ-KMLK-025, REQ-KMLK-051 | Test | PRM-KML-08 |
-| **SYG-KMLK-035** | İki adımlı doğrulama açılmadan önce, hiçbir doğrulama kanalı bulunmayan aktif hesap sahiplerinin sayısı hesaplanıp yöneticiye gösterilir ve onay istenir. | İşlevsel | REQ-KMLK-052 | Test | PRM-KML-15 |
-| **SYG-KMLK-036** | İki adımlı doğrulamanın açık ve kapalı hâlleri ayrı otomatik testlerle doğrulanır. | Kısıt | REQ-KMLK-053 | Test | — |
+| **SYG-KMLK-034** | İki adımlı doğrulama parametreyle kullanıma açılıp kapatılır (varsayılan **kapalı**). Parametre açıkken, **2FA'yı kendi hesabında açmış** kullanıcıdan parola doğrulandıktan sonra kod adımı istenir (#190); kod, üyelikle aynı altyapıyı ve aynı kuralları (uzunluk, süre, deneme sınırı, özetli saklama, tek kullanım) kullanır. | İşlevsel | REQ-KMLK-025, REQ-KMLK-051 | Test | PRM-KML-08 |
+| **SYG-KMLK-035** | İki adımlı doğrulama parametresi açılmadan önce, 2FA'yı kendi hesabında açmış aktif hesap sahiplerinin sayısı hesaplanıp yöneticiye gösterilir; sayı sıfırdan büyükse onay istenir (#190). | İşlevsel | REQ-KMLK-052 | Test | PRM-KML-15 |
+| **SYG-KMLK-036** | İki adımlı doğrulamanın sistem ve kullanıcı düzeyindeki açık ve kapalı hâllerinin her birleşimi ayrı otomatik testlerle doğrulanır (#190). | Kısıt | REQ-KMLK-053 | Test | — |
 | **SYG-KMLK-037** | Oturum, kısa ömürlü bir erişim jetonu (varsayılan 15 dakika, tarayıcı belleğinde) ve bir yenileme jetonuyla (`HttpOnly`, `Secure`, `SameSite=Strict` çerez) yönetilir. Oturumun toplam süresi parametredeki üst sınırı (varsayılan 8 saat) aşamaz. | Kısıt | REQ-KMLK-026 | Test | PRM-KML-11, PRM-KML-12 |
 | **SYG-KMLK-038** | Hareketsizlik süresi (varsayılan **30 dakika**) **kullanıcı etkileşimine** göre ölçülür. Arka plan istekleri (sağlık kontrolü, veri yenileme, bildirim yoklaması) etkinlik sayılmaz; yenileme jetonu, son kullanıcı etkileşiminden bu yana süre dolmuşsa kabul edilmez. | İşlevsel | REQ-KMLK-026, REQ-KMLK-054 | Test | PRM-KML-13 |
 | **SYG-KMLK-039** | Sistem, meşru uzun süreli etkinlik için bir **etkinlik sinyali** uç noktası sunar. Sinyal yalnızca doğrulanmış oturumdan kabul edilir, hareketsizlik sayacını sıfırlar, **toplam oturum süresini uzatmaz** ve dakikada en fazla 2 kez kabul edilir. İstemci sinyali yalnızca medya oynarken ve sekme görünürken gönderir. | İşlevsel | REQ-KMLK-054 | Test | — |
@@ -285,6 +285,7 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 | **SYG-KMLK-077** | Giriş isteğinin yanıt süresi, girişleri mesai başına yayılan 50 kullanıcıda (60 saniyede 50 giriş) 95. yüzdelikte 1 saniyenin altındadır. 50 giriş isteği **aynı anda** geldiğinde 95. yüzdelik 5 saniyenin altında kalır. Süreler parola özetlemesi dahildir. | Performans | REQ-KMLK-022 | Analiz | — |
 | **SYG-KMLK-078** | Tam bir LOGO senkronizasyonu (bugünkü hacim ≈1.540 kart) 60 saniyenin altında tamamlanır. Böylece istihdamı biten kişinin hesabı en geç periyot + 1 dakika içinde kapanır. | Performans | REQ-KMLK-034 | Analiz | PRM-ENT-07 |
 | **SYG-KMLK-079** | Doğrulama kodu, e-posta ve SMS için istekten itibaren 95. yüzdelikte 60 saniye içinde alıcının sunucusuna / operatöre teslim edilir. Teslim edilemeyen ileti yeniden denenir ve sonucu kaydedilir. | Performans | REQ-KMLK-001, REQ-KMLK-016, REQ-KMLK-021 | Analiz | — |
+| **SYG-KMLK-080** | Parametre açıkken kullanıcı, "Hesap güvenliği" ekranından kendi 2FA tercihini açar ve kapatır; tercih varsayılan olarak **kapalıdır**. Açmak için mevcut parola ve seçilen kanala gönderilen kodun doğrulanması gerekir; kod yalnızca o kişiye ve bu amaca aittir. Doğrulama kanalı olmayan kullanıcı 2FA'yı açamaz. Kapatmak için mevcut parola gerekir. Açma ve kapatma denetim izine ve güvenlik olaylarına yazılır. Parametre kapalıyken tercih saklanır ama uygulanmaz (#190). | İşlevsel | REQ-KMLK-025, REQ-KMLK-051, REQ-KMLK-052 | Test | PRM-KML-08 |
 
 ---
 
@@ -469,3 +470,4 @@ madde `İptal` notuyla kalır.
 | 2026-10-04 | 1.2 | AN-23 ve AN-24: İK teyidinin kabulde alınacağı yazıldı (#135) | Bilgi İşlem |
 | 2026-10-04 | 1.3 | §2.2 API yolu `/api/v1/identity/`; §7 destekleyici sistemlerin durumu güncellendi (#133) | Bilgi İşlem |
 | 2026-10-06 | 1.4 | §7: SMTP sertifikasının yeni bitişi (#179) | Bilgi İşlem |
+| 2026-10-10 | 1.5 | Değişiklik talebi #190: SYG-KMLK-034, 035, 036 güncellendi; SYG-KMLK-080 (kullanıcının 2FA tercihi) eklendi | Bilgi İşlem |
