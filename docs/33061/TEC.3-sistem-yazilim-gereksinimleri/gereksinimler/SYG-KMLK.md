@@ -29,7 +29,7 @@ matrisinin §5 sütunu, §4 ile aynı eşlemeyi göstermelidir.
 
 | | |
 |---|---:|
-| Sistem gereksinimi | **80** |
+| Sistem gereksinimi | **81** |
 | Karşılanan paydaş gereksinimi | **56 / 56** |
 | Tür — İşlevsel | 46 |
 | Tür — Performans | 3 |
@@ -77,7 +77,7 @@ Sonraki tüm modüller bu altyapının üzerinde çalışır.
 
 ### 2.4 Sınırlar
 
-**Kapsamdadır:** §4'teki 80 gereksinim. Bunlara, onaylı gereksinimlerin **ön koşulu**
+**Kapsamdadır:** §4'teki 81 gereksinim. Bunlara, onaylı gereksinimlerin **ön koşulu**
 olan dört altyapı dâhildir: kişi/istihdam modeli ve senkronizasyon (`KR-077`), eylem
 yetkisi altyapısı (SYG-KMLK-074), parametre deposu (SYG-KMLK-075, 076) ve İK hesap
 işlemleri ekranı (SYG-KMLK-073).
@@ -286,6 +286,7 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 | **SYG-KMLK-078** | Tam bir LOGO senkronizasyonu (bugünkü hacim ≈1.540 kart) 60 saniyenin altında tamamlanır. Böylece istihdamı biten kişinin hesabı en geç periyot + 1 dakika içinde kapanır. | Performans | REQ-KMLK-034 | Analiz | PRM-ENT-07 |
 | **SYG-KMLK-079** | Doğrulama kodu, e-posta ve SMS için istekten itibaren 95. yüzdelikte 60 saniye içinde alıcının sunucusuna / operatöre teslim edilir. Teslim edilemeyen ileti yeniden denenir ve sonucu kaydedilir. | Performans | REQ-KMLK-001, REQ-KMLK-016, REQ-KMLK-021 | Analiz | — |
 | **SYG-KMLK-080** | Parametre açıkken kullanıcı, "Hesap güvenliği" ekranından kendi 2FA tercihini açar ve kapatır; tercih varsayılan olarak **kapalıdır**. Açmak için mevcut parola ve seçilen kanala gönderilen kodun doğrulanması gerekir; kod yalnızca o kişiye ve bu amaca aittir. Doğrulama kanalı olmayan kullanıcı 2FA'yı açamaz. Kapatmak için mevcut parola gerekir. Açma ve kapatma denetim izine ve güvenlik olaylarına yazılır. Parametre kapalıyken tercih saklanır ama uygulanmaz (#190). | İşlevsel | REQ-KMLK-025, REQ-KMLK-051, REQ-KMLK-052 | Test | PRM-KML-08 |
+| **SYG-KMLK-081** | Doğrulama kodunu alamayan kişi için (e-posta ve telefon erişimi yok) **kurtarma:** `identity.account.update` iznine sahip İK kullanıcısı, "Hesap işlemleri" ekranından kişinin 2FA tercihini **gerekçe girerek** kapatır. Gerekçe hesapta saklanır; işlem denetim izine ve güvenlik olaylarına yazılır. Kişi bundan sonra parolasıyla girer, isterse 2FA'yı yeniden açar. Kullanıcı kendi hesabına bu işlemi uygulayamaz (#190). | İşlevsel | REQ-KMLK-037, REQ-KMLK-052 | Test | — |
 
 ---
 
@@ -414,7 +415,7 @@ karşılaştırıldı; katalog Y4 toplantısıyla depoya girdiğinde bu denetime
 | `REQ-KMLK-049` | SYG-KMLK-041 |
 | `REQ-KMLK-050` | SYG-KMLK-042 |
 | `REQ-KMLK-051` | SYG-KMLK-034, SYG-KMLK-080 |
-| `REQ-KMLK-052` | SYG-KMLK-035, SYG-KMLK-080 |
+| `REQ-KMLK-052` | SYG-KMLK-035, SYG-KMLK-080, SYG-KMLK-081 |
 | `REQ-KMLK-053` | SYG-KMLK-036 |
 | `REQ-KMLK-054` | SYG-KMLK-038, 039 |
 | `REQ-KMLK-028` | SYG-KMLK-044, 075, 076 |
@@ -427,7 +428,7 @@ karşılaştırıldı; katalog Y4 toplantısıyla depoya girdiğinde bu denetime
 | `REQ-KMLK-034` | SYG-KMLK-004, 005, 054, 055, 078 |
 | `REQ-KMLK-035` | SYG-KMLK-056 |
 | `REQ-KMLK-036` | SYG-KMLK-057, 073, 074 |
-| `REQ-KMLK-037` | SYG-KMLK-053, 058 |
+| `REQ-KMLK-037` | SYG-KMLK-053, 058, 081 |
 | `REQ-KMLK-038` | SYG-KMLK-059 |
 | `REQ-KMLK-039` | SYG-KMLK-059 |
 | `REQ-KMLK-040` | SYG-KMLK-005, 010, 060 |
@@ -470,4 +471,4 @@ madde `İptal` notuyla kalır.
 | 2026-10-04 | 1.2 | AN-23 ve AN-24: İK teyidinin kabulde alınacağı yazıldı (#135) | Bilgi İşlem |
 | 2026-10-04 | 1.3 | §2.2 API yolu `/api/v1/identity/`; §7 destekleyici sistemlerin durumu güncellendi (#133) | Bilgi İşlem |
 | 2026-10-06 | 1.4 | §7: SMTP sertifikasının yeni bitişi (#179) | Bilgi İşlem |
-| 2026-10-10 | 1.5 | Değişiklik talebi #190: SYG-KMLK-034, 035, 036 güncellendi; SYG-KMLK-080 (kullanıcının 2FA tercihi) eklendi | Bilgi İşlem |
+| 2026-10-10 | 1.5 | Değişiklik talebi #190: SYG-KMLK-034, 035, 036 güncellendi; SYG-KMLK-080 (kullanıcının 2FA tercihi) ve SYG-KMLK-081 (İK'nın 2FA'yı kurtarma için kapatması) eklendi | Bilgi İşlem |

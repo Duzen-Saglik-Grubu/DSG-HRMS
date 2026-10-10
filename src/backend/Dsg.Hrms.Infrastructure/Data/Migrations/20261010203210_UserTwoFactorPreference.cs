@@ -17,6 +17,13 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                 type: "boolean",
                 nullable: false,
                 defaultValue: false);
+
+            migrationBuilder.AddColumn<string>(
+                name: "two_factor_reset_note",
+                schema: "identity",
+                table: "user_account",
+                type: "text",
+                nullable: true);
         }
 
         /// <inheritdoc />
@@ -24,6 +31,11 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "two_factor_enabled",
+                schema: "identity",
+                table: "user_account");
+
+            migrationBuilder.DropColumn(
+                name: "two_factor_reset_note",
                 schema: "identity",
                 table: "user_account");
         }

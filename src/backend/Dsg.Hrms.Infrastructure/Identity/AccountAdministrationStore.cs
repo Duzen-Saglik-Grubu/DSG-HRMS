@@ -82,7 +82,7 @@ public sealed class AccountAdministrationStore : IAccountAdministrationStore
 
         var accounts = await _context.Set<UserAccount>().AsNoTracking()
             .Where(a => ids.Contains(a.PersonId))
-            .Select(a => new { a.Id, a.PersonId, a.Status, a.StatusReason, a.LockedUntil })
+            .Select(a => new { a.Id, a.PersonId, a.Status, a.StatusReason, a.LockedUntil, a.TwoFactorEnabled })
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
@@ -101,7 +101,8 @@ public sealed class AccountAdministrationStore : IAccountAdministrationStore
                 [.. employments.Where(e => e.PersonId == row.Id).Select(e => new AccountEmployment(e.RegistryCode, e.CompanyName, e.IsActive))],
                 state,
                 account?.StatusReason,
-                account is not null && account.Id == currentAccountId);
+                account is not null && account.Id == currentAccountId,
+                account?.TwoFactorEnabled ?? false);
         }).ToList();
 
         return new PagedResult<AccountSummary>(items, page.Page, page.PageSize, total);

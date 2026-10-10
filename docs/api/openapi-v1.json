@@ -1001,6 +1001,103 @@
         }
       }
     },
+    "/api/v1/identity/accounts/{personId}/two-factor/reset": {
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "summary": "Kisinin iki adimli dogrulama tercihini gerekceyle kapatir.",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountStatusChangeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountStatusChangeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountStatusChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Iki adimli dogrulama kapali.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Gerekce girilmedi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`identity.account.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi bulunamadi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Kisinin hesabi yok, iki adimli dogrulama zaten kapali veya hesap islemi yapanin kendisinin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/identity/accounts/{personId}/invitations": {
       "post": {
         "tags": [
@@ -2291,7 +2388,8 @@
           "employments",
           "state",
           "statusReason",
-          "isCurrentUser"
+          "isCurrentUser",
+          "twoFactorEnabled"
         ],
         "type": "object",
         "properties": {
@@ -2333,6 +2431,10 @@
           "isCurrentUser": {
             "type": "boolean",
             "description": "Satir oturumdaki kullanicinin kendisi mi; kendi hesabi pasife alinamaz (#138)."
+          },
+          "twoFactorEnabled": {
+            "type": "boolean",
+            "description": "Kisinin iki adimli dogrulama tercihi acik mi; hesap yoksa `false` (SYG-KMLK-081)."
           }
         },
         "description": "Listedeki kisi. Yalnizca ad, soyad, sicil ve firma (SYG-KMLK-073)."

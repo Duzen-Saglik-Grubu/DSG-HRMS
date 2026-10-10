@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Dsg.Hrms.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(HrmsDbContext))]
-    [Migration("20261010131637_UserTwoFactorPreference")]
+    [Migration("20261010203210_UserTwoFactorPreference")]
     partial class UserTwoFactorPreference
     {
         /// <inheritdoc />
@@ -805,6 +805,10 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean")
                         .HasColumnName("two_factor_enabled");
+
+                    b.Property<string>("TwoFactorResetNote")
+                        .HasColumnType("text")
+                        .HasColumnName("two_factor_reset_note");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamptz")

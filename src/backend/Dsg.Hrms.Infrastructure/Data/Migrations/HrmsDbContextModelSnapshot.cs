@@ -803,6 +803,10 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("two_factor_enabled");
 
+                    b.Property<string>("TwoFactorResetNote")
+                        .HasColumnType("text")
+                        .HasColumnName("two_factor_reset_note");
+
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("updated_at");

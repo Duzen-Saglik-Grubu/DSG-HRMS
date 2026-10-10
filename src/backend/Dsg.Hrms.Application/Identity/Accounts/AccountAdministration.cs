@@ -2,6 +2,7 @@ using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Exceptions;
 using Dsg.Hrms.Application.Common.Paging;
 using Dsg.Hrms.Application.Identity.Sessions;
+using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Personnel;
 using Microsoft.Extensions.Logging;
@@ -41,6 +42,7 @@ public sealed record AccountEmployment(string RegistryCode, string CompanyName, 
 /// <param name="State">Hesap durumu.</param>
 /// <param name="StatusReason">Durumun nedeni (pasif veya elle aktiflestirilmisse).</param>
 /// <param name="IsCurrentUser">Satir, islemi yapan kullanicinin kendisi mi; ekran pasife alma dugmesini gostermez (#138).</param>
+/// <param name="TwoFactorEnabled">Kisinin iki adimli dogrulama tercihi acik mi (SYG-KMLK-080, 081); hesap yoksa <c>false</c>.</param>
 public sealed record AccountSummary(
     Guid PersonId,
     string FirstName,
@@ -48,7 +50,8 @@ public sealed record AccountSummary(
     IReadOnlyList<AccountEmployment> Employments,
     AccountState State,
     AccountStatusReason? StatusReason,
-    bool IsCurrentUser);
+    bool IsCurrentUser,
+    bool TwoFactorEnabled);
 
 /// <summary>Arama siralamasi.</summary>
 public enum AccountSort
@@ -86,7 +89,8 @@ public interface IAccountAdministrationStore
 }
 
 /// <summary>
-/// IK hesap islemleri (SYG-KMLK-057, 073): arama ve elle pasife alma / aktiflestirme.
+/// IK hesap islemleri (SYG-KMLK-057, 073, 081): arama, elle pasife alma / aktiflestirme ve
+/// iki adimli dogrulamayi kapatma.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -106,16 +110,21 @@ public sealed partial class AccountAdministrationService
     private readonly ICurrentUser _currentUser;
     private readonly IAccessLogger _accessLogger;
     private readonly IDateTimeProvider _clock;
+    private readonly ISecurityEventLog _events;
     private readonly ILogger<AccountAdministrationService> _logger;
 
     /// <summary>Yeni ornek olusturur.</summary>
-    /// <remarks>Iki depo ayni veritabani baglamini paylasir; durum ve oturumlar birlikte yazilir.</remarks>
+    /// <remarks>
+    /// Iki depo ve guvenlik olay kaydi ayni veritabani baglamini paylasir; durum, oturumlar
+    /// ve olaylar birlikte yazilir.
+    /// </remarks>
     public AccountAdministrationService(
         IAccountAdministrationStore store,
         ISessionStore sessions,
         ICurrentUser currentUser,
         IAccessLogger accessLogger,
         IDateTimeProvider clock,
+        ISecurityEventLog events,
         ILogger<AccountAdministrationService> logger)
     {
         _store = store;
@@ -123,6 +132,7 @@ public sealed partial class AccountAdministrationService
         _currentUser = currentUser;
         _accessLogger = accessLogger;
         _clock = clock;
+        _events = events;
         _logger = logger;
     }
 
@@ -214,6 +224,39 @@ public sealed partial class AccountAdministrationService
         LogActivated(_logger, account.Id);
     }
 
+    /// <summary>
+    /// Kisinin iki adimli dogrulama tercihini gerekceyle kapatir (SYG-KMLK-081, R-27): e-posta
+    /// ve telefon erisimini kaybeden kisi yeniden yalnizca parolasiyla giris yapabilir.
+    /// </summary>
+    /// <exception cref="NotFoundException">Kisi yoksa.</exception>
+    /// <exception cref="BusinessRuleException">
+    /// Kisinin hesabi yoksa, tercih zaten kapaliysa veya hesap islemi yapanin kendisininse.
+    /// </exception>
+    /// <remarks>
+    /// Kullanici kendi tercihini Hesap guvenligi ekranindan parolasiyla kapatir; bu yol
+    /// parolasiz bir kisayol olmasin diye kendi hesabina kapalidir. Acik oturumlar kapanmaz:
+    /// kapatma kisinin yetkisini daraltmaz.
+    /// </remarks>
+    public async Task ResetTwoFactorAsync(Guid personId, string reason, CancellationToken cancellationToken)
+    {
+        var (person, account, _) = await FindWithAccountAsync(personId, cancellationToken).ConfigureAwait(false);
+        if (!account.TwoFactorEnabled)
+        {
+            throw new BusinessRuleException("Bu kişinin hesabında iki adımlı doğrulama zaten kapalı.");
+        }
+
+        if (account.Id == _currentUser.UserId)
+        {
+            throw new BusinessRuleException("Kendi iki adımlı doğrulamanızı Hesap güvenliği ekranından kapatabilirsiniz.");
+        }
+
+        account.ResetTwoFactor(reason);
+        _events.Record(SecurityEventType.TwoFactorDisabled, account.Id, person.Id, "hr-reset");
+
+        await _sessions.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        LogTwoFactorReset(_logger, account.Id);
+    }
+
     private async Task<(Person Person, UserAccount Account, bool HasActiveEmployment)> FindWithAccountAsync(Guid personId, CancellationToken cancellationToken)
     {
         var found = await _store.FindAsync(personId, cancellationToken).ConfigureAwait(false)
@@ -230,4 +273,7 @@ public sealed partial class AccountAdministrationService
 
     [LoggerMessage(EventId = 3951, Level = LogLevel.Information, Message = "Hesap elle aktiflestirildi: hesap {AccountId} (SYG-KMLK-057).")]
     private static partial void LogActivated(ILogger logger, long accountId);
+
+    [LoggerMessage(EventId = 3952, Level = LogLevel.Information, Message = "Iki adimli dogrulama IK tarafindan kapatildi: hesap {AccountId} (SYG-KMLK-081).")]
+    private static partial void LogTwoFactorReset(ILogger logger, long accountId);
 }

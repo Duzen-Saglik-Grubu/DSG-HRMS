@@ -341,12 +341,12 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | | |
 |---|---|
 | **Kategori** | Kullanılabilirlik |
-| **Açıklama** | 2FA kullanıcı tercihine bağlıdır (`KR-104`, #190). Kendi 2FA'sını açmış bir kullanıcı hem kurumsal e-postasını hem cep telefonunu kaybederse (numara değişti, e-posta kapandı) kod alamaz ve giriş yapamaz. Ayrı bir kurtarma akışı yoktur; parola sıfırlama da 2FA'yı kapatmaz. |
+| **Açıklama** | 2FA kullanıcı tercihine bağlıdır (`KR-104`, #190). Kendi 2FA'sını açmış bir kullanıcı hem kurumsal e-postasını hem cep telefonunu kaybederse (numara değişti, e-posta kapandı) kod alamaz ve giriş yapamaz. Parola sıfırlama 2FA'yı kapatmaz. |
 | **O / E / Puan** | 1 / 2 / **2** |
 | **Puan gerekçesi** | **Olasılık 1:** İki kanalın birden aynı anda kaybedilmesi gerekir ve 2FA varsayılan kapalıdır. **Etki 2:** Tek kişi etkilenir; veri kaybı yoktur. |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) İletişim bilgisi LOGO'da güncellenince senkronizasyonla HRMS'e gelir; kişi yeni kanalıyla kod alabilir. (2) Son çare: Sistem Yöneticisi PRM-KML-08'i geçici olarak kapatır; bu herkes için 2FA'yı kapatır. (3) İhtiyaç doğarsa yetkili bir kullanıcının kişinin 2FA'sını kapatabileceği bir işlem değerlendirilir. |
-| **Durum** | İzleniyor (#190) |
+| **Önlem** | (1) İletişim bilgisi LOGO'da güncellenince senkronizasyonla HRMS'e gelir; kişi yeni kanalıyla kod alabilir. (2) **Kurtarma:** İK, "Hesap işlemleri" ekranından kişinin 2FA'sını gerekçe girerek kapatır; kişi parolasıyla girer (SYG-KMLK-081). İK, talep edenin kişinin kendisi olduğunu yüz yüze veya bilinen bir kurum içi kanaldan doğrular; işlem denetim izine ve güvenlik olaylarına yazılır. (3) Son çare: Sistem Yöneticisi PRM-KML-08'i geçici olarak kapatır. |
+| **Durum** | İzleniyor; kurtarma işlemi eklendi (#190) |
 
 ## Değişiklik Geçmişi
 
@@ -363,4 +363,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-06 | 1.1 | Kabul edilen riskler satırında R-16 düzeltildi (Bilgi İşlem, `KR-055`); R-25 önlem 5–6: SSH kararı ve Webmin bulgusu (#177) | Bilgi İşlem |
 | 2026-10-06 | 1.2 | R-20: sertifika yenilendi (bitiş 27.03.2027), durum İzleniyor; R-25: Webmin kaldırıldı (#179) | Bilgi İşlem |
 | 2026-10-10 | 1.3 | R-25 Üst Yönetim tarafından kabul edildi (`KR-103`, #127) | Bilgi İşlem |
-| 2026-10-10 | 1.4 | R-27 eklendi: kanallarını kaybeden kullanıcının 2FA ile girişte kalması (#190) | Bilgi İşlem |
+| 2026-10-10 | 1.4 | R-27 eklendi: kanallarını kaybeden kullanıcının 2FA ile girişte kalması; önlem İK'nın kurtarma işlemi (#190) | Bilgi İşlem |

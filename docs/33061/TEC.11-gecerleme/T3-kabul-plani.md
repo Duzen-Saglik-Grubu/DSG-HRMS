@@ -34,7 +34,7 @@ T3'ün, İK'nın 23.09.2026'da onayladığı gereksinimleri **gerçek kullanımd
 | | |
 |---|---|
 | Ortam | UAT — https://insankaynaklaritest.duzen.com.tr (gerçek LOGO verisi, `KR-024`) |
-| Sürüm | **`v0.2.0-rc.3`**: `v0.2.0-rc.2`'nin yerine; deneme ve kod gönderim sınırlarının yeni varsayılanlarını içerir (#185, §6.1 T-03). Dağıtım kaydı: `TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`. Oturumdan önce çalışan sürüm yeniden doğrulanır; forma etiket yazılır |
+| Sürüm | **`v0.2.0-rc.4`**: `v0.2.0-rc.3`'ün yerine; iki adımlı doğrulamanın kullanıcı tercihine bağlanmasını ve İK'nın kurtarma işlemini içerir (#190, §6.1 T-04). Dağıtım kaydı: `TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`. Oturumdan önce çalışan sürüm yeniden doğrulanır; forma etiket yazılır |
 | İletiler | UAT izin listesi kipinde (`AllowList`, `KR-083`): yalnızca listedeki adreslere ve numaralara e-posta ve SMS gider. **Katılımcıların kurumsal e-postaları ve cep telefonları oturumdan önce listeye eklenir** (`NOTIFICATIONS_ALLOWED_RECIPIENTS`), oturumdan sonra çıkarılır |
 | Cihazlar | Masaüstü tarayıcı + en az bir cep telefonu (REQ-KMLK-044) |
 | Süre | Yaklaşık 2 saat (senaryolar 75 dk, kanıt gösterimi 30 dk, değerlendirme 15 dk) |
@@ -47,7 +47,7 @@ Kabul oturumu ancak aşağıdakilerin tamamı sağlanınca yapılır:
 
 - [x] **G2 "Geliştirme tamam"** kapısı geçti (T3 doğrulama raporu §5; 04.10.2026)
 - [x] **SYG-KMLK-064 metin incelemesi** kararı verildi ve onaylanan düzeltmeler uygulandı (04.10.2026, #152)
-- [ ] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (`v0.2.0-rc.3`, #185). Önceki adaylar: `v0.2.0-rc.1` (#157) ve `v0.2.0-rc.2` (#160)
+- [ ] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (`v0.2.0-rc.4`, #190). Önceki adaylar: `v0.2.0-rc.1` (#157), `v0.2.0-rc.2` (#160) ve `v0.2.0-rc.3` (#185)
 - [ ] Katılımcılar İK tarafından belirlendi; adresleri ve numaraları UAT izin listesine eklendi
 - [ ] Katılımcılara kısa kullanım notu verildi (`T3-kullanim-notu.md`, #154)
 - [ ] Bilinen açık `[HATA]` kaydı yok veya her biri kabul öncesinde İK'ya bildirildi
@@ -168,21 +168,23 @@ Her senaryo **katılımcının kendisi tarafından** uygulanır. Bilgi İşlem a
 1. "Hesap işlemleri" ekranında bir personeli sicil numarasıyla, sonra adıyla arar.
 2. Hesabı olmayan, kurumsal e-postası olan bir katılımcıya "Bağlantı gönder" der. Katılımcı bağlantıyla parolasını belirler ve aynı bağlantıyı ikinci kez açar.
 3. Bir katılımcının hesabını gerekçe girmeden, sonra gerekçeyle pasife alır. Katılımcı giriş yapmayı dener. Sonra hesabı gerekçeyle yeniden aktifleştirir.
+4. KS-10'da 2FA'sını açmış katılımcının, kodunu alamadığını varsayarak 2FA'sını önce gerekçesiz, sonra gerekçeyle kapatır. Katılımcı yalnızca parolasıyla giriş yapar.
 
 **Beklenen:**
 - Bağlantı yalnızca bir kez kullanılır; ikinci açılışta "geçersiz" iletisi çıkar.
 - Gerekçe olmadan pasife alma yapılamaz.
 - Pasif hesapla giriş reddedilir.
+- Gerekçe olmadan 2FA kapatılamaz; kapatıldıktan sonra katılımcıdan kod istenmez.
 - Bilgi İşlem, işlemlerin denetim izine kim ve ne zaman bilgisiyle yazıldığını gösterir.
 
-**Kapsadığı gereksinimler:** REQ-KMLK-011, 036, 037
+**Kapsadığı gereksinimler:** REQ-KMLK-011, 036, 037, 052
 
 ### KS-10 — Sistem yönetimi
 **Kim:** Bilgi İşlem (İK izler) · **Cihaz:** Masaüstü
 1. Parametre ekranında kabul edilen alan adlarına bir alan adı ekler ve çıkarır.
 2. Parola en az uzunluğunu 8 yapar; KS-08'deki kısa parolanın artık reddedildiğini gösterir; değeri geri alır.
 3. Destek iletişim bilgisini değiştirir; giriş ekranında güncellendiğini gösterir.
-4. İki adımlı doğrulamayı açmak ister; etkilenecek kişi sayısının gösterildiğini ve onay istendiğini gösterir. Açar; bir katılımcı iki adımlı giriş yapar. Kapatır.
+4. İki adımlı doğrulamayı açar; 2FA'yı kendi hesabında açmış kişi varsa sayısının gösterildiğini ve onay istendiğini gösterir. Bir katılımcı "Hesap güvenliği" ekranından kendi 2FA'sını parolası ve gelen kodla açar, çıkış yapıp iki adımlı giriş yapar. 2FA'sı kapalı başka bir katılımcı tek adımla girer. (Bu katılımcının 2FA'sı KS-09 adım 4'te kapatılır.) Parametreyi en sonda kapatır.
 5. İlk girişte parola değiştirme parametresini açar. Hiç giriş yapmamış bir katılımcı giriş yapar ve parola ekranına yönlendirilir. Parametreyi kapatır.
 6. Kurumsal logoyu yükler; giriş ekranında ve telefonda göstererek bozulmadığını teyit eder; varsayılana döner.
 
@@ -217,7 +219,7 @@ Bu gereksinimler kullanıcı arayüzünden gözlenemez. Kanıtları T3 doğrulam
 | KG-04 | Günlükte kişisel veri, kod ve parola bulunmaması; kimlik olaylarının denetim izinde kullanıcı, zaman, IP ve takip numarasıyla kaydı | REQ-KMLK-018, 040, 041 | `IdentityLogMaskingTests`; `audit.security_event` örneği |
 | KG-05 | Üyelik ve kod gönderim hız sınırları | REQ-KMLK-038, 039 | `RegistrationApiTests` |
 | KG-06 | İşlemsel iletilerin bildirim istisnasından muaf olması | REQ-KMLK-042 | `NotificationDispatcherTests` (istisnanın kendisi Y1'de gelecek) |
-| KG-07 | 2FA'nın açık ve kapalı hâlinin otomatik testi | REQ-KMLK-053 | `SessionApiTests` |
+| KG-07 | 2FA'nın sistem ve kullanıcı düzeyinde açık ve kapalı hâllerinin otomatik testi | REQ-KMLK-053 | `SessionApiTests`, `TwoFactorPreferenceApiTests` |
 | KG-08 | Eşleşen ve eşleşmeyen üyelik isteklerinin yanıt süresi farkı (< 20 ms) | REQ-KMLK-004 | `RegistrationTimingTests` (KPÖ-KMLK-2) |
 
 ### 6.1 İK'nın teyit edeceği yorumlar (#135)
@@ -232,6 +234,7 @@ ele alınır.
 | T-01 | Hareketsizlik neye göre sayılır? | 30 dakikalık hareketsizlik süresi, kişinin açık sekmede **tıklama, tuşa basma, kaydırma veya dokunma** yapmadığı süredir. Sekmede video oynarken de kişi etkin sayılır. Fareyi yalnızca gezdirmek, başka bir sekmede veya programda çalışmak etkinlik sayılmaz. | KS-07 | REQ-KMLK-054; AN-23, `KR-087` |
 | T-02 | Parola değişimi açılırsa kimleri, ne sıklıkla etkiler? | Şu anda ikisi de **kapalı**. (1) Periyodik değişim açılırsa süre 90 gündür; 30 ile 365 gün arasında ayarlanabilir. (2) İlk girişte değişim açılırsa, sisteme hiç giriş yapmamış **herkes** ilk girişinde parolasını değiştirir; üyelikte parolasını kendisi belirleyenler de buna dahildir. Kural açılmadan önce giriş yapmış olanlar etkilenmez. (3) Parolasını değiştirmesi gereken kişi, değiştirene kadar sistemin başka bir ekranını kullanamaz. | KS-08, KS-10 | REQ-KMLK-030, 055; AN-24, `KR-092` |
 | T-03 | Üyelikte deneme ve kod gönderim sınırları | Onaylı gereksinimde TCKN başına saatte 5 üyelik denemesi ve 15 dakikada 3 kod vardı. UAT'de İK ile yapılan denemelerde sistem çok çabuk engelledi; iki varsayılan da **10** yapıldı. Kod gönderim sınırı Sistem Yönetimi ekranından 1–15, üyelik deneme sınırı 3–20 arasında ayarlanabilir. **Değişiklik talebi; İK onayı 10.10.2026'da alındı.** Kabul oturumunda yeni davranış gösterilir | KS-01, KS-02, KS-05 | REQ-KMLK-038, 039; değişiklik talebi #185 |
+| T-04 | İki adımlı doğrulama kimlere uygulanır? | Onaylı gereksinimde parametre açılınca 2FA herkese uygulanıyordu. Artık parametre 2FA'yı yalnızca **kullanıma açar**; her kullanıcı "Hesap güvenliği" ekranından kendi hesabında açar, varsayılan kapalıdır. Açmak için parola ve gelen kod, kapatmak için parola gerekir. Kodu alamayan kişinin 2FA'sını İK "Hesap işlemleri" ekranından gerekçe girerek kapatır. **Değişiklik talebi; kullanıcı tercihi için İK onayı 10.10.2026'da alındı.** Kabul oturumunda yeni davranış gösterilir | KS-09, KS-10 | REQ-KMLK-025, 051, 052, 053; değişiklik talebi #190, `KR-104` |
 
 ---
 
@@ -283,3 +286,4 @@ Kabul kararından önce düzeltilmesi gerekenler İK ile birlikte belirlenir.
 | 2026-10-04 | 0.8 | KS-04 notu: kalan risk R-19 olarak kayıtlı, kabul yetkisi (#126) | Bilgi İşlem |
 | 2026-10-10 | 0.9 | §6.1: T-03 — deneme ve kod gönderim sınırlarındaki değişiklik talebi (#185) İK teyidine; §3, §4 kabul adayı `v0.2.0-rc.3` | Bilgi İşlem |
 | 2026-10-10 | 0.10 | §6.1 T-03: İK onayı alındı (#187) | Bilgi İşlem |
+| 2026-10-10 | 0.11 | KS-09 adım 4 (İK'nın 2FA kapatması), KS-10 adım 4 ve KG-07 kullanıcı tercihine bağlı 2FA'ya göre; §6.1 T-04; §3, §4 kabul adayı `v0.2.0-rc.4` (#190) | Bilgi İşlem |

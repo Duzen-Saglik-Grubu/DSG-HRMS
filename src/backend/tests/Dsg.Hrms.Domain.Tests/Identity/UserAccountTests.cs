@@ -274,4 +274,46 @@ public sealed class UserAccountTests
 
         account.SecurityStamp.ShouldBe(stamp);
     }
+
+    [Fact]
+    public void Hr_reset_turns_two_factor_off_with_the_reason_and_re_enabling_clears_it()
+    {
+        // SYG-KMLK-081: kodu alamayan kisi icin IK gerekceyle kapatir; kisi yeniden acarsa
+        // eski gerekce gecerli durumu anlatmaz.
+        var account = UserAccount.Register(1, "hash", Registered);
+        account.EnableTwoFactor();
+        var stamp = account.SecurityStamp;
+
+        account.ResetTwoFactor("  Telefonunu kaybetti  ");
+
+        account.TwoFactorEnabled.ShouldBeFalse();
+        account.TwoFactorResetNote.ShouldBe("Telefonunu kaybetti");
+        account.SecurityStamp.ShouldBe(stamp);
+
+        account.EnableTwoFactor().ShouldBeTrue();
+        account.TwoFactorResetNote.ShouldBeNull();
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Hr_reset_requires_a_reason(string reason)
+    {
+        var account = UserAccount.Register(1, "hash", Registered);
+        account.EnableTwoFactor();
+
+        Should.Throw<ArgumentException>(() => account.ResetTwoFactor(reason));
+
+        account.TwoFactorEnabled.ShouldBeTrue();
+        account.TwoFactorResetNote.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Hr_reset_of_a_disabled_preference_is_rejected()
+    {
+        var account = UserAccount.Register(1, "hash", Registered);
+
+        Should.Throw<InvalidOperationException>(() => account.ResetTwoFactor("Gerekce"));
+        account.TwoFactorResetNote.ShouldBeNull();
+    }
 }

@@ -30,6 +30,7 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ### Eklendi
 - "Hesap güvenliği" ekranı ve uçları (`/api/v1/identity/account/two-factor`).
+- **Kurtarma:** İK, doğrulama kodunu alamayan kişinin 2FA'sını "Hesap işlemleri" ekranından gerekçe girerek kapatır (`POST /api/v1/identity/accounts/{personId}/two-factor/reset`).
 
 ---
 

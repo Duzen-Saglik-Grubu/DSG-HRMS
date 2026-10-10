@@ -950,6 +950,95 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/identity/accounts/{personId}/two-factor/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Kisinin iki adimli dogrulama tercihini gerekceyle kapatir. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AccountStatusChangeRequest"];
+                    "text/json": components["schemas"]["AccountStatusChangeRequest"];
+                    "application/*+json": components["schemas"]["AccountStatusChangeRequest"];
+                };
+            };
+            responses: {
+                /** @description Iki adimli dogrulama kapali. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Gerekce girilmedi. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`identity.account.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi bulunamadi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisinin hesabi yok, iki adimli dogrulama zaten kapali veya hesap islemi yapanin kendisinin. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/accounts/{personId}/invitations": {
         parameters: {
             query?: never;
@@ -2241,6 +2330,8 @@ export interface components {
             statusReason: null | components["schemas"]["AccountStatusReasonKind"];
             /** @description Satir oturumdaki kullanicinin kendisi mi; kendi hesabi pasife alinamaz (#138). */
             isCurrentUser: boolean;
+            /** @description Kisinin iki adimli dogrulama tercihi acik mi; hesap yoksa `false` (SYG-KMLK-081). */
+            twoFactorEnabled: boolean;
         };
         /** @description Oturum icinde parola degisikligi istegi (SYG-KMLK-048). */
         ChangePasswordRequest: {

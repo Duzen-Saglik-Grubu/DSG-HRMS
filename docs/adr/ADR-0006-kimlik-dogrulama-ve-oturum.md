@@ -182,8 +182,8 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
 > Açmak için mevcut parola ve seçilen kanala gönderilen kodun doğrulanması gerekir
 > (`VerificationPurpose.TwoFactorSetup`; kod kişiye ve amaca bağlı denetlenir). Kanalı
 > olmayan kullanıcı 2FA'yı açamadığı için "kanalı olmayanlar kilitlenir" riski kalktı;
-> parametre açılırken uyarı artık tercihi açık kişileri sayar. Kurtarma akışı yoktur
-> (R-27). Kod altyapısı tek kalır (§3).
+> parametre açılırken uyarı artık tercihi açık kişileri sayar. Kodu alamayan kişinin
+> 2FA'sını İK gerekçe girerek kapatır (R-27). Kod altyapısı tek kalır (§3).
 ### 8. Oturum yönetimi
 
 | Konu | Karar |
