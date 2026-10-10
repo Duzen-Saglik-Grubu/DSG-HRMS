@@ -1,3 +1,4 @@
+using System.Globalization;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Notifications;
@@ -137,26 +138,30 @@ public sealed class VerificationCodeServiceTests
     }
 
     [Fact]
-    public async Task Fourth_code_within_fifteen_minutes_is_rate_limited()
+    public async Task Code_over_the_limit_within_fifteen_minutes_is_rate_limited()
     {
-        // SYG-KMLK-059, PRM-KML-17: kisi basina 15 dakikada 3 kod; kanal degisimi de sayilir.
+        // SYG-KMLK-059, PRM-KML-17: kisi basina 15 dakikada parametredeki sayi kadar kod
+        // (varsayilan 10, #185); kanal degisimi de sayilir.
+        var limit = int.Parse(ParameterCatalog.CodeSendLimit.DefaultValue!, CultureInfo.InvariantCulture);
         var service = CreateService();
-        await service.IssueAsync(Email(), CancellationToken.None);
-        await service.IssueAsync(Sms(), CancellationToken.None);
-        await service.IssueAsync(Email(), CancellationToken.None);
+        for (var i = 0; i < limit; i++)
+        {
+            (await service.IssueAsync(i % 2 == 0 ? Email() : Sms(), CancellationToken.None)).IsRateLimited.ShouldBeFalse();
+        }
 
-        var fourth = await service.IssueAsync(Sms(), CancellationToken.None);
+        var overLimit = await service.IssueAsync(Sms(), CancellationToken.None);
 
-        fourth.ShouldBe(IssueResult.RateLimited);
-        _sent.Count.ShouldBe(3);
-        _store.Codes.Count.ShouldBe(3);
+        overLimit.ShouldBe(IssueResult.RateLimited);
+        _sent.Count.ShouldBe(limit);
+        _store.Codes.Count.ShouldBe(limit);
     }
 
     [Fact]
     public async Task Rate_limit_is_per_person()
     {
+        var limit = int.Parse(ParameterCatalog.CodeSendLimit.DefaultValue!, CultureInfo.InvariantCulture);
         var service = CreateService();
-        for (var i = 0; i < 3; i++)
+        for (var i = 0; i < limit; i++)
         {
             await service.IssueAsync(Email(personId: 1), CancellationToken.None);
         }

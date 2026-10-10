@@ -131,11 +131,11 @@ public static partial class ParameterCatalog
 
     /// <summary>Kod gonderim siniri (kisi basina / 15 dakika).</summary>
     public static readonly ParameterDefinition CodeSendLimit = Integer(
-        "PRM-KML-17", "CodeSendLimit", "Kod gonderim siniri (kisi basina / 15 dakika)", 3, 1, 10);
+        "PRM-KML-17", "CodeSendLimit", "Kod gonderim siniri (kisi basina / 15 dakika)", 10, 1, 15);
 
     /// <summary>Uyelik deneme siniri (TCKN basina / saat).</summary>
     public static readonly ParameterDefinition RegistrationLimitPerNationalId = Integer(
-        "PRM-KML-18", "RegistrationLimitPerNationalId", "Uyelik deneme siniri (TCKN basina / saat)", 5, 3, 20);
+        "PRM-KML-18", "RegistrationLimitPerNationalId", "Uyelik deneme siniri (TCKN basina / saat)", 10, 3, 20);
 
     /// <summary>Uyelik deneme siniri (IP basina / saat).</summary>
     public static readonly ParameterDefinition RegistrationLimitPerIp = Integer(
