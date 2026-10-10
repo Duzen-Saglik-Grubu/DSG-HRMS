@@ -34,7 +34,7 @@ T3'ün, İK'nın 23.09.2026'da onayladığı gereksinimleri **gerçek kullanımd
 | | |
 |---|---|
 | Ortam | UAT — https://insankaynaklaritest.duzen.com.tr (gerçek LOGO verisi, `KR-024`) |
-| Sürüm | **`v0.2.0-rc.2`** (commit `69bafad`), UAT'ye 04.10.2026'da kuruldu; `v0.2.0-rc.1`'in yerine; #138 düzeltmesini içerir (#160). Dağıtım kaydı: `TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`. Oturumdan önce çalışan sürüm yeniden doğrulanır; forma etiket yazılır |
+| Sürüm | **`v0.2.0-rc.3`**: `v0.2.0-rc.2`'nin yerine; deneme ve kod gönderim sınırlarının yeni varsayılanlarını içerir (#185, §6.1 T-03). Dağıtım kaydı: `TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`. Oturumdan önce çalışan sürüm yeniden doğrulanır; forma etiket yazılır |
 | İletiler | UAT izin listesi kipinde (`AllowList`, `KR-083`): yalnızca listedeki adreslere ve numaralara e-posta ve SMS gider. **Katılımcıların kurumsal e-postaları ve cep telefonları oturumdan önce listeye eklenir** (`NOTIFICATIONS_ALLOWED_RECIPIENTS`), oturumdan sonra çıkarılır |
 | Cihazlar | Masaüstü tarayıcı + en az bir cep telefonu (REQ-KMLK-044) |
 | Süre | Yaklaşık 2 saat (senaryolar 75 dk, kanıt gösterimi 30 dk, değerlendirme 15 dk) |
@@ -47,7 +47,7 @@ Kabul oturumu ancak aşağıdakilerin tamamı sağlanınca yapılır:
 
 - [x] **G2 "Geliştirme tamam"** kapısı geçti (T3 doğrulama raporu §5; 04.10.2026)
 - [x] **SYG-KMLK-064 metin incelemesi** kararı verildi ve onaylanan düzeltmeler uygulandı (04.10.2026, #152)
-- [x] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (`v0.2.0-rc.2`, commit `69bafad`, 04.10.2026; #160). Önceki aday `v0.2.0-rc.1` 04.10.2026'da kurulmuştu (#157); #138 düzeltmesini içermediği için yerine rc.2 geldi
+- [ ] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (`v0.2.0-rc.3`, #185). Önceki adaylar: `v0.2.0-rc.1` (#157) ve `v0.2.0-rc.2` (#160)
 - [ ] Katılımcılar İK tarafından belirlendi; adresleri ve numaraları UAT izin listesine eklendi
 - [ ] Katılımcılara kısa kullanım notu verildi (`T3-kullanim-notu.md`, #154)
 - [ ] Bilinen açık `[HATA]` kaydı yok veya her biri kabul öncesinde İK'ya bildirildi
@@ -231,6 +231,7 @@ ele alınır.
 |---|---|---|---|---|
 | T-01 | Hareketsizlik neye göre sayılır? | 30 dakikalık hareketsizlik süresi, kişinin açık sekmede **tıklama, tuşa basma, kaydırma veya dokunma** yapmadığı süredir. Sekmede video oynarken de kişi etkin sayılır. Fareyi yalnızca gezdirmek, başka bir sekmede veya programda çalışmak etkinlik sayılmaz. | KS-07 | REQ-KMLK-054; AN-23, `KR-087` |
 | T-02 | Parola değişimi açılırsa kimleri, ne sıklıkla etkiler? | Şu anda ikisi de **kapalı**. (1) Periyodik değişim açılırsa süre 90 gündür; 30 ile 365 gün arasında ayarlanabilir. (2) İlk girişte değişim açılırsa, sisteme hiç giriş yapmamış **herkes** ilk girişinde parolasını değiştirir; üyelikte parolasını kendisi belirleyenler de buna dahildir. Kural açılmadan önce giriş yapmış olanlar etkilenmez. (3) Parolasını değiştirmesi gereken kişi, değiştirene kadar sistemin başka bir ekranını kullanamaz. | KS-08, KS-10 | REQ-KMLK-030, 055; AN-24, `KR-092` |
+| T-03 | Üyelikte deneme ve kod gönderim sınırları | Onaylı gereksinimde TCKN başına saatte 5 üyelik denemesi ve 15 dakikada 3 kod vardı. UAT'de İK ile yapılan denemelerde sistem çok çabuk engelledi; iki varsayılan da **10** yapıldı. Kod gönderim sınırı Sistem Yönetimi ekranından 1–15, üyelik deneme sınırı 3–20 arasında ayarlanabilir. **Bu bir değişiklik talebidir; İK'nın kabulü gerekir.** | KS-01, KS-02, KS-05 | REQ-KMLK-038, 039; değişiklik talebi #185 |
 
 ---
 
@@ -280,3 +281,4 @@ Kabul kararından önce düzeltilmesi gerekenler İK ile birlikte belirlenir.
 | 2026-10-04 | 0.6 | §3, §4: `v0.2.0-rc.2` UAT'ye kuruldu (#160) | Bilgi İşlem |
 | 2026-10-04 | 0.7 | §6.1: İK'nın teyit edeceği yorumlar T-01 (AN-23) ve T-02 (AN-24) (#135) | Bilgi İşlem |
 | 2026-10-04 | 0.8 | KS-04 notu: kalan risk R-19 olarak kayıtlı, kabul yetkisi (#126) | Bilgi İşlem |
+| 2026-10-10 | 0.9 | §6.1: T-03 — deneme ve kod gönderim sınırlarındaki değişiklik talebi (#185) İK teyidine; §3, §4 kabul adayı `v0.2.0-rc.3` | Bilgi İşlem |

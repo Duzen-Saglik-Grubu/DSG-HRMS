@@ -1,8 +1,10 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using Dsg.Hrms.Api.IntegrationTests.Settings;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Notifications;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Infrastructure.Data;
@@ -131,9 +133,13 @@ public sealed class VerificationCodeStoreTests : IAsyncLifetime
     [Fact]
     public async Task Rate_limit_window_slides_after_fifteen_minutes()
     {
-        await IssueAsync();
-        await IssueAsync(VerificationChannel.Sms);
-        await IssueAsync();
+        // PRM-KML-17 varsayilani kadar kod (#185); kanal degisimi de sayilir.
+        var limit = int.Parse(ParameterCatalog.CodeSendLimit.DefaultValue!, CultureInfo.InvariantCulture);
+        for (var i = 0; i < limit; i++)
+        {
+            (await IssueAsync(i % 2 == 0 ? VerificationChannel.Email : VerificationChannel.Sms)).IsRateLimited.ShouldBeFalse();
+        }
+
         (await IssueAsync()).IsRateLimited.ShouldBeTrue();
 
         _now += VerificationCodeService.RateLimitWindow + TimeSpan.FromSeconds(1);

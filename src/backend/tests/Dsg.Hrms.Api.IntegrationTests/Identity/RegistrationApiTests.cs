@@ -1,5 +1,7 @@
+using System.Globalization;
 using System.Net;
 using System.Text.Json;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Notifications;
@@ -253,10 +255,12 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
     [Theory]
     [InlineData(1)]
     [InlineData(99)]
-    public async Task Sixth_attempt_per_national_id_within_an_hour_is_rejected(int index)
+    public async Task Attempt_over_the_national_id_limit_within_an_hour_is_rejected(int index)
     {
+        // PRM-KML-18 varsayilani kadar deneme (#185).
+        var limit = int.Parse(ParameterCatalog.RegistrationLimitPerNationalId.DefaultValue!, CultureInfo.InvariantCulture);
         using var client = _fixture.CreateClient();
-        for (var i = 0; i < 5; i++)
+        for (var i = 0; i < limit; i++)
         {
             await StartAsync(client, Start(index));
         }
@@ -290,12 +294,14 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
     [Theory]
     [InlineData(1)]
     [InlineData(99)]
-    public async Task Fourth_code_request_within_fifteen_minutes_is_rejected_for_match_and_non_match(int index)
+    public async Task Code_request_over_the_limit_within_fifteen_minutes_is_rejected_for_match_and_non_match(int index)
     {
+        // PRM-KML-17 varsayilani kadar kod istegi (#185).
+        var limit = int.Parse(ParameterCatalog.CodeSendLimit.DefaultValue!, CultureInfo.InvariantCulture);
         using var client = _fixture.CreateClient();
         var id = await StartAsync(client, Start(index));
 
-        for (var i = 0; i < 3; i++)
+        for (var i = 0; i < limit; i++)
         {
             (await client.PostJsonAsync($"{Base}/{id}/code", new { channel = "email" })).Status.ShouldBe(HttpStatusCode.OK);
         }

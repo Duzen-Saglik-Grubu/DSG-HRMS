@@ -17,6 +17,16 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ---
 
+## [0.2.0-rc.3] — 2026-10-10 · T3 Kimlik Yönetimi kabul adayı (3)
+
+`v0.2.0-rc.2`'nin yerine İK kabulüne sunulan sürüm.
+
+### Değiştirildi
+- Kod gönderim sınırının (PRM-KML-17, kişi başına / 15 dakika) varsayılanı 3 → **10**, ayarlanabilir aralık 1–10 → **1–15**; üyelik deneme sınırının (PRM-KML-18, TCKN başına / saat) varsayılanı 5 → **10**. UAT'de İK ile yapılan üyelik denemelerinde sınırlar çok çabuk engelliyordu. Onaylı gereksinimlerde (REQ-KMLK-038, 039) değişiklik talebidir; İK teyidi kabulde (#185)
+- Ekran testlerinde yavaş CI makinesi için süre payı (#182)
+
+---
+
 ## [0.2.0-rc.2] — 2026-10-04 · T3 Kimlik Yönetimi kabul adayı (2)
 
 `v0.2.0-rc.1`'in yerine İK kabulüne sunulan sürüm (#160).
@@ -80,6 +90,6 @@ Modül başına bir MINOR sürüm (`KR-097`). Numaralar kabul sırasına göre v
 | Sürüm | İçerik | Durum |
 |---|---|---|
 | `v0.1.0` | Teknik iskelet (A1) | Etiketlendi (geriye dönük) |
-| `v0.2.0` | T3 Kimlik Yönetimi — ilk kullanıcı teslimi | Kabul adayı: `v0.2.0-rc.2` |
+| `v0.2.0` | T3 Kimlik Yönetimi — ilk kullanıcı teslimi | Kabul adayı: `v0.2.0-rc.3` |
 | `v0.3.0` … | A2'nin kalan modülleri (T1, T2, T4, T5), ardından yatay altyapı (A3) ve iş modülleri (A4+); her biri kabul edildiğinde | Planlandı |
 | `v1.0.0` | Üretime geçiş (AS) | Planlandı |

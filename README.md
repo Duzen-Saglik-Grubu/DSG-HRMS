@@ -12,7 +12,7 @@ Proje **TS ISO/IEC TS 33061 Seviye 2** çerçevesinde yürütülmektedir.
 | | |
 |---|---|
 | **Aşama** | A1 tamamlandı → A2 — Temel Modüller |
-| **Sürüm** | `v0.2.0-rc.2` — T3 Kimlik Yönetimi kabul adayı ([CHANGELOG](CHANGELOG.md)) |
+| **Sürüm** | `v0.2.0-rc.3` — T3 Kimlik Yönetimi kabul adayı ([CHANGELOG](CHANGELOG.md)) |
 | **Kapsam** | 35 modül (5 Temel · 10 Yatay · 20 İş) |
 
 ---
