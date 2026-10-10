@@ -2,15 +2,16 @@
 
 **Belge kimliği:** MAN.1-PP
 **Süreç:** MAN.1 — Proje Planlama
-**Sürüm:** 0.3 (revizyon — üst yönetim onayı bekliyor)
-**Son güncelleme:** 2026-10-06
+**Sürüm:** 0.3 — **onaylandı** (Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026)
+**Son güncelleme:** 2026-10-10
 **Plan sahibi:** Bilgi İşlem Birim Sorumlusu
 **33061 karşılığı:** *Project objectives*, *Project constraints*, *Project plan*,
 *Project infrastructure needs*, *Project human resources needs*
 
-> **Onay durumu:** Bu plan, üst yönetim tarafından onaylanmadan yürürlüğe girmez
-> (33061 MAN.1.BP3 — *"Obtain approval for the project"*). Onay sonrası değişiklikler
-> plan revizyonu olarak `kayitlar/` altında kayda geçirilir.
+> **Onay durumu:** Plan 0.3, RACI 0.2 ve iş kırılım yapısı 0.4 Üst Yönetim tarafından
+> **onaylandı** (Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026; `KR-103`, kayıt: `kayitlar/2026-10-06-plan-ve-raci-onay-talebi.md`
+> 1.1). Bu tarihten sonraki değişiklikler plan revizyonu olarak `kayitlar/` altında kayda
+> geçirilir; kapsam ve takvimi değiştiren revizyonlar yeniden Üst Yönetim onayına sunulur.
 
 ---
 
@@ -277,13 +278,13 @@ MAN.2 kapsamında yürütülür.
 
 | # | İş | Sorumlu |
 |---|---|---|
-| 1 | Planın üst yönetim tarafından onaylanması (MAN.1.BP3) | Üst Yönetim |
-| 2 | B2 — Yeni PostgreSQL sunucusunun sağlanması | Bilgi İşlem |
+| 1 | ~~Planın üst yönetim tarafından onaylanması (MAN.1.BP3)~~ ✅ 09.10.2026 (`KR-103`) | Üst Yönetim |
+| 2 | B2 — Yeni PostgreSQL sunucusunun sağlanması. **Üst Yönetim kararı (09.10.2026):** kaynak ayrıldı; mevcut kaynaklar kullanılacak, yeni sistem için güncel bir PostgreSQL kurulacak. Hedef tarih belirlenmedi | Bilgi İşlem |
 | 3 | ~~B3 — UAT ortamı~~ (✅ 16.09.2026); B4 — üretim ortamının kurulması | Bilgi İşlem |
 | 4 | B5 — NAS yedekleme düzeninin teyidi | Bilgi İşlem |
 | 5 | ~~B8 — GitHub kurulumu~~ (✅; dal koruma yerine telafi kontrolleri, `KR-055`) | Bilgi İşlem |
 | 6 | B9 — Yedekleme ve geri yükleme düzeninin tanımlanması (RPO/RTO) | Bilgi İşlem |
-| 7 | Başarı ölçütlerinin (§1) üst yönetimle teyidi | Bilgi İşlem |
+| 7 | ~~Başarı ölçütlerinin (§1) üst yönetimle teyidi~~ ✅ 09.10.2026: hepsi değişiklik olmadan onaylandı | Bilgi İşlem |
 
 ---
 
@@ -294,3 +295,4 @@ MAN.2 kapsamında yürütülür.
 | 2026-09-07 | 0.1 | İlk taslak | Bilgi İşlem |
 | 2026-10-04 | 0.2 | §3 aşama tablosu: modül başına sürüm (`KR-097`, #125) | Bilgi İşlem |
 | 2026-10-06 | 0.3 | **Plan revizyonu (#127):** başlıktaki sürüm (0.1 kalmıştı) geçmişle eşitlendi; §3 çevrim adımları SYG ve kabul adayı etiketi; §5.2 gerçekleşen sıra ve T3'ün öne alınması (`KR-040`, `KR-077`); §6.2 ortamlar (UAT kuruldu, gerçek veri); §6.3 B2, B3, B8, B9; §8–§9 durum raporu sıklığı (`KR-101`); §11 durumlar. Üst Yönetim onayına sunuldu | Bilgi İşlem |
+| 2026-10-10 | 0.3 | Üst Yönetim onayı işlendi (Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026; `KR-103`, #127). İçerik değişmedi; başlık ve §11 | Bilgi İşlem |

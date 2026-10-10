@@ -2,7 +2,8 @@
 
 **Belge kimliği:** MAN.1-RS
 **Süreç:** MAN.1 — Proje Planlama
-**Son güncelleme:** 2026-10-06
+**Son güncelleme:** 2026-10-10
+**Onay:** Sürüm 0.2 onaylandı (Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026; `KR-103`)
 **33061 karşılığı:** *Roles, responsibilities, accountabilities, and authorities*
 **Karşıladığı öznitelik maddeleri:** PA 2.1 (d) sorumluluk ve yetki tanımı, PA 2.1 (f) yetkinlik
 
@@ -196,3 +197,4 @@ gizlemediği bir gerçektir ve üst yönetime raporlanan bir konudur.
 |---|---|---|---|
 | 2026-09-07 | 0.1 | İlk oluşturma — roller, RACI, yetkinlik yönetimi | Bilgi İşlem |
 | 2026-10-06 | 0.2 | §4.1 yetkinlik tablosu T3'e göre güncellendi; §5 dal koruma satırı gerçeğe göre düzeltildi. Üst Yönetim onayına sunuldu (#127) | Bilgi İşlem |
+| 2026-10-10 | 0.2 | Üst Yönetim onayı işlendi (`KR-103`, #127) | Bilgi İşlem |

@@ -62,6 +62,7 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 | BK-23 | T3 İK inceleme seti | `Masaüstü\HRMS\T3_Kabul_IK_Inceleme\` | Bilgi İşlem | Kurum içi | Kabul kararına kadar | Asılları depodadır; kabulden sonra silinebilir |
 | BK-24 | İmzalı kabul formları (taranmış) | **Belirlenecek** (kurum içi güvenli konum; TEC.11 YAKLASIM §6) | İK | Kurum içi: ad ve imza | **Öneri:** Sistemin ömrü boyunca (belgelendirme kanıtı) | — |
 | BK-25 | Geliştirme yardımcısıyla yazışma arşivi | Geliştirici makinesi, `claude/` (`.gitignore`'da) | Bilgi İşlem | **Gizli**: kararların ve onayların ham kaydı; parolalar 05.10.2026'da temizlendi | **Öneri:** Kararlar karar defterine, onaylar onay kaydına aktarıldıktan sonra arşiv olarak | Parolalar 05.10.2026'da temizlendi (Ö-1). Arşive yeni parola yazılmaz |
+| BK-26 | Üst Yönetim onay formu (doldurulmuş) ve onay seti | `Masaüstü\HRMS\Ust_Yonetim_Onay_Seti_2026-10\` | Bilgi İşlem | Kurum içi: ad, unvan | Sistemin ömrü boyunca (belgelendirme kanıtı) | — ; kalıcı saklama konumu Ö-3 ile birlikte belirlenecek |
 
 ## 5. Açık işler
 
@@ -77,3 +78,4 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#131) | Bilgi İşlem |
 | 2026-10-06 | 1.1 | Ö-1 kapandı; BK-25 güncellendi (#177) | Bilgi İşlem |
+| 2026-10-10 | 1.2 | BK-26: Üst Yönetim onay formu (#127) | Bilgi İşlem |

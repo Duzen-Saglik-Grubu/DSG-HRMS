@@ -5,6 +5,7 @@
 **Sunan:** Bilgi İşlem · **Onaylayacak:** Üst Yönetim
 **Dayanak:** Proje durum raporu 1 (`MAN.2-proje-degerlendirme-ve-kontrol/raporlar/2026-10-06-durum-raporu.md`) §5
 **Tarih:** 2026-10-06 · **Kaynak:** #127
+**Sonuç:** **Onaylandı** — Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026 (§4)
 
 > Bu form doldurulup imzalandıktan sonra taranır. Taranmış nüsha depo dışında saklanır ve
 > bilgi kayıt defterine yazılır. Kararlar bu belgenin bir sonraki sürümüne ve karar
@@ -79,15 +80,35 @@ Mevcut İK sisteminin veritabanının (PostgreSQL 14) üretici desteği Kasım 2
 
 Değiştirilmesi istenen ölçüt: ……………………………………………………………
 
-## 3. İmza
+## 3. İmza (talep hâli)
 
 | | Ad soyad | Unvan | Tarih | İmza |
 |---|---|---|---|---|
 | Onaylayan (Üst Yönetim) | | | | |
 | Sunan (Bilgi İşlem) | Doğuş Uçanok | | | |
 
+## 4. Üst Yönetim kararları (09.10.2026)
+
+Form, Üst Yönetim'e Word belgesi olarak gönderildi ve doldurulmuş hâli Bilgi İşlem'e geri
+iletildi. Formdaki imza hücreleri boş; onay, formu dolduran ve ad, unvan ve tarih yazan
+onaylayan tarafından bildirildi. Doldurulmuş form: `Masaüstü\HRMS\Ust_Yonetim_Onay_Seti_2026-10\02_Onay_Formu.docx`
+(bilgi kayıt defteri BK-26).
+
+| Karar | Sonuç | Not |
+|---|---|---|
+| 1 — Plan 0.3, RACI 0.2, iş kırılım yapısı 0.4 | ✅ **Onaylandı** | — |
+| 2 — R-25 risk kabulü | ✅ **Kabul edildi** | — |
+| 3 — Üretim altyapısı | ✅ **Kaynak ayrıldı** | "Mevcut kaynaklardan kullanılacak. Yeni İnsan Kaynakları Yönetim Sistemi için güncel bir PostgreSQL kurulacak." Hedef tarih yazılmadı |
+| 4 — Başarı ölçütleri | ✅ **Hepsi onaylandı** | Değiştirilmesi istenen ölçüt yok |
+
+| | Ad soyad | Unvan | Tarih |
+|---|---|---|---|
+| Onaylayan (Üst Yönetim) | Elvan Laleli Şahin | Yönetim Kurulu Üyesi | 09.10.2026 |
+| Sunan (Bilgi İşlem) | Doğuş Uçanok | Bilgi İşlem Birim Sorumlusu | 09.10.2026 |
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-06 | 1.0 | Onay talebi hazırlandı (#127) | Bilgi İşlem |
+| 2026-10-10 | 1.1 | Üst Yönetim kararları işlendi: dört karar da onaylandı (Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026; `KR-103`) | Bilgi İşlem |

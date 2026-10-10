@@ -2,7 +2,8 @@
 
 **Belge kimliği:** MAN.1-WBS
 **Süreç:** MAN.1 — Proje Planlama
-**Son güncelleme:** 2026-09-17
+**Son güncelleme:** 2026-10-10
+**Onay:** Sürüm 0.4 onaylandı (Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026; `KR-103`)
 **33061 karşılığı:** *Work breakdown structure*
 
 > **Kullanım:** Bu belge işin **yapısını** tanımlar; **durumunu** değil. Görevlerin
@@ -313,3 +314,4 @@ Bu kural, aşağıdaki üç yanlışı birden engeller:
 | 2026-09-17 | 0.2 | Modül başlangıç koşulu eklendi: her modül kendi İK gereksinim toplantısıyla başlar (`KR-068`) | Bilgi İşlem |
 | 2026-09-18 | 0.3 | §5 milestone eşlemesi tamamlandı ve atama kuralı yazıldı; WBS 7 için `SK` milestone'u açıldı (BULGU-08) | Bilgi İşlem |
 | 2026-10-06 | 0.4 | §4 kritik yol gerçekleşen sıraya göre: T3 önce, T1 çekirdeği T3 içinde (`KR-040`, `KR-077`, #127) | Bilgi İşlem |
+| 2026-10-10 | 0.4 | Üst Yönetim onayı işlendi (`KR-103`, #127) | Bilgi İşlem |
