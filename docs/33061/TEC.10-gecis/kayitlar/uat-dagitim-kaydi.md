@@ -18,3 +18,4 @@ doğrulama geçtikten sonra ekler; satır PR ile commit edilir. Aynı bilgi sunu
 |---|---|---|---|
 | 2026-10-04T18:47:00Z | v0.2.0-rc.1 | `6cfeef0` | Doğuş Uçanok |
 | 2026-10-04T20:04:34Z | v0.2.0-rc.2 | `69bafad` | Doğuş Uçanok |
+| 2026-10-10T13:02:28Z | v0.2.0-rc.3 | `fa3e194` | Doğuş Uçanok |
