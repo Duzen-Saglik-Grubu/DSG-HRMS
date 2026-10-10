@@ -47,7 +47,7 @@ Kabul oturumu ancak aşağıdakilerin tamamı sağlanınca yapılır:
 
 - [x] **G2 "Geliştirme tamam"** kapısı geçti (T3 doğrulama raporu §5; 04.10.2026)
 - [x] **SYG-KMLK-064 metin incelemesi** kararı verildi ve onaylanan düzeltmeler uygulandı (04.10.2026, #152)
-- [ ] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (`v0.2.0-rc.4`, #190). Önceki adaylar: `v0.2.0-rc.1` (#157), `v0.2.0-rc.2` (#160) ve `v0.2.0-rc.3` (#185)
+- [x] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (`v0.2.0-rc.4`, #190; kurulum 11.10.2026 00:56, `353eae7`). Önceki adaylar: `v0.2.0-rc.1` (#157), `v0.2.0-rc.2` (#160) ve `v0.2.0-rc.3` (#185)
 - [ ] Katılımcılar İK tarafından belirlendi; adresleri ve numaraları UAT izin listesine eklendi
 - [ ] Katılımcılara kısa kullanım notu verildi (`T3-kullanim-notu.md`, #154)
 - [ ] Bilinen açık `[HATA]` kaydı yok veya her biri kabul öncesinde İK'ya bildirildi
@@ -288,3 +288,4 @@ Kabul kararından önce düzeltilmesi gerekenler İK ile birlikte belirlenir.
 | 2026-10-10 | 0.10 | §6.1 T-03: İK onayı alındı (#187) | Bilgi İşlem |
 | 2026-10-10 | 0.11 | KS-09 adım 4 (İK'nın 2FA kapatması), KS-10 adım 4 ve KG-07 kullanıcı tercihine bağlı 2FA'ya göre; §6.1 T-04; §3, §4 kabul adayı `v0.2.0-rc.4` (#190) | Bilgi İşlem |
 | 2026-10-11 | 0.12 | §6.1 T-04: kurtarma işlemi için İK onayı (10.10.2026) kayda geçti (Doğuş Uçanok bildirdi, #190) | Bilgi İşlem |
+| 2026-10-11 | 0.13 | §4: kabul adayı `v0.2.0-rc.4` etiketlendi ve UAT'ye kuruldu (#192) | Bilgi İşlem |
