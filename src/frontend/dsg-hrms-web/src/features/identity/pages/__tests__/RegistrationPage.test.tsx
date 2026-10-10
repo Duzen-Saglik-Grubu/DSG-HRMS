@@ -59,6 +59,7 @@ describe('RegistrationPage', () => {
       passwordRules: { minLength: 6, maxLength: 128, requireComplexity: false },
       verificationCodeLength: 6,
       logoVersion: null,
+      twoFactorAvailable: false,
     });
     vi.spyOn(registrationApi, 'start').mockResolvedValue({
       registrationId: 'r-1',

@@ -41,11 +41,15 @@ const STATE_COLOR: Record<AccountState, 'default' | 'success' | 'warning' | 'err
   locked: 'warning',
 };
 
-type Action = { kind: 'deactivate' | 'activate' | 'invite'; account: AccountSummary };
+type Action = {
+  kind: 'deactivate' | 'activate' | 'invite' | 'resetTwoFactor';
+  account: AccountSummary;
+};
 
 /**
- * IK hesap islemleri (SYG-KMLK-057, 073): kisiyi sicil, ad veya soyadla arama, hesap durumunu
- * gorme, hesabi gerekceyle pasife alma ve yeniden aktiflestirme.
+ * IK hesap islemleri (SYG-KMLK-057, 073, 081): kisiyi sicil, ad veya soyadla arama, hesap
+ * durumunu gorme, hesabi gerekceyle pasife alma ve yeniden aktiflestirme, kodu alamayan
+ * kisinin iki adimli dogrulamasini gerekceyle kapatma.
  *
  * Ekran kisisel veri olarak yalnizca ad, soyad, sicil ve firma gosterir. Dugmeler izne gore
  * gorunur; asil denetim sunucudadir.
@@ -122,6 +126,9 @@ export function AccountsPage() {
               {t(`identity.accounts.reason.${row.statusReason}`)}
             </Typography>
           ) : null}
+          {row.state !== 'none' && row.twoFactorEnabled ? (
+            <Chip size="small" variant="outlined" label={t('identity.accounts.twoFactorOn')} />
+          ) : null}
         </Stack>
       ),
     },
@@ -140,6 +147,15 @@ export function AccountsPage() {
             </PermissionGate>
           ) : null}
           <PermissionGate permission={permissions.accountUpdate}>
+            {row.state !== 'none' && row.twoFactorEnabled && !row.isCurrentUser ? (
+              // Kendi tercihini kisi Hesap guvenligi ekranindan parolasiyla kapatir; sunucu da reddeder.
+              <Button
+                size="small"
+                onClick={() => setAction({ kind: 'resetTwoFactor', account: row })}
+              >
+                {t('identity.accounts.resetTwoFactor')}
+              </Button>
+            ) : null}
             {row.state === 'passive' ? (
               <Button size="small" onClick={() => setAction({ kind: 'activate', account: row })}>
                 {t('identity.accounts.activate')}
@@ -255,8 +271,8 @@ interface StatusDialogProps {
 }
 
 /**
- * Pasife alma, aktiflestirme ve davet baglantisi. Gerekce zorunludur ve denetim izine yazilir
- * (SYG-KMLK-053, 057).
+ * Pasife alma, aktiflestirme, davet baglantisi ve iki adimli dogrulamayi kapatma. Gerekce
+ * zorunludur ve denetim izine yazilir (SYG-KMLK-053, 057, 081).
  */
 function StatusDialog({ action, onClose, onDone }: StatusDialogProps) {
   const { t } = useTranslation();
@@ -272,9 +288,12 @@ function StatusDialog({ action, onClose, onDone }: StatusDialogProps) {
         return (await invitationApi.send(action.account.personId, reason.trim())).expiresAt;
       }
 
-      await (key === 'deactivate'
-        ? accountsApi.deactivate(action.account.personId, reason.trim())
-        : accountsApi.activate(action.account.personId, reason.trim()));
+      const send = {
+        deactivate: accountsApi.deactivate,
+        activate: accountsApi.activate,
+        resetTwoFactor: accountsApi.resetTwoFactor,
+      }[key];
+      await send(action.account.personId, reason.trim());
       return undefined;
     },
     onSuccess: async (expiresAt) => {

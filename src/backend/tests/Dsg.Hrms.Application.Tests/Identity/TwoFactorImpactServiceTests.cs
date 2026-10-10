@@ -6,44 +6,56 @@ using NSubstitute;
 
 namespace Dsg.Hrms.Application.Tests.Identity;
 
-/// <summary>2FA acilmadan once etki uyarisi (SYG-KMLK-035).</summary>
+/// <summary>2FA acilmadan once etki uyarisi (SYG-KMLK-035, 080).</summary>
 public sealed class TwoFactorImpactServiceTests
 {
     private readonly ITwoFactorImpactStore _store = Substitute.For<ITwoFactorImpactStore>();
 
     private TwoFactorImpactService Service(FakeSystemParameters parameters) => new(_store, parameters);
 
-    [Theory]
-    [InlineData("email,sms", true, true)]
-    [InlineData("sms", false, true)]
-    [InlineData("email", true, false)]
-    public async Task Channels_are_counted_with_the_same_rule_as_sign_in(string channels, bool email, bool sms)
+    [Fact]
+    public async Task Impact_is_the_number_of_active_accounts_with_their_own_preference_on()
     {
-        _store.CountWithoutChannelAsync(email, sms, Arg.Any<CancellationToken>()).Returns(2);
+        // SYG-KMLK-080: parametre acilinca yalnizca kendi tercihi acik olanlardan kod istenir.
+        _store.CountWithTwoFactorPreferenceAsync(Arg.Any<CancellationToken>()).Returns(2);
 
-        var impact = await Service(new FakeSystemParameters().With(ParameterCatalog.VerificationChannels, channels))
-            .EvaluateAsync(CancellationToken.None);
+        var impact = await Service(new FakeSystemParameters()).EvaluateAsync(CancellationToken.None);
 
         impact.AffectedCount.ShouldBe(2);
         impact.ConfirmationRequired.ShouldBeTrue();
     }
 
     [Fact]
+    public async Task No_confirmation_is_required_when_nobody_is_affected()
+    {
+        _store.CountWithTwoFactorPreferenceAsync(Arg.Any<CancellationToken>()).Returns(0);
+        var service = Service(new FakeSystemParameters());
+
+        var impact = await service.EvaluateAsync(CancellationToken.None);
+
+        impact.AffectedCount.ShouldBe(0);
+        impact.ConfirmationRequired.ShouldBeFalse();
+        await service.EnsureConfirmedAsync(ParameterCatalog.TwoFactorEnabled.Key, "true", confirmed: false, CancellationToken.None);
+    }
+
+    [Fact]
     public async Task Enabling_without_confirmation_is_refused_with_the_count()
     {
-        _store.CountWithoutChannelAsync(Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(3);
+        _store.CountWithTwoFactorPreferenceAsync(Arg.Any<CancellationToken>()).Returns(3);
         var service = Service(new FakeSystemParameters());
 
         var error = await Should.ThrowAsync<BusinessRuleException>(() =>
             service.EnsureConfirmedAsync(ParameterCatalog.TwoFactorEnabled.Key, "TRUE", confirmed: false, CancellationToken.None));
 
-        error.Message.ShouldContain("3 aktif hesap sahibi");
+        error.Message.ShouldContain("açmış 3 kişi");
+        error.Message.ShouldContain("girişte kod girecek");
         await service.EnsureConfirmedAsync(ParameterCatalog.TwoFactorEnabled.Key, "true", confirmed: true, CancellationToken.None);
     }
 
     [Fact]
     public async Task Other_changes_need_no_confirmation()
     {
+        _store.CountWithTwoFactorPreferenceAsync(Arg.Any<CancellationToken>()).Returns(1);
         var service = Service(new FakeSystemParameters());
 
         await service.EnsureConfirmedAsync(ParameterCatalog.TwoFactorEnabled.Key, "false", confirmed: false, CancellationToken.None);
@@ -55,7 +67,9 @@ public sealed class TwoFactorImpactServiceTests
         // Zaten aciksa degisiklik yoktur; uyari kapaliysa onay istenmez.
         await Service(new FakeSystemParameters().With(ParameterCatalog.TwoFactorEnabled, "true"))
             .EnsureConfirmedAsync(ParameterCatalog.TwoFactorEnabled.Key, "true", confirmed: false, CancellationToken.None);
-        await Service(new FakeSystemParameters().With(ParameterCatalog.TwoFactorImpactWarning, "false"))
-            .EnsureConfirmedAsync(ParameterCatalog.TwoFactorEnabled.Key, "true", confirmed: false, CancellationToken.None);
+
+        var withoutWarning = Service(new FakeSystemParameters().With(ParameterCatalog.TwoFactorImpactWarning, "false"));
+        (await withoutWarning.EvaluateAsync(CancellationToken.None)).ConfirmationRequired.ShouldBeFalse();
+        await withoutWarning.EnsureConfirmedAsync(ParameterCatalog.TwoFactorEnabled.Key, "true", confirmed: false, CancellationToken.None);
     }
 }

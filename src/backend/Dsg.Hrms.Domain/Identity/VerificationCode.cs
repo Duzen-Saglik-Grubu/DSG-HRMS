@@ -176,6 +176,9 @@ public enum VerificationPurpose
 
     /// <summary>Iki adimli dogrulama (SYG-KMLK-034).</summary>
     TwoFactor = 3,
+
+    /// <summary>Kullanicinin kendi iki adimli dogrulamasini acmasi (SYG-KMLK-080).</summary>
+    TwoFactorSetup = 4,
 }
 
 /// <summary>Kodun gonderildigi kanal.</summary>

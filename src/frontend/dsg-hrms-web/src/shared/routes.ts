@@ -11,6 +11,7 @@ export const routes = {
   register: '/register',
   forgotPassword: '/forgot-password',
   changePassword: '/account/password',
+  accountSecurity: '/account/security',
   accounts: '/accounts',
   invite: '/invite',
   parameters: '/system/parameters',

@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client';
+import { fetchPublicSettings, type PublicSettings } from '@/shared/api/publicSettings';
 import type { ApiSchemas } from '@/shared/api/schemas';
 
 export type VerificationChannel = ApiSchemas['VerificationChannelKind'];
@@ -6,15 +7,7 @@ export type VerificationOutcome = ApiSchemas['VerificationOutcome'];
 export type RegistrationStarted = ApiSchemas['RegistrationStartedResponse'];
 export type CodeRequested = ApiSchemas['CodeRequestedResponse'];
 export type VerificationResponse = ApiSchemas['VerificationResponse'];
-
-/** Giris ve uyelik ekranlarinin ayarlari (sayilar tip uretecinden dolayi normallestirilir). */
-export interface PublicSettings {
-  supportContact: string;
-  passwordRules: { minLength: number; maxLength: number; requireComplexity: boolean };
-  verificationCodeLength: number;
-  /** Yuklu kurumsal logonun surumu (PRM-GRN-01); yoksa varsayilan logo kullanilir. */
-  logoVersion: string | null;
-}
+export type { PublicSettings };
 
 const BASE = '/identity/registrations';
 
@@ -52,21 +45,5 @@ export const registrationApi = {
     await apiClient.post(`${BASE}/${registrationId}/account`, { password });
   },
 
-  publicSettings: async (): Promise<PublicSettings> => {
-    const response = await apiClient.get<ApiSchemas['PublicSettingsResponse']>(
-      '/identity/public-settings',
-    );
-    const data = response.data;
-
-    return {
-      supportContact: data.supportContact,
-      passwordRules: {
-        minLength: Number(data.passwordRules.minLength),
-        maxLength: Number(data.passwordRules.maxLength),
-        requireComplexity: data.passwordRules.requireComplexity,
-      },
-      verificationCodeLength: Number(data.verificationCodeLength),
-      logoVersion: data.logoVersion ?? null,
-    };
-  },
+  publicSettings: (): Promise<PublicSettings> => fetchPublicSettings(),
 };

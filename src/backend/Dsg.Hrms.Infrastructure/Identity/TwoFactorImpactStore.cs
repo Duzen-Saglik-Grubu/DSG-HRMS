@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dsg.Hrms.Infrastructure.Identity;
 
-/// <summary>2FA etki sayimi (SYG-KMLK-035).</summary>
+/// <summary>2FA etki sayimi (SYG-KMLK-035, 080).</summary>
 public sealed class TwoFactorImpactStore : ITwoFactorImpactStore
 {
     private readonly HrmsDbContext _context;
@@ -18,13 +18,10 @@ public sealed class TwoFactorImpactStore : ITwoFactorImpactStore
     }
 
     /// <inheritdoc />
-    public Task<int> CountWithoutChannelAsync(bool emailAllowed, bool smsAllowed, CancellationToken cancellationToken) =>
-        (from account in _context.Set<UserAccount>().AsNoTracking()
-         join person in _context.Set<Person>().AsNoTracking() on account.PersonId equals person.Id
-         where account.Status == AccountStatus.Active
-             && _context.Set<Employment>().Any(e => e.PersonId == person.Id && e.IsActive)
-             && !(emailAllowed && person.Email != null)
-             && !(smsAllowed && person.MobilePhone != null)
-         select account.Id)
-        .CountAsync(cancellationToken);
+    public Task<int> CountWithTwoFactorPreferenceAsync(CancellationToken cancellationToken) =>
+        _context.Set<UserAccount>().AsNoTracking()
+            .Where(account => account.Status == AccountStatus.Active
+                && account.TwoFactorEnabled
+                && _context.Set<Employment>().Any(e => e.PersonId == account.PersonId && e.IsActive))
+            .CountAsync(cancellationToken);
 }

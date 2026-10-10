@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dsg.Hrms.Api.Identity;
 
 /// <summary>
-/// IK hesap islemleri (SYG-KMLK-057, 073).
+/// IK hesap islemleri (SYG-KMLK-057, 073, 081).
 /// </summary>
 /// <remarks>
 /// Yanit kisisel veri olarak YALNIZCA ad, soyad, sicil ve firma tasir; TCKN, dogum tarihi,
@@ -96,6 +96,28 @@ public sealed class AccountsController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>Kisinin iki adimli dogrulama tercihini gerekceyle kapatir.</summary>
+    /// <response code="204">Iki adimli dogrulama kapali.</response>
+    /// <response code="400">Gerekce girilmedi.</response>
+    /// <response code="403">Yetki yok (<c>identity.account.update</c>).</response>
+    /// <response code="404">Kisi bulunamadi.</response>
+    /// <response code="422">Kisinin hesabi yok, iki adimli dogrulama zaten kapali veya hesap islemi yapanin kendisinin.</response>
+    [HttpPost("{personId:guid}/two-factor/reset")]
+    [HasPermission(Permissions.AccountUpdate)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> ResetTwoFactorAsync(Guid personId, AccountStatusChangeRequest request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        await _accounts.ResetTwoFactorAsync(personId, request.Reason, cancellationToken);
+        return NoContent();
+    }
+
     private static AccountSummaryResponse ToResponse(AccountSummary summary) => new(
         summary.PersonId,
         summary.FirstName,
@@ -115,7 +137,8 @@ public sealed class AccountsController : ControllerBase
             AccountStatusReason.NewEmployment => AccountStatusReasonKind.NewEmployment,
             _ => null,
         },
-        summary.IsCurrentUser);
+        summary.IsCurrentUser,
+        summary.TwoFactorEnabled);
 }
 
 /// <summary>Sayfalanmis yanit (ADR-0010 §4).</summary>
@@ -200,6 +223,7 @@ public enum SortOrder
 /// <param name="State">Hesap durumu.</param>
 /// <param name="StatusReason">Durumun nedeni.</param>
 /// <param name="IsCurrentUser">Satir oturumdaki kullanicinin kendisi mi; kendi hesabi pasife alinamaz (#138).</param>
+/// <param name="TwoFactorEnabled">Kisinin iki adimli dogrulama tercihi acik mi; hesap yoksa <c>false</c> (SYG-KMLK-081).</param>
 public sealed record AccountSummaryResponse(
     Guid PersonId,
     string FirstName,
@@ -207,7 +231,8 @@ public sealed record AccountSummaryResponse(
     IReadOnlyList<AccountEmploymentResponse> Employments,
     AccountStateKind State,
     AccountStatusReasonKind? StatusReason,
-    bool IsCurrentUser);
+    bool IsCurrentUser,
+    bool TwoFactorEnabled);
 
 /// <summary>Istihdam.</summary>
 /// <param name="RegistryCode">Sicil numarasi.</param>

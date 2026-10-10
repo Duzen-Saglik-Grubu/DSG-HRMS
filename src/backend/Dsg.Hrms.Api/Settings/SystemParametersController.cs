@@ -84,8 +84,8 @@ public sealed class SystemParametersController : ControllerBase
     }
 
     /// <summary>
-    /// Iki adimli dogrulama acilirsa giris yapamayacak aktif hesap sahiplerinin sayisi
-    /// (SYG-KMLK-035). Kisilerin kendisi donmez, yalnizca sayi.
+    /// Iki adimli dogrulama acilirsa giriste kod girmeye baslayacak, kendi hesabinda tercihi acik
+    /// aktif hesap sahiplerinin sayisi (SYG-KMLK-035, 080). Kisilerin kendisi donmez, yalnizca sayi.
     /// </summary>
     /// <response code="200">Etki.</response>
     /// <response code="403">Yetki yok (<c>system.parameter.view</c>).</response>
@@ -214,9 +214,9 @@ public sealed class ParameterListRequestValidator : AbstractValidator<ParameterL
     }
 }
 
-/// <summary>2FA'nin acilmasinin etkisi (SYG-KMLK-035).</summary>
-/// <param name="AffectedCount">Hicbir dogrulama kanali olmayan aktif hesap sahibi sayisi.</param>
-/// <param name="ConfirmationRequired">Acmak icin onay gerekiyor mu (PRM-KML-15).</param>
+/// <summary>2FA'nin acilmasinin etkisi (SYG-KMLK-035, 080).</summary>
+/// <param name="AffectedCount">Kendi hesabinda iki adimli dogrulamayi acmis aktif hesap sahibi sayisi; parametre acilinca giriste kod girerler.</param>
+/// <param name="ConfirmationRequired">Acmak icin onay gerekiyor mu: sayi sifirdan buyuk ve uyari acik (PRM-KML-15).</param>
 public sealed record TwoFactorImpactResponse(int AffectedCount, bool ConfirmationRequired);
 
 /// <summary>Parametre degisikligi.</summary>

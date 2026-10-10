@@ -12,7 +12,7 @@ export interface AccountSearch extends PageRequest {
 const BASE = '/identity/accounts';
 
 /**
- * IK hesap islemleri (SYG-KMLK-057, 073). Yanit kisisel veri olarak yalnizca ad, soyad, sicil
+ * IK hesap islemleri (SYG-KMLK-057, 073, 081). Yanit kisisel veri olarak yalnizca ad, soyad, sicil
  * ve firma tasir.
  */
 export const accountsApi = {
@@ -45,5 +45,10 @@ export const accountsApi = {
 
   activate: async (personId: string, reason: string): Promise<void> => {
     await apiClient.post(`${BASE}/${personId}/activation`, { reason });
+  },
+
+  /** Kisinin iki adimli dogrulama tercihini gerekceyle kapatir (SYG-KMLK-081). */
+  resetTwoFactor: async (personId: string, reason: string): Promise<void> => {
+    await apiClient.post(`${BASE}/${personId}/two-factor/reset`, { reason });
   },
 };

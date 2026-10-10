@@ -148,7 +148,8 @@ function ParameterRow({ parameter, canUpdate }: ParameterRowProps) {
     },
   });
 
-  // 2FA acilirken once etkisi gosterilir ve onay istenir (SYG-KMLK-035); sunucu da onaysiz
+  // 2FA acilirken once etkisi (kendi tercihi acik olup giriste kod girmeye baslayacak kisi
+  // sayisi) gosterilir ve onay istenir (SYG-KMLK-035, 080); sunucu da onaysiz
   // acmayi reddeder.
   const toggle = async (next: string) => {
     if (parameter.key === TWO_FACTOR_KEY && next === 'true') {
@@ -272,7 +273,6 @@ function ParameterRow({ parameter, canUpdate }: ParameterRowProps) {
           open={impact !== null}
           title={t('system.parameters.twoFactor.title')}
           description={t('system.parameters.twoFactor.text', { count: impact ?? 0 })}
-          destructive={(impact ?? 0) > 0}
           confirmLabel={t('system.parameters.twoFactor.confirm')}
           onCancel={() => setImpact(null)}
           onConfirm={() => {

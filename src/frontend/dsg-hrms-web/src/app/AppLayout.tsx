@@ -13,10 +13,14 @@ import {
 import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
 import LockResetRounded from '@mui/icons-material/LockResetRounded';
 import ManageAccountsOutlined from '@mui/icons-material/ManageAccountsOutlined';
+import SecurityOutlined from '@mui/icons-material/SecurityOutlined';
 import TuneRounded from '@mui/icons-material/TuneRounded';
 import LogoutRounded from '@mui/icons-material/LogoutRounded';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate } from 'react-router';
+import { fetchPublicSettings } from '@/shared/api/publicSettings';
+import { queryKeys } from '@/shared/api/queryKeys';
 import { session, useSession } from '@/shared/auth/session';
 import { SessionActivity } from '@/shared/auth/SessionActivity';
 import { permissions } from '@/shared/auth/permissions';
@@ -55,7 +59,11 @@ export function AppLayout() {
   );
 }
 
-/** Oturumdaki kullanicinin adi, parola degisikligi ve cikis (SYG-KMLK-043, 048). */
+/**
+ * Oturumdaki kullanicinin adi, parola degisikligi, hesap guvenligi ve cikis
+ * (SYG-KMLK-043, 048, 080). Hesap guvenligi yalnizca iki adimli dogrulama sistemde
+ * kullaniliyorsa gorunur; sayfa yine de adresiyle acilabilir.
+ */
 function UserMenu() {
   const { t } = useTranslation();
   const state = useSession();
@@ -63,6 +71,13 @@ function UserMenu() {
   const canManageAccounts = usePermission(permissions.accountView);
   const canViewParameters = usePermission(permissions.parameterView);
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  const settings = useQuery({
+    queryKey: queryKeys.identity.publicSettings,
+    queryFn: fetchPublicSettings,
+    staleTime: 5 * 60_000,
+    enabled: state.status === 'authenticated',
+  });
+  const twoFactorAvailable = settings.data?.twoFactorAvailable === true;
 
   if (state.status !== 'authenticated') {
     return null;
@@ -131,6 +146,19 @@ function UserMenu() {
           </ListItemIcon>
           {t('session.changePassword')}
         </MenuItem>
+        {twoFactorAvailable ? (
+          <MenuItem
+            onClick={() => {
+              setAnchor(null);
+              void navigate(routes.accountSecurity);
+            }}
+          >
+            <ListItemIcon>
+              <SecurityOutlined fontSize="small" />
+            </ListItemIcon>
+            {t('session.accountSecurity')}
+          </MenuItem>
+        ) : null}
         <MenuItem
           onClick={() => {
             setAnchor(null);

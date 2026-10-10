@@ -18,6 +18,7 @@ const ACTIVE: AccountSummary = {
   state: 'active',
   statusReason: null,
   isCurrentUser: false,
+  twoFactorEnabled: false,
 };
 
 const PASSIVE: AccountSummary = {
@@ -28,6 +29,7 @@ const PASSIVE: AccountSummary = {
   state: 'passive',
   statusReason: 'employmentEnded',
   isCurrentUser: false,
+  twoFactorEnabled: false,
 };
 
 const NONE: AccountSummary = {
@@ -38,6 +40,7 @@ const NONE: AccountSummary = {
   state: 'none',
   statusReason: null,
   isCurrentUser: false,
+  twoFactorEnabled: false,
 };
 
 function page(items: AccountSummary[]) {
@@ -131,6 +134,65 @@ describe('AccountsPage', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('iki adimli dogrulamayi kapatma yalnizca tercihi acik ve kendi olmayan hesapta sunulur (SYG-KMLK-081)', async () => {
+    vi.mocked(accountsApi.search).mockResolvedValue(
+      page([
+        { ...ACTIVE, twoFactorEnabled: true },
+        {
+          ...PASSIVE,
+          personId: 'p-4',
+          firstName: 'Zeynep',
+          twoFactorEnabled: true,
+          isCurrentUser: true,
+        },
+        { ...PASSIVE },
+      ]),
+    );
+    renderWithProviders(<AccountsPage />);
+
+    const enabled = (await screen.findByText('Ayşe Demir')).closest('tr')!;
+    const own = screen.getByText('Zeynep Kaya').closest('tr')!;
+    const disabled = screen.getByText('Mehmet Kaya').closest('tr')!;
+
+    expect(within(enabled).getByText('İki adımlı doğrulama açık')).toBeInTheDocument();
+    expect(
+      within(enabled).getByRole('button', { name: 'İki adımlı doğrulamayı kapat' }),
+    ).toBeInTheDocument();
+    expect(within(own).getByText('İki adımlı doğrulama açık')).toBeInTheDocument();
+    expect(
+      within(own).queryByRole('button', { name: 'İki adımlı doğrulamayı kapat' }),
+    ).not.toBeInTheDocument();
+    expect(within(disabled).queryByText('İki adımlı doğrulama açık')).not.toBeInTheDocument();
+    expect(
+      within(disabled).queryByRole('button', { name: 'İki adımlı doğrulamayı kapat' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('iki adimli dogrulamayi kapatma gerekce ister, gonderir ve sonucu bildirir (SYG-KMLK-081)', async () => {
+    vi.mocked(accountsApi.search).mockResolvedValue(page([{ ...ACTIVE, twoFactorEnabled: true }]));
+    const reset = vi.spyOn(accountsApi, 'resetTwoFactor').mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    renderWithProviders(<AccountsPage />);
+
+    const row = (await screen.findByText('Ayşe Demir')).closest('tr')!;
+    await user.click(within(row).getByRole('button', { name: 'İki adımlı doğrulamayı kapat' }));
+    const dialog = await screen.findByRole('dialog', { name: 'İki adımlı doğrulamayı kapat' });
+    expect(within(dialog).getByText(/yalnızca parolasıyla giriş yapar/)).toBeInTheDocument();
+
+    await user.click(within(dialog).getByRole('button', { name: 'İki adımlı doğrulamayı kapat' }));
+    expect(within(dialog).getByText('Gerekçe girin.')).toBeInTheDocument();
+    expect(reset).not.toHaveBeenCalled();
+
+    await user.type(within(dialog).getByLabelText(/Gerekçe/), ' Telefonunu kaybetti ');
+    await user.click(within(dialog).getByRole('button', { name: 'İki adımlı doğrulamayı kapat' }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Ayşe Demir adlı kişinin iki adımlı doğrulaması kapatıldı.',
+    );
+    expect(reset).toHaveBeenCalledWith('p-1', 'Telefonunu kaybetti');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('sunucunun reddini pencerede gosterir', async () => {
     vi.spyOn(accountsApi, 'activate').mockRejectedValue(
       new ApiError({
@@ -192,12 +254,18 @@ describe('AccountsPage', () => {
 
   it('degistirme izni yoksa eylem dugmeleri gorunmez', async () => {
     await setSession({ status: 'authenticated', permissions: [permissions.accountView] });
+    vi.mocked(accountsApi.search).mockResolvedValue(
+      page([{ ...ACTIVE, twoFactorEnabled: true }, PASSIVE, NONE]),
+    );
     renderWithProviders(<AccountsPage />);
 
     await screen.findByText('Ayşe Demir');
 
     expect(screen.queryByRole('button', { name: 'Pasife al' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Aktifleştir' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'İki adımlı doğrulamayı kapat' }),
+    ).not.toBeInTheDocument();
   });
 
   it('goruntuleme izni yoksa listeyi istemez', async () => {

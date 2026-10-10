@@ -415,9 +415,10 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
         body.GetProperty("passwordRules").GetProperty("minLength").GetInt32().ShouldBe(6);
         body.GetProperty("passwordRules").GetProperty("requireComplexity").GetBoolean().ShouldBeFalse();
         body.GetProperty("verificationCodeLength").GetInt32().ShouldBe(6);
+        body.GetProperty("twoFactorAvailable").GetBoolean().ShouldBeFalse(); // SYG-KMLK-080
 
         // Yeni bir alan eklenirse bu test bilincli olarak guncellenmelidir: uc kimliksizdir.
-        body.EnumerateObject().Select(p => p.Name).ShouldBe(["supportContact", "passwordRules", "verificationCodeLength", "logoVersion"]);
+        body.EnumerateObject().Select(p => p.Name).ShouldBe(["supportContact", "passwordRules", "verificationCodeLength", "logoVersion", "twoFactorAvailable"]);
     }
 
     // ------------------------------------------------------------------ yardimcilar

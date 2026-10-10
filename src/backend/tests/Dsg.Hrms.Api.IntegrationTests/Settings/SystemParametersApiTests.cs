@@ -159,27 +159,53 @@ public sealed class SystemParametersApiTests : IClassFixture<RegistrationApiFixt
         entry.Changes.ShouldNotContain(Convert.ToBase64String(Png));
     }
 
-    // ------------------------------------------------------------------ 2FA etki uyarisi (SYG-KMLK-035)
+    // ------------------------------------------------------------------ 2FA etki uyarisi (SYG-KMLK-035, 080)
 
     [Fact]
     public async Task Enabling_two_factor_shows_the_impact_and_requires_confirmation()
     {
         using var client = _fixture.CreateClient();
         var admin = await SignInAsync(client, "mehmet.kaya@duzen.com.tr");
-        (await GetAsync(client, $"{Parameters}/two-factor-impact", admin)).Body.GetProperty("affectedCount").GetInt32().ShouldBe(0);
+        var impact = (await GetAsync(client, $"{Parameters}/two-factor-impact", admin)).Body;
+        impact.GetProperty("affectedCount").GetInt32().ShouldBe(0);
+        impact.GetProperty("confirmationRequired").GetBoolean().ShouldBeFalse();
 
-        // Kisi 2'nin e-postasi LOGO'da silindi, telefonu yok: 2FA acilirsa giris yapamaz.
-        await _fixture.WithDbAsync(context => context.Set<Person>()
-            .Where(p => p.NationalId == NationalId(2))
-            .ExecuteUpdateAsync(set => set.SetProperty(p => p.Email, (string?)null)));
-        (await GetAsync(client, $"{Parameters}/two-factor-impact", admin)).Body.GetProperty("affectedCount").GetInt32().ShouldBe(1);
+        // SYG-KMLK-080: yalnizca kendi tercihi acik AKTIF hesaplar sayilir. Kisi 1 tercihini acti;
+        // istihdami biten kisi 4'un ve pasif hesapli kisi 3'un tercihi sayilmaz.
+        await CreateAccountAsync(3);
+        await CreateAccountAsync(4);
+        await EnableTwoFactorPreferenceAsync(1);
+        await EnableTwoFactorPreferenceAsync(3);
+        await EnableTwoFactorPreferenceAsync(4);
+        await _fixture.WithDbAsync(async context =>
+        {
+            var personId = await PersonIdAsync(context, 3);
+            (await context.Set<UserAccount>().SingleAsync(a => a.PersonId == personId)).DeactivateManually("Test");
+            return await context.SaveChangesAsync();
+        });
+
+        impact = (await GetAsync(client, $"{Parameters}/two-factor-impact", admin)).Body;
+        impact.GetProperty("affectedCount").GetInt32().ShouldBe(1);
+        impact.GetProperty("confirmationRequired").GetBoolean().ShouldBeTrue();
 
         var refused = await PutJsonAsync(client, $"{Parameters}/PRM-KML-08", admin, new { value = "true" });
         refused.Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
-        refused.Body.GetProperty("detail").GetString()!.ShouldContain("1 aktif hesap sahibi giriş yapamaz");
+        refused.Body.GetProperty("detail").GetString()!.ShouldContain("açmış 1 kişi bundan sonra girişte kod girecek");
 
         (await PutJsonAsync(client, $"{Parameters}/PRM-KML-08", admin, new { value = "true", confirmed = true })).Status.ShouldBe(HttpStatusCode.NoContent);
         (await PutJsonAsync(client, $"{Parameters}/PRM-KML-08", admin, new { value = "false" })).Status.ShouldBe(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task Confirmation_is_not_required_when_nobody_has_the_preference_on()
+    {
+        // SYG-KMLK-080: tercih varsayilan kapali; kanali olmayan kisi tercihi acamaz. Parametre
+        // kimsenin girisini engellemez, bu yuzden onay istenmez.
+        using var client = _fixture.CreateClient();
+        var admin = await SignInAsync(client, "mehmet.kaya@duzen.com.tr");
+
+        (await GetAsync(client, $"{Parameters}/two-factor-impact", admin)).Body.GetProperty("affectedCount").GetInt32().ShouldBe(0);
+        (await PutJsonAsync(client, $"{Parameters}/PRM-KML-08", admin, new { value = "true" })).Status.ShouldBe(HttpStatusCode.NoContent);
     }
 
     [Fact]
@@ -187,6 +213,7 @@ public sealed class SystemParametersApiTests : IClassFixture<RegistrationApiFixt
     {
         using var client = _fixture.CreateClient();
         var admin = await SignInAsync(client, "mehmet.kaya@duzen.com.tr");
+        await EnableTwoFactorPreferenceAsync(1);
 
         (await PutJsonAsync(client, $"{Parameters}/PRM-KML-15", admin, new { value = "false" })).Status.ShouldBe(HttpStatusCode.NoContent);
         (await GetAsync(client, $"{Parameters}/two-factor-impact", admin)).Body.GetProperty("confirmationRequired").GetBoolean().ShouldBeFalse();
@@ -214,6 +241,17 @@ public sealed class SystemParametersApiTests : IClassFixture<RegistrationApiFixt
             context.Add(UserAccount.Register(person.Id, hasher.Hash(PasswordPolicy.Normalize(Password)), _fixture.Clock.UtcNow));
             return await context.SaveChangesAsync();
         });
+
+    private Task<int> EnableTwoFactorPreferenceAsync(int index) =>
+        _fixture.WithDbAsync(async context =>
+        {
+            var personId = await PersonIdAsync(context, index);
+            (await context.Set<UserAccount>().SingleAsync(a => a.PersonId == personId)).EnableTwoFactor();
+            return await context.SaveChangesAsync();
+        });
+
+    private static Task<long> PersonIdAsync(Infrastructure.Data.HrmsDbContext context, int index) =>
+        context.Set<Person>().Where(p => p.NationalId == NationalId(index)).Select(p => p.Id).SingleAsync();
 
     private static async Task<string> SignInAsync(HttpClient client, string email)
     {

@@ -10,6 +10,7 @@ public sealed class VerificationMessagesTests
     [InlineData(VerificationPurpose.Registration)]
     [InlineData(VerificationPurpose.PasswordReset)]
     [InlineData(VerificationPurpose.TwoFactor)]
+    [InlineData(VerificationPurpose.TwoFactorSetup)]
     public void Sms_fits_one_segment_with_the_longest_parameters(VerificationPurpose purpose)
     {
         // En uzun kod (PRM-KML-09: 8) ve en uzun sure (PRM-KML-10: 30) ile bile tek SMS.
@@ -26,6 +27,7 @@ public sealed class VerificationMessagesTests
     [InlineData(VerificationPurpose.Registration, "üyelik")]
     [InlineData(VerificationPurpose.PasswordReset, "parola sıfırlama")]
     [InlineData(VerificationPurpose.TwoFactor, "giriş")]
+    [InlineData(VerificationPurpose.TwoFactorSetup, "iki adımlı doğrulamayı açma")]
     public void Email_names_the_purpose_and_the_organization(VerificationPurpose purpose, string purposeText)
     {
         VerificationMessages.EmailSubject(purpose).ShouldContain(purposeText);

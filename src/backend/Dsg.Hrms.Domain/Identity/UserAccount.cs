@@ -70,6 +70,19 @@ public sealed class UserAccount : Entity, IAuditable
     /// </summary>
     public bool FirstPasswordChangePending { get; private set; }
 
+    /// <summary>
+    /// Kullanicinin kendi iki adimli dogrulama tercihi (SYG-KMLK-080). Varsayilan kapali.
+    /// Giriste kod yalnizca sistem parametresi (PRM-KML-08) ve bu tercih birlikte acikken
+    /// istenir.
+    /// </summary>
+    public bool TwoFactorEnabled { get; private set; }
+
+    /// <summary>
+    /// IK'nin iki adimli dogrulamayi kapatma gerekcesi (SYG-KMLK-081, R-27). Kullanici
+    /// tercihi yeniden actiginda <c>null</c> olur; hic kapatilmadiysa <c>null</c>.
+    /// </summary>
+    public string? TwoFactorResetNote { get; private set; }
+
     /// <inheritdoc />
     public DateTimeOffset CreatedAt { get; set; }
 
@@ -152,6 +165,70 @@ public sealed class UserAccount : Entity, IAuditable
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Iki adimli dogrulamayi kullanicinin kendi tercihiyle acar (SYG-KMLK-080). Degisiklik
+    /// olduysa <c>true</c> doner.
+    /// </summary>
+    /// <remarks>
+    /// Guvenlik damgasi YENILENMEZ: tercih bir sonraki giristen itibaren gecerlidir; acik
+    /// oturumlar kapanmaz.
+    /// </remarks>
+    public bool EnableTwoFactor()
+    {
+        if (TwoFactorEnabled)
+        {
+            return false;
+        }
+
+        TwoFactorEnabled = true;
+
+        // IK'nin onceki kapatma gerekcesi artik gecerli durumu anlatmaz (SYG-KMLK-081).
+        TwoFactorResetNote = null;
+        return true;
+    }
+
+    /// <summary>
+    /// Iki adimli dogrulamayi kullanicinin kendi tercihiyle kapatir (SYG-KMLK-080).
+    /// Degisiklik olduysa <c>true</c> doner. Guvenlik damgasi yenilenmez.
+    /// </summary>
+    public bool DisableTwoFactor()
+    {
+        if (!TwoFactorEnabled)
+        {
+            return false;
+        }
+
+        TwoFactorEnabled = false;
+        return true;
+    }
+
+    /// <summary>
+    /// Iki adimli dogrulamayi IK gerekcesiyle kapatir (SYG-KMLK-081, R-27): e-posta ve
+    /// telefon erisimini kaybeden kisi yeniden yalnizca parolasiyla giris yapabilir.
+    /// </summary>
+    /// <param name="reason">Gerekce.</param>
+    /// <exception cref="ArgumentException">Gerekce bossa.</exception>
+    /// <exception cref="InvalidOperationException">Tercih zaten kapaliysa.</exception>
+    /// <remarks>
+    /// Guvenlik damgasi yenilenmez: kapatma kisinin yetkisini daraltmaz, acik oturumlar
+    /// surer. Gerekce denetim izine ozellik degisikligi olarak duser (SYG-KMLK-058).
+    /// </remarks>
+    public void ResetTwoFactor(string reason)
+    {
+        if (string.IsNullOrWhiteSpace(reason))
+        {
+            throw new ArgumentException("Gerekce girilmeden iki adimli dogrulama kapatilamaz.", nameof(reason));
+        }
+
+        if (!TwoFactorEnabled)
+        {
+            throw new InvalidOperationException("Iki adimli dogrulama zaten kapali.");
+        }
+
+        TwoFactorEnabled = false;
+        TwoFactorResetNote = reason.Trim();
     }
 
     /// <summary>Kilitlenmeyi kaydeder (SYG-KMLK-058).</summary>

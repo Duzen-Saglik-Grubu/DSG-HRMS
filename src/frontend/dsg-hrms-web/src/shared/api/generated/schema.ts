@@ -320,8 +320,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Iki adimli dogrulama acilirsa giris yapamayacak aktif hesap sahiplerinin sayisi
-         *     (SYG-KMLK-035). Kisilerin kendisi donmez, yalnizca sayi.
+         * Iki adimli dogrulama acilirsa giriste kod girmeye baslayacak, kendi hesabinda tercihi acik
+         *     aktif hesap sahiplerinin sayisi (SYG-KMLK-035, 080). Kisilerin kendisi donmez, yalnizca sayi.
          */
         get: {
             parameters: {
@@ -408,6 +408,267 @@ export interface paths {
                     };
                 };
                 /** @description Mevcut parola hatali (`errors.currentPassword`) veya yeni parola kurallara uymuyor (`errors.newPassword`). */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Oturum kapali. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Cok fazla hatali deneme; e-posta gecici olarak kilitli. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/account/two-factor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Hesabin iki adimli dogrulama durumu (SYG-KMLK-080). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Durum. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TwoFactorStatusResponse"];
+                    };
+                };
+                /** @description Oturum kapali. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/account/two-factor/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Iki adimli dogrulamayi acmayi baslatir: mevcut parola denetlenir ve secilen kanala kod gonderilir (SYG-KMLK-080). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["TwoFactorSetupRequest"];
+                    "text/json": components["schemas"]["TwoFactorSetupRequest"];
+                    "application/*+json": components["schemas"]["TwoFactorSetupRequest"];
+                };
+            };
+            responses: {
+                /** @description Kod gonderildi. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TwoFactorSetupResponse"];
+                    };
+                };
+                /** @description Mevcut parola hatali (`errors.currentPassword`) veya istek gecersiz. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Oturum kapali. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Iki adimli dogrulama sistemde kapali, hesapta zaten acik veya secilen kanal kullanilamaz. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Cok fazla hatali deneme veya cok fazla kod istendi. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/account/two-factor/setup/verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Iki adimli dogrulamayi acma kodunu dogrular; dogruysa hesapta iki adimli dogrulama acilir (SYG-KMLK-080). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["TwoFactorSetupVerificationRequest"];
+                    "text/json": components["schemas"]["TwoFactorSetupVerificationRequest"];
+                    "application/*+json": components["schemas"]["TwoFactorSetupVerificationRequest"];
+                };
+            };
+            responses: {
+                /** @description Dogrulama sonucu; `verified` ise acildi. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TwoFactorSetupVerificationResponse"];
+                    };
+                };
+                /** @description Istek gecersiz. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Oturum kapali. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Iki adimli dogrulama sistemde kapatildi. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/account/two-factor/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hesapta iki adimli dogrulamayi kapatir; mevcut parola istenir (SYG-KMLK-080). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["TwoFactorDisableRequest"];
+                    "text/json": components["schemas"]["TwoFactorDisableRequest"];
+                    "application/*+json": components["schemas"]["TwoFactorDisableRequest"];
+                };
+            };
+            responses: {
+                /** @description Kapatildi (zaten kapaliysa da). */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Mevcut parola hatali (`errors.currentPassword`) veya istek gecersiz. */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -673,6 +934,95 @@ export interface paths {
                     };
                 };
                 /** @description Kisinin hesabi yok, hesap zaten aktif veya kisinin aktif calisma kaydi yok. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/accounts/{personId}/two-factor/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Kisinin iki adimli dogrulama tercihini gerekceyle kapatir. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AccountStatusChangeRequest"];
+                    "text/json": components["schemas"]["AccountStatusChangeRequest"];
+                    "application/*+json": components["schemas"]["AccountStatusChangeRequest"];
+                };
+            };
+            responses: {
+                /** @description Iki adimli dogrulama kapali. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Gerekce girilmedi. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`identity.account.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi bulunamadi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisinin hesabi yok, iki adimli dogrulama zaten kapali veya hesap islemi yapanin kendisinin. */
                 422: {
                     headers: {
                         [name: string]: unknown;
@@ -1980,6 +2330,8 @@ export interface components {
             statusReason: null | components["schemas"]["AccountStatusReasonKind"];
             /** @description Satir oturumdaki kullanicinin kendisi mi; kendi hesabi pasife alinamaz (#138). */
             isCurrentUser: boolean;
+            /** @description Kisinin iki adimli dogrulama tercihi acik mi; hesap yoksa `false` (SYG-KMLK-081). */
+            twoFactorEnabled: boolean;
         };
         /** @description Oturum icinde parola degisikligi istegi (SYG-KMLK-048). */
         ChangePasswordRequest: {
@@ -2170,6 +2522,8 @@ export interface components {
             verificationCodeLength: number | string;
             /** @description Yuklu kurumsal logonun surumu (PRM-GRN-01); yuklenmemisse bos ve varsayilan logo kullanilir. */
             logoVersion: null | string;
+            /** @description Iki adimli dogrulama sistemde kullaniliyor mu (PRM-KML-08); kullanici menusundeki hesap guvenligi sayfasi buna gore gosterilir (SYG-KMLK-080). */
+            twoFactorAvailable: boolean;
         };
         /** @description Uyelik baslatildi. */
         RegistrationStartedResponse: {
@@ -2316,15 +2670,64 @@ export interface components {
              */
             expiresAt: string;
         };
-        /** @description 2FA'nin acilmasinin etkisi (SYG-KMLK-035). */
+        /** @description Iki adimli dogrulamayi kapatma istegi (SYG-KMLK-080). */
+        TwoFactorDisableRequest: {
+            /** @description Mevcut parola. */
+            currentPassword: string;
+        };
+        /** @description 2FA'nin acilmasinin etkisi (SYG-KMLK-035, 080). */
         TwoFactorImpactResponse: {
             /**
              * Format: int32
-             * @description Hicbir dogrulama kanali olmayan aktif hesap sahibi sayisi.
+             * @description Kendi hesabinda iki adimli dogrulamayi acmis aktif hesap sahibi sayisi; parametre acilinca giriste kod girerler.
              */
             affectedCount: number | string;
-            /** @description Acmak icin onay gerekiyor mu (PRM-KML-15). */
+            /** @description Acmak icin onay gerekiyor mu: sayi sifirdan buyuk ve uyari acik (PRM-KML-15). */
             confirmationRequired: boolean;
+        };
+        /** @description Iki adimli dogrulamayi acma istegi (SYG-KMLK-080). */
+        TwoFactorSetupRequest: {
+            /** @description Mevcut parola. */
+            currentPassword: string;
+            /** @description Kodun gonderilecegi kanal. */
+            channel: components["schemas"]["VerificationChannelKind"];
+        };
+        /** @description Iki adimli dogrulamayi acma kodu gonderildi. */
+        TwoFactorSetupResponse: {
+            /**
+             * Format: uuid
+             * @description Kodun kimligi; dogrulamada geri gonderilir.
+             */
+            codeId: string;
+            /**
+             * Format: date-time
+             * @description Kodun gecerlilik sonu (geri sayim, SYG-KMLK-028).
+             */
+            codeExpiresAt: string;
+        };
+        /** @description Iki adimli dogrulamayi acma kodunun dogrulama istegi. */
+        TwoFactorSetupVerificationRequest: {
+            /**
+             * Format: uuid
+             * @description Gonderilen kodun kimligi.
+             */
+            codeId: string;
+            /** @description Girilen kod. */
+            code: string;
+        };
+        /** @description Iki adimli dogrulamayi acma kodunun dogrulama sonucu. */
+        TwoFactorSetupVerificationResponse: {
+            /** @description Sonuc; `verified` ise hesapta iki adimli dogrulama acildi. */
+            result: components["schemas"]["VerificationOutcome"];
+        };
+        /** @description Hesabin iki adimli dogrulama durumu (SYG-KMLK-080). */
+        TwoFactorStatusResponse: {
+            /** @description Iki adimli dogrulama sistemde kullaniliyor mu (PRM-KML-08); kullanilmiyorsa acilamaz. */
+            available: boolean;
+            /** @description Kullanicinin kendi tercihi acik mi; giriste kod ancak sistemde de aciksa istenir. */
+            enabled: boolean;
+            /** @description Kisinin kullanabilecegi kanallar; bossa kayitli kurumsal e-posta veya cep telefonu yoktur ve acilamaz. Hedef donmez. */
+            channels: components["schemas"]["VerificationChannelKind"][];
         };
         /** @description Iki adimli dogrulama sonucu. */
         TwoFactorVerificationResponse: {

@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Dsg.Hrms.Application.Identity.Passwords;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Personnel;
@@ -14,7 +15,7 @@ namespace Dsg.Hrms.Api.IntegrationTests.Identity;
 
 /// <summary>
 /// IK hesap islemleri uctan uca: gercek HTTP boru hatti ve gercek PostgreSQL
-/// (SYG-KMLK-054, 057, 058, 073, 074). Veriler SENTETIKTIR.
+/// (SYG-KMLK-054, 057, 058, 073, 074, 081). Veriler SENTETIKTIR.
 /// </summary>
 /// <remarks>
 /// Kisi 1 IK kullanicisidir (IK Kimlik Islemleri rolu); kisi 2'nin hesabi uzerinde islem yapilir.
@@ -67,7 +68,7 @@ public sealed class AccountsApiTests : IClassFixture<RegistrationApiFixture>, IA
 
         status.ShouldBe(HttpStatusCode.OK);
         var item = body.GetProperty("items").EnumerateArray().Single();
-        item.EnumerateObject().Select(p => p.Name).ShouldBe(["personId", "firstName", "lastName", "employments", "state", "statusReason", "isCurrentUser"]);
+        item.EnumerateObject().Select(p => p.Name).ShouldBe(["personId", "firstName", "lastName", "employments", "state", "statusReason", "isCurrentUser", "twoFactorEnabled"]);
         item.GetProperty("employments")[0].EnumerateObject().Select(p => p.Name).ShouldBe(["registryCode", "companyName", "isActive"]);
         item.GetProperty("employments")[0].GetProperty("registryCode").GetString().ShouldBe("00002");
         item.GetProperty("state").GetString().ShouldBe("active");
@@ -217,6 +218,80 @@ public sealed class AccountsApiTests : IClassFixture<RegistrationApiFixture>, IA
     }
 
     [Fact]
+    public async Task Hr_reset_turns_two_factor_off_with_the_reason_and_sign_in_is_single_step_again()
+    {
+        // SYG-KMLK-081: e-posta ve telefon erisimini kaybeden kisi (R-27) yeniden yalnizca
+        // parolasiyla giris yapabilir; gerekce denetim izine, olay guvenlik kaydina yazilir.
+        await SetPreferenceAsync(2, true);
+        var token = await HrSignInAsync();
+        using var client = _fixture.CreateClient();
+        (await GetAsync(client, $"{Accounts}?q=00002", token)).Body.GetProperty("items")[0].GetProperty("twoFactorEnabled").GetBoolean().ShouldBeTrue();
+        (await GetAsync(client, $"{Accounts}?q=00003", token)).Body.GetProperty("items")[0].GetProperty("twoFactorEnabled").GetBoolean().ShouldBeFalse();
+
+        (await PostAsync(client, $"{Accounts}/{await PersonIdAsync(2)}/two-factor/reset", token, new { reason = "  Telefonunu ve e-postasini kaybetti  " })).Status
+            .ShouldBe(HttpStatusCode.NoContent);
+
+        (await GetAsync(client, $"{Accounts}?q=00002", token)).Body.GetProperty("items")[0].GetProperty("twoFactorEnabled").GetBoolean().ShouldBeFalse();
+        var (account, change, events) = await _fixture.WithDbAsync(async context =>
+        {
+            var account = await AccountOfAsync(context, 2);
+            var change = await context.ChangeLog.Where(e => e.EntityName == nameof(UserAccount) && e.EntityId == account.PublicId && e.Operation == AuditOperation.Update)
+                .OrderByDescending(e => e.Id).Select(e => e.Changes).FirstAsync();
+            var events = await context.Set<SecurityEventEntry>().Where(e => e.UserAccountId == account.Id).ToListAsync();
+            return (account, change, events);
+        });
+        account.TwoFactorEnabled.ShouldBeFalse();
+        account.TwoFactorResetNote.ShouldBe("Telefonunu ve e-postasini kaybetti");
+        change.ShouldContain("Telefonunu ve e-postasini kaybetti");
+        change.ShouldContain(nameof(UserAccount.TwoFactorEnabled));
+        change.ShouldContain(nameof(UserAccount.TwoFactorResetNote));
+        events.ShouldContain(e => e.EventType == SecurityEventType.TwoFactorDisabled && e.Detail == "hr-reset" && e.PersonId == account.PersonId);
+
+        // Sistemde iki adimli dogrulama acik olsa da kisi tek adimda girer.
+        await SetParameterAsync(ParameterCatalog.TwoFactorEnabled, "true");
+        using var target = _fixture.CreateClient();
+        using var response = await target.PostAsJsonAsync(new Uri("/api/v1/identity/sessions", UriKind.Relative), new { email = TargetEmail, password = Password });
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("status").GetString().ShouldBe("signedIn");
+    }
+
+    [Fact]
+    public async Task Hr_reset_requires_permission_a_reason_and_an_enabled_preference_of_someone_else()
+    {
+        // SYG-KMLK-081
+        await SetPreferenceAsync(1, true);
+        await SetPreferenceAsync(2, true);
+        using var client = _fixture.CreateClient();
+        var target = await PersonIdAsync(2);
+
+        var unauthorized = await SignInAsync(client, HrEmail);
+        (await PostAsync(client, $"{Accounts}/{target}/two-factor/reset", unauthorized, new { reason = "Deneme" })).Status
+            .ShouldBe(HttpStatusCode.Forbidden);
+
+        var token = await HrSignInAsync();
+        (await PostAsync(client, $"{Accounts}/{target}/two-factor/reset", token, new { reason = " " })).Status.ShouldBe(HttpStatusCode.BadRequest);
+        (await PostAsync(client, $"{Accounts}/{Guid.NewGuid()}/two-factor/reset", token, new { reason = "Deneme" })).Status.ShouldBe(HttpStatusCode.NotFound);
+
+        var noAccount = await PostAsync(client, $"{Accounts}/{await PersonIdAsync(3)}/two-factor/reset", token, new { reason = "Deneme" });
+        noAccount.Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        noAccount.Body.GetProperty("detail").GetString().ShouldBe("Kişinin hesabı yok; henüz üye olmamış.");
+
+        var own = await PostAsync(client, $"{Accounts}/{await PersonIdAsync(1)}/two-factor/reset", token, new { reason = "Deneme" });
+        own.Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        own.Body.GetProperty("detail").GetString().ShouldBe("Kendi iki adımlı doğrulamanızı Hesap güvenliği ekranından kapatabilirsiniz.");
+
+        (await PostAsync(client, $"{Accounts}/{target}/two-factor/reset", token, new { reason = "Deneme" })).Status.ShouldBe(HttpStatusCode.NoContent);
+        var again = await PostAsync(client, $"{Accounts}/{target}/two-factor/reset", token, new { reason = "Tekrar" });
+        again.Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        again.Body.GetProperty("detail").GetString().ShouldBe("Bu kişinin hesabında iki adımlı doğrulama zaten kapalı.");
+
+        var preferences = await _fixture.WithDbAsync(async context => (
+            (await AccountOfAsync(context, 1)).TwoFactorEnabled,
+            (await AccountOfAsync(context, 2)).TwoFactorResetNote));
+        preferences.ShouldBe((true, "Deneme"));
+    }
+
+    [Fact]
     public async Task Listing_is_written_to_the_access_log()
     {
         var token = await HrSignInAsync();
@@ -262,6 +337,29 @@ public sealed class AccountsApiTests : IClassFixture<RegistrationApiFixture>, IA
             }
 
             return await context.SaveChangesAsync();
+        });
+
+    private Task<int> SetPreferenceAsync(int index, bool enabled) =>
+        _fixture.WithDbAsync(async context =>
+        {
+            var account = await AccountOfAsync(context, index);
+            if (enabled)
+            {
+                account.EnableTwoFactor();
+            }
+            else
+            {
+                account.DisableTwoFactor();
+            }
+
+            return await context.SaveChangesAsync();
+        });
+
+    private Task<int> SetParameterAsync(ParameterDefinition parameter, string value) =>
+        _fixture.WithServicesAsync(async services =>
+        {
+            await services.GetRequiredService<ISystemParameterEditor>().UpdateAsync(parameter.Key, value, CancellationToken.None);
+            return 0;
         });
 
     private static async Task<(string? State, string? Reason)> StateOfAsync(HttpClient client, string token, string registryCode)
