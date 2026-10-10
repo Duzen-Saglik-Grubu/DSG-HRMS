@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-10-06
+**Son güncelleme:** 2026-10-10
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -216,7 +216,7 @@ raporunda ayrıca ele alınır.
 
 **Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-15, R-18, R-20, R-25
 
-**Kabul edilen riskler:** R-16 (Bilgi İşlem, puan 4; `KR-055`), R-19 (Bilgi İşlem, puan 2; `KR-078`). İkisinin de puanı 6'nın altında olduğu için kabul yetkisi Bilgi İşlem'dedir. 04.10.2026'daki özet R-16 için yanlışlıkla "Üst Yönetim kararı" yazıyordu (#177).
+**Kabul edilen riskler:** R-25 (Üst Yönetim, 09.10.2026, puan 6; `KR-103`), R-16 (Bilgi İşlem, puan 4; `KR-055`), R-19 (Bilgi İşlem, puan 2; `KR-078`). İkisinin de puanı 6'nın altında olduğu için kabul yetkisi Bilgi İşlem'dedir. 04.10.2026'daki özet R-16 için yanlışlıkla "Üst Yönetim kararı" yazıyordu (#177).
 
 **Son gözden geçirme:** 2026-10-04 — T3 sonu risk gözden geçirmesi (#126, denetim bulgusu T3-05). **R-01'in özet tablosundaki puanı düzeltildi:** kayıt 2×3 = 6 diyordu, özet 9 sayıyordu. R-03, R-08, R-14 güncellendi. T3 döneminde yaşanan veya ortaya çıkan riskler eklendi: R-19 (`KR-078` kalan riski), R-20 (SMTP sertifikası), R-21 (sunucu saati), R-22 (güvenilen vekil ağı), R-23 (bağımsız olmayan inceleme), R-24 (UAT kapasitesi), R-25 (UAT'de gerçek veri ve gerçek gönderim), R-26 (yerel çalışma kaybı). T3 boyunca deftere risk eklenmemişti; olayların da gözden geçirmeyi tetiklemesi §1'e yazıldı.
 
@@ -325,7 +325,7 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **O / E / Puan** | 2 / 3 / **6** |
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | (1) UAT'de ileti gönderimi `AllowList` kipindedir; yalnızca listedeki adreslere gider (`KR-083`). Liste kabul katılımcılarıyla sınırlı tutulur ve oturumdan sonra daraltılır. (2) UAT yalnızca kurum içinden erişilebilir ve TLS ile yayındadır; API ve veritabanı dışarıya kapalıdır. (3) Günlükte kişisel veri maskelenir; hesap işlemleri ekranı yalnızca ad, sicil ve firmayı gösterir. (4) Sırlar kaynak ağacının dışında tutulur; dağıtım yerel ortam dosyalarını sunucuya taşımaz (#125). (5) SSH (06.10.2026, `KR-102`, #174): erişim anahtarla yapılıyor ve sunucu parolası artık yazışmaya girmiyor; `root` parolası değiştirildi. Parola ile giriş, erişimin tamamen kaybolmaması için bilerek açık bırakıldı. UAT yedekleme kuralı `KR-098`. (6) Sunucuda belgelenmemiş Webmin yönetim paneli (10000 portu, ağa açık) bulundu ve 06.10.2026'de kaldırıldı (#177, #179); dışarıya açık portlar 22, 80, 443 |
-| **Durum** | Açık — puan 6 olduğu için kabul yetkisi RACI'ye göre Üst Yönetim'dedir; gerçek veriyle çalışmanın gerekçesi ve önlemleri üst yönetime sunulacak |
+| **Durum** | **Kabul edildi** — Üst Yönetim, Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026 (`KR-103`; onay kaydı `MAN.1-proje-planlama/kayitlar/2026-10-06-plan-ve-raci-onay-talebi.md`). Önlemler izlenmeye devam eder |
 
 ### R-26 — Geliştirme makinesindeki commit edilmemiş çalışmanın kaybı
 | | |
@@ -351,3 +351,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-04 | 1.0 | T3 sonu gözden geçirme (#126): R-01 özet puanı düzeltildi; "Kabul edildi" durumu ve kabul yetkisi kuralı §1'e yazıldı; R-03, R-08, R-14 güncellendi; R-19…R-26 eklendi | Bilgi İşlem |
 | 2026-10-06 | 1.1 | Kabul edilen riskler satırında R-16 düzeltildi (Bilgi İşlem, `KR-055`); R-25 önlem 5–6: SSH kararı ve Webmin bulgusu (#177) | Bilgi İşlem |
 | 2026-10-06 | 1.2 | R-20: sertifika yenilendi (bitiş 27.03.2027), durum İzleniyor; R-25: Webmin kaldırıldı (#179) | Bilgi İşlem |
+| 2026-10-10 | 1.3 | R-25 Üst Yönetim tarafından kabul edildi (`KR-103`, #127) | Bilgi İşlem |
