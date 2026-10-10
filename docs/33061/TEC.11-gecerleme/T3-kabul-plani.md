@@ -231,7 +231,7 @@ ele alınır.
 |---|---|---|---|---|
 | T-01 | Hareketsizlik neye göre sayılır? | 30 dakikalık hareketsizlik süresi, kişinin açık sekmede **tıklama, tuşa basma, kaydırma veya dokunma** yapmadığı süredir. Sekmede video oynarken de kişi etkin sayılır. Fareyi yalnızca gezdirmek, başka bir sekmede veya programda çalışmak etkinlik sayılmaz. | KS-07 | REQ-KMLK-054; AN-23, `KR-087` |
 | T-02 | Parola değişimi açılırsa kimleri, ne sıklıkla etkiler? | Şu anda ikisi de **kapalı**. (1) Periyodik değişim açılırsa süre 90 gündür; 30 ile 365 gün arasında ayarlanabilir. (2) İlk girişte değişim açılırsa, sisteme hiç giriş yapmamış **herkes** ilk girişinde parolasını değiştirir; üyelikte parolasını kendisi belirleyenler de buna dahildir. Kural açılmadan önce giriş yapmış olanlar etkilenmez. (3) Parolasını değiştirmesi gereken kişi, değiştirene kadar sistemin başka bir ekranını kullanamaz. | KS-08, KS-10 | REQ-KMLK-030, 055; AN-24, `KR-092` |
-| T-03 | Üyelikte deneme ve kod gönderim sınırları | Onaylı gereksinimde TCKN başına saatte 5 üyelik denemesi ve 15 dakikada 3 kod vardı. UAT'de İK ile yapılan denemelerde sistem çok çabuk engelledi; iki varsayılan da **10** yapıldı. Kod gönderim sınırı Sistem Yönetimi ekranından 1–15, üyelik deneme sınırı 3–20 arasında ayarlanabilir. **Bu bir değişiklik talebidir; İK'nın kabulü gerekir.** | KS-01, KS-02, KS-05 | REQ-KMLK-038, 039; değişiklik talebi #185 |
+| T-03 | Üyelikte deneme ve kod gönderim sınırları | Onaylı gereksinimde TCKN başına saatte 5 üyelik denemesi ve 15 dakikada 3 kod vardı. UAT'de İK ile yapılan denemelerde sistem çok çabuk engelledi; iki varsayılan da **10** yapıldı. Kod gönderim sınırı Sistem Yönetimi ekranından 1–15, üyelik deneme sınırı 3–20 arasında ayarlanabilir. **Değişiklik talebi; İK onayı 10.10.2026'da alındı.** Kabul oturumunda yeni davranış gösterilir | KS-01, KS-02, KS-05 | REQ-KMLK-038, 039; değişiklik talebi #185 |
 
 ---
 
@@ -282,3 +282,4 @@ Kabul kararından önce düzeltilmesi gerekenler İK ile birlikte belirlenir.
 | 2026-10-04 | 0.7 | §6.1: İK'nın teyit edeceği yorumlar T-01 (AN-23) ve T-02 (AN-24) (#135) | Bilgi İşlem |
 | 2026-10-04 | 0.8 | KS-04 notu: kalan risk R-19 olarak kayıtlı, kabul yetkisi (#126) | Bilgi İşlem |
 | 2026-10-10 | 0.9 | §6.1: T-03 — deneme ve kod gönderim sınırlarındaki değişiklik talebi (#185) İK teyidine; §3, §4 kabul adayı `v0.2.0-rc.3` | Bilgi İşlem |
+| 2026-10-10 | 0.10 | §6.1 T-03: İK onayı alındı (#187) | Bilgi İşlem |
