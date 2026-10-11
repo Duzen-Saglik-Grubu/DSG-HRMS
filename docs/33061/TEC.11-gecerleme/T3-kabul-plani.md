@@ -110,16 +110,16 @@ Her senaryo **katılımcının kendisi tarafından** uygulanır. Bilgi İşlem a
 
 ### KS-05 — Doğrulama kodu kuralları
 **Kim:** Personel 2 · **Cihaz:** Masaüstü
-1. Parola sıfırlamayı başlatır, e-posta kodu ister ve kodu 3 kez yanlış girer.
-2. Yeni kod ister; kodu doğru girer; aynı kodu ikinci kez kullanmayı dener.
-3. Yeni kod ister ve 5 dakika bekleyip girer.
+1. Parola sıfırlamayı başlatır, e-posta kodu ister ve kodu 4 kez yanlış girer.
+2. Yeni kod ister ve 5 dakika bekleyip girer.
 
 **Beklenen:**
-- 3 yanlış denemeden sonra kod iptal olur ve "Yeni kod isteyin" iletisi çıkar.
-- Kullanılmış kod kabul edilmez.
+- Kod en fazla 3 kez yanlış girilebilir. İlk 3 yanlış denemede "Kod hatalı. Lütfen tekrar deneyin." iletisi çıkar. 4. yanlış denemede kod iptal olur ve "Çok fazla hatalı deneme yapıldı. Yeni kod isteyin." iletisi çıkar (REQ-KMLK-017 kabul ölçütü).
 - Süresi dolan kod için anlaşılır bir ileti çıkar.
 
-**Kapsadığı gereksinimler:** REQ-KMLK-016, 017, 019
+**Kapsadığı gereksinimler:** REQ-KMLK-016, 017
+
+> **Not:** Kodun tek kullanımlık olması (REQ-KMLK-019) ekrandan denenemez: doğru kod girilince akış bir sonraki adıma geçer ve kod bir daha girilemez. Bu özellik kanıt gösteriminde gösterilir (KG-09).
 
 ### KS-06 — Giriş ve hatalı giriş
 **Kim:** Personel 1 · **Cihaz:** Masaüstü
@@ -139,16 +139,16 @@ Her senaryo **katılımcının kendisi tarafından** uygulanır. Bilgi İşlem a
 **Kim:** Personel 2 · **Cihaz:** Masaüstü ve cep telefonu
 1. Masaüstünde giriş yapar; telefonda aynı hesapla giriş yapar; masaüstünde sayfayı yeniler.
 2. Masaüstünde yeniden giriş yapar; 30 dakika işlem yapmaz. Bilgi İşlem hareketsizlik süresini parametreyle kısaltabilir.
-3. Giriş yapar ve uzun bir video oynatır.
-4. Çıkış yapar; tarayıcının geri tuşuyla korumalı sayfaya dönmeyi dener.
+3. Çıkış yapar; tarayıcının geri tuşuyla korumalı sayfaya dönmeyi dener.
 
 **Beklenen:**
 - Masaüstünde "Hesabınıza başka bir cihazdan giriş yapıldı" iletisi çıkar.
 - Hareketsizlikte önce uyarı, sonra kapanış iletisi gelir.
-- Video oynarken oturum kapanmaz.
 - Çıkıştan sonra sayfa açılmaz.
 
-**Kapsadığı gereksinimler:** REQ-KMLK-026, 027, 049, 050, 054
+**Kapsadığı gereksinimler:** REQ-KMLK-026, 027, 049, 050
+
+> **Not:** Video oynarken oturumun açık kalması (REQ-KMLK-054) T3'te ekrandan gösterilemez; uygulamada video bulunan ilk ekran Eğitim Yönetimi modülüyle gelecek. Davranış kodda hazırdır ve kanıt gösteriminde otomatik testle gösterilir (KG-10). Eğitim Yönetimi'nin kabulünde senaryo olarak denenir.
 
 ### KS-08 — Parola işlemleri
 **Kim:** Personel 3 · **Cihaz:** Masaüstü
@@ -221,6 +221,8 @@ Bu gereksinimler kullanıcı arayüzünden gözlenemez. Kanıtları T3 doğrulam
 | KG-06 | İşlemsel iletilerin bildirim istisnasından muaf olması | REQ-KMLK-042 | `NotificationDispatcherTests` (istisnanın kendisi Y1'de gelecek) |
 | KG-07 | 2FA'nın sistem ve kullanıcı düzeyinde açık ve kapalı hâllerinin otomatik testi | REQ-KMLK-053 | `SessionApiTests`, `TwoFactorPreferenceApiTests` |
 | KG-08 | Eşleşen ve eşleşmeyen üyelik isteklerinin yanıt süresi farkı (< 20 ms) | REQ-KMLK-004 | `RegistrationTimingTests` (KPÖ-KMLK-2) |
+| KG-09 | Kodun tek kullanımlık olması: doğrulanmış kod ikinci kez kabul edilmez; aynı anda gelen iki doğrulamadan yalnızca biri başarılı olur | REQ-KMLK-019 | `VerificationCodeTests`, `VerificationCodeServiceTests`, `VerificationCodeStoreTests` |
+| KG-10 | Sayfada video veya ses oynarken ve sekme görünürken etkinlik sinyali gönderilmesi; durunca veya sekme gizlenince kesilmesi | REQ-KMLK-054 | `SessionActivity.test.tsx` |
 
 ### 6.1 İK'nın teyit edeceği yorumlar (#135)
 
@@ -231,7 +233,7 @@ ele alınır.
 
 | # | Konu | Bilgi İşlem'in yorumu | Gösterildiği senaryo | Kaynak |
 |---|---|---|---|---|
-| T-01 | Hareketsizlik neye göre sayılır? | 30 dakikalık hareketsizlik süresi, kişinin açık sekmede **tıklama, tuşa basma, kaydırma veya dokunma** yapmadığı süredir. Sekmede video oynarken de kişi etkin sayılır. Fareyi yalnızca gezdirmek, başka bir sekmede veya programda çalışmak etkinlik sayılmaz. | KS-07 | REQ-KMLK-054; AN-23, `KR-087` |
+| T-01 | Hareketsizlik neye göre sayılır? | 30 dakikalık hareketsizlik süresi, kişinin açık sekmede **tıklama, tuşa basma, kaydırma veya dokunma** yapmadığı süredir. Sekmede video oynarken de kişi etkin sayılır (T3'te video ekranı yoktur; KG-10'da otomatik testle gösterilir). Fareyi yalnızca gezdirmek, başka bir sekmede veya programda çalışmak etkinlik sayılmaz. | KS-07 | REQ-KMLK-054; AN-23, `KR-087` |
 | T-02 | Parola değişimi açılırsa kimleri, ne sıklıkla etkiler? | Şu anda ikisi de **kapalı**. (1) Periyodik değişim açılırsa süre 90 gündür; 30 ile 365 gün arasında ayarlanabilir. (2) İlk girişte değişim açılırsa, sisteme hiç giriş yapmamış **herkes** ilk girişinde parolasını değiştirir; üyelikte parolasını kendisi belirleyenler de buna dahildir. Kural açılmadan önce giriş yapmış olanlar etkilenmez. (3) Parolasını değiştirmesi gereken kişi, değiştirene kadar sistemin başka bir ekranını kullanamaz. | KS-08, KS-10 | REQ-KMLK-030, 055; AN-24, `KR-092` |
 | T-03 | Üyelikte deneme ve kod gönderim sınırları | Onaylı gereksinimde TCKN başına saatte 5 üyelik denemesi ve 15 dakikada 3 kod vardı. UAT'de İK ile yapılan denemelerde sistem çok çabuk engelledi; iki varsayılan da **10** yapıldı. Kod gönderim sınırı Sistem Yönetimi ekranından 1–15, üyelik deneme sınırı 3–20 arasında ayarlanabilir. **Değişiklik talebi; İK onayı 10.10.2026'da alındı.** Kabul oturumunda yeni davranış gösterilir | KS-01, KS-02, KS-05 | REQ-KMLK-038, 039; değişiklik talebi #185 |
 | T-04 | İki adımlı doğrulama kimlere uygulanır? | Onaylı gereksinimde parametre açılınca 2FA herkese uygulanıyordu. Artık parametre 2FA'yı yalnızca **kullanıma açar**; her kullanıcı "Hesap güvenliği" ekranından kendi hesabında açar, varsayılan kapalıdır. Açmak için parola ve gelen kod, kapatmak için parola gerekir. Kodu alamayan kişinin 2FA'sını İK "Hesap işlemleri" ekranından gerekçe girerek kapatır. **Değişiklik talebi; kullanıcı tercihi ve İK'nın kurtarma işlemi için İK onayı 10.10.2026'da alındı.** Kabul oturumunda yeni davranış gösterilir | KS-09, KS-10 | REQ-KMLK-025, 051, 052, 053; değişiklik talebi #190, `KR-104` |
@@ -245,8 +247,8 @@ ele alınır.
 | Bölüm | Gereksinim | Senaryo / kanıt |
 |---|---|---|
 | Üyelik | 001–014 | KS-01…04, KS-09, KS-10, KG-01, KG-02 |
-| Doğrulama kodu | 015–021 | KS-02, KS-05, KG-03, KG-04 |
-| Giriş | 022–027, 049–054 | KS-06, KS-07, KS-10, KG-07 |
+| Doğrulama kodu | 015–021 | KS-02, KS-05, KG-03, KG-04, KG-09 |
+| Giriş | 022–027, 049–054 | KS-06, KS-07, KS-10, KG-07, KG-10 |
 | Parola | 028–033, 055 | KS-08, KS-10, KG-03 |
 | Hesap yaşam döngüsü | 034–037 | KS-09, KG-01 |
 | Güvenlik | 038–042 | KG-04…KG-06 |
@@ -289,3 +291,4 @@ Kabul kararından önce düzeltilmesi gerekenler İK ile birlikte belirlenir.
 | 2026-10-10 | 0.11 | KS-09 adım 4 (İK'nın 2FA kapatması), KS-10 adım 4 ve KG-07 kullanıcı tercihine bağlı 2FA'ya göre; §6.1 T-04; §3, §4 kabul adayı `v0.2.0-rc.4` (#190) | Bilgi İşlem |
 | 2026-10-11 | 0.12 | §6.1 T-04: kurtarma işlemi için İK onayı (10.10.2026) kayda geçti (Doğuş Uçanok bildirdi, #190) | Bilgi İşlem |
 | 2026-10-11 | 0.13 | §4: kabul adayı `v0.2.0-rc.4` etiketlendi ve UAT'ye kuruldu (#192) | Bilgi İşlem |
+| 2026-10-11 | 0.14 | Prova bulguları (#196): KS-05'te iptalin 4. yanlış denemede olduğu (REQ-KMLK-017) yazıldı, tek kullanım KG-09'a taşındı; KS-07'deki video adımı KG-10'a taşındı (T3'te video ekranı yok); §7 | Bilgi İşlem |
