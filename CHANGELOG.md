@@ -15,6 +15,9 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ## [Yayımlanmamış]
 
+### Düzeltildi
+- **Parametre ekranında T5'e ait bir parametre görünüyordu (#198).** "İK'nın kilitli hesabı açabilmesi" (PRM-HSP-03) hiçbir işleve bağlı olmadan listeleniyordu. Kilit açma T5 Kullanıcı Yönetimi kapsamında; parametre o modülle birlikte gelecek (SYG-KMLK-076).
+
 ---
 
 ## [0.2.0-rc.4] — 2026-10-10 · T3 Kimlik Yönetimi kabul adayı (4)

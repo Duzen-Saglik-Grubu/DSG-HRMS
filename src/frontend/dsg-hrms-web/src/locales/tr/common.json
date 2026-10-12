@@ -352,7 +352,6 @@
         "PRM-KML-21": "Periyodik parola değişim süresi (gün)",
         "PRM-HSP-01": "İK'nın personele parola oluşturma bağlantısı gönderebilmesi",
         "PRM-HSP-02": "Çalışma kaydı biten hesabın otomatik pasifleştirilmesi",
-        "PRM-HSP-03": "İK'nın kilitli hesabı açabilmesi",
         "PRM-HSP-04": "Parola oluşturma bağlantısının geçerlilik süresi (saat)",
         "PRM-GRN-04": "Destek iletişim bilgisi (üyelik ve giriş ekranları)",
         "PRM-BLD-03": "Bildirim istisnasının işlemsel iletileri kapsamaması"
