@@ -20,3 +20,4 @@ doğrulama geçtikten sonra ekler; satır PR ile commit edilir. Aynı bilgi sunu
 | 2026-10-04T20:04:34Z | v0.2.0-rc.2 | `69bafad` | Doğuş Uçanok |
 | 2026-10-10T13:02:28Z | v0.2.0-rc.3 | `fa3e194` | Doğuş Uçanok |
 | 2026-10-10T21:56:02Z | v0.2.0-rc.4 | `353eae7` | Doğuş Uçanok |
+| 2026-10-12T19:51:46Z | v0.2.0-rc.5 | `149f6ee` | Doğuş Uçanok |
