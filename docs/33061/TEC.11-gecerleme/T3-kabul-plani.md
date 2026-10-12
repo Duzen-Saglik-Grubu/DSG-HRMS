@@ -48,7 +48,7 @@ Kabul oturumu ancak aşağıdakilerin tamamı sağlanınca yapılır:
 - [x] **G2 "Geliştirme tamam"** kapısı geçti (T3 doğrulama raporu §5; 04.10.2026)
 - [x] **SYG-KMLK-064 metin incelemesi** kararı verildi ve onaylanan düzeltmeler uygulandı (04.10.2026, #152)
 - [x] Bilgi İşlem kabul senaryolarının **provasını** yerel ortamda yaptı (11–12.10.2026, Doğuş Uçanok). Bulgular düzeltildi: kabul planı KS-05 ve KS-07 (#196), T5'e ait parametrenin ekrandan çıkarılması (#198)
-- [ ] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (`v0.2.0-rc.5`, #200). Önceki adaylar: `v0.2.0-rc.1` (#157), `v0.2.0-rc.2` (#160), `v0.2.0-rc.3` (#185) ve `v0.2.0-rc.4` (#190)
+- [x] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (`v0.2.0-rc.5`, #200; kurulum 12.10.2026 22:51, `149f6ee`; CI kanıt özeti `TEC.9-dogrulama/kayitlar/2026-10-12-v0.2.0-rc.5-ci-kanit-ozeti.md`). Önceki adaylar: `v0.2.0-rc.1` (#157), `v0.2.0-rc.2` (#160), `v0.2.0-rc.3` (#185) ve `v0.2.0-rc.4` (#190)
 - [ ] Katılımcılar İK tarafından belirlendi; adresleri ve numaraları UAT izin listesine eklendi
 - [ ] Katılımcılara kısa kullanım notu verildi (`T3-kullanim-notu.md`, #154)
 - [ ] Bilinen açık `[HATA]` kaydı yok veya her biri kabul öncesinde İK'ya bildirildi
@@ -294,3 +294,4 @@ Kabul kararından önce düzeltilmesi gerekenler İK ile birlikte belirlenir.
 | 2026-10-11 | 0.13 | §4: kabul adayı `v0.2.0-rc.4` etiketlendi ve UAT'ye kuruldu (#192) | Bilgi İşlem |
 | 2026-10-11 | 0.14 | Prova bulguları (#196): KS-05'te iptalin 4. yanlış denemede olduğu (REQ-KMLK-017) yazıldı, tek kullanım KG-09'a taşındı; KS-07'deki video adımı KG-10'a taşındı (T3'te video ekranı yok); §7 | Bilgi İşlem |
 | 2026-10-12 | 0.15 | §4: Bilgi İşlem provası tamamlandı (#196, #198); §3, §4 kabul adayı `v0.2.0-rc.5` (#200) | Bilgi İşlem |
+| 2026-10-12 | 0.16 | §4: kabul adayı `v0.2.0-rc.5` etiketlendi ve UAT'ye kuruldu (#202) | Bilgi İşlem |
