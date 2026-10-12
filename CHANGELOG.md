@@ -15,6 +15,12 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ## [Yayımlanmamış]
 
+---
+
+## [0.2.0-rc.5] — 2026-10-12 · T3 Kimlik Yönetimi kabul adayı (5)
+
+`v0.2.0-rc.4`'ün yerine İK kabulüne sunulan sürüm. Bilgi İşlem'in kabul senaryoları provasında çıkan düzeltmeyi içerir; kabul planındaki düzeltmeler (#196) yalnızca belgede yapıldı.
+
 ### Düzeltildi
 - **Parametre ekranında T5'e ait bir parametre görünüyordu (#198).** "İK'nın kilitli hesabı açabilmesi" (PRM-HSP-03) hiçbir işleve bağlı olmadan listeleniyordu. Kilit açma T5 Kullanıcı Yönetimi kapsamında; parametre o modülle birlikte gelecek (SYG-KMLK-076).
 
@@ -110,6 +116,6 @@ Modül başına bir MINOR sürüm (`KR-097`). Numaralar kabul sırasına göre v
 | Sürüm | İçerik | Durum |
 |---|---|---|
 | `v0.1.0` | Teknik iskelet (A1) | Etiketlendi (geriye dönük) |
-| `v0.2.0` | T3 Kimlik Yönetimi — ilk kullanıcı teslimi | Kabul adayı: `v0.2.0-rc.4` |
+| `v0.2.0` | T3 Kimlik Yönetimi — ilk kullanıcı teslimi | Kabul adayı: `v0.2.0-rc.5` |
 | `v0.3.0` … | A2'nin kalan modülleri (T1, T2, T4, T5), ardından yatay altyapı (A3) ve iş modülleri (A4+); her biri kabul edildiğinde | Planlandı |
 | `v1.0.0` | Üretime geçiş (AS) | Planlandı |
