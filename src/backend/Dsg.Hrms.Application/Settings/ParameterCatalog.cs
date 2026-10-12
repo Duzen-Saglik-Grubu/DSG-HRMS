@@ -162,9 +162,8 @@ public static partial class ParameterCatalog
     public static readonly ParameterDefinition AutoDeactivateOnEmploymentEnd = Boolean(
         "PRM-HSP-02", "AutoDeactivateOnEmploymentEnd", "Istihdami biten hesabin otomatik pasiflestirilmesi", true);
 
-    /// <summary>IK'nin kilitli hesabi acabilmesi.</summary>
-    public static readonly ParameterDefinition HrCanUnlockAccounts = Boolean(
-        "PRM-HSP-03", "HrCanUnlockAccounts", "IK'nin kilitli hesabi acabilmesi", true);
+    // PRM-HSP-03 (IK'nin kilitli hesabi acabilmesi) T5 Kullanici Yonetimi kapsamindadir
+    // (REQ-KLNC-008, 23.09.2026 toplantisi S-03); islevi gelene kadar katalogda yer almaz (SYG-KMLK-076).
 
     /// <summary>Parola olusturma baglantisinin gecerlilik suresi (saat).</summary>
     public static readonly ParameterDefinition InviteLinkLifetimeHours = Integer(
@@ -192,7 +191,7 @@ public static partial class ParameterCatalog
             VerificationCodeLifetimeMinutes, AccessTokenLifetimeMinutes, SessionMaxHours, IdleTimeoutMinutes,
             SingleActiveSession, TwoFactorImpactWarning, MaxVerificationAttempts, CodeSendLimit,
             RegistrationLimitPerNationalId, RegistrationLimitPerIp, RequirePasswordChangeOnFirstLogin, PasswordMaxAgeDays,
-            HrInviteEnabled, AutoDeactivateOnEmploymentEnd, HrCanUnlockAccounts, InviteLinkLifetimeHours,
+            HrInviteEnabled, AutoDeactivateOnEmploymentEnd, InviteLinkLifetimeHours,
             SupportContact, TransactionalMessagesBypassExemption,
         }.OrderBy(p => p.Key, StringComparer.Ordinal),
     ];
