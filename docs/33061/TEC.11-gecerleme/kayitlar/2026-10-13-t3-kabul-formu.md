@@ -81,7 +81,7 @@
 
 ## 6. Karar (G3)
 
-**Kabul:** Zorunlu gereksinimlerin tamamı karşılandı. Formda yazılı karar: "Kabul edildi."
+**Kabul:** Zorunlu gereksinimlerin tamamı karşılandı. Word formdaki onay kutusu işaretlenemediği için karar kutunun yanına "Kabul edildi" olarak yazıldı.
 
 - Koşullu kabul koşulu: yok
 - Ret gerekçesi: yok
@@ -92,9 +92,11 @@
 | Kabul eden (İK) | Elvan Laleli Şahin | İnsan Kaynaklarından Sorumlu Yönetim Kurulu Üyesi | 13.10.2026 | İmzalı nüsha: BK-24 |
 | Hazırlayan (Bilgi İşlem) | Doğuş Uçanok | Bilgi İşlem Birim Sorumlusu | 13.10.2026 | İmzalı nüsha: BK-24 |
 
-> **İmza:** Islak imzalar, onaylı kalite belgeleriyle birlikte toplanacak (Doğuş Uçanok'un
-> kararı). Kabulün tarihli kanıtı bu kayıt ve oturumda doldurulan Word formudur
-> (`Masaüstü\HRMS\T3_Kabul_IK_Inceleme\02_T3_Kabul_Formu.docx`, 13.10.2026 14:35).
+> **İmza:** İmza gereken belgelerin (İK, Üst Yönetim) tamamı daha sonra onaylı kalite
+> belgeleriyle birlikte imzalatılacak; **asıl kanıt imzalı nüsha olacak** (Doğuş Uçanok'un
+> kararı, 13.10.2026). O zamana kadar kabulün tarihli kanıtı bu kayıt ve oturumda doldurulan
+> Word formudur (`Masaüstü\HRMS\T3_Kabul_IK_Inceleme\02_T3_Kabul_Formu.docx`; belge kimliği
+> 13.10.2026'da forma işlendi).
 
 ## Değişiklik Geçmişi
 

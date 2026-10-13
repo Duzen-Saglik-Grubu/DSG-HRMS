@@ -102,12 +102,12 @@ kapsama ölçümü (matris §6): kaynaktan kabule **56 / 56 kalem eksiksiz → %
    (`KR-097`). UAT'de aynı commit çalıştığı için yeniden kurulum gerekmez.
 2. **Modül sonu işleri:** 33061 süreç denetimi, durum raporu (`KR-101`), bilgi kayıt defteri
    gözden geçirmesi ve konfigürasyon denetimi.
-3. **UAT izin listesi:** `KR-083` gereği kabul katılımcılarının listeden çıkarılıp
-   çıkarılmayacağı kararlaştırılır (BK-22).
+3. **UAT izin listesi:** Kabul katılımcıları listeden çıkarılmaz; sonraki modüllerin
+   kabulünde de katılımcı olabilirler (`KR-106`, BK-22).
 4. **Katılımcı seçimi (öneri):** Sonraki modüllerin kabulünde personel katılımcılar farklı
    birimlerden seçilir.
-5. **İmzalar:** Kabul formunun ıslak imzaları onaylı kalite belgeleriyle birlikte toplanır;
-   saklama yeri BK-24'te kayıtlıdır.
+5. **İmzalar:** İmza gereken belgelerin tamamı onaylı kalite belgeleriyle birlikte
+   imzalatılır; asıl kanıt imzalı nüsha olur. Saklama yeri o zaman belirlenir (BK-24, Ö-3).
 
 ---
 
