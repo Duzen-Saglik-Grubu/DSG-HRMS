@@ -42,7 +42,7 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 |---|---|---|---|---|---|---|
 | BK-10 | UAT veritabanı: personel, hesaplar, denetim izi, güvenlik olayları | UAT sunucusu, Docker volume `dsg-hrms-uat_uat-postgres-data` | Bilgi İşlem | **Gizli**: gerçek personel verisi (R-25) | **Öneri:** UAT kullanıldıkça tutulur; düzenli yedeklenmez (`KR-098`) | **Öneri:** Üretime geçişten sonra veya UAT kapatıldığında volume silinir (`docker compose down -v`); silme kayda geçer |
 | BK-11 | UAT uygulama günlükleri | UAT, volume `dsg-hrms-uat_uat-api-logs` | Bilgi İşlem | Kurum içi: kişisel veri maskelenir (#119) | **90 dosya (gün)**: `RetainedFileCountLimit`, ADR-0009 | Otomatik: eski dosya silinir |
-| BK-12 | UAT sır dosyası | `/opt/dsg-hrms/secrets/.env.uat` | Bilgi İşlem | **Gizli** | UAT kullanıldıkça | UAT kapatıldığında silinir. Bir sır değiştirildiğinde eski değer dosyada tutulmaz |
+| BK-12 | UAT sır dosyası | `/opt/dsg-hrms/secrets/.env.uat` | Bilgi İşlem | **Gizli** | UAT kullanıldıkça | UAT kapatıldığında silinir. Bir sır değiştirildiğinde eski değer dosyada tutulmaz. Dosyanın yedek kopyası bırakılmaz; 27.09 tarihli kopya 13.10.2026'da silindi (#207) |
 | BK-13 | UAT geçici veritabanı kopyaları | `/opt/dsg-hrms/yedek-*.sql.gz` | Bilgi İşlem | **Gizli** | Yalnızca riskli işlem sürince (`KR-098`) | İşlem doğrulanınca silinir |
 | BK-14 | UAT dağıtım kaydı | `/opt/dsg-hrms/deployments.log`; depoda `TEC.10-gecis/kayitlar/` | Bilgi İşlem | Kurum içi | Sistemin ömrü boyunca (depodaki) | Gerekmez |
 | BK-15 | Yerel geliştirme veritabanı | Geliştirici makinesi, Docker volume'leri | Bilgi İşlem | **Gizli**: geliştirme ortamı gerçek LOGO verisiyle çalışır | **Öneri:** Geliştirme süresince | **Öneri:** Geliştirici değiştiğinde veya makine el değiştirdiğinde volume'ler silinir |
@@ -80,3 +80,4 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 | 2026-10-06 | 1.1 | Ö-1 kapandı; BK-25 güncellendi (#177) | Bilgi İşlem |
 | 2026-10-10 | 1.2 | BK-26: Üst Yönetim onay formu (#127) | Bilgi İşlem |
 | 2026-10-13 | 1.3 | BK-23, BK-24: T3 kabul formunun geçici yeri; Ö-3 açık; BK-22: katılımcılar listede kalır (`KR-106`) (#204) | Bilgi İşlem |
+| 2026-10-13 | 1.4 | BK-12: yedek kopya bırakılmaz; eski kopya silindi (#207) | Bilgi İşlem |

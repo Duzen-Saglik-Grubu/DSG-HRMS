@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.5-KOL
 **Süreç:** MAN.5 — Konfigürasyon Yönetimi (`MAN.5.BP2`, `BP3`)
-**Son güncelleme:** 2026-10-05 · **Sahibi:** Bilgi İşlem
+**Son güncelleme:** 2026-10-13 · **Sahibi:** Bilgi İşlem
 **Kaynak:** T3 süreç denetimi, bulgu BULGU-05 (#132)
 
 > Konfigürasyon öğesi (KÖ), değiştiğinde sistemin davranışını veya kanıtını değiştiren ve
@@ -21,7 +21,7 @@
 | Depo dışı öğeler (§3.2, §3.3) | Bu listedeki konum ve değişiklik yolu | Konfigürasyon denetimi raporu (`raporlar/`) |
 
 Modül kapanışında ve kabul adayı etiketlendiğinde konfigürasyon denetimi yapılır.
-Denetim, depo dışı öğelerin bu listeyle uyumunu sınar.
+Denetim, depo dışı öğelerin bu listeyle uyumunu sınar. UAT'de her denetimde şunlar da sınanır: dinleyen portlar TCP **ve UDP** için (`ss -ltnup`); `secrets/` dizininin tamamı (yalnızca `.env.uat` bulunur, kopya yoktur); bekleyen yeniden başlatma ve `apt` geçmişi (#207).
 
 ---
 
@@ -100,3 +100,4 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 | 2026-10-05 | 1.0 | İlk oluşturma (#132) | Bilgi İşlem |
 | 2026-10-06 | 1.1 | KÖ-34 SSH anahtarı; KÖ-35 Webmin eklendi (#177) | Bilgi İşlem |
 | 2026-10-06 | 1.2 | KÖ-35 Webmin kaldırıldı; KÖ-43 yeni sertifika (#179) | Bilgi İşlem |
+| 2026-10-13 | 1.3 | §1: UAT denetiminde UDP dinleyiciler, `secrets/` dizininin tamamı ve yeniden başlatma da sınanır (#207) | Bilgi İşlem |
