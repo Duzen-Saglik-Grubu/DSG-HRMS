@@ -323,7 +323,7 @@ raporunda ayrıca ele alınır.
 | **O / E / Puan** | 2 / 2 / **4** |
 | **Puan gerekçesi** | **Olasılık 2:** İki haftada üç örnek görüldü; yeniden deneme ve "denetim yapılamadı" issue'su 28.09 sonrasında eklendi, ama 05.10'daki iptal türünü yakalamadı. **Etki 2:** Denetlenmeyen değişiklik `main`'e girebilir ve kalite kanıtı eksik kalır; ürün doğrudan bozulmaz, sonraki çalışmalar ve modül sonu denetimi açığı yakalar. |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) Kontrol işi iptal veya hata ile biterse yeniden denenir; yine olmazsa "denetim yapılamadı" issue'su açılır (#208). (2) Dal Koruma Denetimi `main-failure-check` izleme listesine eklenir (#208). (3) Haftalık "son `main` commit'i yeşil mi" denetimi (#208). (4) Testler boş kümede başarısız olur: mimari testi artık hiçbir bağımlılık ölçmezse başarısız oluyor (#171 düzeltmesi). (5) 05.10 olayı TEC.13 olay kayıtlarına geriye dönük yazılır (#208). |
+| **Önlem** | (1) **Uygulandı (#208):** `main-failure-check` tamamlanamayan çalışmaları (iptal, zaman aşımı) da kayda geçirir. (2) **Uygulandı (#208):** Dal Koruma Denetimi izleme listesinde. (3) **Uygulandı (#208):** Zamanlanmış tarama (`main-health-sweep.yml`, 6 saatte bir) son `main` commit'inin doğrulandığını ve kayıt kontrolünün kendisinin çalıştığını sınar; çalışmazsa `[HATA] Denetim çalışmadı` issue'su açılır. 05.10 olayına karşı geriye dönük denendi ve yakaladı. (4) Testler boş kümede başarısız olur: mimari testi artık hiçbir bağımlılık ölçmezse başarısız oluyor (#171 düzeltmesi). (5) **Uygulandı:** 05.10 olayı TEC.13 olay kayıtlarında O-5 (#208). |
 | **Durum** | Açık |
 
 ### R-29 — Bağımlılıklarda tekrarlayan güvenlik açıkları
@@ -400,3 +400,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-10 | 1.4 | R-27 eklendi: kanallarını kaybeden kullanıcının 2FA ile girişte kalması; önlem İK'nın kurtarma işlemi (#190) | Bilgi İşlem |
 | 2026-10-13 | 1.5 | T3 modül kapanışı gözden geçirmesi (MAN.8 Ek A §8.1): R-09 yeniden puanlandı (2/2/4 → 3/2/6); R-20 açıklaması ve puanı (2/3/6 → 1/3/3); R-08, R-19, R-21, R-23, R-25 (önlem 1 `KR-106`, önlem 7 #207), R-26, R-27 güncellendi; R-28, R-29, R-30 eklendi; özet güncellendi; bölüm sırası düzeltildi (R-11 ve R-17…R-27 taşındı, içerik değişmedi) | Bilgi İşlem |
 | 2026-10-13 | 1.6 | R-25 önlem 7 ve R-30 önlem 1 uygulandı: UAT'deki eski sır kopyası silindi (#207) | Bilgi İşlem |
+| 2026-10-13 | 1.7 | R-28: önlem 1, 2, 3 ve 5 uygulandı (#208) | Bilgi İşlem |
