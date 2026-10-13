@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-10-10
+**Son güncelleme:** 2026-10-13
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -116,7 +116,7 @@ raporunda ayrıca ele alınır.
 | **Açıklama** | **Güncel ölçüm (2026-09-22):** 564 aktif kişiden **4'ünde kurumsal e-posta**, **10'unda cep telefonu** kayıtlı değildir; **2'sinde ise ikisi de yoktur**. Bu 2 kişi **hiçbir kanaldan** doğrulama kodu alamaz ve kendi başına üye olamaz. Geçersiz telefon biçimi kalmamıştır. **Önceki ölçümler:** 21.09.2026 → 5 / 12 / 4; 09.09.2026 → 38 / 13 / 12 ve 1 geçersiz numara. İK'nın iki turda yaptığı düzeltme, hiçbir kanaldan doğrulanamayan kişi sayısını **12 → 4 → 2**'ye indirdi. Kurumsal adresi olmayanlar için SMS doğrulaması zorunlu kılınmadığından (`KR-020`), kalıcı çözüm veri düzeltmesidir. (Bkz. `docs/analiz/01-mevcut-sistem-veri-envanteri.md` §1.5) |
 | **O / E / Puan** | 2 / 2 / **4** (ilk değer 3 / 2 / 6 idi; etkilenen kişi sayısı 12'den 2'ye indiği için olasılık düşürüldü. Puan 4'te tutuluyor: kalan 2 kişi düzeltilmezse etki KESİNDİR — o kişiler sisteme giremez) |
 | **Sahibi** | İK Birimi |
-| **Önlem** | (0) **Öncelik: iletişim bilgisi hiç olmayan 2 kişi.** Bu kişiler tamamlanmadan sisteme giremezler. (1) İK, devreye alma öncesinde eksik iletişim bilgilerini LOGO'da tamamlayacak. (2) Sistem, eksik iletişim bilgisi olan aktif personeli listeleyen bir yönetim raporu sunacak. (3) Hiçbir iletişim bilgisi olmayan personel için İK'nın gerekçe girerek hesap açabildiği, tam loglanan **istisna akışı** tasarlanacak (Kullanıcı Yönetimi modülü). **Güncelleme (2026-10-04):** İK, iletişim bilgisi hiç olmayan 2 kişinin sisteme alınmayacağına karar verdi (`KR-076`); bu kişiler için istisna akışı kullanılmayacak. Telefonu olup kurumsal e-postası olmayan kişiler SMS ile üye olabiliyor (T3, PR #88/#91). Ölçüm 22.09.2026'dan beri yenilenmedi; kabul öncesinde yenilenmeli. |
+| **Önlem** | (0) **Öncelik: iletişim bilgisi hiç olmayan 2 kişi.** Bu kişiler tamamlanmadan sisteme giremezler. (1) İK, devreye alma öncesinde eksik iletişim bilgilerini LOGO'da tamamlayacak. (2) Sistem, eksik iletişim bilgisi olan aktif personeli listeleyen bir yönetim raporu sunacak. (3) Hiçbir iletişim bilgisi olmayan personel için İK'nın gerekçe girerek hesap açabildiği, tam loglanan **istisna akışı** tasarlanacak (Kullanıcı Yönetimi modülü). **Güncelleme (2026-10-04):** İK, iletişim bilgisi hiç olmayan 2 kişinin sisteme alınmayacağına karar verdi (`KR-076`); bu kişiler için istisna akışı kullanılmayacak. Telefonu olup kurumsal e-postası olmayan kişiler SMS ile üye olabiliyor (T3, PR #88/#91). Ölçüm 22.09.2026'dan beri yenilenmedi; kabul öncesinde yenilenmeli. **Güncelleme (2026-10-13):** Kabul öncesi yeniden ölçüm yapılmadı. Ölçüm, üretime geçiş (AS) kararından önce ve en geç sıradaki modülün kabulünde yenilenir. |
 | **Durum** | Açık |
 
 ### R-09 — Mevcut sistemin PostgreSQL 14 sürümünün destek dışına çıkması
@@ -124,10 +124,11 @@ raporunda ayrıca ele alınır.
 |---|---|
 | **Kategori** | Altyapı |
 | **Açıklama** | Mevcut HRMS, PostgreSQL 14 üzerinde çalışmaktadır ve bu sürümün üretici desteği **Kasım 2026**'da sona ermektedir. Yeni sisteme geçiş bu tarihten sonraya sarkarsa mevcut sistem desteksiz kalır. |
-| **O / E / Puan** | 2 / 2 / **4** |
+| **O / E / Puan** | **3** / 2 / **6** *(2026-10-13'te 2/2/4'ten yükseltildi)* |
+| **Puan gerekçesi** | **Olasılık 3:** PostgreSQL 14 desteği Kasım 2026'da bitiyor. Üretim altyapısı için kaynak ayrıldı ama hedef tarih belirlenmedi (`KR-103` karar 4); kesimin destek bitişinden sonraya kalması artık neredeyse kesindir. **Etki 2:** Eski sistem yalnızca veri kaynağı olarak kalır ve yeni geliştirme yapılmaz; desteksiz sürümde güvenlik yaması alınamaz. |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) **Karar (2026-09-04):** Yeni sistem, **ayrı bir sunucuda kurulacak güncel PostgreSQL sürümü** üzerinde çalışacaktır; mevcut sunucu ve sürüm yükseltilmeyecektir. (2) Geçiş tamamlanana kadar mevcut sistem yerinde kalacağı için, kesim tarihi Kasım 2026 sonrasına sarkarsa eski sistem desteksiz sürümde çalışmaya devam eder. Bu süre boyunca eski sistem yalnızca veri kaynağı olarak kullanılacak, yeni geliştirme yapılmayacaktır. (3) Kesim sonrası eski veritabanı salt-okunur arşive alınacaktır. |
-| **Durum** | İzleniyor — kalıntı risk düşük |
+| **Önlem** | (1) **Karar (2026-09-04):** Yeni sistem, **ayrı bir sunucuda kurulacak güncel PostgreSQL sürümü** üzerinde çalışacaktır; mevcut sunucu ve sürüm yükseltilmeyecektir. (2) Geçiş tamamlanana kadar mevcut sistem yerinde kalacağı için, kesim tarihi Kasım 2026 sonrasına sarkarsa eski sistem desteksiz sürümde çalışmaya devam eder. Bu süre boyunca eski sistem yalnızca veri kaynağı olarak kullanılacak, yeni geliştirme yapılmayacaktır. (3) Kesim sonrası eski veritabanı salt-okunur arşive alınacaktır. **Güncelleme (2026-10-13):** Puan 6'ya çıktığı için risk aktif takibe alındı ve durum raporlarında ayrıca ele alınır (§1). |
+| **Durum** | Açık — kesimin destek bitişinden sonraya kalması kesinleşiyor; Üst Yönetim durum raporu 2'de bilgilendirilir |
 
 ### R-10 — Değerlendirme (rating) çerçevesinin elde bulunmaması
 | | |
@@ -138,6 +139,16 @@ raporunda ayrıca ele alınır.
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | TS ISO/IEC 33020 standardı TSE'den temin edilmiş ve incelenmiştir. Seviye 2 kriterleri, derecelendirme ölçeği ve öz değerlendirme tablosu `docs/33061/00-OLGUNLUK-SEVIYESI-KRITERLERI.md` belgesinde tanımlanmıştır. Kapsamdaki 15 sürecin tamamı için PA 1.1 (Tam), PA 2.1 ve PA 2.2 (en az Büyük Ölçüde) kanıtı üretilecek şekilde tasarım yapılmaktadır. |
 | **Durum** | Kapandı — 2026-09-04 (standart temin edildi ve kriterler belgelendi) |
+
+### R-11 — TSE standard dokümanının telif ihlali oluşturacak şekilde paylaşılması
+| | |
+|---|---|
+| **Kategori** | Hukuki |
+| **Açıklama** | Satın alınan TSE standard dokümanı, TSE lisansı gereği çoğaltılamaz ve dağıtılamaz. GitHub deposuna eklenmesi telif ihlali oluşturur. |
+| **O / E / Puan** | 1 / 3 / **3** |
+| **Sahibi** | Bilgi İşlem |
+| **Önlem** | `docs/TSE_ISO_IEC_TS_33061/` klasörü `.gitignore` ile depo dışında tutulmuştur. Standardın içeriği proje dokümanlarına kopyalanmaz; yalnızca madde numarasıyla atıf yapılır. Doküman yerel olarak veya kurum içi güvenli bir konumda saklanır. |
+| **Durum** | Kapandı — önlem uygulandı (2026-09-03) |
 
 ### R-12 — Aynı e-posta adresinin birden fazla personele tanımlı olması
 | | |
@@ -158,16 +169,6 @@ raporunda ayrıca ele alınır.
 | **Sahibi** | İK Birimi + Bilgi İşlem |
 | **Önlem** | (1) İK, kurumsal e-posta adresi olmayan personele kurumsal adres tanımlayacak. Kalıcı çözüm veri düzeltmesidir; kurumsal adresi olmayanlar için SMS doğrulaması **zorunlu kılınmayacaktır** (`KR-020`). (2) Sistem, kabul edilen kurumsal alan adlarını (`@duzen.com.tr`, `@zeytinim.com`, `@labpt.com.tr`) **yapılandırılabilir bir liste** olarak tutacak; liste dışı adreslere e-posta ile doğrulama kodu gönderilmeyecek. (3) Bu kural Kullanıcı Yönetimi modülü gereksinimlerinde karara bağlanacaktır. |
 | **Durum** | **Kapandı — 2026-09-21.** Ölçüm 0 kişi. **Teknik kontrol kaldırılmaz:** LOGO canlı bir sistemdir, yeni kayıt her gün açılabilir. Kurumsal olmayan adrese doğrulama kodu göndermeme kuralı (`KR-019`, `REQ-KMLK-008`) kalıcıdır; risk kapanmıştır, kural kapanmaz |
-
-### R-11 — TSE standard dokümanının telif ihlali oluşturacak şekilde paylaşılması
-| | |
-|---|---|
-| **Kategori** | Hukuki |
-| **Açıklama** | Satın alınan TSE standard dokümanı, TSE lisansı gereği çoğaltılamaz ve dağıtılamaz. GitHub deposuna eklenmesi telif ihlali oluşturur. |
-| **O / E / Puan** | 1 / 3 / **3** |
-| **Sahibi** | Bilgi İşlem |
-| **Önlem** | `docs/TSE_ISO_IEC_TS_33061/` klasörü `.gitignore` ile depo dışında tutulmuştur. Standardın içeriği proje dokümanlarına kopyalanmaz; yalnızca madde numarasıyla atıf yapılır. Doküman yerel olarak veya kurum içi güvenli bir konumda saklanır. |
-| **Durum** | Kapandı — önlem uygulandı (2026-09-03) |
 
 ### R-14 — Doğrulama SMS'inin kara liste nedeniyle ulaşmaması
 | | |
@@ -201,37 +202,6 @@ raporunda ayrıca ele alınır.
 | **Karar (2026-09-09)** | Kurum, deponun **özel kalmasına** ve organizasyonun **Free planında devam etmesine** karar vermiştir; GitHub Team planına geçilmeyecektir (`KR-055`). Risk, uygulanan telafi edici kontrollerle **kabul edilmiştir** (risk kabulü). Denetimde `dal-koruma-telafi-kontrolleri.md` belgesi ve CI denetim kayıtları gösterilecektir. |
 | **Durum** | **Kabul edildi** — telafi edici kontrollerle izleniyor |
 
----
-
-## 3. Risk özeti
-
-| Puan | Risk sayısı | Riskler |
-|---|---:|---|
-| 9 | 1 | R-18 |
-| 6 | 8 | R-01, R-03, R-04, R-05, R-06, R-15, R-20, R-25 |
-| 4 | 6 | R-08, R-09, R-14, R-16, R-23, R-24 |
-| 3 | 1 | R-02 |
-| 2 | 5 | R-19, R-21, R-22, R-26, R-27 |
-| Kapandı | 6 | R-07, R-10, R-11, R-12, R-13, R-17 |
-
-**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-15, R-18, R-20, R-25
-
-**Kabul edilen riskler:** R-25 (Üst Yönetim, 09.10.2026, puan 6; `KR-103`), R-16 (Bilgi İşlem, puan 4; `KR-055`), R-19 (Bilgi İşlem, puan 2; `KR-078`). İkisinin de puanı 6'nın altında olduğu için kabul yetkisi Bilgi İşlem'dedir. 04.10.2026'daki özet R-16 için yanlışlıkla "Üst Yönetim kararı" yazıyordu (#177).
-
-**Son gözden geçirme:** 2026-10-04 — T3 sonu risk gözden geçirmesi (#126, denetim bulgusu T3-05). **R-01'in özet tablosundaki puanı düzeltildi:** kayıt 2×3 = 6 diyordu, özet 9 sayıyordu. R-03, R-08, R-14 güncellendi. T3 döneminde yaşanan veya ortaya çıkan riskler eklendi: R-19 (`KR-078` kalan riski), R-20 (SMTP sertifikası), R-21 (sunucu saati), R-22 (güvenilen vekil ağı), R-23 (bağımsız olmayan inceleme), R-24 (UAT kapasitesi), R-25 (UAT'de gerçek veri ve gerçek gönderim), R-26 (yerel çalışma kaybı). T3 boyunca deftere risk eklenmemişti; olayların da gözden geçirmeyi tetiklemesi §1'e yazıldı.
-
-Önceki: 2026-09-22 — İK'nın ikinci düzeltme turundan sonra ölçüm yenilendi. `R-12` **kapandı** (paylaşılan adres 4 kişi / 1 adres → 0). `R-08` ölçümü güncellendi: hiçbir iletişim bilgisi olmayan kişi **4 → 2**; puan 4'te tutuldu.
-Önceki: 2026-09-21 — LOGO verisi, İK'nın düzeltme çalışmasından sonra yeniden ölçüldü. `R-13` **kapandı** (kişisel e-posta 59 → 0); `R-08` puanı 6'dan 4'e düştü (hiçbir iletişim bilgisi olmayan kişi 12 → 4); `R-12` değişmedi (4 kişi / 1 adres).
-Önceki: 2026-09-16 — `R-18` (elle sertifika yenilemesi) eklendi; R-17'nin önlemi Let's Encrypt / DNS-01 kararıyla güncellendi. Bu gözden geçirmede, R-17 eklenirken **özet tablosunun güncellenmediği** fark edildi ve düzeltildi: kayıt eklemek yeterli değildir, özet de aynı anda güncellenmelidir.
-Önceki: 2026-09-08 — `R-16` (dal koruma kısıtı) eklendi; GitHub kurulumu sırasında tespit edildi.
-Önceki: 2026-09-07 — `R-15` (kapsam büyüklüğü) eklendi; `R-02`'nin
-olasılığı, LOGO sürüm yükseltmelerinin TRISOFT tarafından önceden bildirildiği ve geçmiş
-yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e düşürüldü**.
-Önceki: 2026-09-06 — R-14 (SMS kara listesi) eklendi.
-Önceki: 2026-09-05 — R-07 kapandı; R-08, R-12, R-13 güncel ölçümlerle güncellendi.
-
----
-
 ### R-17 — UAT ortamının şifrelenmemiş bağlantı (HTTP) üzerinden yayımlanması
 | | |
 |---|---|
@@ -241,8 +211,6 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | (1) **Let's Encrypt** sertifikası ile UAT ve üretim ortamlarında **TLS zorunlu** kılınacak; HTTP isteği HTTPS'e yönlendirilecek. Kurum içi (self-signed) sertifika yerine Let's Encrypt seçilmiştir: her istemciye elle kök sertifika dağıtma yükü doğmaz. Doğrulama **DNS-01** yöntemiyle yapılır; bu yöntem sunucunun internete açılmasını gerektirmez, dolayısıyla "yalnızca kurum içi erişim" kısıtı korunur. (2) Bu iş **T3 Kimlik Yönetimi devreye alınmadan önce** tamamlanacaktır — modülün ön koşuludur. (3) Yenileme riski ayrıca **R-18** altında izlenir. |
 | **Durum** | **Kapandı — 17.09.2026.** UAT `https://insankaynaklaritest.duzen.com.tr` üzerinden yayında; HTTP 301 ile yönlendiriliyor, sertifika doğrulaması `curl` ile sınandı (`ssl_verify_result=0`). Yenileme riski **R-18** altında devam eder. |
-
----
 
 ### R-18 — TLS sertifikası yenilemesinin elle yapılması nedeniyle süresinin dolması
 | | |
@@ -254,8 +222,6 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **Önlem** | (1) **Sistem içi uyarı** (asıl önlem): Y4 Sistem Yönetimi modülünde sertifikanın kalan geçerlilik günü izlenir; eşiğin (varsayılan 10 gün) altına düştüğünde sistem yöneticisine **e-posta ve SMS** gönderilir — bkz. gereksinim #42. Uyarı, **sunulan** sertifikadan okunur; böylece "dosya yenilendi ama nginx yeniden yüklenmedi" durumu da yakalanır. (2) Alıcı tek kişi değil, **sistem yöneticisi rolüdür**; tek kişinin izinli olması uyarıyı kör etmez. (3) **Ara dönem** (Y4 hazır olana kadar): sertifikanın bitiş tarihi UAT runbook'una yazılır ve Bilgi İşlem takvim hatırlatmasıyla takip eder. (4) **HSTS bilinçli olarak kapalı tutulur**: sertifika kaçırılırsa kullanıcı uyarıyı atlayarak sisteme erişebilir; HSTS bunu imkânsız kılardı. HSTS ancak yenileme otomatikleştiğinde açılacaktır. |
 | **Durum** | Açık — ara dönem önlemi yürürlükte; asıl önlem A3 aşamasında (#42) |
 
----
-
 ### R-19 — Üyelikte bilgilerin eşleştiğinin dolaylı olarak anlaşılması (`KR-078`)
 | | |
 |---|---|
@@ -264,15 +230,16 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **O / E / Puan** | 1 / 2 / **2** |
 | **Puan gerekçesi** | **Olasılık 1:** Farkı görebilmek için kişinin T.C. Kimlik Numarası, doğum tarihi ve kurumsal e-postasının **üçünün birden** doğru bilinmesi gerekir; üyelik denemeleri kişi ve IP başına hız sınırına tabidir (SYG-KMLK-059). **Etki 2:** Öğrenilen tek bilgi kişinin kurumda çalıştığıdır. Hesaba erişim sağlanmaz: kod yine kişinin kendi adresine gider. |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | Onaylı gereksinim metni korunur. Kalan risk T3 kabulünde İK'ya gösterilir (kabul planı KS-04 notu, kabul formu §4). Telefonu olmayan kişi sayısı azaldıkça risk de küçülür (R-08). |
+| **Önlem** | Onaylı gereksinim metni korunur. Kalan risk T3 kabulünde İK'ya gösterilir (kabul planı KS-04 notu, kabul formu §4). Telefonu olmayan kişi sayısı azaldıkça risk de küçülür (R-08). **Güncelleme (2026-10-13):** Kalan risk T3 kabulünde İK'ya gösterildi ve uygun bulundu (kabul formu, AN-01; `KR-105`). Üyelik deneme sınırı #185 ile TCKN başına saatte 5'ten 10'a çıktı (PRM-KML-18). Olasılık 1'de tutuldu: farkı görmek için üç bilginin birden doğru bilinmesi gerekir ve IP başına sınır (PRM-KML-19, saatte 20) değişmedi. |
 | **Durum** | **Kabul edildi** — Bilgi İşlem, 25.09.2026 (`KR-078`). Puan 6'nın altında olduğu için kabul yetkisi RACI'ye göre Bilgi İşlem'dedir; puan ve gerekçesi 04.10.2026'da kayda geçti; puanı Doğuş Uçanok 05.10.2026'da onayladı (#126) |
 
 ### R-20 — SMTP sunucusu sertifikasının süresinin dolması
 | | |
 |---|---|
 | **Kategori** | Entegrasyon / Kullanılabilirlik |
-| **Açıklama** | Doğrulama kodları ve davet bağlantıları `mail.duzen.com.tr:587` üzerinden gönderilir. Gönderici sunucu sertifikasını doğrular; doğrulama kapatılmaz (runbook §10.5). `mail.duzen.com.tr` sertifikasının geçerliliği **11.10.2026**'da bitiyor. Yenilenmezse veya yenilenip Postfix yeniden yüklenmezse **e-posta kanalı tamamen durur**: e-postayla üyelik, parola sıfırlama ve davet yapılamaz. 27.09.2026'da 587 portunun süresi dolmuş, kendinden imzalı bir sertifika sunduğu görülmüştü; bu durum sunucu tarafında düzeltildi. |
-| **O / E / Puan** | 2 / 3 / **6** |
+| **Açıklama** | Doğrulama kodları ve davet bağlantıları `mail.duzen.com.tr:587` üzerinden gönderilir. Gönderici sunucu sertifikasını doğrular; doğrulama kapatılmaz (runbook §10.5). `mail.duzen.com.tr` sertifikası 06.10.2026'da yenilendi; geçerlilik **27.03.2027**'de bitiyor (#179; önceki sertifika 11.10.2026'da bitiyordu). Yenilenmezse veya yenilenip Postfix yeniden yüklenmezse **e-posta kanalı tamamen durur**: e-postayla üyelik, parola sıfırlama ve davet yapılamaz. 27.09.2026'da 587 portunun süresi dolmuş, kendinden imzalı bir sertifika sunduğu görülmüştü; bu durum sunucu tarafında düzeltildi. |
+| **O / E / Puan** | **1** / 3 / **3** *(2026-10-13'te 2/3/6'dan düşürüldü)* |
+| **Puan gerekçesi** | **Olasılık 1:** Sertifika yaklaşık 5,5 ay daha geçerli; bitiş tarihi biliniyor ve sonraki yenileme bitişten 2–3 gün önce yapılacak (önlem 1). Hazır olma kontrolü, kanal bozulursa dağıtımda ve kabul öncesinde gösterir (önlem 2). **Etki 3:** Değişmedi; yenilenmezse e-posta kanalı tamamen durur. |
 | **Sahibi** | Bilgi İşlem (e-posta sunucusu yöneticisi) |
 | **Önlem** | (1) Sertifika bitişten 2–3 gün önce yenilenir (Doğuş Uçanok, 05.10.2026; ilk yenileme 06.10.2026 öncesinde yapıldı); ardından Postfix yeniden yüklenecek ve runbook §10.5'teki `openssl` denetimi çalıştırılacak. (2) API'nin hazır olma kontrolü e-posta kanalını `Unhealthy` gösterir; dağıtım sonrası ve kabul öncesinde bakılır. (3) Kalıcı önlem: R-18'deki sertifika uyarısı (Y4) SMTP sertifikasını da kapsayacak. |
 | **Durum** | İzleniyor — sertifika 06.10.2026'de yenilenmiş bulundu: Sectigo, geçerlilik 04.10.2026–**27.03.2027**; 587 portunda doğrulama `0 (ok)`; UAT e-posta kanalı Healthy (#179). Sonraki yenileme bitişten 2–3 gün önce |
@@ -284,7 +251,7 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **Açıklama** | **Gerçekleşti (29.09.2026, #103):** UAT sunucusunun saati yaklaşık 10 dakika gerideydi; NTP eşitlemesi çalışmıyordu. Kod ekranı açılır açılmaz "süresi doldu" diyordu. Saat sapması ayrıca denetim izindeki ve günlüklerdeki zamanları kaydırır, oturum ve kod sürelerini bozar. |
 | **O / E / Puan** | 1 / 2 / **2** |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) Sunucuda düz NTP kaynakları tanımlandı (runbook, NTP bölümü). (2) İstemci, geri sayımları sunucu saatine göre düzeltir (PR #104); tarayıcı veya sunucu saati sapsa da süreler doğru gösterilir. (3) NTP eşitlemesi konfigürasyon öğeleri listesine ve üretim kurulum denetimine alınacak (#132). |
+| **Önlem** | (1) Sunucuda düz NTP kaynakları tanımlandı (runbook, NTP bölümü). (2) İstemci, geri sayımları sunucu saatine göre düzeltir (PR #104); tarayıcı veya sunucu saati sapsa da süreler doğru gösterilir. (3) NTP eşitlemesi konfigürasyon öğeleri listesinde (KÖ-32) ve konfigürasyon denetiminde: 06.10.2026'da (D-11) ve 13.10.2026'da (D-13) uygun (#132). |
 | **Durum** | İzleniyor — önlemler yürürlükte |
 
 ### R-22 — Güvenilen vekil ağının yanlış yapılandırılması
@@ -304,7 +271,7 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **Açıklama** | Geliştirmeyi ve incelemeyi aynı kişi yürütüyor; PR'ı açan ve birleştiren aynı hesap. İnceleme, geliştirme yardımcısının (Claude) ürettiği kodun ve belgenin tek bir kişi tarafından gözden geçirilmesine dayanıyor. Gözden kaçan bir hatayı ikinci bir göz yakalamaz. |
 | **O / E / Puan** | 2 / 2 / **4** |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) İnceleme onayı birleştirmeden önce PR'a yazılır; CI denetler (`KR-096`, #128). (2) Otomatik kapılar: derleme, birim, entegrasyon ve uçtan uca testler, kapsam eşiği, mimari testi, gereksinim izlenebilirliği, statik analiz, güvenlik taramaları (ADR-0011 §6). (3) Modül sonunda süreç denetimi yapılır. (4) İK kabulü ürünü geliştiriciden bağımsız bir gözle sınar (TEC.11). |
+| **Önlem** | (1) İnceleme onayı birleştirmeden önce PR'a yazılır; CI denetler (`KR-096`, #128). Denetimin kendisi de çalışmayabilir: 05.10.2026'da Dal Koruma Denetimi iki PR'da (#169, #172) hiç koşmadı; `main-failure-check` adım çalıştırmadan iptal oldu ve issue açılmadı (#208, R-28). (2) Otomatik kapılar: derleme, birim, entegrasyon ve uçtan uca testler, kapsam eşiği, mimari testi, gereksinim izlenebilirliği, statik analiz, güvenlik taramaları (ADR-0011 §6). (3) Modül sonunda süreç denetimi yapılır. (4) İK kabulü ürünü geliştiriciden bağımsız bir gözle sınar (TEC.11). |
 | **Durum** | İzleniyor |
 
 ### R-24 — UAT sunucusunun işlemci kapasitesi
@@ -324,7 +291,7 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **Açıklama** | Kabul testlerinin gerçek personelle yapılabilmesi için UAT, LOGO'dan gerçek personel verisini okur; maskeleme uygulanmaz (R-03 önlem 6'nın istisnası). SMTP ve NetGSM gerçektir. Yanlış yapılandırılmış bir gönderim kipi gerçek personele doğrulama kodu veya davet gönderebilir. UAT'ye yetkisiz erişim, gerçek personel verisinin ifşası demektir. |
 | **O / E / Puan** | 2 / 3 / **6** |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) UAT'de ileti gönderimi `AllowList` kipindedir; yalnızca listedeki adreslere gider (`KR-083`). Liste kabul katılımcılarıyla sınırlı tutulur ve oturumdan sonra daraltılır. (2) UAT yalnızca kurum içinden erişilebilir ve TLS ile yayındadır; API ve veritabanı dışarıya kapalıdır. (3) Günlükte kişisel veri maskelenir; hesap işlemleri ekranı yalnızca ad, sicil ve firmayı gösterir. (4) Sırlar kaynak ağacının dışında tutulur; dağıtım yerel ortam dosyalarını sunucuya taşımaz (#125). (5) SSH (06.10.2026, `KR-102`, #174): erişim anahtarla yapılıyor ve sunucu parolası artık yazışmaya girmiyor; `root` parolası değiştirildi. Parola ile giriş, erişimin tamamen kaybolmaması için bilerek açık bırakıldı. UAT yedekleme kuralı `KR-098`. (6) Sunucuda belgelenmemiş Webmin yönetim paneli (10000 portu, ağa açık) bulundu ve 06.10.2026'de kaldırıldı (#177, #179); dışarıya açık portlar 22, 80, 443 |
+| **Önlem** | (1) UAT'de ileti gönderimi `AllowList` kipindedir; yalnızca listedeki adreslere gider (`KR-083`). Liste kurum çalışanı kabul katılımcılarıyla sınırlıdır; katılımcılar sonraki kabuller için listede kalır (`KR-106`, 13.10.2026). (2) UAT yalnızca kurum içinden erişilebilir ve TLS ile yayındadır; API ve veritabanı dışarıya kapalıdır. (3) Günlükte kişisel veri maskelenir; hesap işlemleri ekranı yalnızca ad, sicil ve firmayı gösterir. (4) Sırlar kaynak ağacının dışında tutulur; dağıtım yerel ortam dosyalarını sunucuya taşımaz (#125). (5) SSH (06.10.2026, `KR-102`, #174): erişim anahtarla yapılıyor ve sunucu parolası artık yazışmaya girmiyor; `root` parolası değiştirildi. Parola ile giriş, erişimin tamamen kaybolmaması için bilerek açık bırakıldı. UAT yedekleme kuralı `KR-098`. (6) Sunucuda belgelenmemiş Webmin yönetim paneli (10000 portu, ağa açık) bulundu ve 06.10.2026'de kaldırıldı (#177, #179); dışarıya açık portlar 22, 80, 443. (7) 13.10.2026 modül sonu denetiminde `/opt/dsg-hrms/secrets/` altında kayıt dışı eski bir sır kopyası (`.env.uat.yedek-20260929`) bulundu. Güncel dosyayla karşılaştırılır; içinde hâlâ geçerli bir sır varsa döndürülür, dosya silinir ve sonuç issue'ya yazılır (#207). Bu tür kopyalar ayrıca **R-30** altında izlenir |
 | **Durum** | **Kabul edildi** — Üst Yönetim, Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026 (`KR-103`; onay kaydı `MAN.1-proje-planlama/kayitlar/2026-10-06-plan-ve-raci-onay-talebi.md`). Önlemler izlenmeye devam eder |
 
 ### R-26 — Geliştirme makinesindeki commit edilmemiş çalışmanın kaybı
@@ -334,7 +301,7 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **Açıklama** | **Gerçekleşti (30.09.2026):** `git stash -u` sırasında izlenmeyen boş klasörler kayboldu; PR #118'de geri getirildi. Commit edilmemiş çalışma tek makinede durur; yanlış bir Git komutu veya disk arızası onu geri getirilemez biçimde siler. |
 | **O / E / Puan** | 1 / 2 / **2** |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) `git stash -u` ve `git clean -d` kullanılmaz; ara çalışma dalda WIP commit'i olarak saklanır. (2) Boş klasörler `.gitkeep` ile izlenir. (3) Dallar sık sık GitHub'a gönderilir. (4) Olay kaydı #129'da yazılır. |
+| **Önlem** | (1) `git stash -u` ve `git clean -d` kullanılmaz; ara çalışma dalda WIP commit'i olarak saklanır. (2) Boş klasörler `.gitkeep` ile izlenir. (3) Dallar sık sık GitHub'a gönderilir. (4) Olay kaydı yazıldı: `TEC.13-bakim/kayitlar/2026-10-04-t3-olay-kayitlari.md` (#129). |
 | **Durum** | İzleniyor |
 
 ### R-27 — Doğrulama kanallarını kaybeden kullanıcının iki adımlı girişte kalması
@@ -346,7 +313,74 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | **Puan gerekçesi** | **Olasılık 1:** İki kanalın birden aynı anda kaybedilmesi gerekir ve 2FA varsayılan kapalıdır. **Etki 2:** Tek kişi etkilenir; veri kaybı yoktur. |
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | (1) İletişim bilgisi LOGO'da güncellenince senkronizasyonla HRMS'e gelir; kişi yeni kanalıyla kod alabilir. (2) **Kurtarma:** İK, "Hesap işlemleri" ekranından kişinin 2FA'sını gerekçe girerek kapatır; kişi parolasıyla girer (SYG-KMLK-081). İK, talep edenin kişinin kendisi olduğunu yüz yüze veya bilinen bir kurum içi kanaldan doğrular; işlem denetim izine ve güvenlik olaylarına yazılır. (3) Son çare: Sistem Yöneticisi PRM-KML-08'i geçici olarak kapatır. |
-| **Durum** | İzleniyor; kurtarma işlemi eklendi (#190) |
+| **Durum** | İzleniyor — kurtarma işlemi yürürlükte; İK kabulde T-04'ü uygun buldu, KG-07 otomatik testle gösterildi (13.10.2026, `KR-105`) |
+
+### R-28 — Otomatik kontrollerin sessizce etkisiz kalması
+| | |
+|---|---|
+| **Kategori** | Kalite Güvencesi (MAN.8) / Konfigürasyon Yönetimi (MAN.5) |
+| **Açıklama** | Bir kalite kapısı veya tespit edici denetim hiç çalışmadığında ya da hiçbir şeyi denetlemeden geçtiğinde kayıt oluşmuyor; zayıflık ancak sonradan fark ediliyor. **Gerçekleşenler:** (a) 28.09.2026: Dal Koruma Denetimi GitHub API'sinden bozuk yanıt aldı; commit denetlenmeden geçti, issue açılmadı (olay kaydı O-1). (b) 05.10.2026 20:19–20:55 UTC: `main`'deki 4 commit'in CI işleri adım çalıştırmadan iptal oldu ve `main` 06.10'a kadar kırmızı kaldı; bunu yakalaması gereken `main-failure-check` 8 kez adım çalıştırmadan iptal oldu, issue açılmadı; Dal Koruma Denetimi iki PR'da (#169, #172) hiç koşmadı (#208). (c) #171 (05.10.2026): modüller arası bağımlılık mimari testi hiçbir tipi denetlemeden geçiyordu. |
+| **O / E / Puan** | 2 / 2 / **4** |
+| **Puan gerekçesi** | **Olasılık 2:** İki haftada üç örnek görüldü; yeniden deneme ve "denetim yapılamadı" issue'su 28.09 sonrasında eklendi, ama 05.10'daki iptal türünü yakalamadı. **Etki 2:** Denetlenmeyen değişiklik `main`'e girebilir ve kalite kanıtı eksik kalır; ürün doğrudan bozulmaz, sonraki çalışmalar ve modül sonu denetimi açığı yakalar. |
+| **Sahibi** | Bilgi İşlem |
+| **Önlem** | (1) Kontrol işi iptal veya hata ile biterse yeniden denenir; yine olmazsa "denetim yapılamadı" issue'su açılır (#208). (2) Dal Koruma Denetimi `main-failure-check` izleme listesine eklenir (#208). (3) Haftalık "son `main` commit'i yeşil mi" denetimi (#208). (4) Testler boş kümede başarısız olur: mimari testi artık hiçbir bağımlılık ölçmezse başarısız oluyor (#171 düzeltmesi). (5) 05.10 olayı TEC.13 olay kayıtlarına geriye dönük yazılır (#208). |
+| **Durum** | Açık |
+
+### R-29 — Bağımlılıklarda tekrarlayan güvenlik açıkları
+| | |
+|---|---|
+| **Kategori** | Güvenlik / Bakım (TEC.13) |
+| **Açıklama** | Kodda değişiklik olmadan, yeni yayımlanan açıklar nedeniyle CI kırmızıya dönüyor. İki haftada üç yüksek önemli açık: 30.09.2026 API imajının taban katmanında CVE-2026-84782 (`main` yaklaşık 21 saat kırmızı kaldı; olay kaydı), 04.10.2026 ön yüz geliştirme bağımlılığında `brace-expansion` (#149), 06.10.2026 ön yüz derleme araçlarında `source-map-js` (#175). Her biri birleştirmeyi durdurur ve plansız iş üretir. |
+| **O / E / Puan** | 3 / 1 / **3** |
+| **Puan gerekçesi** | **Olasılık 3:** Örüntü gerçekleşiyor; yeni açıklar kurumun denetimi dışında yayımlanıyor. **Etki 1:** Üç açığın üçü de taramalarla birleştirmeden önce yakalandı; ön yüz açıkları üretime giden pakette değildi (#149, #175). Etki, plansız iş ve birleştirme gecikmesidir. |
+| **Sahibi** | Bilgi İşlem |
+| **Önlem** | (1) Güvenlik taramaları her PR'da ve `main`'de çalışır: konteyner taraması ve `npm audit --audit-level=high` kapısı (#150; ADR-0011 §6). (2) `main` kırmızıyken yeni özellik birleştirilmez; otomatik issue açılır (CONTRIBUTING §1.1, #129). (3) Düzenli bağımlılık güncellemesi değerlendirilecek. |
+| **Durum** | İzleniyor |
+
+### R-30 — Depo dışında kayıt dışı gizli bilgi kopyaları
+| | |
+|---|---|
+| **Kategori** | KVKK / Güvenlik (MAN.6) |
+| **Açıklama** | 13.10.2026 modül sonu karşılaştırmasında bilgi kayıt defterinde olmayan gizli bilgi kümeleri bulundu: UAT'de eski sır kopyası (`/opt/dsg-hrms/secrets/.env.uat.yedek-20260929`, #207), `src_old/` (düz metin bağlantı dizeleri), yerel `docker/.env`, yerel API günlükleri (#215). Kayıtta olmayan küme için sahip, saklama süresi ve imha koşulu yoktur; sır döndürüldüğünde eski kopya geçerli kalabilir, unutulan kopya ifşa edilebilir. |
+| **O / E / Puan** | 3 / 2 / **6** |
+| **Puan gerekçesi** | **Olasılık 3:** Gerçekleşti; dört küme kayıt dışıydı. **Etki 2:** Kümeler geliştirici makinesinde ve yalnızca kurum içinden erişilebilen UAT sunucusunda duruyor; ifşa için ayrıca erişim gerekir. Temizlik ve kayıt sonrasında yeniden puanlanır. |
+| **Sahibi** | Bilgi İşlem |
+| **Önlem** | (1) UAT'deki eski sır kopyası karşılaştırılır, gerekirse sır döndürülür ve dosya silinir (#207; R-25 önlem 7). (2) Kayıt dışı kümeler bilgi kayıt defterine eklenir; `src_old/` için imha ve parola kararı verilir (#215). (3) Her modül sonu denetiminde bilgi kayıt defteri depo dışı konumlarla karşılaştırılır (`KR-101`). |
+| **Durum** | Açık |
+
+---
+
+## 3. Risk özeti
+
+| Puan | Risk sayısı | Riskler |
+|---|---:|---|
+| 9 | 1 | R-18 |
+| 6 | 9 | R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-25, R-30 |
+| 4 | 6 | R-08, R-14, R-16, R-23, R-24, R-28 |
+| 3 | 3 | R-02, R-20, R-29 |
+| 2 | 5 | R-19, R-21, R-22, R-26, R-27 |
+| Kapandı | 6 | R-07, R-10, R-11, R-12, R-13, R-17 |
+| **Toplam** | **30** | Açık 10 · İzleniyor 11 · Kabul edildi 3 · Kapandı 6 |
+
+**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-18, R-25, R-30
+
+**Kabul edilen riskler:** R-25 (Üst Yönetim, 09.10.2026, puan 6; `KR-103`), R-16 (Bilgi İşlem, puan 4; `KR-055`), R-19 (Bilgi İşlem, puan 2; `KR-078`). İkisinin de puanı 6'nın altında olduğu için kabul yetkisi Bilgi İşlem'dedir. 04.10.2026'daki özet R-16 için yanlışlıkla "Üst Yönetim kararı" yazıyordu (#177).
+
+**Son gözden geçirme:** 2026-10-13 — T3 modül kapanışı (T3 kabul edildi, `KR-105`; modül sonu denetimi MAN.8 Ek A §8.1). **R-09** 4 → 6'ya yükseldi ve aktif takibe girdi (PostgreSQL 14 desteği Kasım 2026'da bitiyor, üretim için hedef tarih yok). **R-20** 6 → 3'e düştü (sertifika 27.03.2027'ye kadar geçerli) ve aktif takipten çıktı. R-08, R-19, R-21, R-23, R-25, R-26, R-27 güncellendi. Yeni riskler: **R-28** (otomatik kontrollerin sessizce etkisiz kalması, #208), **R-29** (tekrarlayan bağımlılık açıkları), **R-30** (kayıt dışı gizli bilgi kopyaları, #207, #215). Bölüm sırası düzeltildi: R-11 yerine, R-17…R-30 §2'ye taşındı; içerik taşıma sırasında değişmedi.
+
+Önceki: 2026-10-04 — T3 sonu risk gözden geçirmesi (#126, denetim bulgusu T3-05). **R-01'in özet tablosundaki puanı düzeltildi:** kayıt 2×3 = 6 diyordu, özet 9 sayıyordu. R-03, R-08, R-14 güncellendi. T3 döneminde yaşanan veya ortaya çıkan riskler eklendi: R-19 (`KR-078` kalan riski), R-20 (SMTP sertifikası), R-21 (sunucu saati), R-22 (güvenilen vekil ağı), R-23 (bağımsız olmayan inceleme), R-24 (UAT kapasitesi), R-25 (UAT'de gerçek veri ve gerçek gönderim), R-26 (yerel çalışma kaybı). T3 boyunca deftere risk eklenmemişti; olayların da gözden geçirmeyi tetiklemesi §1'e yazıldı.
+
+Önceki: 2026-09-22 — İK'nın ikinci düzeltme turundan sonra ölçüm yenilendi. `R-12` **kapandı** (paylaşılan adres 4 kişi / 1 adres → 0). `R-08` ölçümü güncellendi: hiçbir iletişim bilgisi olmayan kişi **4 → 2**; puan 4'te tutuldu.
+Önceki: 2026-09-21 — LOGO verisi, İK'nın düzeltme çalışmasından sonra yeniden ölçüldü. `R-13` **kapandı** (kişisel e-posta 59 → 0); `R-08` puanı 6'dan 4'e düştü (hiçbir iletişim bilgisi olmayan kişi 12 → 4); `R-12` değişmedi (4 kişi / 1 adres).
+Önceki: 2026-09-16 — `R-18` (elle sertifika yenilemesi) eklendi; R-17'nin önlemi Let's Encrypt / DNS-01 kararıyla güncellendi. Bu gözden geçirmede, R-17 eklenirken **özet tablosunun güncellenmediği** fark edildi ve düzeltildi: kayıt eklemek yeterli değildir, özet de aynı anda güncellenmelidir.
+Önceki: 2026-09-08 — `R-16` (dal koruma kısıtı) eklendi; GitHub kurulumu sırasında tespit edildi.
+Önceki: 2026-09-07 — `R-15` (kapsam büyüklüğü) eklendi; `R-02`'nin
+olasılığı, LOGO sürüm yükseltmelerinin TRISOFT tarafından önceden bildirildiği ve geçmiş
+yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e düşürüldü**.
+Önceki: 2026-09-06 — R-14 (SMS kara listesi) eklendi.
+Önceki: 2026-09-05 — R-07 kapandı; R-08, R-12, R-13 güncel ölçümlerle güncellendi.
+
+---
 
 ## Değişiklik Geçmişi
 
@@ -364,3 +398,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-06 | 1.2 | R-20: sertifika yenilendi (bitiş 27.03.2027), durum İzleniyor; R-25: Webmin kaldırıldı (#179) | Bilgi İşlem |
 | 2026-10-10 | 1.3 | R-25 Üst Yönetim tarafından kabul edildi (`KR-103`, #127) | Bilgi İşlem |
 | 2026-10-10 | 1.4 | R-27 eklendi: kanallarını kaybeden kullanıcının 2FA ile girişte kalması; önlem İK'nın kurtarma işlemi (#190) | Bilgi İşlem |
+| 2026-10-13 | 1.5 | T3 modül kapanışı gözden geçirmesi (MAN.8 Ek A §8.1): R-09 yeniden puanlandı (2/2/4 → 3/2/6); R-20 açıklaması ve puanı (2/3/6 → 1/3/3); R-08, R-19, R-21, R-23, R-25 (önlem 1 `KR-106`, önlem 7 #207), R-26, R-27 güncellendi; R-28, R-29, R-30 eklendi; özet güncellendi; bölüm sırası düzeltildi (R-11 ve R-17…R-27 taşındı, içerik değişmedi) | Bilgi İşlem |

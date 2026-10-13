@@ -3,7 +3,7 @@
 **Belge kimliği:** MAN.1-PP
 **Süreç:** MAN.1 — Proje Planlama
 **Sürüm:** 0.3 — **onaylandı** (Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026)
-**Son güncelleme:** 2026-10-10
+**Son güncelleme:** 2026-10-13
 **Plan sahibi:** Bilgi İşlem Birim Sorumlusu
 **33061 karşılığı:** *Project objectives*, *Project constraints*, *Project plan*,
 *Project infrastructure needs*, *Project human resources needs*
@@ -150,7 +150,7 @@ kabulden sonra aynı commit `vX.Y.0` olarak etiketlenir. Numaralar kabul sıras�
 |---|---|---|
 | A0 — Hazırlık | ✅ Tamamlandı | — |
 | A1 — İskelet | ✅ Tamamlandı (12.09.2026) | `v0.1.0` |
-| A2 — T3 Kimlik | Geliştirme tamam (G2, 04.10.2026); İK kabulü bekliyor | `v0.2.0-rc.2` |
+| A2 — T3 Kimlik | **Kabul edildi ve kapandı** (G3 ve G4, 13.10.2026; `KR-105`) | `v0.2.0` |
 | A2 — T1, T2, T4, T5 | İK gereksinim toplantısı bekliyor (`KR-068`) | kabul sırasıyla `v0.3.0` … |
 
 **T3 önce geliştirildi.** Diğer bütün modüller giriş ve yetkilendirmeye bağımlı olduğu için
@@ -296,3 +296,4 @@ MAN.2 kapsamında yürütülür.
 | 2026-10-04 | 0.2 | §3 aşama tablosu: modül başına sürüm (`KR-097`, #125) | Bilgi İşlem |
 | 2026-10-06 | 0.3 | **Plan revizyonu (#127):** başlıktaki sürüm (0.1 kalmıştı) geçmişle eşitlendi; §3 çevrim adımları SYG ve kabul adayı etiketi; §5.2 gerçekleşen sıra ve T3'ün öne alınması (`KR-040`, `KR-077`); §6.2 ortamlar (UAT kuruldu, gerçek veri); §6.3 B2, B3, B8, B9; §8–§9 durum raporu sıklığı (`KR-101`); §11 durumlar. Üst Yönetim onayına sunuldu | Bilgi İşlem |
 | 2026-10-10 | 0.3 | Üst Yönetim onayı işlendi (Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026; `KR-103`, #127). İçerik değişmedi; başlık ve §11 | Bilgi İşlem |
+| 2026-10-13 | 0.3.1 | §5.2 durum sütunu: T3 kabul edildi, `v0.2.0` (#206). Kapsam ve takvim değişmedi; yeniden onay gerekmez | Bilgi İşlem |
