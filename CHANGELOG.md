@@ -17,6 +17,12 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ---
 
+## [0.2.0] — 2026-10-13 · T3 Kimlik Yönetimi
+
+İK'nın 13.10.2026'da **kabul ettiği** sürüm (G3, `KR-105`). Kod `v0.2.0-rc.5` ile aynı commit'tir (`149f6ee`); değişiklikler aşağıdaki aday bölümlerindedir. Kabul formu: `docs/33061/TEC.11-gecerleme/kayitlar/2026-10-13-t3-kabul-formu.md`.
+
+---
+
 ## [0.2.0-rc.5] — 2026-10-12 · T3 Kimlik Yönetimi kabul adayı (5)
 
 `v0.2.0-rc.4`'ün yerine İK kabulüne sunulan sürüm. Bilgi İşlem'in kabul senaryoları provasında çıkan düzeltmeyi içerir; kabul planındaki düzeltmeler (#196) yalnızca belgede yapıldı.
@@ -116,6 +122,6 @@ Modül başına bir MINOR sürüm (`KR-097`). Numaralar kabul sırasına göre v
 | Sürüm | İçerik | Durum |
 |---|---|---|
 | `v0.1.0` | Teknik iskelet (A1) | Etiketlendi (geriye dönük) |
-| `v0.2.0` | T3 Kimlik Yönetimi — ilk kullanıcı teslimi | Kabul adayı: `v0.2.0-rc.5` |
+| `v0.2.0` | T3 Kimlik Yönetimi — ilk kullanıcı teslimi | **Kabul edildi** (13.10.2026); `v0.2.0-rc.5` ile aynı commit |
 | `v0.3.0` … | A2'nin kalan modülleri (T1, T2, T4, T5), ardından yatay altyapı (A3) ve iş modülleri (A4+); her biri kabul edildiğinde | Planlandı |
 | `v1.0.0` | Üretime geçiş (AS) | Planlandı |

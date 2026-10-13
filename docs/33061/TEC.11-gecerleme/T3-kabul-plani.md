@@ -5,7 +5,7 @@
 **Modül:** T3 Kimlik Yönetimi
 **Ölçüt:** `PG-KMLK` 1.2: 56 onaylı paydaş gereksinimi ve kabul kriterleri (İK onayı 23.09.2026)
 **Hazırlayan:** Bilgi İşlem · **Gözden geçirecek ve kabul kararını verecek:** İK
-**Son güncelleme:** 2026-10-04 · **Durum:** Taslak; İK gözden geçirmesi ve takvim bekleniyor
+**Son güncelleme:** 2026-10-13 · **Durum:** **Uygulandı.** Kabul oturumu 13.10.2026; karar **Kabul** (`TEC.11-gecerleme/kayitlar/2026-10-13-t3-kabul-formu.md`)
 
 ---
 
@@ -49,9 +49,9 @@ Kabul oturumu ancak aşağıdakilerin tamamı sağlanınca yapılır:
 - [x] **SYG-KMLK-064 metin incelemesi** kararı verildi ve onaylanan düzeltmeler uygulandı (04.10.2026, #152)
 - [x] Bilgi İşlem kabul senaryolarının **provasını** yerel ortamda yaptı (11–12.10.2026, Doğuş Uçanok). Bulgular düzeltildi: kabul planı KS-05 ve KS-07 (#196), T5'e ait parametrenin ekrandan çıkarılması (#198)
 - [x] Kabul adayı sürüm **etiketlendi** ve UAT'ye bu etiketten kuruldu (`v0.2.0-rc.5`, #200; kurulum 12.10.2026 22:51, `149f6ee`; CI kanıt özeti `TEC.9-dogrulama/kayitlar/2026-10-12-v0.2.0-rc.5-ci-kanit-ozeti.md`). Önceki adaylar: `v0.2.0-rc.1` (#157), `v0.2.0-rc.2` (#160), `v0.2.0-rc.3` (#185) ve `v0.2.0-rc.4` (#190)
-- [ ] Katılımcılar İK tarafından belirlendi; adresleri ve numaraları UAT izin listesine eklendi
-- [ ] Katılımcılara kısa kullanım notu verildi (`T3-kullanim-notu.md`, #154)
-- [ ] Bilinen açık `[HATA]` kaydı yok veya her biri kabul öncesinde İK'ya bildirildi
+- [x] Katılımcılar İK tarafından belirlendi; İK, katılımcıları UAT izin listesinde zaten bulunan kişiler arasından seçti, listeye ekleme gerekmedi (12.10.2026)
+- [x] Katılımcılara kısa kullanım notu verildi (`T3-kullanim-notu.md`, #154; Doğuş Uçanok bildirdi, 13.10.2026)
+- [x] Bilinen açık `[HATA]` kaydı yok veya her biri kabul öncesinde İK'ya bildirildi (12.10.2026: açık `[HATA]` kaydı yok)
 
 ---
 
@@ -295,3 +295,4 @@ Kabul kararından önce düzeltilmesi gerekenler İK ile birlikte belirlenir.
 | 2026-10-11 | 0.14 | Prova bulguları (#196): KS-05'te iptalin 4. yanlış denemede olduğu (REQ-KMLK-017) yazıldı, tek kullanım KG-09'a taşındı; KS-07'deki video adımı KG-10'a taşındı (T3'te video ekranı yok); §7 | Bilgi İşlem |
 | 2026-10-12 | 0.15 | §4: Bilgi İşlem provası tamamlandı (#196, #198); §3, §4 kabul adayı `v0.2.0-rc.5` (#200) | Bilgi İşlem |
 | 2026-10-12 | 0.16 | §4: kabul adayı `v0.2.0-rc.5` etiketlendi ve UAT'ye kuruldu (#202) | Bilgi İşlem |
+| 2026-10-13 | 0.17 | Durum: uygulandı, karar Kabul (13.10.2026); §4 katılımcı, kullanım notu ve açık hata maddeleri (#204) | Bilgi İşlem |

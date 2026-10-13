@@ -58,9 +58,9 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 |---|---|---|---|---|---|---|
 | BK-20 | LOGO veri düzeltme ve kart çelişkileri listeleri | `Masaüstü\HRMS\DSG-HRMS_LOGO_*.xlsx` | Bilgi İşlem; listeyi İK kullanır | **Gizli**: ad, sicil, iletişim bilgisi | **Öneri:** İK'nın düzeltmesi bitip yeniden ölçüm yapılana kadar | **Öneri:** Yeniden ölçümden sonra silinir; yeni liste gerekirse yeniden üretilir |
 | BK-21 | Modül gereksinim çalışma dosyaları | `Masaüstü\HRMS\DSG-HRMS_*_Gereksinimleri.xlsx`, `…_Sistem_Yonetimi_Parametreleri.xlsx` | Bilgi İşlem | Kurum içi | Onaylı içerik depoya (TEC.2) alınınca çalışma kopyasıdır | **Öneri:** Modülün gereksinimleri depoda onaylandıktan sonra silinebilir |
-| BK-22 | UAT izin listesi | `Masaüstü\HRMS\DSG-HRMS_UAT_Izin_Listesi.txt` | Bilgi İşlem | **Gizli**: e-posta adresleri ve telefon numaraları | Kabul oturumları sürdükçe | **Öneri:** Kabul oturumundan sonra listedeki kişiler çıkarılır (`KR-083`) |
-| BK-23 | T3 İK inceleme seti | `Masaüstü\HRMS\T3_Kabul_IK_Inceleme\` | Bilgi İşlem | Kurum içi | Kabul kararına kadar | Asılları depodadır; kabulden sonra silinebilir |
-| BK-24 | İmzalı kabul formları (taranmış) | **Belirlenecek** (kurum içi güvenli konum; TEC.11 YAKLASIM §6) | İK | Kurum içi: ad ve imza | **Öneri:** Sistemin ömrü boyunca (belgelendirme kanıtı) | — |
+| BK-22 | UAT izin listesi | `Masaüstü\HRMS\DSG-HRMS_UAT_Izin_Listesi.txt` | Bilgi İşlem | **Gizli**: e-posta adresleri ve telefon numaraları | Kabul oturumları sürdükçe; katılımcılar sonraki kabuller için listede kalır (`KR-106`) | **Öneri:** Kabullerin tamamı bittiğinde veya kişi kurumdan ayrıldığında listeden çıkarılır |
+| BK-23 | T3 İK inceleme seti | `Masaüstü\HRMS\T3_Kabul_IK_Inceleme\` | Bilgi İşlem | Kurum içi | Kabul kararına kadar; **doldurulmuş kabul formu (`02_T3_Kabul_Formu.docx`) BK-24'e taşınana kadar** | Diğer belgelerin asılları depodadır, silinebilir. Doldurulmuş form BK-24'e taşınmadan klasör silinmez |
+| BK-24 | İmzalı kabul formları (taranmış) | **Belirlenecek** (kurum içi güvenli konum; TEC.11 YAKLASIM §6). T3: oturumda doldurulan form şimdilik `Masaüstü\HRMS\T3_Kabul_IK_Inceleme\02_T3_Kabul_Formu.docx` (13.10.2026); depo kaydı `TEC.11-gecerleme/kayitlar/2026-10-13-t3-kabul-formu.md` | İK | Kurum içi: ad ve imza | **Öneri:** Sistemin ömrü boyunca (belgelendirme kanıtı) | — |
 | BK-25 | Geliştirme yardımcısıyla yazışma arşivi | Geliştirici makinesi, `claude/` (`.gitignore`'da) | Bilgi İşlem | **Gizli**: kararların ve onayların ham kaydı; parolalar 05.10.2026'da temizlendi | **Öneri:** Kararlar karar defterine, onaylar onay kaydına aktarıldıktan sonra arşiv olarak | Parolalar 05.10.2026'da temizlendi (Ö-1). Arşive yeni parola yazılmaz |
 | BK-26 | Üst Yönetim onay formu (doldurulmuş) ve onay seti | `Masaüstü\HRMS\Ust_Yonetim_Onay_Seti_2026-10\` | Bilgi İşlem | Kurum içi: ad, unvan | Sistemin ömrü boyunca (belgelendirme kanıtı) | — ; kalıcı saklama konumu Ö-3 ile birlikte belirlenecek |
 
@@ -70,7 +70,7 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 |---|---|---|---|
 | Ö-1 | ~~Yazışma arşivinden parolaların temizlenmesi; UAT sunucu parolasının değiştirilip SSH'nin anahtarla yapılması~~ **Kapandı (06.10.2026):** arşivden 24 parola temizlendi (UAT 21, LOGO, eski İK veritabanı, SMTP); SSH anahtarla; `root` parolası değiştirildi; parola girişi bilerek açık (`KR-102`, #174). Kalan: parola, yardımcının bu oturuma ait dökümünde duruyor; parola değiştirildiği için geçersiz | UAT `root` parolası her sunucu işinde yazışmaya düz metin olarak yazılıyor. Parola bu arşivde ve yardımcının oturum dökümlerinde kalıcı olarak duruyor. Parola girişi açık olduğu için (R-25) bu parola sunucuya tam erişim demektir | Bilgi İşlem |
 | Ö-2 | "Öneri" olarak işaretlenen saklama ve imha sürelerinin KVKK Sorumlusu tarafından onaylanması | RACI: saklama süreleri KVKK Sorumlusu'nda; ADR-0009 §6 açık iş | KVKK Sorumlusu |
-| Ö-3 | İmzalı kabul formlarının (BK-24) saklanacağı konumun belirlenmesi | T3 kabul oturumundan önce gerekli | İK + Bilgi İşlem |
+| Ö-3 | İmzalı kabul formlarının (BK-24) saklanacağı konumun belirlenmesi | T3 kabul oturumundan önce belirlenmeliydi; belirlenmedi. İmza gereken belgelerin tamamı onaylı kalite belgeleriyle birlikte imzalatılacak ve asıl kanıt imzalı nüsha olacak (13.10.2026); konum o zaman kararlaştırılır. T3 formu o zamana kadar Masaüstü'nde (BK-23) | İK + Bilgi İşlem |
 
 ## Değişiklik Geçmişi
 
@@ -79,3 +79,4 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 | 2026-10-05 | 1.0 | İlk oluşturma (#131) | Bilgi İşlem |
 | 2026-10-06 | 1.1 | Ö-1 kapandı; BK-25 güncellendi (#177) | Bilgi İşlem |
 | 2026-10-10 | 1.2 | BK-26: Üst Yönetim onay formu (#127) | Bilgi İşlem |
+| 2026-10-13 | 1.3 | BK-23, BK-24: T3 kabul formunun geçici yeri; Ö-3 açık; BK-22: katılımcılar listede kalır (`KR-106`) (#204) | Bilgi İşlem |
