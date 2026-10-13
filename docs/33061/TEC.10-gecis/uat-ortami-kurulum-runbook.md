@@ -1,7 +1,7 @@
 # UAT Ortamı — Kurulum ve Dağıtım Runbook'u
 
 **Belge kimliği:** TEC.10-RB-001
-**Son güncelleme:** 2026-10-06
+**Son güncelleme:** 2026-10-13
 **İlgili süreçler:** TEC.10 (Geçiş), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-024`, `KR-038`, `KR-065`, `KR-097`
 
@@ -273,8 +273,11 @@ rm /opt/dsg-hrms/yedek-*.sql.gz
 | **HTTPS (TLS)** | ✅ Yapıldı — Let's Encrypt, 17.09.2026 (`KR-067`) |
 | **Sertifikanın süresinin dolması** | ⚠️ **İzleniyor** (`R-18`) — yenileme elle; bitiş **16.12.2026** |
 | **HSTS** | ⛔ Bilinçli olarak kapalı — gerekçe §7 |
-| Güvenlik duvarı | ⚠️ `ufw` kurulu değil. Dışarıya açık portlar (06.10.2026): 22, 80, 443; API 5299 ve veritabanı 5434 yalnızca yerel |
+| Güvenlik duvarı | ⚠️ `ufw` kurulu değil. Dışarıya açık portlar (13.10.2026, `ss -ltnup`; TCP **ve UDP** sınanır): TCP 22, 80, 443; dışarıya açık UDP yok. API 5299 ve veritabanı 5434 yalnızca yerel |
 | Webmin (10000) | ✅ Kaldırıldı (06.10.2026, #179); belgelenmemişti ve kullanılmıyordu |
+| Avahi (UDP 5353) ve CUPS (631) | ✅ Kapatıldı ve maskelendi (13.10.2026, #207). Masaüstü kurulumundan kalmışlardı; kullanılmıyorlardı |
+| Sır dosyası kopyaları | ✅ `secrets/` dizininde yalnızca `.env.uat` bulunur. 27.09 tarihli `.env.uat.yedek-20260929` silindi (13.10.2026, #207). Sır dosyası değiştirilirken yedek kopya bırakılmaz |
+| İşletim sistemi güncellemeleri | Güvenlik güncellemeleri `unattended-upgrades` ile kendiliğinden gelir. Yeniden başlatma gerektiğinde (`/var/run/reboot-required`) duyurulmuş bir zamanda yapılır; son yeniden başlatma 13.10.2026 (#207). Konteynerler `unless-stopped` ile kendiliğinden kalkar |
 | Kimlik doğrulama | ✅ T3 Kimlik Yönetimi (`v0.2.0-rc.2`) |
 
 ---
@@ -636,3 +639,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-10-04 | 1.8 | §1: erişim yöntemi ve veri sınıfı (gerçek veri) düzeltildi; §5 yedek kuralı (`KR-098`, #133) | Bilgi İşlem |
 | 2026-10-06 | 1.9 | §1 erişim (SSH anahtarı); §4 doğrulama HTTPS'e göre; §6 güvenlik notları güncellendi, Webmin bulgusu (#177) | Bilgi İşlem |
 | 2026-10-06 | 1.10 | §6: Webmin kaldırıldı, açık portlar; §10.5: SMTP sertifikasının güncel durumu (#179) | Bilgi İşlem |
+| 2026-10-13 | 1.11 | §6: Avahi ve CUPS kapatıldı, eski sır kopyası silindi; UDP dinleyiciler, işletim sistemi güncellemeleri ve yeniden başlatma (#207) | Bilgi İşlem |
