@@ -89,8 +89,8 @@
 
 | Rol | Ad soyad | Unvan | Tarih | İmza |
 |---|---|---|---|---|
-| Kabul eden (İK) | Elvan Laleli Şahin | İnsan Kaynaklarından Sorumlu Yönetim Kurulu Üyesi | 13.10.2026 | İmzalı nüsha: BK-24 |
-| Hazırlayan (Bilgi İşlem) | Doğuş Uçanok | Bilgi İşlem Birim Sorumlusu | 13.10.2026 | İmzalı nüsha: BK-24 |
+| Kabul eden (İK) | Elvan Laleli Şahin | İnsan Kaynaklarından Sorumlu Yönetim Kurulu Üyesi | 13.10.2026 | İmza bekleniyor (`KR-105` madde 4; BK-24, Ö-3) |
+| Hazırlayan (Bilgi İşlem) | Doğuş Uçanok | Bilgi İşlem Birim Sorumlusu | 13.10.2026 | İmza bekleniyor (`KR-105` madde 4; BK-24, Ö-3) |
 
 > **İmza:** İmza gereken belgelerin (İK, Üst Yönetim) tamamı daha sonra onaylı kalite
 > belgeleriyle birlikte imzalatılacak; **asıl kanıt imzalı nüsha olacak** (Doğuş Uçanok'un
@@ -98,8 +98,13 @@
 > Word formudur (`Masaüstü\HRMS\T3_Kabul_IK_Inceleme\02_T3_Kabul_Formu.docx`; belge kimliği
 > 13.10.2026'da forma işlendi).
 
+> **Bütünlük:** Word formun SHA-256 özeti (13.10.2026): `a7f37ce56a8d86c07a990534ca51cc5c93db4ae35b2b546a7ce73cbce7774c4b`.
+> Dosya boyutu 22.454 bayt; son değişiklik zamanı 13.10.2026 15:46:21 (+03:00). Form
+> değiştirilirse özet yeniden alınır ve bu kayda yazılır (#213).
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-13 | 1.0 | Oturumda doldurulan formdan depoya alındı (#204) | Bilgi İşlem |
+| 2026-10-13 | 1.1 | §6 imza sütunu "İmza bekleniyor" olarak düzeltildi; Word formun SHA-256 özeti, boyutu ve değişiklik zamanı eklendi (#213) | Bilgi İşlem |
