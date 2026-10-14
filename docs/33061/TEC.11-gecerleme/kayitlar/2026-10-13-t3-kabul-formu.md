@@ -94,13 +94,17 @@
 
 > **İmza:** İmza gereken belgelerin (İK, Üst Yönetim) tamamı daha sonra onaylı kalite
 > belgeleriyle birlikte imzalatılacak; **asıl kanıt imzalı nüsha olacak** (Doğuş Uçanok'un
-> kararı, 13.10.2026). O zamana kadar kabulün tarihli kanıtı bu kayıt ve oturumda doldurulan
-> Word formudur (`Masaüstü\HRMS\T3_Kabul_IK_Inceleme\02_T3_Kabul_Formu.docx`; belge kimliği
-> 13.10.2026'da forma işlendi).
+> kararı, 13.10.2026; `KR-107`). O zamana kadar kabulün tarihli kanıtı bu kayıt ve oturumda
+> doldurulan Word formudur. Formun kopyası depodadır: `2026-10-13-t3-kabul-formu.docx`
+> (bu klasörde). Aslı `Masaüstü\HRMS\T3_Kabul_IK_Inceleme\02_T3_Kabul_Formu.docx`; belge kimliği
+> 13.10.2026'da forma işlendi.
 
 > **Bütünlük:** Word formun SHA-256 özeti (13.10.2026): `a7f37ce56a8d86c07a990534ca51cc5c93db4ae35b2b546a7ce73cbce7774c4b`.
 > Dosya boyutu 22.454 bayt; son değişiklik zamanı 13.10.2026 15:46:21 (+03:00). Form
 > değiştirilirse özet yeniden alınır ve bu kayda yazılır (#213).
+>
+> **Depo kopyası (14.10.2026):** `2026-10-13-t3-kabul-formu.docx`, SHA-256 `f13849017e73e861d73d87fc878fbb8a720965845284defce7402be07941f369`.
+> Depo kopyasında yalnızca dosya üst verisindeki yazar ve son değiştiren alanları (Word hesabının kişisel e-posta adresi) "Bilgi İşlem" ile değiştirildi; belge içeriği ve diğer bütün parçalar aslıyla bayt bayt aynıdır, oluşturma ve değiştirme tarihleri korunmuştur (aslının özeti yukarıda).
 
 ## Değişiklik Geçmişi
 
@@ -108,3 +112,4 @@
 |---|---|---|---|
 | 2026-10-13 | 1.0 | Oturumda doldurulan formdan depoya alındı (#204) | Bilgi İşlem |
 | 2026-10-13 | 1.1 | §6 imza sütunu "İmza bekleniyor" olarak düzeltildi; Word formun SHA-256 özeti, boyutu ve değişiklik zamanı eklendi (#213) | Bilgi İşlem |
+| 2026-10-14 | 1.2 | Doldurulmuş Word formun üst verisi temizlenmiş kopyası depoya alındı; özetleri (`KR-107`, #213) | Bilgi İşlem |
