@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.9-YAK
 **Süreç:** TEC.9 — Doğrulama
-**Son güncelleme:** 2026-10-04 (1.1)
+**Son güncelleme:** 2026-10-14 (1.3)
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -49,7 +49,8 @@ Doğrulama, sistemin **belirtilen gereksinimlerini karşıladığına dair nesne
    - kapsam;
    - açık noktalar.
 3. **G2 kapı kaydı** raporun içinde tutulur. Bilgi İşlem kararını tarihle yazar. Geçmeden UAT kabulüne (TEC.11) geçilmez.
-4. Ardından modül sonu 33061 süreç denetimi yapılır (MAN.8).
+4. **G2'den sonra gelen değişiklikler:** G2'den sonra gelen değişiklik talebi veya davranış değiştiren düzeltme, doğrulama raporuna satır olarak eklenir; kabul adayı etiketlenmeden önce rapor kabule sunulacak commit için güncellenir ve G2 yeniden kaydedilir (#209). Raporun başlığı, gereksinim tablosu ve CI kanıt özeti aynı commit'i gösterir.
+5. Ardından modül sonu 33061 süreç denetimi yapılır (MAN.8).
 
 ---
 
@@ -134,3 +135,4 @@ Bu belge her modül sonu süreç denetiminde (MAN.8) gözden geçirilir.
 | 2026-10-04 | 1.0 | İlk oluşturma (#123) | Bilgi İşlem |
 | 2026-10-04 | 1.1 | Uçtan uca testler kuruldu (#146): §3 ve §4 | Bilgi İşlem |
 | 2026-10-04 | 1.2 | §5, §6: CI kanıt özeti ve kalıcı arşiv kuralı (#136) | Bilgi İşlem |
+| 2026-10-14 | 1.3 | §2.2 madde 4: G2'den sonra gelen değişiklik talebi ve düzeltme rapora işlenir, G2 kabul adayı için yeniden kaydedilir (#209; denetim M-03, YB-01) | Bilgi İşlem |

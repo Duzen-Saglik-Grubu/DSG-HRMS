@@ -3,7 +3,7 @@
 **Belge kimliği:** TEC.9-RPR-2026-10-02-PERF
 **Süreç:** TEC.9 — Doğrulama (gereksinim doğrulama yöntemi: Analiz)
 **Ortam:** UAT (`insankaynaklaritest.duzen.com.tr`): 2 çekirdek, 7,4 GB bellek, Docker yığını; sürüm `4199526` (ilk ölçüm), `2d79f01` (tekrar, #120 sonrası)
-**Ölçüm tarihi:** 2026-10-02; tekrar ve e-posta ölçümü 2026-10-04
+**Ölçüm tarihi:** 2026-10-02; tekrar ve e-posta ölçümü 2026-10-04; kabul edilen sürümde tekrar 2026-10-14 (`v0.2.0`, §2.6)
 **Ölçen:** Bilgi İşlem
 
 > Bu rapor SYG-KMLK-077, 078 ve 079'un (KPÖ-KMLK-1, 3, 4) UAT'de ölçülen sonuçlarını
@@ -16,7 +16,7 @@
 
 | Gereksinim | Ölçüt | Hedef | Sonuç | Değerlendirme |
 |---|---|---|---|---|
-| SYG-KMLK-077 | Giriş yanıt süresi, p95 | < 1 sn (60 sn'ye yayılan 50 giriş); < 5 sn (aynı anda 50 giriş) | **0,279 sn**; **4,42 sn** (04.10, #120 sonrası) | ✅ Karşılanıyor. İlk ölçümde (02.10) karşılanmıyordu; bkz. §2.4–2.5 |
+| SYG-KMLK-077 | Giriş yanıt süresi, p95 | < 1 sn (60 sn'ye yayılan 50 giriş); < 5 sn (aynı anda 50 giriş) | **0,261 sn**; **4,38 sn** (14.10, `v0.2.0`). Önceki: 0,279 sn; 4,42 sn (04.10) | ✅ Karşılanıyor. İlk ölçümde (02.10) karşılanmıyordu; bkz. §2.4–2.6 |
 | SYG-KMLK-078 | Tam senkronizasyon süresi | < 60 sn (≈1.540 kart) | p95 **0,43 sn**, en kötü **3,6 sn** (573 çalışma) | ✅ Karşılanıyor |
 | SYG-KMLK-079 | Kodun teslim süresi, p95 | < 60 sn (e-posta ve SMS) | SMS p95 **0,50 sn** (16 gönderim); e-posta p95 **0,43 sn** (25 gönderim) | ✅ Karşılanıyor |
 
@@ -96,6 +96,21 @@ Yöntem ve betik §2.1 ile aynıdır.
 
 **Değerlendirme:** ✅ SYG-KMLK-077 karşılanıyor.
 
+### 2.6 Kabul edilen sürümde tekrar (14.10.2026, `v0.2.0` = `149f6ee`)
+
+G2'den (04.10) sonra giriş akışı değişti: 2FA kullanıcı tercihine bağlandı (#190), kendi hesabı ve son yönetici kuralları geldi (#138). Ölçüm, kabul edilen sürümün UAT'deki kurulumunda (12.10.2026'dan beri çalışıyor) yinelendi (#209). Yöntem ve betik §2.1 ile aynıdır; ölçüm 11:00:52–11:05:24 UTC arasında yapıldı.
+
+| Senaryo | p50 | p90 | p95 | p99 | En az | En çok | İşlem/sn | Hedef |
+|---|---|---|---|---|---|---|---|---|
+| Yüksüz (20) | 186 | 231 | 246 | 555 | 172 | 555 | 4,81 | — |
+| Gerçekçi: 60 sn'ye yayılan 50 giriş (150) | 197 | 250 | **261** | 279 | 172 | 282 | — | p95 < 1.000 ✅ |
+| Aynı anda 50 giriş, 5 dalga (250) | 3.708 | 4.317 | **4.380** | 4.439 | 1.005 | 4.446 | 5,35 | p95 < 5.000 ✅ |
+| Sürekli yük: 50 kullanıcı × 10 ardışık (500) | 3.828 | 6.265 | 6.630 | 8.403 | 170 | 11.380 | 11,80 | tanım dışı (bilgi) |
+
+Bütün yanıtlar beklenen `401` koduyla döndü; hata, zaman aşımı veya `5xx` olmadı. API günlüğünde hata yok.
+
+**Değerlendirme:** ✅ SYG-KMLK-077 kabul edilen sürümde de karşılanıyor. Sonuçlar 04.10 ölçümüyle aynı düzeyde; #190 ve #138 giriş süresini etkilemedi. Aynı anda 50 giriş için p95 hâlâ üst sınıra yakın (4,38 / 5 sn); 04.10'daki çekirdek sayısı uyarısı geçerlidir.
+
 ---
 
 ## 3. SYG-KMLK-078 — Tam senkronizasyon süresi
@@ -145,6 +160,7 @@ UAT'deki 1 e-posta gönderimi başarısızdır (0,19 sn, `smtp-tls`). Bu deneme,
 - 02.10'daki 920 satır 03.10.2026'da kullanıcı tarafından silindi.
 - 04.10'daki tekrar ölçüm yine 920 sayaç satırı bıraktı: `updated_at >= 2026-10-04T10:26:14Z`, `failed_count = 1`, `locked_until IS NULL`. Temizlik onaya bırakılmıştır.
 - **Kimlik olayları (SYG-KMLK-060):** 04.10 ölçümü `audit.security_event` tablosuna 920 `SignInFailed / invalid-credentials` olayı yazdı; hesap bilgisi yok. Kayıt değiştirilemez olduğundan (`KR-060`) bu olaylar **silinmez**. Zaman aralığıyla (04.10.2026 10:26–10:32 UTC) ve kurum ağındaki ölçüm istemcisinin IP'siyle ayırt edilir.
+- **14.10 ölçümü:** 920 sayaç satırı (`updated_at` 11:00:53–11:05:24 UTC, hiçbirinde kilit yok) ve 920 `SignInFailed` olayı bıraktı. Olaylar silinmez; sayaç satırlarının temizliği onaya bırakılmıştır.
 - **İleri ölçümler için öneri:** Sentetik yük testleri, olay incelemesini karıştırmaması için kayda geçirilmelidir (bu rapor).
 
 ## Değişiklik Geçmişi
@@ -153,3 +169,4 @@ UAT'deki 1 e-posta gönderimi başarısızdır (0,19 sn, `smtp-tls`). Bu deneme,
 |---|---|---|---|
 | 2026-10-02 | 0.1 | İlk ölçüm | Bilgi İşlem |
 | 2026-10-04 | 0.2 | SYG-KMLK-077 tekrar ölçümü (#120 sonrası, `KR-095`); SYG-KMLK-079 e-posta ölçümü tamamlandı (#121) | Bilgi İşlem |
+| 2026-10-14 | 0.3 | §2.6: SYG-KMLK-077 kabul edilen sürümde (`v0.2.0`) yeniden ölçüldü (#209); §5 yan etkiler | Bilgi İşlem |
