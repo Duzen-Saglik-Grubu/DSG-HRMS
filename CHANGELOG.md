@@ -15,6 +15,9 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ## [Yayımlanmamış]
 
+### Güvenlik
+- **System.Security.Cryptography.Pkcs 10.0.13'e sabitlendi (#223).** MailKit ve SQL Server sürücüsü üzerinden dolaylı gelen 10.0.0 sürümünde 13.10.2026'da iki hizmet engelleme (DoS) açığı yayımlandı: CVE-2026-84008 (yüksek) ve CVE-2026-70162 (orta). `main` 14.10.2026'da bu yüzden kırmızıya düştü; kayıt otomatik açıldı.
+
 ---
 
 ## [0.2.0] — 2026-10-13 · T3 Kimlik Yönetimi

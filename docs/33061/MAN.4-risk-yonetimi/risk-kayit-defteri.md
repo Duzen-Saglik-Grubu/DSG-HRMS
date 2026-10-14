@@ -330,11 +330,11 @@ raporunda ayrıca ele alınır.
 | | |
 |---|---|
 | **Kategori** | Güvenlik / Bakım (TEC.13) |
-| **Açıklama** | Kodda değişiklik olmadan, yeni yayımlanan açıklar nedeniyle CI kırmızıya dönüyor. İki haftada üç yüksek önemli açık: 30.09.2026 API imajının taban katmanında CVE-2026-84782 (`main` yaklaşık 21 saat kırmızı kaldı; olay kaydı), 04.10.2026 ön yüz geliştirme bağımlılığında `brace-expansion` (#149), 06.10.2026 ön yüz derleme araçlarında `source-map-js` (#175). Her biri birleştirmeyi durdurur ve plansız iş üretir. |
+| **Açıklama** | Kodda değişiklik olmadan, yeni yayımlanan açıklar nedeniyle CI kırmızıya dönüyor. İki haftada üç yüksek önemli açık: 30.09.2026 API imajının taban katmanında CVE-2026-84782 (`main` yaklaşık 21 saat kırmızı kaldı; olay kaydı), 04.10.2026 ön yüz geliştirme bağımlılığında `brace-expansion` (#149), 06.10.2026 ön yüz derleme araçlarında `source-map-js` (#175). 14.10.2026'da dördüncüsü: backend'de dolaylı gelen `System.Security.Cryptography.Pkcs` 10.0.0'da CVE-2026-84008 (#223). Her biri birleştirmeyi durdurur ve plansız iş üretir. |
 | **O / E / Puan** | 3 / 1 / **3** |
 | **Puan gerekçesi** | **Olasılık 3:** Örüntü gerçekleşiyor; yeni açıklar kurumun denetimi dışında yayımlanıyor. **Etki 1:** Üç açığın üçü de taramalarla birleştirmeden önce yakalandı; ön yüz açıkları üretime giden pakette değildi (#149, #175). Etki, plansız iş ve birleştirme gecikmesidir. |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) Güvenlik taramaları her PR'da ve `main`'de çalışır: konteyner taraması ve `npm audit --audit-level=high` kapısı (#150; ADR-0011 §6). (2) `main` kırmızıyken yeni özellik birleştirilmez; otomatik issue açılır (CONTRIBUTING §1.1, #129). (3) Düzenli bağımlılık güncellemesi değerlendirilecek. |
+| **Önlem** | (1) Güvenlik taramaları her PR'da ve `main`'de çalışır: konteyner taraması ve `npm audit --audit-level=high` kapısı (#150; ADR-0011 §6). (2) `main` kırmızıyken yeni özellik birleştirilmez; otomatik issue açılır (CONTRIBUTING §1.1, #129). 14.10.2026'da kayıt otomatik açıldı (#223; #208'den sonra ilk gerçek tetiklenme). (4) Dolaylı paketteki açık, merkezi paket dosyasında yamalı sürüme sabitlenerek kapatılır; sabitleme paket envanterinde §3.6.1'de gerekçesiyle tutulur. (3) Düzenli bağımlılık güncellemesi değerlendirilecek. |
 | **Durum** | İzleniyor |
 
 ### R-30 — Depo dışında kayıt dışı gizli bilgi kopyaları
@@ -401,3 +401,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-13 | 1.5 | T3 modül kapanışı gözden geçirmesi (MAN.8 Ek A §8.1): R-09 yeniden puanlandı (2/2/4 → 3/2/6); R-20 açıklaması ve puanı (2/3/6 → 1/3/3); R-08, R-19, R-21, R-23, R-25 (önlem 1 `KR-106`, önlem 7 #207), R-26, R-27 güncellendi; R-28, R-29, R-30 eklendi; özet güncellendi; bölüm sırası düzeltildi (R-11 ve R-17…R-27 taşındı, içerik değişmedi) | Bilgi İşlem |
 | 2026-10-13 | 1.6 | R-25 önlem 7 ve R-30 önlem 1 uygulandı: UAT'deki eski sır kopyası silindi (#207) | Bilgi İşlem |
 | 2026-10-13 | 1.7 | R-28: önlem 1, 2, 3 ve 5 uygulandı (#208) | Bilgi İşlem |
+| 2026-10-14 | 1.8 | R-29: dördüncü olay (Pkcs, #223) ve önlem 4 | Bilgi İşlem |

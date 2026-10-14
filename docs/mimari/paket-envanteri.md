@@ -1,7 +1,7 @@
 # Paket Envanteri
 
 **Belge kimliği:** MIM-003
-**Son güncelleme:** 2026-09-11
+**Son güncelleme:** 2026-10-14
 **İlgili süreç:** TEC.5 (Tasarım), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-001`, `KR-005`, `KR-006`, `KR-025`, `KR-026`, `KR-057`
 
@@ -111,6 +111,16 @@ Proje dosyalarında sürüm yazılmaz.
 | Paket | Sürüm | Lisans | Amaç |
 |---|---|---|---|
 | Microsoft.Extensions.Http.Resilience | 10.10.0 | MIT | Yeniden deneme, zaman aşımı, devre kesici (ADR-0012 §5) |
+| MailKit | 4.18.0 | MIT | SMTP istemcisi (ADR-0012 §3). Envantere 14.10.2026'da eklendi; #85'ten beri kullanılıyordu |
+
+### 3.6.1 Güvenlik için sabitlenen dolaylı paketler
+
+Doğrudan kullanılmazlar; açıklı sürümün gelmemesi için geçişli sabitlemeyle (§5) yamalı sürüme
+sabitlenirler. Üst paketler yamalı sürümü kendisi getirdiğinde satır kaldırılır.
+
+| Paket | Sürüm | Lisans | Nereden gelir | Neden |
+|---|---|---|---|---|
+| System.Security.Cryptography.Pkcs | 10.0.13 | MIT | MimeKit (MailKit), Microsoft.Data.SqlClient | 10.0.0–10.0.12'de iki DoS açığı: CVE-2026-84008 (yüksek), CVE-2026-70162 (orta); 13.10.2026'da yayımlandı (#223) |
 
 ### 3.7 Raporlama
 
@@ -260,3 +270,4 @@ Reddedilen bir paket varsa §2 tablosuna gerekçesiyle yazılır.
 | 2026-09-11 | 0.6 | §4.4 konteyner taban imajları eklendi | Bilgi İşlem |
 | 2026-09-11 | 0.7 | Tarih seçimi paketleri eklendi; MUI X Pro bileşenleri reddedilenler tablosuna işlendi | Bilgi İşlem |
 | 2026-09-12 | 0.8 | §4.3 TypeScript 6 hazırlığı notu eklendi (baseUrl kaldırıldı) | Bilgi İşlem |
+| 2026-10-14 | 0.9 | §3.6: MailKit eklendi; §3.6.1 güvenlik için sabitlenen dolaylı paketler: System.Security.Cryptography.Pkcs 10.0.13 (#223) | Bilgi İşlem |
