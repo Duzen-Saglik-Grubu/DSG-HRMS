@@ -1,0 +1,32 @@
+name: main saglik taramasi
+
+# AMAC (#208)
+# "main kirmizi denetimi" bir main calismasi bittiginde tetiklenir. 05.10.2026'da
+# isler calistirici bulamadan iptal oldu; kayit tutan isin kendisi de calismadi ve
+# main dogrulanmadan kaldigi hicbir yerde kayda gecmedi.
+#
+# Bu tarama ayri ve zamanlanmistir: main'in son commit'inin izlenen is akislarinda
+# basariyla dogrulandigini ve kayit tutan denetimin calistigini SONRADAN sinar.
+# Bulunan her sorun icin [HATA] issue'su acar (.github/scripts/main-health-sweep.mjs).
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  sweep:
+    name: main dogrulandi mi
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tara ve kayda gecir
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/main-health-sweep.mjs

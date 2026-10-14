@@ -11,6 +11,9 @@ Bu belge onları geriye dönük olarak kaydeder. 04.10.2026'dan sonra:
 - Dal koruma denetimi yapılamazsa `[DÜZELTİCİ]` issue'su otomatik açılır.
 - Diğer olaylar `[HATA]` issue'su olarak kayda geçer; risk niteliğindeyse risk defterine de işlenir (MAN.4 §1).
 
+> **Ek (13.10.2026):** O-5, bu kuralların ilk kez çalışmadığı olaydır; T3 modül sonu denetiminde
+> bulundu ve geriye dönük kaydedildi (#208).
+
 ---
 
 ## O-1 — Dal koruma denetiminin çökmesi (28.09.2026)
@@ -50,6 +53,17 @@ Bu belge onları geriye dönük olarak kaydeder. 04.10.2026'dan sonra:
 | **Düzeltme** | Sertifika doğrulaması kapatılmadı. Postfix'in sertifika ayarları sunucu tarafında, 01.10.2026'da geçerli sertifikayı gösterecek şekilde düzeltildi. UAT `/health/notifications` 02.10.2026'da `email: Healthy` döndü (T3 süreç denetimi, Ek C düzeltme notu). 05.10.2026'da 587 portu `CN=mail.duzen.com.tr` sertifikasını sunuyor. Doğrulama komutu runbook §10.5'tedir. |
 | **Açık kalan** | ~~Sertifikanın 11.10.2026'da dolması~~ — sertifika yenilendi; yeni bitiş 27.03.2027, 587 portunda doğrulama `0 (ok)` (06.10.2026, #179). Risk: R-20. |
 
+## O-5 — `main`'in doğrulanmadan kalması ve kayıt kontrolünün çalışmaması (05.10.2026)
+
+| | |
+|---|---|
+| **Ne oldu** | 05.10.2026 20:19–20:36 UTC arasında `main`'e gelen dört commit'in (`2592fab`, `3f6833d`, `c6a9c86`, `90a25a9`) CI çalışmaları başarısız oldu. İşlerin çoğu **adım çalıştırmadan iptal edildi** (çalıştırıcı bulunamadı); `2592fab`'de konteyner taraması başarısız oldu. API sözleşme denetimi üç commit'te, Dal Koruma Denetimi iki commit'te (`3f6833d`, `90a25a9`) aynı nedenle başarısız oldu. |
+| **Kayıt kontrolü** | Bunu kayda geçirmesi gereken `main-failure-check` 20:34–20:55 UTC arasında 7 kez tetiklendi; işi her seferinde adım çalıştırmadan iptal oldu ve `[HATA] main kırmızı` issue'su **açılmadı**. Dal Koruma Denetimi izleme listesinde değildi. |
+| **Süre** | `main`, 06.10.2026 09:52 UTC'deki `e8dfc87` commit'ine kadar yaklaşık **13 saat** doğrulanmadan kaldı. İlk başarısızlıktan (`2592fab`, PR #168) sonra üç belge PR'ı daha birleşti (#169, #170, #172): kayıt açılmadığı için `main`'in kırmızı olduğu görülmedi ve CONTRIBUTING §1.1 kuralı uygulanamadı. Dördü de yalnızca belge değişikliğiydi. `90a25a9`'dan sonra 06.10 09:52'ye kadar başka PR birleşmedi. |
+| **Sonradan doğrulama** | Sonraki commit'te (`e8dfc87`) CI, API sözleşme denetimi ve Dal Koruma Denetimi başarılı. Dört commit'in kodu sonraki yeşil çalışmalarda da derlendi ve sınandı. Dal Koruma Denetimi'nin koşmadığı iki commit'in PR'larında (#169, #172) onay yorumu birleştirmeden önce yazılmış (modül sonu denetimi Ek A A-03). İptalin kesin nedeni bilinmiyor; çalışma günlükleri silinmiş. **Uygunsuzluk yok; kontrol açığı var.** |
+| **Fark edilme** | 13.10.2026, T3 modül sonu denetimi (konfigürasyon denetimi D-19; MAN.8 M-02). |
+| **Önlem** | (1) `main-failure-check` artık `failure`'ın yanında `cancelled`, `timed_out` ve `startup_failure` sonuçlarını da kayda geçirir ve Dal Koruma Denetimi'ni de izler. (2) Ayrı bir zamanlanmış iş akışı (`main-health-sweep.yml`, 6 saatte bir) son `main` commit'inin üç iş akışında da doğrulandığını ve kayıt kontrolünün kendisinin çalıştığını sonradan sınar; sorun bulursa `[HATA]` issue'su açar. Tarama bu olaya karşı geriye dönük denendi ve olayı yakaladı (#208). Risk: R-28. |
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
@@ -57,3 +71,4 @@ Bu belge onları geriye dönük olarak kaydeder. 04.10.2026'dan sonra:
 | 2026-10-04 | 1.0 | İlk oluşturma: O-1…O-4 geriye dönük kayıtları (#129) | Bilgi İşlem |
 | 2026-10-05 | 1.1 | O-4: düzeltme tarihi (01.10.2026) ve doğrulaması eklendi (#134) | Bilgi İşlem |
 | 2026-10-06 | 1.2 | O-4: sertifika yenilendi (#179) | Bilgi İşlem |
+| 2026-10-13 | 1.3 | O-5: 05.10 `main`'in doğrulanmadan kalması ve kayıt kontrolünün çalışmaması; önlemler (#208) | Bilgi İşlem |
