@@ -61,7 +61,7 @@ değildir.
 | [ADR-0006](ADR-0006-kimlik-dogrulama-ve-oturum.md) | Kimlik Doğrulama, Üyelik ve Oturum | Kabul Edildi; §7'nin iki kuralı → ADR-0017 | 2026-10-14 (1.2) | Üyelik akışı, doğrulama kodu, parola politikası, JWT + yenileme jetonu |
 | [ADR-0007](ADR-0007-yetkilendirme-modeli.md) | Yetkilendirme Modeli | Kabul Edildi | 2026-09-29 (0.2) | Rol (eylem) × Kapsam (satır); `404` tercihi; yetki sızıntısı testi |
 | [ADR-0008](ADR-0008-sir-ve-yapilandirma-yonetimi.md) | Sır ve Yapılandırma Yönetimi | Kabul Edildi | 2026-09-26 (0.2) | User Secrets / ortam değişkeni, `gitleaks`, açılışta doğrulama |
-| [ADR-0009](ADR-0009-loglama-denetim-izi-ve-kvkk.md) | Loglama, Denetim İzi ve KVKK | Kabul Edildi | 2026-10-03 (0.3) | Üç kayıt türü, maskeleme, erişim kaydı, saklama ve imha |
+| [ADR-0009](ADR-0009-loglama-denetim-izi-ve-kvkk.md) | Loglama, Denetim İzi ve KVKK | Kabul Edildi; §7 → ADR-0018 | 2026-10-14 (0.4) | Üç kayıt türü, maskeleme, erişim kaydı, saklama ve imha |
 | [ADR-0010](ADR-0010-api-sozlesmesi-ve-hata-yonetimi.md) | API Sözleşmesi ve Hata Yönetimi | Kabul Edildi | 2026-09-06 (0.1) | OpenAPI, Problem Details, sayfalama, eşzamanlılık |
 | [ADR-0011](ADR-0011-test-stratejisi.md) | Test Stratejisi ve Kalite Kapıları | Kabul Edildi; §7 Veri sütunu → ADR-0018 | 2026-10-14 (0.4) | Test piramidi, kapsam eşikleri, Testcontainers, CI kapıları |
 | [ADR-0012](ADR-0012-bildirim-altyapisi.md) | Bildirim Altyapısı | Kabul Edildi | 2026-09-27 (0.3) | E-posta/SMS/uygulama içi, NetGSM standart servisi, dayanıklılık |
@@ -111,3 +111,4 @@ değerlendirilmelidir:
 | 2026-10-05 | 0.3 | ADR-0016 eklendi; ADR-0002 durumu (#171) | Bilgi İşlem |
 | 2026-10-14 | 0.4 | Dizinde ADR-0006 son değişikliği 1.1 (10.10.2026) olarak düzeltildi; varsayımlar tablosunda 2FA kullanıcı tercihine bağlı (`KR-104`) (#214) | Bilgi İşlem |
 | 2026-10-14 | 0.5 | ADR-0017 ve ADR-0018 eklendi; ADR-0006 ve ADR-0011 durumları (`KR-099`, #212) | Bilgi İşlem |
+| 2026-10-14 | 0.6 | ADR-0009 durumu ve son değişikliği (#215) | Bilgi İşlem |

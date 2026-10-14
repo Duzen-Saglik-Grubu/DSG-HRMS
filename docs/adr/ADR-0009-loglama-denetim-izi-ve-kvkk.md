@@ -1,6 +1,6 @@
 # ADR-0009 — Loglama, Denetim İzi ve KVKK Kontrolleri
 
-**Durum:** Kabul Edildi
+**Durum:** Kabul Edildi; §7 → ADR-0018
 **Tarih:** 2026-09-06
 **Karar defteri karşılığı:** `KR-023`
 **İlgili süreç:** TEC.5 (Tasarım), MAN.6 (Bilgi Yönetimi)
@@ -124,15 +124,24 @@ alanın log'a düşmesi test hatası üretir.
   alındıkça daraltılabilir.
 - İmha işlemleri kayıt altına alınır (ne, ne zaman, hangi kural gereği).
 
+> **Karar (14.10.2026, `KR-109`):** Kurumun KVKK Sorumlusu denetim izi (`PRM-KVK-01`),
+> erişim kaydı (`PRM-KVK-02`) ve kimlik güvenlik olayları için saklama süresini **10 yıl**
+> olarak belirledi. Süre dolan kaydın imhası Y2 Denetim ve KVKK modülünde geliştirilir;
+> o zamana kadar kayıt silinmez. Diğer bilgi kümelerinin süreleri bilgi kayıt defterindedir.
+
 > **Not:** "Süresiz saklama" KVKK md. 7 karşısında savunulabilir bir konum değildir.
 > Sistem, bugünkü ihtiyacı karşılarken gelecekteki uyum çalışmasını da kod değişikliği
 > olmadan mümkün kılacak şekilde tasarlanmıştır.
 
 ### 7. Test ortamı verisi
 
-UAT ortamına gerçek personel verisi kopyalanacaksa **maskelenerek** kopyalanır: TCKN,
+~~UAT ortamına gerçek personel verisi kopyalanacaksa **maskelenerek** kopyalanır: TCKN,
 telefon, e-posta ve özel nitelikli alanlar gerçek değerlerini taşımaz. Bu, KVKK'nın
-"amaçla sınırlılık" ilkesinin gereğidir.
+"amaçla sınırlılık" ilkesinin gereğidir.~~
+
+> **Yerini aldı → ADR-0018 (`KR-108`):** Yerel geliştirme ortamı ve UAT gerçek personel
+> verisiyle çalışır, maskeleme yapılmaz. Gerekçe, korumalar ve kabul edilen risk (R-25,
+> `KR-103`) ADR-0018'dedir. Bu bölüm #212'de gözden kaçmış, #215'te işaretlendi.
 
 ### 8. Gözlemlenebilirlik
 
@@ -194,3 +203,4 @@ veri sızıntısı incelemesi mümkün olur.
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-10 | 0.2 | §4 maskeleme biçimleri kesinleştirildi (telefon, IBAN); gerçekleştirme `KR-059` ile iki katmanlı yapıldı | Bilgi İşlem |
 | 2026-10-03 | 0.3 | §3.1 kimlik olayı kaydı gerçekleştirme notu (`KR-094`, #119) | Bilgi İşlem |
+| 2026-10-14 | 0.4 | §6: KVKK saklama süresi kararı (`KR-109`); §7 → ADR-0018 (`KR-108`) (#215) | Bilgi İşlem |
