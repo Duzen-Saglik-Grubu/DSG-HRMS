@@ -340,9 +340,10 @@ Refs: #42
 | Issue bağlantısı | **Zorunlu** — `Closes #42` (görev/hata) veya `Refs #42` (gereksinim) |
 | Milestone | **Zorunlu** — PR ve issue aynı aşamaya (A0/A1/A2/A3/AS) bağlanır |
 | Değişiklik talebi | Onaylı bir gereksinimi değiştiren PR, `tur:degisiklik-talebi` issue'sunda **tarihli paydaş onayı** (`Paydaş onayı: GG.AA.YYYY — <rol> — <kanal>`) kayda geçmeden birleştirilemez; CI denetler. Yordam: TEC.2 YAKLAŞIM §4.1 (#210) |
-| Boyut | Hedef **< 400 satır** değişiklik; büyükse bölünür |
+| Etiket | **Zorunlu** — PR'da en az bir `tur:` ve bir `surec:` etiketi; kapatılan issue'da `tur:` etiketi. CI denetler (#216) |
+| Boyut | Hedef **< 400 satır** değişiklik; büyükse bölünür. Üretilen dosyalar (OpenAPI belgesi, üretilen tipler, migration tasarım dosyaları, `package-lock.json`) hariç **1.500 satırı aşan** PR, gövdede `Boyut gerekçesi:` ile neden bölünmediğini yazar; CI denetler (#216) |
 | CI | Tüm kalite kapıları geçmeli |
-| İnceleme | En az **1 onay**. Tek kişilik düzende onay, **birleştirmeden önce** PR'a "İnceledim ve onaylıyorum." yorumu olarak yazılır; CI bunu `main`'de denetler (`KR-096`). Onay yorumunu yalnızca inceleyen yazar |
+| İnceleme | En az **1 onay**. Tek kişilik düzende onay, **birleştirmeden önce** PR'a "İnceledim ve onaylıyorum." yorumu olarak yazılır; CI bunu `main`'de denetler (`KR-096`). Onay yorumunu yalnızca inceleyen yazar. Boyut gerekçesi gereken büyük PR'larda onay yorumuna neyin incelendiği kısaca eklenir (ör. "backend ve testler satır satır; üretilen tipler örneklemeyle") |
 | Birleştirme | **Squash merge** — `main` geçmişi okunabilir kalır |
 | Dal | Birleştirme sonrası **silinir** |
 
@@ -415,6 +416,11 @@ Bir iş, aşağıdakilerin **tamamı** sağlanmadan "bitti" sayılmaz:
 
 > Bu liste, ADR-0011 §2 ve §6'nın operasyonel karşılığıdır ve MAN.8 kapsamında
 > kalite kriteri sayılır.
+>
+> **Atlanamaz maddeler CI'da denetlenir (#216):** PR gövdesinde "Yetki sızıntısı testi" ve
+> "Maskeleme testi" maddeleri ya işaretlidir (`- [x]`) ya da üstü çizilip aynı satırda
+> gerekçesi yazılır (`- [ ] ~~Maskeleme testi~~ — kod değişikliği yok`). Uygulanmayan diğer
+> maddeler de aynı biçimde yazılır; madde sessizce silinmez.
 
 ---
 
@@ -535,3 +541,4 @@ açıklamalıdır ve `CHANGELOG.md`'deki bölümle eşleşir.
 | 2026-10-04 | 1.3 | §1.1 `main` kırmızıyken kuralı (#129); §9 kabul adayı etiketi (`KR-097`) | Bilgi İşlem |
 | 2026-10-13 | 1.4 | §1.1: tamamlanamayan çalışmalar ve Dal Koruma Denetimi de kayda geçer; zamanlanmış `main` sağlık taraması (#208) | Bilgi İşlem |
 | 2026-10-14 | 1.5 | §5: değişiklik talebinde paydaş onayı kuralı ve CI denetimi (#210) | Bilgi İşlem |
+| 2026-10-14 | 1.6 | §5: etiket ve boyut kuralları CI'da; büyük PR'da onay yorumu; §6: atlanamaz maddelerin denetimi (#216) | Bilgi İşlem |
