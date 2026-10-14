@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.5-DK
 **Süreç:** MAN.5 — Konfigürasyon Yönetimi
-**Son güncelleme:** 2026-09-09
+**Son güncelleme:** 2026-10-14
 **İlgili risk:** `R-16`
 **İlgili kararlar:** `KR-054`, `KR-055`
 
@@ -197,7 +197,7 @@ denetimde sorulduğunda bu belge gösterilecektir.
 |---|---|---|---|
 | 1 | GitHub Team planı kararının alınması | Üst Yönetim / Bilgi İşlem | ✅ **Kapandı** — Free planda kalınacak (`KR-055`) |
 | 2 | `R-16` riskinin kabul edilmesi ve kayda geçirilmesi | Bilgi İşlem | ✅ Kapandı |
-| 3 | Telafi kontrollerinin çalıştığına dair kanıtların dönemsel örneklenmesi (MAN.5.BP5) | Bilgi İşlem | 🔄 Sürekli |
+| 3 | Telafi kontrollerinin çalıştığına dair kanıtların dönemsel örneklenmesi (MAN.5.BP5) | Bilgi İşlem | 🔄 Sürekli. İlk örnekleme: T3 konfigürasyon denetimi D-19 (13.10.2026); dal koruma denetimi 20/20 commit'te çalışmış, `main` kırmızı denetimi 05.10'da iptal olmuş (B-4, düzeltici #208) |
 | 4 | `core.hooksPath` kurulumunun her çalışma kopyasında yapılması | Bilgi İşlem | ✅ Kurulum kılavuzunda |
 
 ---
@@ -210,3 +210,4 @@ denetimde sorulduğunda bu belge gösterilecektir.
 | 2026-09-09 | 0.2 | Kalıcı çözüm kararı işlendi: Free planda kalınacak, telafi kontrolleri kalıcıdır (`KR-055`); `R-16` kabul edildi | Bilgi İşlem |
 | 2026-10-04 | 0.3 | §3.5 inceleme onayı denetimi (`KR-096`, #128) | Bilgi İşlem |
 | 2026-10-04 | 0.4 | §3.3: yeniden deneme ve "denetim yapılamadı" kaydı (#129) | Bilgi İşlem |
+| 2026-10-14 | 0.5 | §6 iş 3: ilk örnekleme (13.10.2026 konfigürasyon denetimi D-19); başlıktaki "Son güncelleme" 09.09'da kalmıştı, geçmişle eşitlendi (#214) | Bilgi İşlem |

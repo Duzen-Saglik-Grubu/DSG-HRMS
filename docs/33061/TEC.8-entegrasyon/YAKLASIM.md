@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.8-YAK
 **Süreç:** TEC.8 — Entegrasyon
-**Son güncelleme:** 2026-10-05
+**Son güncelleme:** 2026-10-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir. Ayrıca `PA 2.1` için hedef, sorumluluk, kaynak ve taraflar arası arayüzler (§1, §4, §5).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -101,9 +101,11 @@ Geçerse satır sunucudaki `deployments.log`'a ve
 
 Entegrasyon raporu yazılır: `raporlar/YYYY-AA-GG-<modül>-entegrasyon-raporu.md`. Her
 arayüz için CI'daki sınama, UAT'deki canlı sınama, güncel durum ve açık iş; ayrıca
-bulunan anomaliler. T3 raporu: `raporlar/2026-10-05-t3-entegrasyon-raporu.md` (#134).
-Beş arayüzü kapsar ve yedi anomali kaydeder (A-1…A-7): dördü CI'da, üçü UAT'de
-bulundu; UAT'dekilerin üçü de ortam yapılandırmasıydı.
+bulunan anomaliler. Rapor, modülün **kabul edilen** sürümünü (`vX.Y.0`) kapsar; ara bir
+adayla bırakılmaz. T3 raporu: `raporlar/2026-10-05-t3-entegrasyon-raporu.md` (#134; 1.2,
+14.10.2026: `v0.2.0` = `149f6ee`). Beş arayüzü kapsar ve yedi anomali kaydeder
+(A-1…A-7): dördü CI'da, üçü UAT'de bulundu; UAT'dekilerin üçü de ortam yapılandırmasıydı.
+1.0–1.1 `v0.2.0-rc.2`'de kalmıştı (T3 modül sonu denetimi Ek C YB-07).
 
 ### 3.6 Anomaliler
 
@@ -183,7 +185,11 @@ uca yığın (`docker/compose.e2e.yml`, `docker/e2e/up.sh`: sentetik veri, e-pos
 | 1 | `deploy-uat.sh` dış arayüzleri denetlemez; §3.4 elle yapılır ve sonucu dağıtım kaydına girmez. Başarısız `/health/notifications` dağıtımı durdurmaz |
 | 2 | UAT imajları sunucuda yeniden derlenir. CI'da `trivy` ile taranan imaj aynı commit'ten derlenir ama aynı ikili dosya değildir; imaj özeti (digest) karşılaştırılmaz |
 | 3 | Uçtan uca yığın HTTPS'siz çalışır (`Security__RequireHttps: 'false'`) ve LOGO ile NetGSM'i içermez. HTTPS zinciri ve iki dış arayüz yalnızca UAT'de canlı sınanır |
-| 4 | Modül kapanışları arasında entegrasyon sonucu yalnızca PR metinlerinde ve 90 günlük CI kayıtlarında durur |
+| 4 | Modül kapanışları arasında entegrasyon sonucu yalnızca PR metinlerinde ve 90 günlük CI kayıtlarında durur. Her aday için kalıcı CI özeti `TEC.9-dogrulama/kayitlar/` altında (#136) |
+| 5 | Uçtan uca senaryolar 2FA'yı açma ve iki adımlı girişi (`KR-104`, #190) içermiyor; bu akış entegrasyon ve ekran testleriyle sınanıyor |
+
+1–4, 13.10.2026 T3 modül sonu denetiminde de açık bulundu (Ek C §1.3, §1.5); 1 numara için
+`deploy-uat.sh`'nin sağlık sonuçlarını dağıtım kaydına yazması önerildi.
 
 ---
 
@@ -197,3 +203,4 @@ gözden geçirilir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
+| 2026-10-14 | 1.1 | T3 modül sonu gözden geçirmesi: §3.5 raporun kabul edilen sürümü kapsaması, T3 raporu 1.2; §9 madde 4 notu ve madde 5 (#214) | Bilgi İşlem |

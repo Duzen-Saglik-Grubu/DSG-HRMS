@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.5-YAK
 **Süreç:** MAN.5 — Konfigürasyon Yönetimi
-**Son güncelleme:** 2026-10-05
+**Son güncelleme:** 2026-10-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.1`: amaç, planlama, sorumluluk, kaynak ve arayüzler (§1–§4). `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir (§5). `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir (§6).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -55,16 +55,24 @@ Depo özeldir ve GitHub Free planındadır; sunucu tarafı dal koruma kullanıla
    - Çalışan imajın commit'ini doğrular.
    - Dağıtımı sunucuda `deployments.log`'a ve depoda `TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`'ye yazar. Depodaki satır PR ile commit edilir.
 3. **Kabul:** İK kabul formu bu etikete atıf yapar (TEC.11). Kabulden sonra aynı commit `vX.Y.0` olarak etiketlenir. Kabulden sonra düzeltme gerekirse `rc.N+1` verilir.
-4. Bugünkü etiketler: `v0.1.0` (A1, geriye dönük), `v0.2.0-rc.1`, `v0.2.0-rc.2`. `v0.2.0` T3 kabulünü bekliyor.
+4. Bugünkü etiketler (14.10.2026): `v0.1.0` (A1, geriye dönük, `065a7c3`); `v0.2.0-rc.1` (`6cfeef0`), `rc.2` (`69bafad`), `rc.3` (`fa3e194`), `rc.4` (`353eae7`), `rc.5` (`149f6ee`); `v0.2.0` (`149f6ee`, T3 Kimlik Yönetimi, İK kabulü 13.10.2026, `KR-105`). Yedisi de açıklamalı ve `origin`'de; her birinin CHANGELOG bölümü var.
+5. **Kabul etiketi ve CHANGELOG:** `vX.Y.0` kabul edilen adayın commit'ine konduğu için o commit'teki `CHANGELOG.md`'de `[X.Y.0]` bölümü henüz yoktur; bölüm kabulden sonraki commit'te yazılır (T3: `d354e94`). Bu, "kabulden sonra aynı commit etiketlenir" kuralının doğal sonucudur, uygunsuzluk değildir (konfigürasyon denetimi 13.10.2026, G-4).
 
 ### 2.4 Konfigürasyon öğeleri ve konfigürasyon denetimi
 
-- **Öğe listesi:** `konfigurasyon-ogeleri.md`, depo içi ve depo dışı öğeleri `KÖ-01`…`KÖ-52` kimlikleriyle sayar. Her öğenin yeri ve değişiklik yolu oradadır. Baseline üç biçimde oluşur:
+- **Öğe listesi:** `konfigurasyon-ogeleri.md`, depo içi ve depo dışı öğeleri `KÖ-01`…`KÖ-52` kimlikleriyle sayar (sonradan eklenen ara öğeler `KÖ-08a`, `KÖ-14a`; yerel geliştirme ortamı `KÖ-36`). Her öğenin yeri ve değişiklik yolu oradadır. Baseline üç biçimde oluşur:
   - depodaki öğeler için açıklamalı Git etiketi;
   - dağıtılan yapı için dağıtım kaydı;
   - depo dışı öğeler (sunucu ayarları, sertifikalar, dış hizmet hesapları) için konfigürasyon denetimi.
 - **Ne zaman denetlenir:** Her kabul adayı etiketinde ve her modül kapanışında. Denetim "kabule sunulan yapı, kayıtlarda yazan yapı mı?" sorusunu cevaplar.
-- **İlk denetim:** `raporlar/2026-10-05-ilk-konfigurasyon-denetimi.md` (`v0.2.0-rc.2`). 12 madde denetlendi: 10'u uygun, 2'si sunucu erişimi gerektirdiği için sınanamadı, uygunsuzluk yok.
+- **Yapılan denetimler:**
+
+  | Rapor | Denetlenen | Sonuç |
+  |---|---|---|
+  | `raporlar/2026-10-05-ilk-konfigurasyon-denetimi.md` | `v0.2.0-rc.2` | 12 madde: 05.10'da 10'u uygun, 2'si (D-11, D-12) sunucu erişimi gerektirdiği için sınanamadı; ikisi 06.10'da sınandı ve uygun (rapor 1.1–1.2). Uygunsuzluk yok |
+  | `raporlar/2026-10-13-t3-konfigurasyon-denetimi.md` | `v0.2.0` (`149f6ee`), T3 modül kapanışı | 20 madde: 14 uygun, 4 kısmen uygun, 1 sınanamadı (D-18), 1 uygunsuzluk (D-19, `main` kırmızı denetiminin iptali). Bulgular B-1…B-4; B-1 ve UAT'deki B-3 maddeleri 13.10'da giderildi (#207), öğe listesi B-2/B-3'e göre güncellendi (#214) |
+
+  `v0.2.0-rc.3`, `rc.4` ve `rc.5` için ayrı denetim yapılmadı; kabule giren `rc.5` yapısı modül kapanış denetiminde `v0.2.0` olarak denetlendi. Denetim sıklığı kuralı #218'de ele alınıyor.
 
 ---
 
@@ -102,7 +110,7 @@ RACI'de MAN.5'in sorumlusu ve hesap vereni Bilgi İşlem'dir; İK bilgilendirili
 | Telafi kontrolleri | `dal-koruma-telafi-kontrolleri.md` | Kısıt, kontrol, karar, açık iş | Bilgi İşlem |
 | Konfigürasyon öğeleri | `konfigurasyon-ogeleri.md` | `KÖ-NN`: yer, sahibi, değişiklik yolu | Bilgi İşlem |
 | Değişiklik kaydı | GitHub issue + PR | Şablon; issue bağlantısı; onay yorumu | PR sahibi, inceleyen |
-| Baseline | Açıklamalı Git etiketi | `vX.Y.Z[-rc.N]`; açıklama CHANGELOG başlığıyla aynı | Bilgi İşlem |
+| Baseline | Açıklamalı Git etiketi | `vX.Y.Z[-rc.N]`; açıklama ilgili CHANGELOG bölümüne adıyla atıf yapar (ör. "CHANGELOG [0.2.0]"). Açıklama ASCII yazılır ve başlığın birebir kopyası değildir (konfigürasyon denetimi 13.10.2026, G-3) | Bilgi İşlem |
 | Sürüm notu | `CHANGELOG.md` | Keep a Changelog; her etikete bir bölüm | Bilgi İşlem (sürüm hazırlık PR'ı) |
 | Dağıtım kaydı | `TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`, sunucuda `deployments.log` | Zaman (UTC), sürüm, commit, dağıtan | `deploy-uat.sh` |
 | Konfigürasyon denetimi | `raporlar/<tarih>-*konfigurasyon-denetimi.md` | `D-NN` maddeleri: yöntem, sonuç | Bilgi İşlem |
@@ -135,15 +143,18 @@ RACI'de MAN.5'in sorumlusu ve hesap vereni Bilgi İşlem'dir; İK bilgilendirili
 
 ## 8. Açık noktalar
 
+Durum sütunu 14.10.2026'da T3 modül sonu denetimlerine göre güncellendi (#214).
+
 | # | Konu | Durum |
 |---|---|---|
 | 1 | Sunucu tarafı dal koruma yok; kontrol olayı önlemez, sonradan yakalar | Bilinçli kabul (`KR-055`, `R-16`) |
-| 2 | Telafi kontrollerinin dönemsel örneklenmesi (`dal-koruma-telafi-kontrolleri.md` §6 iş 3) konfigürasyon denetiminin maddeleri arasında yok | Bir sonraki denetime madde olarak eklenmeli |
-| 3 | İlk denetimin D-11 (NTP) ve D-12 (sır dosyası izni) maddeleri sınanmadı | Bir sonraki sunucu işinde |
-| 4 | `00-DOKUMAN-HARITASI.md` sürüm kontrolü için "GitHub Releases" diyor; GitHub Release hiç oluşturulmadı. Uygulama: CHANGELOG + açıklamalı etiket | Harita bu belgeye göre düzeltilmeli |
-| 5 | CHANGELOG yalnızca sürüm hazırlık PR'ında güncellenir; unutulursa onu yalnızca konfigürasyon denetimi yakalar (D-01) | İzleniyor |
-| 6 | Örnek ortam dosyası ile compose değişkenlerinin uyumu (D-04) elle denetleniyor | CI'a alınması düşünülebilir |
+| 2 | Telafi kontrollerinin dönemsel örneklenmesi (`dal-koruma-telafi-kontrolleri.md` §6 iş 3) konfigürasyon denetiminin maddeleri arasında yok | ✅ Kapandı: 13.10.2026 denetiminde D-19 olarak ilk kez yapıldı; `main` kırmızı denetiminin 05.10'daki iptalini buldu (B-4). Kontrollerin kendisinin izlenmesi #208 ile eklendi (zamanlanmış `main` sağlık taraması) |
+| 3 | İlk denetimin D-11 (NTP) ve D-12 (sır dosyası izni) maddeleri sınanmadı | ✅ Kapandı: 06.10.2026'da sınandı (ilk denetim raporu 1.1–1.2); 13.10'da da uygun (D-13, D-14) |
+| 4 | `00-DOKUMAN-HARITASI.md` sürüm kontrolü için "GitHub Releases" diyor; GitHub Release hiç oluşturulmadı. Uygulama: CHANGELOG + açıklamalı etiket | ✅ Kapandı: harita düzeltildi (#214) |
+| 5 | CHANGELOG yalnızca sürüm hazırlık PR'ında güncellenir; unutulursa onu yalnızca konfigürasyon denetimi yakalar (D-01) | İzleniyor. 13.10 denetiminde 7 etiketin 7'sinin bölümü var |
+| 6 | Örnek ortam dosyası ile compose değişkenlerinin uyumu (D-04/D-08) elle denetleniyor | Açık: 13.10 denetiminde de elle yapıldı (G-2, Ö-9) |
 | 7 | 04.10.2026'dan önceki UAT dağıtımlarının commit kaydı yok | Geriye dönük kapatılamaz; kayıtta yazılı |
+| 8 | Kabul adayları `rc.3`, `rc.4`, `rc.5` için konfigürasyon denetimi yapılmadı (§2.4 kuralı) | Açık: kural ya da uygulaması #218'de |
 
 ---
 
@@ -156,3 +167,4 @@ Bu belge her konfigürasyon denetiminde ve her modül sonu süreç denetiminde (
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
+| 2026-10-14 | 1.1 | T3 modül sonu gözden geçirmesi: §2.3 etiket listesi (`rc.3`…`rc.5`, `v0.2.0`) ve kabul etiketinde CHANGELOG bölümünün sonraki commit'te yazılması; §2.4 yapılan denetimler; §5 etiket açıklaması kuralı uygulamaya göre; §8 durumları güncellendi, madde 8 eklendi (#214) | Bilgi İşlem |

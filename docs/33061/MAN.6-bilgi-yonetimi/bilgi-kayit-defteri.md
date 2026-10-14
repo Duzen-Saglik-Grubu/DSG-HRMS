@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.6-BKD
 **Süreç:** MAN.6 — Bilgi Yönetimi (`MAN.6.BP1`–`BP4`)
-**Son güncelleme:** 2026-10-05 · **Sahibi:** Bilgi İşlem
+**Son güncelleme:** 2026-10-14 · **Sahibi:** Bilgi İşlem
 **Kaynak:** T3 süreç denetimi, bulgu BULGU-06 (#131)
 
 > Proje boyunca üretilen veya kullanılan her bilgi kümesinin **nerede durduğu, kimin

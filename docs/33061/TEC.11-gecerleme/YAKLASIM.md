@@ -47,7 +47,7 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
    - Her senaryo "geçti", "geçmedi" veya "koşullu" olarak işaretlenir.
    - Bulunan her sorun bir `[HATA]` issue'su olur, senaryo kimliğiyle.
    - Gözlemler (kullanım güçlüğü vb.) ayrıca yazılır.
-5. **Karar (G3):** İK, kabul ölçütüne göre kabul formunu imzalar: kabul, koşullu kabul veya ret. Form, sürüm etiketini taşır.
+5. **Karar (G3):** İK, kabul ölçütüne göre kararını kabul formuna yazar: kabul, koşullu kabul veya ret. Form, sürüm etiketini taşır. Form oturumda doldurulur ve depoya alınır; ıslak imza kalite belgeleriyle birlikte proje sonunda toplanır (`KR-107`; T3: `KR-105` (4)).
 6. **Kabul raporu:** Bilgi İşlem kabul raporunu yazar; izlenebilirlik matrisinin "Kabul" sütununu doldurur.
 
 ---
@@ -76,7 +76,7 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 |---|---|
 | UAT ortamı (gerçek LOGO verisiyle) | Var (TEC.10 runbook) |
 | UAT izin listesi: yalnızca listedeki adreslere e-posta ve SMS gider (`KR-083`) | Var; katılımcılar her kabulde eklenir |
-| Etiketli sürüm ve dağıtım kaydı | #125 ile kurulacak |
+| Etiketli sürüm ve dağıtım kaydı | Var (#125): UAT'ye yalnızca etiketten `deploy-uat.sh` ile kurulur; kayıt `TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`. T3 kabulü `v0.2.0-rc.5` kurulumunda yapıldı |
 | Kabul formu şablonu | `docs/sablonlar/kabul-formu.md` |
 
 ---
@@ -106,7 +106,7 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 | d) Sistem geçerlenir | Kabul oturumu |
 | e) Destekleyici sistemler mevcut | §5 |
 | f) Sonuçlar ve anomaliler belirlenir | Kabul formu, `[HATA]` issue'ları |
-| g) Nesnel kanıt | İmzalı kabul formu, kabul raporu |
+| g) Nesnel kanıt | Kabul formu (depo kaydı ve doldurulmuş formun kopyası; imzalı nüsha proje sonunda, `KR-107`), kabul raporu, `KR-105` |
 | h) İzlenebilirlik | Matris "Kabul" sütunu |
 
 ## Değişiklik Geçmişi
@@ -116,3 +116,4 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 | 2026-10-04 | 1.0 | İlk oluşturma (#124) | Bilgi İşlem |
 | 2026-10-04 | 1.1 | §6: katılımcı notu eklendi (#154) | Bilgi İşlem |
 | 2026-10-14 | 1.2 | §6: kabul formu kopyası depoda; imzalı nüsha proje sonunda (`KR-107`, #213) | Bilgi İşlem |
+| 2026-10-14 | 1.3 | T3 modül sonu gözden geçirmesi: §2 adım 5 imza zamanı (`KR-107`); §5 etiketli sürüm ve dağıtım kaydı kuruldu (#125); §7 (g) (#214) | Bilgi İşlem |

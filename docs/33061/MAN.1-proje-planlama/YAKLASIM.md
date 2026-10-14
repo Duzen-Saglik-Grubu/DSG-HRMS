@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.1-YAK
 **Süreç:** MAN.1 — Proje Planlama
-**Son güncelleme:** 2026-10-05
+**Son güncelleme:** 2026-10-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.1`: hedefler, planlama, sorumluluklar, kaynaklar ve arayüzler. `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -78,8 +78,9 @@ gerektirdiği kadarı kurulur (`KR-077`: T3 kapsamında T1 çekirdeği).
 ### 2.4 Sürüm planı
 
 Kabul edilen her modül bir MINOR sürüm üretir; numara kabul sırasına göre verilir
-(`KR-097`). İK kabulüne sunulan sürüm `vX.Y.0-rc.N` etiketi alır. Bugünkü durum:
-`v0.1.0` (A1), `v0.2.0-rc.1` ve `v0.2.0-rc.2` (T3 kabul adayları). Etiketleme MAN.5'e aittir.
+(`KR-097`). İK kabulüne sunulan sürüm `vX.Y.0-rc.N` etiketi alır. Bugünkü durum (14.10.2026):
+`v0.1.0` (A1); `v0.2.0-rc.1`…`rc.5` (T3 kabul adayları); `v0.2.0` (T3, İK kabulü 13.10.2026,
+`KR-105`; `rc.5` ile aynı commit). Sıradaki modül kabul sırasıyla `v0.3.0` alır. Etiketleme MAN.5'e aittir.
 
 ### 2.5 Planın işe çevrilmesi
 
@@ -144,7 +145,7 @@ Onay tarihi ve onaylayan, belgenin başlığına ve `kayitlar/`'a yazılır.
   birlikte güncellenir. Biri güncellenip diğeri unutulursa belge kendi içinde çelişir.
 - **Onay durumu:** Başlıkta yazılıdır. Onaysız plan "taslak" olarak işaretli kalır.
 - **Karar izi:** Planı değiştiren her karar önce `KR-NNN` olarak yazılır, sonra plana yansıtılır.
-- **Saklama:** Git geçmişi tüm sürümleri saklar. Saklama ve imha kuralı MAN.6'da tanımlanacak (#131).
+- **Saklama:** Git geçmişi tüm sürümleri saklar. Depo dışı kopyaların (ör. Üst Yönetim onay seti) saklama ve imha kuralı MAN.6 bilgi kayıt defterindedir (#131); doldurulmuş formlar depoda `kayitlar/` altında tutulur (`KR-107`).
 
 ---
 
@@ -162,17 +163,18 @@ Onay tarihi ve onaylayan, belgenin başlığına ve `kayitlar/`'a yazılır.
 ## 7. Açık noktalar
 
 T3 sonu süreç denetiminde (`MAN.8-kalite-guvence/raporlar/2026-10-02-t3-surec-denetimi.md`,
-Ek A §1) görülen ve 05.10.2026'da hâlâ açık olan konular:
+Ek A §1) görülen konular. Durum sütunu 14.10.2026'da T3 modül sonu denetimine
+(`2026-10-13-t3-modul-sonu-denetimi-ek-A.md` §1) göre güncellendi (#214).
 
-| # | Açık nokta | İzlendiği yer |
-|---|---|---|
-| 1 | Plan ve RACI 07.09.2026'dan beri onaysız; `A0 — Hazırlık ve Planlama` milestone'u açık | #127 |
-| 2 | Plan v0.2 revizyonu yapılmadı: `KR-077` sırası, `SYG-` kimliği (plan §3 hâlâ `REQ-` diyor), UAT'nin kurulmuş olması ve gerçek veriyle çalışması (`KR-083`, `R-25`), B3/B8 durumları. WBS §4 kritik yolu da T1 → T2 → T3 diyor | #127 |
-| 3 | `proje-plani.md` başlığı "Sürüm 0.1, 2026-09-07" diyor; değişiklik geçmişinde 0.2 (2026-10-04) var | #127 |
-| 4 | `kayitlar/` boş: hiçbir plan revizyonu kayda geçmedi | — |
-| 5 | Bütçe kalemi yok; plan yalnızca araçların ücretsiz olduğunu söylüyor | — |
-| 6 | RACI yetkinlik tablosu (§4.1) 07.09.2026'dan beri güncellenmedi; "her modül kapanışında" kuralı T3 için henüz işlemedi | T3 kapanışı |
-| 7 | WBS §5.2 süreç işlerini `SK` milestone'una atar; CONTRIBUTING §5 ise yalnızca A0/A1/A2/A3/AS sayar. Denetim işleri (#125–#133) `A2` altında açıldı. İki kural birleştirilmeli | — |
+| # | Açık nokta | İzlendiği yer | Durum (14.10.2026) |
+|---|---|---|---|
+| 1 | Plan ve RACI 07.09.2026'dan beri onaysız; `A0 — Hazırlık ve Planlama` milestone'u açık | #127 | ⚠️ Kısmen: plan 0.3, RACI 0.2 ve WBS 0.4 Üst Yönetim tarafından onaylandı (09.10.2026, `KR-103`). `A0` milestone'u açık işi kalmadığı hâlde hâlâ açık |
+| 2 | Plan v0.2 revizyonu yapılmadı: `KR-077` sırası, `SYG-` kimliği (plan §3 hâlâ `REQ-` diyor), UAT'nin kurulmuş olması ve gerçek veriyle çalışması (`KR-083`, `R-25`), B3/B8 durumları. WBS §4 kritik yolu da T1 → T2 → T3 diyor | #127 | ✅ Kapandı: plan 0.3 ve WBS 0.4 (06.10.2026, PR #181) |
+| 3 | `proje-plani.md` başlığı "Sürüm 0.1, 2026-09-07" diyor; değişiklik geçmişinde 0.2 (2026-10-04) var | #127 | ✅ Kapandı: plan 0.3 ile eşitlendi |
+| 4 | `kayitlar/` boş: hiçbir plan revizyonu kayda geçmedi | — | ⚠️ Kısmen: onay kaydı var (`kayitlar/2026-10-06-plan-ve-raci-onay-talebi.md`, Üst Yönetim onay formu). §2.6'nın öngördüğü `…-plan-revizyonu.md` kaydı yazılmadı; revizyon özeti onay talebi §1'de |
+| 5 | Bütçe kalemi yok; plan yalnızca araçların ücretsiz olduğunu söylüyor | — | Açık |
+| 6 | RACI yetkinlik tablosu (§4.1) 07.09.2026'dan beri güncellenmedi; "her modül kapanışında" kuralı T3 için henüz işlemedi | T3 kapanışı | ✅ Kapandı: RACI 0.2 §4.1 (06.10.2026) |
+| 7 | WBS §5.2 süreç işlerini `SK` milestone'una atar; CONTRIBUTING §5 ise yalnızca A0/A1/A2/A3/AS sayar. Denetim işleri (#125–#133) `A2` altında açıldı. İki kural birleştirilmeli | — | Açık (MAN.8 Ek A, A-15) |
 
 ---
 
@@ -185,3 +187,4 @@ Bu belge her modül sonu süreç denetiminde (MAN.8) ve plan revizyonu yapıldı
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
+| 2026-10-14 | 1.1 | T3 modül sonu gözden geçirmesi: §2.4 sürüm durumu (`v0.2.0`); §5 saklama kuralı MAN.6 ve `KR-107`; §7 durum sütunu (#214) | Bilgi İşlem |

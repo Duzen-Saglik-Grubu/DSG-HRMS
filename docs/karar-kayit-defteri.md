@@ -1,7 +1,7 @@
 # Karar Kayıt Defteri
 
 **Belge kimliği:** KKD
-**Son güncelleme:** 2026-10-04
+**Son güncelleme:** 2026-10-14
 **Amaç:** Proje boyunca alınan kararların tek ve resmî kaydı. Bir kararın *ne olduğu*,
 *neden alındığı* ve *ne zaman alındığı* buradan izlenir.
 **İlgili süreçler:** MAN.2 (Proje Değerlendirme ve Kontrol), TEC.2, TEC.5

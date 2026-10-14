@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.2-YAK
 **Süreç:** MAN.2 — Proje Değerlendirme ve Kontrol
-**Son güncelleme:** 2026-10-13
+**Son güncelleme:** 2026-10-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.1`: hedefler, izleme sıklığı, sorumluluklar, kaynaklar ve arayüzler. `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -43,8 +43,8 @@ Bir sonraki adıma geçiş, `proje-plani.md` §3.1'deki kapılarla yetkilendiril
 | Kapı | Karar veren | Kayıt | Örnek |
 |---|---|---|---|
 | G1 — Gereksinim kilidi | İK | Onaylı `PG-<MODÜL>.md` (`KR-068`) | T3: İK toplantısı 23.09.2026, `PG-KMLK.md` |
-| G2 — Geliştirme tamam | Bilgi İşlem | Doğrulama raporu (TEC.9) | T3: GEÇTİ, 04.10.2026 (`TEC.9-dogrulama/raporlar/2026-10-04-t3-dogrulama-raporu.md` §5) |
-| G3 — Kabul | İK | İmzalı kabul formu (TEC.11) | T3: `v0.2.0-rc.2` kabul bekliyor |
+| G2 — Geliştirme tamam | Bilgi İşlem | Doğrulama raporu (TEC.9) | T3: GEÇTİ, 04.10.2026 (`TEC.9-dogrulama/raporlar/2026-10-04-t3-dogrulama-raporu.md` §5.1); kabul edilen `v0.2.0` için yeniden kayıt 14.10.2026 (aynı rapor 2.0, §5.2, #209) |
+| G3 — Kabul | İK | İmzalı kabul formu (TEC.11) | T3: **Kabul**, 13.10.2026, `v0.2.0-rc.5` = `v0.2.0` (`KR-105`; `TEC.11-gecerleme/kayitlar/2026-10-13-t3-kabul-formu.md`). Islak imzalar kalite belgeleriyle proje sonunda toplanır (`KR-107`) |
 | G4 — Kapanış | Bilgi İşlem | Kapanış gözden geçirmesi (§2.4) | T3: 13.10.2026 (`kayitlar/2026-10-13-t3-kapanis-gozden-gecirmesi.md`) |
 
 ### 2.3 Aşama kapanışı ve modül sonu denetimi
@@ -155,13 +155,15 @@ Rapor Üst Yönetime iletilir; iletim tarihi ve alıcı rapora yazılır. **İlk
 
 ## 8. Açık noktalar
 
+Durumlar 14.10.2026'da T3 modül sonu denetimine (MAN.8 Ek A §2) göre güncellendi (#214).
+
 | # | Açık nokta | İzlendiği yer |
 |---|---|---|
-| 1 | Hiç durum raporu yazılmadı. 18.09.2026'da "A2 başlarken" diye söz verilmişti; A2 24.09'da başladı | #127 |
-| 2 | §3'teki beş ölçütün hiçbiri henüz ölçülmedi; hedef değerleri yok | #127 |
+| 1 | ~~Hiç durum raporu yazılmadı. 18.09.2026'da "A2 başlarken" diye söz verilmişti; A2 24.09'da başladı~~ **Kapandı:** durum raporu 1 (06.10.2026) ve 2 (13.10.2026) `raporlar/` altında | #127, #206 |
+| 2 | §3'teki beş ölçütün hiçbiri henüz ölçülmedi; hedef değerleri yok. **Kısmen (14.10.2026):** ölçütler durum raporu 1 ve 2'de gerçek değerle verildi; hedef değerleri hâlâ yok | #127 |
 | 3 | ~~Kapanmış modül olmadığı için kapanış gözden geçirmesi ve alınan dersler kaydı yok~~ **Kapandı (13.10.2026):** T3 kapanış gözden geçirmesi ve alınan dersler `kayitlar/` altında; durum raporu 2 `raporlar/` altında | #206 |
-| 4 | A1 kapanış değerlendirmesi "üst yönetim bilgisine sunulacak" durumunda kaldı; iletim kaydı yok | #127 |
-| 5 | `KR-077` fiilî bir yeniden planlamadır; plana etkisi analiz edilmedi | #127 (MAN.1) |
+| 4 | ~~A1 kapanış değerlendirmesi "üst yönetim bilgisine sunulacak" durumunda kaldı; iletim kaydı yok~~ **Kapandı:** A1 durumu durum raporu 1 §2 ile Üst Yönetime sunuldu (06.10.2026) | #127 |
+| 5 | ~~`KR-077` fiilî bir yeniden planlamadır; plana etkisi analiz edilmedi~~ **Kapandı:** plan 0.3 §5.2 T3'ün öne alınmasını yansıtıyor (06.10.2026); Üst Yönetim onayladı (`KR-103`) | #127 (MAN.1) |
 | 6 | Ölçütleri GitHub'dan otomatik derleyen bir araç yok; değerler elle toplanacak | — |
 | 7 | Eskalasyon eşiği tanımlı değil. Bugünkü tek yazılı kural: puanı 6 ve üzeri risk Üst Yönetime gider (MAN.4) | — |
 
@@ -179,3 +181,4 @@ gözden geçirilir. Rapor dönemi pratikte işlemiyorsa burada değiştirilir.
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
 | 2026-10-06 | 1.1 | §2.5 durum raporu sıklığı onaylandı (`KR-101`, #177) | Bilgi İşlem |
 | 2026-10-13 | 1.2 | §2.2 G4 durumu ve §8 açık nokta 3: T3 kapanışı (#206) | Bilgi İşlem |
+| 2026-10-14 | 1.3 | T3 modül sonu gözden geçirmesi: §2.2 G2 yeniden kaydı ve G3 kabulü; §8 açık nokta 1, 4, 5 kapandı, 2 kısmen (#214) | Bilgi İşlem |

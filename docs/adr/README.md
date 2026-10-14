@@ -1,6 +1,6 @@
 # Mimari Karar Kayıtları (ADR)
 
-**Son güncelleme:** 2026-10-04
+**Son güncelleme:** 2026-10-14
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama) — *"Design rationale"* çıktısı
 
 ---
@@ -58,7 +58,7 @@ değildir.
 | [ADR-0003](ADR-0003-logo-entegrasyon-stratejisi.md) | LOGO Entegrasyon Stratejisi | Kabul Edildi | 2026-09-26 (0.2) | Salt okuma, yalıtım katmanı, 15 dk snapshot senkronizasyon, şema sapma denetimi |
 | [ADR-0004](ADR-0004-veritabani-tasarim-standartlari.md) | Veritabanı Tasarım Standartları | Kabul Edildi | 2026-09-06 (0.1) | Adlandırma, tipler, soft delete, tarih aralıklı tablolar, migration kuralları |
 | [ADR-0005](ADR-0005-cekirdek-veri-modeli.md) | Çekirdek Veri Modeli | Kabul Edildi | 2026-09-06 (0.1) | Kişi/İstihdam ayrımı, tarih farkındalığı, yönetici grafı |
-| [ADR-0006](ADR-0006-kimlik-dogrulama-ve-oturum.md) | Kimlik Doğrulama, Üyelik ve Oturum | Kabul Edildi | 2026-10-01 (1.0) | Üyelik akışı, doğrulama kodu, parola politikası, JWT + yenileme jetonu |
+| [ADR-0006](ADR-0006-kimlik-dogrulama-ve-oturum.md) | Kimlik Doğrulama, Üyelik ve Oturum | Kabul Edildi | 2026-10-10 (1.1) | Üyelik akışı, doğrulama kodu, parola politikası, JWT + yenileme jetonu |
 | [ADR-0007](ADR-0007-yetkilendirme-modeli.md) | Yetkilendirme Modeli | Kabul Edildi | 2026-09-29 (0.2) | Rol (eylem) × Kapsam (satır); `404` tercihi; yetki sızıntısı testi |
 | [ADR-0008](ADR-0008-sir-ve-yapilandirma-yonetimi.md) | Sır ve Yapılandırma Yönetimi | Kabul Edildi | 2026-09-26 (0.2) | User Secrets / ortam değişkeni, `gitleaks`, açılışta doğrulama |
 | [ADR-0009](ADR-0009-loglama-denetim-izi-ve-kvkk.md) | Loglama, Denetim İzi ve KVKK | Kabul Edildi | 2026-10-03 (0.3) | Üç kayıt türü, maskeleme, erişim kaydı, saklama ve imha |
@@ -94,7 +94,7 @@ değerlendirilmelidir:
 
 | ADR | Varsayım | Değişirse |
 |---|---|---|
-| ADR-0006 | Uygulama **yalnızca yerel ağda** çalışacak | İnternete açılırsa 2FA'nın varsayılan olarak **açık** olması değerlendirilir. 2FA geliştirildi ve parametreyle açılabilir (`KR-069`, PRM-KML-08); varsayılan kapalı |
+| ADR-0006 | Uygulama **yalnızca yerel ağda** çalışacak | İnternete açılırsa 2FA'nın varsayılan olarak **açık** olması değerlendirilir. 2FA geliştirildi: parametre (PRM-KML-08) yalnızca kullanıma açar, her kullanıcı kendi hesabında açar; varsayılan kapalı (`KR-069`, `KR-104`) |
 | ADR-0003 | LOGO tablo yapısı sabit; tek `LH_001_PERSON` tablosu var | Firma bazlı tablo eklenirse eşleme yaklaşımı gözden geçirilir |
 | ADR-0012 | NetGSM hesabında OTP paketi yok | Paket tanımlanırsa doğrulama kodları OTP servisine taşınabilir |
 | ADR-0014 | Rapor hacmi 50.000 satırın altında | Aşılırsa arka planda üretim modeline geçilir |
@@ -107,3 +107,4 @@ değerlendirilmelidir:
 | 2026-09-06 | 0.1 | İlk oluşturma; ADR-0001…ADR-0015 dizini | Bilgi İşlem |
 | 2026-10-04 | 0.2 | Kural 2: ek ve sınırlı değişiklik yerinde, karar değişikliği yeni ADR ile (`KR-099`); dizine son değişiklik sütunu; ADR-0006 gözden geçirme tetikleyicisi 2FA geliştirmesine göre güncellendi (#133) | Bilgi İşlem |
 | 2026-10-05 | 0.3 | ADR-0016 eklendi; ADR-0002 durumu (#171) | Bilgi İşlem |
+| 2026-10-14 | 0.4 | Dizinde ADR-0006 son değişikliği 1.1 (10.10.2026) olarak düzeltildi; varsayımlar tablosunda 2FA kullanıcı tercihine bağlı (`KR-104`) (#214) | Bilgi İşlem |
