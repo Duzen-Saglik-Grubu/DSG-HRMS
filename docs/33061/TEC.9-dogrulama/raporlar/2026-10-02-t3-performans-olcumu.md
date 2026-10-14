@@ -158,9 +158,9 @@ UAT'deki 1 e-posta gönderimi başarısızdır (0,19 sn, `smtp-tls`). Bu deneme,
 - Giriş testi, var olmayan 920 adres için `identity.login_throttle` tablosunda hatalı giriş sayacı oluşturdu.
 - Bu satırlar gerçek bir hesaba bağlı değildir ve kilit oluşturmaz.
 - 02.10'daki 920 satır 03.10.2026'da kullanıcı tarafından silindi.
-- 04.10'daki tekrar ölçüm yine 920 sayaç satırı bıraktı: `updated_at >= 2026-10-04T10:26:14Z`, `failed_count = 1`, `locked_until IS NULL`. Temizlik onaya bırakılmıştır.
+- 04.10'daki tekrar ölçüm yine 920 sayaç satırı bıraktı: `updated_at >= 2026-10-04T10:26:14Z`, `failed_count = 1`, `locked_until IS NULL`. Temizlik onaya bırakıldı; 14.10 silmesinden önce tabloda toplam 925 satır vardı, yani 04.10'dan ayrıca kalan sayaç satırı yoktu (aşağıda).
 - **Kimlik olayları (SYG-KMLK-060):** 04.10 ölçümü `audit.security_event` tablosuna 920 `SignInFailed / invalid-credentials` olayı yazdı; hesap bilgisi yok. Kayıt değiştirilemez olduğundan (`KR-060`) bu olaylar **silinmez**. Zaman aralığıyla (04.10.2026 10:26–10:32 UTC) ve kurum ağındaki ölçüm istemcisinin IP'siyle ayırt edilir.
-- **14.10 ölçümü:** 920 sayaç satırı (`updated_at` 11:00:53–11:05:24 UTC, hiçbirinde kilit yok) ve 920 `SignInFailed` olayı bıraktı. Olaylar silinmez; sayaç satırlarının temizliği onaya bırakılmıştır.
+- **14.10 ölçümü:** 920 sayaç satırı (`updated_at` 11:00:53–11:05:24 UTC, hiçbirinde kilit yok) ve 920 `SignInFailed` olayı bıraktı. Olaylar silinmez. **Sayaç satırları silindi:** 14.10.2026 12:42 UTC'de, Doğuş Uçanok'un onayıyla, 920 satır. Önce aynı silme bir işlem içinde geri alınarak denendi: tabloda 925 satır vardı, ölçüt 920'sini seçti, ölçüm dışındaki 5 eski satır korundu.
 - **İleri ölçümler için öneri:** Sentetik yük testleri, olay incelemesini karıştırmaması için kayda geçirilmelidir (bu rapor).
 
 ## Değişiklik Geçmişi
@@ -170,3 +170,4 @@ UAT'deki 1 e-posta gönderimi başarısızdır (0,19 sn, `smtp-tls`). Bu deneme,
 | 2026-10-02 | 0.1 | İlk ölçüm | Bilgi İşlem |
 | 2026-10-04 | 0.2 | SYG-KMLK-077 tekrar ölçümü (#120 sonrası, `KR-095`); SYG-KMLK-079 e-posta ölçümü tamamlandı (#121) | Bilgi İşlem |
 | 2026-10-14 | 0.3 | §2.6: SYG-KMLK-077 kabul edilen sürümde (`v0.2.0`) yeniden ölçüldü (#209); §5 yan etkiler | Bilgi İşlem |
+| 2026-10-14 | 0.4 | §5: 14.10 ölçümünün 920 sayaç satırı Doğuş Uçanok'un onayıyla silindi (14.10.2026 12:42 UTC; önce geri alınan deneme: 925 satır, 920 seçildi, 5 eski satır korundu) (#214) | Bilgi İşlem |

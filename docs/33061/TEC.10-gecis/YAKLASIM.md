@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.10-YAK
 **Süreç:** TEC.10 — Geçiş
-**Son güncelleme:** 2026-10-05
+**Son güncelleme:** 2026-10-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -128,14 +128,17 @@ RACI: `MAN.1-proje-planlama/roller-ve-sorumluluklar.md` §3.1.
 
 ## 8. Açık noktalar
 
+Durumlar 14.10.2026'da T3 modül sonu denetimine (MAN.8 Ek C §3) göre güncellendi (#214).
+
 | Konu | Durum |
 |---|---|
 | **Üretim ortamı ve geçiş planı** | Yok. Aşama AS'de (`v1.0.0`) planlanacak: ortam, kesim (cut-over), takvim |
 | **Veri göçü** | Başlamadı. Önlemler R-01'de yazılı (idempotent betik, mutabakat raporu, üç deneme); `raporlar/` boş |
-| **Geri dönüş (rollback)** | Yazılı yordam yok. Önceki etiketten betik yeniden çalıştırılabilir; ancak şema betiği yalnızca eksik migration'ları uygular, şemayı geri almaz |
-| **Kullanıcı eğitimi ve kılavuz** | Üretim için yok. Bugün yalnızca kabul katılımcı notu var |
-| **Runbook'ta bayat satırlar** | §4 doğrulama komutları `http://` ile `200` bekliyor (TLS'ten beri `301`; betik doğru denetliyor). §6'da "uygulamada oturum yok" ve ufw satırları güncel değil |
-| **SSH parola girişi** | Hâlâ açık (runbook §1 ve §6, R-25) |
+| **Geri dönüş (rollback)** | Yazılı yordam yok. Önceki etiketten betik yeniden çalıştırılabilir; ancak şema betiği yalnızca eksik migration'ları uygular, şemayı geri almaz. T3'te beş kurulumun (`rc.1`…`rc.5`) hiçbirinde geri dönüş gerekmedi; yordam sınanmadı. Önceki adayların imajları sunucuda duruyor (konfigürasyon denetimi 13.10.2026, G-6) |
+| **Kullanıcı eğitimi ve kılavuz** | Üretim için yok. Bugün yalnızca kabul katılımcı notu var (`TEC.11-gecerleme/T3-kullanim-notu.md`) |
+| ~~**Runbook'ta bayat satırlar**~~ | ✅ Kapandı: runbook 1.9 (06.10.2026, #177) §4 doğrulamayı HTTPS'e göre, §6 güvenlik notlarını güncelledi |
+| **SSH parola girişi** | Bilinçli karar: anahtarla erişilir, parola girişi erişimin kaybolmaması için açık bırakıldı (`KR-102`, #174); kalan risk Üst Yönetim tarafından kabul edildi (R-25, `KR-103`) |
+| **`v0.2.0` ve dağıtım kaydı** | Kabul edilen `v0.2.0`, kurulu `rc.5` ile aynı commit (`149f6ee`); yeniden kurulum yapılmadı. Dağıtım kaydında `v0.2.0` için ayrı satır yok (sunucuda `VERSION` = `v0.2.0-rc.5`); kayda not düşülmesi önerildi (MAN.8 Ek C YB-12) |
 | **Sertifika takibi** | Elle; bitiş tarihi runbook §1'de. Sistem içi uyarı Y4'te gelecek (#42, R-18) |
 
 ---
@@ -149,3 +152,4 @@ Bu belge her modül sonu süreç denetiminde (MAN.8) ve üretim geçişi planlan
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
+| 2026-10-14 | 1.1 | T3 modül sonu gözden geçirmesi: §8 runbook satırı kapandı (runbook 1.9), SSH satırı `KR-102` ve `KR-103`, geri dönüş ve `v0.2.0` dağıtım kaydı notları (#214) | Bilgi İşlem |

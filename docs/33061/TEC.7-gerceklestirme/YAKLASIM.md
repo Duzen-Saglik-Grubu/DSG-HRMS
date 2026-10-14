@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.7-YAK
 **Süreç:** TEC.7 — Gerçekleştirme
-**Son güncelleme:** 2026-10-05
+**Son güncelleme:** 2026-10-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir. Ayrıca `PA 2.1` için hedef, plan, sorumluluk ve kaynaklar (§1–§4).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -68,7 +68,7 @@ gerçekleştirmeyle aynı PR'da yazılır, ama kanıt olarak TEC.9'a aittir.
 
 - **Kaynak:** Git deposu; her birleştirme `main`'de tek bir squash commit'tir.
 - **Sürüm:** Kabule sunulan sürüm `vX.Y.0-rc.N` açıklamalı etiketini alır (ör.
-  `v0.2.0-rc.1`, `v0.2.0-rc.2`); kabulden sonra aynı commit `vX.Y.0` olur (`KR-097`).
+  `v0.2.0-rc.1`…`rc.5`); kabulden sonra aynı commit `vX.Y.0` olur (`KR-097`; T3: `v0.2.0` = `rc.5`).
 - **Sürüm notu:** `CHANGELOG.md`'de etiketle eşleşen bölüm; her madde issue numarası taşır.
 - **İmaj:** API ve web imajları Dockerfile'larından derlenir; CI'da `trivy` ile taranır.
   UAT'ye kurulum TEC.8 ve TEC.10'dadır.
@@ -132,7 +132,7 @@ Doküman haritası, gerçekleştirme raporunun karşılığı olarak `CHANGELOG.
 |---|---|---|
 | a) Gerçekleştirme kısıtları belirlenir | §2.2; SYG "Kısıt" türü; mimari testleri | Var |
 | b) Sistem öğesi gerçeklenir | `src/`, PR'lar | Var |
-| c) Öğe paketlenir veya saklanır | Git, etiketler, `CHANGELOG.md`, imajlar (§2.3) | Var (`v0.1.0`, `v0.2.0-rc.1`, `v0.2.0-rc.2`) |
+| c) Öğe paketlenir veya saklanır | Git, etiketler, `CHANGELOG.md`, imajlar (§2.3) | Var (`v0.1.0`; `v0.2.0-rc.1`…`rc.5`; `v0.2.0`, 13.10.2026) |
 | d) Destekleyici sistemler mevcut | §3 | Var |
 | e) Gerçekleştirmenin izlenebilirliği | Issue başlığı, kod ve testte SYG kimliği, PR, matris, CI'daki SYG ↔ test denetimi | Var; §7 madde 3 |
 
@@ -161,3 +161,4 @@ değiştiren bir değişiklikte gözden geçirilir.
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
 | 2026-10-05 | 1.1 | §8 madde 1 kapandı: ADR-0016 (#171) | Bilgi İşlem |
+| 2026-10-14 | 1.2 | §2.3 ve §6 (c): etiket listesi `v0.2.0`'a kadar güncellendi (#214) | Bilgi İşlem |

@@ -53,6 +53,13 @@ jobs:
       - name: Gereksinim izlenebilirligini denetle
         run: node .github/scripts/requirement-traceability-check.mjs
 
+      # Belge tutarliligi (#214): "Son guncelleme" degisiklik gecmisinin son satirindan
+      # eski olamaz; SYG bolum 1 ozet sayimlari bolum 4'ten yeniden sayilir. T3 modul
+      # sonu denetiminde 13 belgenin basligi ve SYG sayimlari bayatti; kural yaziliydi
+      # ama denetlenmiyordu. Betik once kendini sinar.
+      - name: Belge tutarliligini denetle
+        run: node .github/scripts/doc-consistency-check.mjs
+
       - name: Denetle
         uses: actions/github-script@v7
         with:

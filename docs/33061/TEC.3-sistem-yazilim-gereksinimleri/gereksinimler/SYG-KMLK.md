@@ -31,16 +31,16 @@ matrisinin §5 sütunu, §4 ile aynı eşlemeyi göstermelidir.
 |---|---:|
 | Sistem gereksinimi | **81** |
 | Karşılanan paydaş gereksinimi | **56 / 56** |
-| Tür — İşlevsel | 46 |
+| Tür — İşlevsel | 48 |
 | Tür — Performans | 3 |
 | Tür — Arayüz | 4 |
 | Tür — İşlevsel olmayan | 14 |
 | Tür — Kısıt | 12 |
-| Doğrulama — Test | 71 |
+| Doğrulama — Test | 73 |
 | Doğrulama — Gösterim | 3 |
 | Doğrulama — İnceleme | 2 |
 | Doğrulama — Analiz | 3 |
-| Parametreye bağlı | 31 |
+| Parametreye bağlı | 32 |
 | Kritik performans ölçütü | 6 |
 
 ---
@@ -474,3 +474,4 @@ madde `İptal` notuyla kalır.
 | 2026-10-06 | 1.4 | §7: SMTP sertifikasının yeni bitişi (#179) | Bilgi İşlem |
 | 2026-10-10 | 1.5 | Değişiklik talebi #190: SYG-KMLK-034, 035, 036 güncellendi; SYG-KMLK-080 (kullanıcının 2FA tercihi) ve SYG-KMLK-081 (İK'nın 2FA'yı kurtarma için kapatması) eklendi | Bilgi İşlem |
 | 2026-10-14 | 1.6 | SYG-KMLK-057: kendi hesabı ve son Sistem Yöneticisi kuralı; AN-26 (#138'den türetilmiş davranış, #211) | Bilgi İşlem |
+| 2026-10-14 | 1.7 | §1 özet sayımları §4'ten yeniden sayıldı: İşlevsel 46 → 48, Test 71 → 73, parametreye bağlı 31 → 32 (SYG-KMLK-080 ve 081 sayılmamıştı); sayımlar artık CI'da denetlenir (`doc-consistency-check.mjs`, #214) | Bilgi İşlem |

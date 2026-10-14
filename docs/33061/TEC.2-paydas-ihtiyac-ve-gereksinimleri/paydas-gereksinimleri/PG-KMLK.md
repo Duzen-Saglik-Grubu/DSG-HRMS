@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.2-PG-KMLK
 **Süreç:** TEC.2 — Paydaş İhtiyaç ve Gereksinimlerinin Tanımlanması
-**Son güncelleme:** 2026-09-28
+**Son güncelleme:** 2026-10-14
 **Kaynak toplantı:** `kayitlar/2026-09-23-kimlik-gereksinim-toplantisi.md`
 **Onay durumu:** **Onaylandı — 2026-09-23** (İK gereksinim toplantısı)
 
@@ -31,6 +31,15 @@ toplantı kaydı §4.
 | Açık soru cevabıyla netleşen | 2 (REQ-KMLK-011, REQ-KMLK-022) |
 | Toplantı sonucu eklenen | 3 (REQ-KMLK-054, 055, 056) |
 | **Toplam onaylı gereksinim** | **56** |
+| Onaydan sonraki değişiklik talebi | 3 (#77, #185, #190) — gereksinim sayısı değişmedi |
+
+**Onaydan sonraki değişiklik talepleri** (yordam: TEC.2 YAKLASIM §4.1):
+
+| Talep | Onay | Etkilenen gereksinim | Değişiklik |
+|---|---|---|---|
+| #77 | 26.09.2026 — Bilgi İşlem, İK görüşmesinden sonra (`KR-079`) | REQ-KMLK-009 (yorum) | Ortak e-posta ve ad çelişkisi kurallarında yalnızca aktif siciller sayılır. Gereksinim metni değişmedi; SYG-KMLK-008 güncellendi |
+| #185 | 10.10.2026 — İK (Doğuş Uçanok bildirdi, #187); kabulde teyit (T-03) | REQ-KMLK-038, 039 | Üyelik denemesi TCKN başına saatte 5 → 10; kod gönderimi 15 dakikada 3 → 10 (parametre aralığı 1–15) |
+| #190 | 10.10.2026 — İK; kabulde teyit (T-04) | REQ-KMLK-025, 051, 052, 053; kurtarma işlemi REQ-KMLK-037 ve 052 altında | 2FA kullanıcı tercihine bağlı (`KR-104`); İK, kodu alamayan kişinin 2FA'sını gerekçeyle kapatır (SYG-KMLK-080, 081) |
 
 ## 3. Kimlik numaraları hakkında
 
@@ -168,3 +177,4 @@ Sistem gereksinimi, tasarım, kod ve test halkaları, işin yapıldığı PR'da 
 | 2026-10-10 | 1.4 | Değişiklik talebi #185 İK tarafından onaylandı (Doğuş Uçanok bildirdi, #187) | Bilgi İşlem |
 | 2026-10-10 | 1.5 | **Değişiklik talebi #190** (İK onaylı, 10.10.2026): 2FA kullanıcı tercihine bağlı; REQ-KMLK-025, 051, 052, 053 güncellendi | Bilgi İşlem |
 | 2026-10-11 | 1.6 | Değişiklik talebi #190 kapsamında İK'nın kurtarma işlemi (kodu alamayan kişinin 2FA'sını gerekçeyle kapatma; REQ-KMLK-052 ve 037 altında, SYG-KMLK-081) İK tarafından 10.10.2026'da onaylandı (Doğuş Uçanok bildirdi) | Bilgi İşlem |
+| 2026-10-14 | 1.7 | §2 özete onaydan sonraki değişiklik talepleri (#77, #185, #190) eklendi; başlık tarihi geçmişle eşitlendi (#214) | Bilgi İşlem |

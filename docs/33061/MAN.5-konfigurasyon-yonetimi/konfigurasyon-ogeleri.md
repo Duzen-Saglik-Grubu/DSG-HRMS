@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.5-KOL
 **Süreç:** MAN.5 — Konfigürasyon Yönetimi (`MAN.5.BP2`, `BP3`)
-**Son güncelleme:** 2026-10-13 · **Sahibi:** Bilgi İşlem
+**Son güncelleme:** 2026-10-14 · **Sahibi:** Bilgi İşlem
 **Kaynak:** T3 süreç denetimi, bulgu BULGU-05 (#132)
 
 > Konfigürasyon öğesi (KÖ), değiştiğinde sistemin davranışını veya kanıtını değiştiren ve
@@ -18,7 +18,7 @@
 |---|---|---|
 | Depodaki öğeler (§2) | **Git etiketi** (`KR-097`): kabul adayı `vX.Y.0-rc.N`, kabul edilen `vX.Y.0` | `CHANGELOG.md` bölümü, etiket açıklaması |
 | Dağıtılan yapı (§3.1) | Etiketten derlenen imajlar; commit OCI etiketinde | `TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`, sunucuda `deployments.log` |
-| Depo dışı öğeler (§3.2, §3.3) | Bu listedeki konum ve değişiklik yolu | Konfigürasyon denetimi raporu (`raporlar/`) |
+| Depo dışı öğeler (§3.2, §3.2a, §3.3) | Bu listedeki konum ve değişiklik yolu | Konfigürasyon denetimi raporu (`raporlar/`) |
 
 Modül kapanışında ve kabul adayı etiketlendiğinde konfigürasyon denetimi yapılır.
 Denetim, depo dışı öğelerin bu listeyle uyumunu sınar. UAT'de her denetimde şunlar da sınanır: dinleyen portlar TCP **ve UDP** için (`ss -ltnup`); `secrets/` dizininin tamamı (yalnızca `.env.uat` bulunur, kopya yoktur); bekleyen yeniden başlatma ve `apt` geçmişi (#207).
@@ -36,15 +36,17 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 | KÖ-03 | Veritabanı migration'ları | `src/backend/Dsg.Hrms.Infrastructure/Data/Migrations/` | Uygulanmış migration değiştirilmez (ADR-0004); model–migration farkı CI'da denetlenir |
 | KÖ-04 | Ön yüz kaynak kodu ve testleri | `src/frontend/dsg-hrms-web/src/`, `e2e/` | |
 | KÖ-05 | Ön yüz metinleri | `src/frontend/dsg-hrms-web/src/locales/tr/` | SYG-KMLK-064 |
-| KÖ-06 | API sözleşmesi | `docs/api/openapi-v1.json`; üretilen tipler `src/shared/api/generated/` | İkisi de derlemeden üretilir; güncelliği CI'da denetlenir |
-| KÖ-07 | Bağımlılık sürümleri | `Directory.Packages.props`, `global.json`, `package-lock.json` | Açık taraması CI'da (.NET ve npm) |
-| KÖ-08 | Gömülü veri | Yaygın parola listesi `Infrastructure/Identity/Passwords/` | Kaynak ve lisans aynı klasörün README'sinde |
+| KÖ-06 | API sözleşmesi | `docs/api/openapi-v1.json`; üretilen tipler `src/frontend/dsg-hrms-web/src/shared/api/generated/` | İkisi de derlemeden üretilir; güncelliği CI'da denetlenir |
+| KÖ-07 | Bağımlılık sürümleri ve derleme ayarları | `src/backend/Directory.Packages.props`, `src/backend/Directory.Build.props`, `global.json`, `src/frontend/dsg-hrms-web/package-lock.json` | Açık taraması CI'da (.NET ve npm) |
+| KÖ-08 | Gömülü veri | Yaygın parola listesi `src/backend/Dsg.Hrms.Infrastructure/Identity/Passwords/` | Kaynak ve lisans aynı klasörün README'sinde |
+| KÖ-08a | Kurumsal logo dosyası | `assets/duzen_logo.png`; web imajındaki kopyası `src/frontend/dsg-hrms-web/public/brand/duzen_logo.png` | UAT'ye dağıtılır (KÖ-22). İki dosyanın aynılığı CI'da denetlenir (`brand-asset-check.mjs`, #90). Uygulamada değiştirilen logo ayrı öğedir (KÖ-51) |
 | KÖ-09 | Konteyner imaj tanımları | `src/backend/Dsg.Hrms.Api/Dockerfile`, `src/frontend/dsg-hrms-web/Dockerfile` | Taban imajlar özetle (digest) sabit; trivy taraması CI'da |
 | KÖ-10 | nginx yapılandırması | `src/frontend/dsg-hrms-web/nginx/` | TLS ve düz HTTP kipleri |
-| KÖ-11 | Compose yığınları | `docker/compose.yml` (geliştirme), `compose.uat.yml`, `compose.e2e.yml` | |
+| KÖ-11 | Compose yığınları | `docker/compose.yml` (geliştirme), `compose.uat.yml`, `compose.e2e.yml`; uçtan uca yığının betikleri ve tohum verisi `docker/e2e/` (`up.sh`, `down.sh`, `seed.sql`); TLS'siz kip için boş klasör `docker/tls-empty/` | |
 | KÖ-12 | Örnek ortam dosyaları | `docker/.env.example`, `docker/.env.uat.example` | Yığının kullandığı her değişkeni içermeli (§ denetim D-04) |
-| KÖ-13 | Dağıtım ve TLS betikleri | `docker/deploy-uat.sh`, `renew-tls.sh`, `acme-dns-hook.sh` | |
+| KÖ-13 | Dağıtım, TLS ve veritabanı hesabı betikleri | `docker/deploy-uat.sh`, `renew-tls.sh`, `acme-dns-hook.sh`; LOGO salt-okunur hesabının betiği `docker/logo/read-only-login.sql` | Hesabın kendisi KÖ-40 |
 | KÖ-14 | CI iş akışları ve betikleri | `.github/workflows/`, `.github/scripts/` | |
+| KÖ-14a | Depo ve araç ayarları | `.gitattributes`, `.gitignore`, `.gitleaks.toml` (CI sır taraması ayarı), `.config/dotnet-tools.json` (araç sürümleri; migration betiğini üreten `dotnet-ef` dahil) | `.gitignore` depo dışında kalan öğeleri (KÖ-30, KÖ-36, MAN.6 bilgi kayıt defteri) belirler |
 | KÖ-15 | Git kancaları | `.githooks/` (`commit-msg`, `pre-push`) | Her makinede `core.hooksPath` ile etkinleştirilir (CONTRIBUTING §0) |
 | KÖ-16 | GitHub şablonları ve sahiplik | `.github/ISSUE_TEMPLATE/`, PR şablonu, `CODEOWNERS` | |
 | KÖ-17 | Proje belgeleri | `docs/` (ADR, karar defteri, 33061 kanıtları, şablonlar), `CHANGELOG.md`, `CONTRIBUTING.md`, `README.md` | |
@@ -57,18 +59,24 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 |---|---|---|---|---|
 | KÖ-20 | API ve web imajları | Sunucuda `dsg-hrms-api:<sürüm>`, `dsg-hrms-web:<sürüm>` (ve `:uat`) | Yalnızca `deploy-uat.sh` | `docker inspect` OCI etiketi (runbook §3.2) |
 | KÖ-21 | Dağıtım kaydı | `/opt/dsg-hrms/deployments.log`, `/opt/dsg-hrms/VERSION` | Yalnızca `deploy-uat.sh` yazar | Depodaki kayıtla karşılaştırma |
-| KÖ-22 | Sunucudaki kaynak kopyası | `/opt/dsg-hrms/src`, `/opt/dsg-hrms/docker` | Her dağıtımda silinip `git archive` ile yeniden yazılır | Elle değiştirilmez |
+| KÖ-22 | Sunucudaki kaynak kopyası | `/opt/dsg-hrms/src`, `/opt/dsg-hrms/docker`, `/opt/dsg-hrms/global.json`, `/opt/dsg-hrms/assets/`; dağıtımın ürettiği idempotent şema betiği `/opt/dsg-hrms/sema.sql` | Her dağıtımda silinip `git archive` ile yeniden yazılır; `sema.sql` her dağıtımda migration'lardan yeniden üretilir (`deploy-uat.sh`) | Elle değiştirilmez |
 
 ### 3.2 Sunucu yapılandırması (UAT)
 
 | KÖ | Öğe | Yer | Sahibi | Değişiklik yolu |
 |---|---|---|---|---|
-| KÖ-30 | UAT sır dosyası | `/opt/dsg-hrms/secrets/.env.uat` (izin `600`) | Bilgi İşlem | Elle, runbook §2.2 ve §9–§10'a göre. **İçerik depoya girmez**; değişken listesi KÖ-12 ile aynıdır |
+| KÖ-30 | UAT sır dosyası | `/opt/dsg-hrms/secrets/.env.uat` (izin `600`) | Bilgi İşlem | Elle, runbook §2.2 ve §9–§10'a göre. **İçerik depoya girmez.** Değişken listesi KÖ-12'deki `.env.uat.example`'ın alt kümesidir; varsayılanı olan isteğe bağlı değişkenler (ör. `IDENTITY_PUBLIC_BASE_URL`) yazılmayabilir (konfigürasyon denetimi 13.10.2026, D-08). `secrets/` dizininde yalnızca bu dosya bulunur; eski kopya bırakılmaz (#207) |
 | KÖ-31 | UAT TLS sertifikası | `/opt/dsg-hrms/tls/` | Bilgi İşlem | `renew-tls.sh` ile 90 günde bir, elle (`KR-067`, R-18). Bitiş: 16.12.2026 |
 | KÖ-32 | NTP kaynakları | `/etc/chrony/sources.d/dsg-hrms-ntp.sources` | Bilgi İşlem | Elle, runbook NTP bölümü (#103, R-21) |
-| KÖ-33 | Docker Engine ve işletim sistemi | UAT sunucusu (Ubuntu 26.04) | Bilgi İşlem | Elle, runbook §2.1 |
+| KÖ-33 | Docker Engine ve işletim sistemi | UAT sunucusu (Ubuntu 26.04) | Bilgi İşlem | **İşletim sistemi güvenlik güncellemeleri** `unattended-upgrades` ile kendiliğinden kurulur; iz `/var/log/apt/history.log`. **Docker Engine ve sürüm yükseltmeleri** elle, runbook §2.1. Yeniden başlatma gerektiğinde (`/var/run/reboot-required`) duyurulmuş bir zamanda yapılır; son yeniden başlatma 13.10.2026 (#207). Masaüstü kurulumundan kalan Avahi ve CUPS servisleri 13.10.2026'da kapatıldı ve maskelendi (#207, runbook §6). Her konfigürasyon denetiminde `apt` geçmişi ve bekleyen yeniden başlatma sınanır (§1) |
 | KÖ-34 | SSH erişimi | UAT sunucusu `/root/.ssh/authorized_keys`; geliştirici makinesinde `~/.ssh/dsg-hrms-uat` | Bilgi İşlem | Elle. Anahtarla erişim; parola girişi bilerek açık (`KR-102`, #174) |
 | KÖ-35 | ~~Webmin yönetim paneli~~ | — | — | **Kaldırıldı (06.10.2026, #179).** 06.10.2026'da belgelenmemiş olarak bulunmuştu; kullanılmıyordu |
+
+### 3.2a Yerel geliştirme ortamı
+
+| KÖ | Öğe | Yer | Sahibi | Değişiklik yolu |
+|---|---|---|---|---|
+| KÖ-36 | Yerel geliştirme ortamı (Docker Desktop yığını ve sır dosyası) | Geliştirici makinesi: `docker/compose.yml` ile kurulan yığın; sır dosyası `docker/.env` (depo dışı, `.gitignore`'da) | Bilgi İşlem | Elle. Ortam gerçek LOGO verisiyle ve gerçek SMTP/NetGSM gönderimiyle çalışır (28.09.2026 kararı); `docker/.env` gerçek sırları tutar, **içeriği depoya girmez**, değişken listesi KÖ-12'deki `docker/.env.example` ile aynıdır. Ortam her güncellendiğinde hangi commit'ten derlendiği not edilir (imaj `version` etiketi veya `git describe`); "yerelde denenir, sonra UAT'ye gider" kuralı bunu gerektirir. Baseline değildir, kabul kanıtı üretmez. Verisi MAN.6 bilgi kayıt defterinde (BK-15) |
 
 ### 3.3 Dış hizmetler ve kurum altyapısı
 
@@ -101,3 +109,4 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 | 2026-10-06 | 1.1 | KÖ-34 SSH anahtarı; KÖ-35 Webmin eklendi (#177) | Bilgi İşlem |
 | 2026-10-06 | 1.2 | KÖ-35 Webmin kaldırıldı; KÖ-43 yeni sertifika (#179) | Bilgi İşlem |
 | 2026-10-13 | 1.3 | §1: UAT denetiminde UDP dinleyiciler, `secrets/` dizininin tamamı ve yeniden başlatma da sınanır (#207) | Bilgi İşlem |
+| 2026-10-14 | 1.4 | T3 konfigürasyon denetimi (B-2, B-3, D-08): KÖ-06, KÖ-07, KÖ-08 yolları tam yazıldı; KÖ-08a (logo dosyası) ve KÖ-14a (depo ve araç ayarları) eklendi; KÖ-11 ve KÖ-13 sayılmayan dosyalarla tamamlandı; KÖ-22 `global.json`, `assets/`, `sema.sql`; KÖ-30 değişken listesi notu; KÖ-33 otomatik güvenlik güncellemeleri, yeniden başlatma ve Avahi/CUPS (#207); §3.2a KÖ-36 yerel geliştirme ortamı (#214) | Bilgi İşlem |
