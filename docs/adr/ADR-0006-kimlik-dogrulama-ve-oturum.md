@@ -1,8 +1,8 @@
 # ADR-0006 — Kimlik Doğrulama, Üyelik ve Oturum Yönetimi
 
-**Durum:** Kabul Edildi
+**Durum:** Kabul Edildi; §7'nin iki uygulama kuralı → ADR-0017
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`, `KR-078`, `KR-086`, `KR-087`, `KR-088`, `KR-090`
+**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`, `KR-078`, `KR-086`, `KR-087`, `KR-088`, `KR-090`, `KR-092`, `KR-104` (→ ADR-0017)
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **İlgili riskler:** `R-08`, `R-12`, `R-13`, `R-14`
 
@@ -109,10 +109,16 @@ Eşleşmenin sızmaması (`KR-016`) ile kanal gösterimi arasındaki gerilim ve 
 
 | Kapsam | Sınır |
 |---|---|
-| TCKN başına üyelik denemesi | 5 deneme / saat |
-| IP başına üyelik denemesi | 20 deneme / saat |
-| Kod gönderimi (kişi başına) | 3 gönderim / 15 dakika |
-| Giriş denemesi (**girilen e-posta** başına — hesap var olmasa da; `SYG-KMLK-033`) | 5 başarısız deneme → 15 dakika kilit |
+| TCKN başına üyelik denemesi | 10 deneme / saat (PRM-KML-18; 3–20) |
+| IP başına üyelik denemesi | 20 deneme / saat (PRM-KML-19; 5–100) |
+| Kod gönderimi (kişi başına) | 10 gönderim / 15 dakika (PRM-KML-17; 1–15) |
+| Giriş denemesi (**girilen e-posta** başına — hesap var olmasa da; `SYG-KMLK-033`) | 5 başarısız deneme (PRM-KML-03) → 15 dakika kilit (PRM-KML-04) |
+
+> **Değer güncellemesi (14.10.2026, #212):** İlk sürümde TCKN başına üyelik denemesi 5 /
+> saat ve kod gönderimi 3 / 15 dakikaydı. UAT'de İK ile yapılan denemelerde sistem çok
+> çabuk engelledi; iki varsayılan da 10 yapıldı (değişiklik talebi #185, İK onayı
+> 10.10.2026). Sınırların hepsi Sistem Yönetimi parametresidir; parantez içinde kimlik
+> ve izin verilen aralık var. Karar değişmedi, değerler değişti (`KR-099` madde 1).
 
 Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
 
@@ -177,13 +183,15 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
   hâle gelir ve nedeni anlaşılmaz.
 
 
-> **Gerçekleştirme notu (`KR-104`, #190, 10.10.2026):** Parametre (PRM-KML-08) 2FA'yı
-> yalnızca **kullanıma açar**. Her kullanıcı kendi hesabında açar; varsayılan kapalıdır.
-> Açmak için mevcut parola ve seçilen kanala gönderilen kodun doğrulanması gerekir
-> (`VerificationPurpose.TwoFactorSetup`; kod kişiye ve amaca bağlı denetlenir). Kanalı
-> olmayan kullanıcı 2FA'yı açamadığı için "kanalı olmayanlar kilitlenir" riski kalktı;
-> parametre açılırken uyarı artık tercihi açık kişileri sayar. Kodu alamayan kişinin
-> 2FA'sını İK gerekçe girerek kapatır (R-27). Kod altyapısı tek kalır (§3).
+> **Yerini aldı (`KR-104`, 10.10.2026 → ADR-0017, 14.10.2026):** Yukarıdaki ilk kuralın "parola doğrulandıktan
+> sonra herkesten kod istenir" kısmı ve üçüncü kural geçerli değildir (ilk kuraldaki tek kod
+> altyapısı hükmü geçerlidir). 2FA artık **kullanıcı tercihine bağlıdır**: parametre
+> yalnızca kullanıma açar, her kullanıcı kendi hesabında açar ve kapatır; kanalı olmayan
+> kullanıcı 2FA'yı açamadığı için "listele ve uyar" kuralına gerek kalmadı. Ayrıntı ve
+> gerekçe: **ADR-0017**. §7'nin geri kalanı (geliştirilir, parametreyle yönetilir, varsayılan
+> kapalı, tek kod altyapısı, açık ve kapalı hâllerin ayrı testi) yürürlüktedir. Bu kayıt
+> 10.10.2026'da gerçekleştirme notu olarak yazılmıştı; karar iki kuralın yerine başka bir
+> çözüm koyduğu için `KR-099` gereği ayrı ADR'ye taşındı (T3 modül sonu denetimi M-07).
 ### 8. Oturum yönetimi
 
 | Konu | Karar |
@@ -289,3 +297,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | 2026-09-30 | 0.9 | §4: İK davet bağlantısı gerçekleştirme notu (`KR-090`, #107) | Bilgi İşlem |
 | 2026-10-01 | 1.0 | §6: zorunlu parola değişimi gerçekleştirme notu (`KR-092`, #113) | Bilgi İşlem |
 | 2026-10-10 | 1.1 | §7: kullanıcı tercihine bağlı 2FA gerçekleştirme notu (`KR-104`, #190) | Bilgi İşlem |
+| 2026-10-14 | 1.2 | §5: sınır değerleri #185'e göre ve parametre kimlikleriyle; §7: kullanıcı tercihine bağlı 2FA ADR-0017'ye taşındı (`KR-099`); başlıkta `KR-092`, `KR-104` (#212) | Bilgi İşlem |

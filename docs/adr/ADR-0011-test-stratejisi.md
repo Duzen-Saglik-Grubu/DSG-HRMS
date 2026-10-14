@@ -1,6 +1,6 @@
 # ADR-0011 — Test Stratejisi ve Kalite Kapıları
 
-**Durum:** Kabul Edildi
+**Durum:** Kabul Edildi; §7 Veri sütunu → ADR-0018
 **Tarih:** 2026-09-06
 **Karar defteri karşılığı:** `KR-024`
 **İlgili süreç:** TEC.9 (Doğrulama), MAN.8 (Kalite Güvence)
@@ -104,9 +104,13 @@ gerekçesi PR'da yazılır ve `duzeltici-faaliyet` etiketli bir issue açılır 
 
 | Ortam | Amaç | Veri |
 |---|---|---|
-| **Geliştirme** | Günlük geliştirme | Sentetik |
-| **UAT** | İK ile kabul testi (`KR-024`) | Gerçek veriden **maskelenmiş** kopya |
+| **Geliştirme** | Günlük geliştirme | ~~Sentetik~~ Gerçek (→ ADR-0018) |
+| **UAT** | İK ile kabul testi (`KR-024`) | ~~Gerçek veriden maskelenmiş kopya~~ Gerçek, maskelenmez (→ ADR-0018) |
 | **Üretim** | Canlı kullanım | Gerçek |
+
+> **Yerini aldı (14.10.2026, ADR-0018, `KR-108`):** Yerel geliştirme ortamı ve UAT gerçek
+> personel verisiyle çalışır; CI ve otomatik testler sentetik veriyle çalışmaya devam eder.
+> Gerekçe, korumalar ve kabul edilen risk (R-25) ADR-0018'dedir.
 
 UAT ayrı bir Docker Compose yığını ve ayrı veritabanıdır. Yalnızca **etiketlenmiş
 sürümler** UAT'ye gider; kabul formu o sürüm numarasına yazılır (TEC.11).
@@ -171,3 +175,4 @@ dönmek ise kalite kaybı demektir.
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-09 | 0.2 | İddia kütüphanesi FluentAssertions yerine Shouldly (`KR-057`) | Bilgi İşlem |
 | 2026-10-04 | 0.3 | §6 kod gözden geçirme kapısının tek kişilik düzende kanıtı (`KR-096`, #128) | Bilgi İşlem |
+| 2026-10-14 | 0.4 | §7: ortamların Veri sütunu ADR-0018'e taşındı (`KR-108`, `KR-099`, #212) | Bilgi İşlem |

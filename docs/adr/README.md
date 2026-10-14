@@ -58,17 +58,19 @@ değildir.
 | [ADR-0003](ADR-0003-logo-entegrasyon-stratejisi.md) | LOGO Entegrasyon Stratejisi | Kabul Edildi | 2026-09-26 (0.2) | Salt okuma, yalıtım katmanı, 15 dk snapshot senkronizasyon, şema sapma denetimi |
 | [ADR-0004](ADR-0004-veritabani-tasarim-standartlari.md) | Veritabanı Tasarım Standartları | Kabul Edildi | 2026-09-06 (0.1) | Adlandırma, tipler, soft delete, tarih aralıklı tablolar, migration kuralları |
 | [ADR-0005](ADR-0005-cekirdek-veri-modeli.md) | Çekirdek Veri Modeli | Kabul Edildi | 2026-09-06 (0.1) | Kişi/İstihdam ayrımı, tarih farkındalığı, yönetici grafı |
-| [ADR-0006](ADR-0006-kimlik-dogrulama-ve-oturum.md) | Kimlik Doğrulama, Üyelik ve Oturum | Kabul Edildi | 2026-10-10 (1.1) | Üyelik akışı, doğrulama kodu, parola politikası, JWT + yenileme jetonu |
+| [ADR-0006](ADR-0006-kimlik-dogrulama-ve-oturum.md) | Kimlik Doğrulama, Üyelik ve Oturum | Kabul Edildi; §7'nin iki kuralı → ADR-0017 | 2026-10-14 (1.2) | Üyelik akışı, doğrulama kodu, parola politikası, JWT + yenileme jetonu |
 | [ADR-0007](ADR-0007-yetkilendirme-modeli.md) | Yetkilendirme Modeli | Kabul Edildi | 2026-09-29 (0.2) | Rol (eylem) × Kapsam (satır); `404` tercihi; yetki sızıntısı testi |
 | [ADR-0008](ADR-0008-sir-ve-yapilandirma-yonetimi.md) | Sır ve Yapılandırma Yönetimi | Kabul Edildi | 2026-09-26 (0.2) | User Secrets / ortam değişkeni, `gitleaks`, açılışta doğrulama |
 | [ADR-0009](ADR-0009-loglama-denetim-izi-ve-kvkk.md) | Loglama, Denetim İzi ve KVKK | Kabul Edildi | 2026-10-03 (0.3) | Üç kayıt türü, maskeleme, erişim kaydı, saklama ve imha |
 | [ADR-0010](ADR-0010-api-sozlesmesi-ve-hata-yonetimi.md) | API Sözleşmesi ve Hata Yönetimi | Kabul Edildi | 2026-09-06 (0.1) | OpenAPI, Problem Details, sayfalama, eşzamanlılık |
-| [ADR-0011](ADR-0011-test-stratejisi.md) | Test Stratejisi ve Kalite Kapıları | Kabul Edildi | 2026-10-04 (0.3) | Test piramidi, kapsam eşikleri, Testcontainers, CI kapıları |
+| [ADR-0011](ADR-0011-test-stratejisi.md) | Test Stratejisi ve Kalite Kapıları | Kabul Edildi; §7 Veri sütunu → ADR-0018 | 2026-10-14 (0.4) | Test piramidi, kapsam eşikleri, Testcontainers, CI kapıları |
 | [ADR-0012](ADR-0012-bildirim-altyapisi.md) | Bildirim Altyapısı | Kabul Edildi | 2026-09-27 (0.3) | E-posta/SMS/uygulama içi, NetGSM standart servisi, dayanıklılık |
 | [ADR-0013](ADR-0013-dosya-saklama.md) | Dosya Saklama ve Güvenlik Taraması | Kabul Edildi | 2026-09-06 (0.1) | NAS + `IFileStorage`, ClamAV, yükleme/indirme denetimleri |
 | [ADR-0014](ADR-0014-raporlama-ve-disa-aktarma.md) | Raporlama ve Dışa Aktarma | Kabul Edildi | 2026-09-06 (0.1) | ClosedXML + PDFsharp, `export` izni, dışa aktarma kaydı |
 | [ADR-0015](ADR-0015-frontend-mimarisi.md) | Frontend Mimarisi ve Arayüz İlkeleri | Kabul Edildi | 2026-09-06 (0.1) | Modül bazlı yapı, TanStack Query, ortak bileşenler, kullanılabilirlik |
 | [ADR-0016](ADR-0016-modul-siniri-denetimi.md) | Modül Sınırının Denetimi | Kabul Edildi | 2026-10-05 (0.1) | Bildirilen bağımlılık tablosu; ölçülen ve bildirilen bağımlılıkların birebir karşılaştırılması |
+| [ADR-0017](ADR-0017-iki-adimli-dogrulama-kullanici-tercihi.md) | İki Adımlı Doğrulamanın Kullanıcı Tercihine Bağlanması | Kabul Edildi | 2026-10-14 (1.0) | Parametre yalnızca kullanıma açar; kullanıcı kodla açar, parolayla kapatır; İK kurtarması (`KR-104`) |
+| [ADR-0018](ADR-0018-ortamlarin-verisi.md) | Ortamların Verisi | Kabul Edildi | 2026-10-14 (1.0) | Yerel geliştirme ve UAT gerçek personel verisiyle; CI sentetik (`KR-108`) |
 
 ---
 
@@ -108,3 +110,4 @@ değerlendirilmelidir:
 | 2026-10-04 | 0.2 | Kural 2: ek ve sınırlı değişiklik yerinde, karar değişikliği yeni ADR ile (`KR-099`); dizine son değişiklik sütunu; ADR-0006 gözden geçirme tetikleyicisi 2FA geliştirmesine göre güncellendi (#133) | Bilgi İşlem |
 | 2026-10-05 | 0.3 | ADR-0016 eklendi; ADR-0002 durumu (#171) | Bilgi İşlem |
 | 2026-10-14 | 0.4 | Dizinde ADR-0006 son değişikliği 1.1 (10.10.2026) olarak düzeltildi; varsayımlar tablosunda 2FA kullanıcı tercihine bağlı (`KR-104`) (#214) | Bilgi İşlem |
+| 2026-10-14 | 0.5 | ADR-0017 ve ADR-0018 eklendi; ADR-0006 ve ADR-0011 durumları (`KR-099`, #212) | Bilgi İşlem |
