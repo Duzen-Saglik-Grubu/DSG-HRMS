@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.11-YAK
 **Süreç:** TEC.11 — Geçerleme
-**Son güncelleme:** 2026-10-04
+**Son güncelleme:** 2026-10-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -87,7 +87,7 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 |---|---|---|---|
 | Kabul planı | `TEC.11-gecerleme/<MODÜL>-kabul-plani.md` | Bilgi İşlem | PR ile; İK gözden geçirir |
 | Katılımcı notu | `TEC.11-gecerleme/<MODÜL>-kullanim-notu.md` | Bilgi İşlem | PR ile; İK gözden geçirir. Adım adım yönlendirme içermez |
-| İmzalı kabul formu | `kayitlar/<tarih>-<modül>-kabul-formu.md` (taranmış imzalı nüsha depo dışında, MAN.6 kaydında) | İK | Sürüm etiketi formda yazılı |
+| Kabul formu | `kayitlar/<tarih>-<modül>-kabul-formu.md` ve oturumda doldurulan formun kopyası `kayitlar/<tarih>-<modül>-kabul-formu.docx` (üst verisi temizlenmiş; aslının ve kopyanın SHA-256 özeti `.md` kayıtta). Taranmış imzalı nüsha proje sonunda kalite belgesi olarak depoya konur (`KR-107`) | İK | Sürüm etiketi formda yazılı |
 | Kabul raporu | `raporlar/<tarih>-<modül>-kabul-raporu.md` | Bilgi İşlem | PR ile |
 | Kabulde bulunan sorunlar | GitHub issue (`[HATA]`, `surec:TEC.11`) | Bulan | Senaryo kimliğiyle |
 | İzlenebilirlik | `../izlenebilirlik-matrisi.md` "Kabul" sütunu | Bilgi İşlem | PR ile |
@@ -115,3 +115,4 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 |---|---|---|---|
 | 2026-10-04 | 1.0 | İlk oluşturma (#124) | Bilgi İşlem |
 | 2026-10-04 | 1.1 | §6: katılımcı notu eklendi (#154) | Bilgi İşlem |
+| 2026-10-14 | 1.2 | §6: kabul formu kopyası depoda; imzalı nüsha proje sonunda (`KR-107`, #213) | Bilgi İşlem |

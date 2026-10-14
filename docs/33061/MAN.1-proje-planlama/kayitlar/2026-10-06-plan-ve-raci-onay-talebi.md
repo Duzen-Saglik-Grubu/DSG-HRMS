@@ -106,9 +106,16 @@ onaylayan tarafından bildirildi. Doldurulmuş form: `Masaüstü\HRMS\Ust_Yoneti
 | Onaylayan (Üst Yönetim) | Elvan Laleli Şahin | Yönetim Kurulu Üyesi | 09.10.2026 |
 | Sunan (Bilgi İşlem) | Doğuş Uçanok | Bilgi İşlem Birim Sorumlusu | 09.10.2026 |
 
+> **Doldurulmuş form:** Üst Yönetim'in 09.10.2026'da doldurduğu Word form depodadır:
+> `2026-10-09-ust-yonetim-onay-formu.docx` (bu klasörde), SHA-256 `ab4ee6c4a8c79de5336a91c587e48fe243389b01f01fb04dd35b43540498c802`. Aslı
+> `Masaüstü\HRMS\Ust_Yonetim_Onay_Seti_2026-10\02_Onay_Formu.docx`, SHA-256
+> `bf1e2b9ad90b00aafed797270bd91bcae7cf917b1a81b0ba83a59368d0d8da29` (son değişiklik 10.10.2026). Depo kopyasında yalnızca dosya üst verisindeki yazar ve son değiştiren alanları (Word hesabının kişisel e-posta adresi) "Bilgi İşlem" ile değiştirildi; belge içeriği ve diğer bütün parçalar aslıyla bayt bayt aynıdır, oluşturma ve değiştirme tarihleri korunmuştur. İmzalar onaylı
+> kalite belgeleriyle birlikte toplanır (`KR-107`).
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-06 | 1.0 | Onay talebi hazırlandı (#127) | Bilgi İşlem |
 | 2026-10-10 | 1.1 | Üst Yönetim kararları işlendi: dört karar da onaylandı (Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026; `KR-103`) | Bilgi İşlem |
+| 2026-10-14 | 1.2 | Doldurulmuş Word formun üst verisi temizlenmiş kopyası depoya alındı; özetleri (`KR-107`, #213) | Bilgi İşlem |
