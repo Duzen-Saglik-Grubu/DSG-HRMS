@@ -22,6 +22,7 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  issues: read
 
 jobs:
   traceability:
@@ -42,6 +43,9 @@ jobs:
 
       - name: Dal adi kuralini sina
         run: node .github/scripts/branch-name-test.mjs
+
+      - name: Degisiklik talebi onay kuralini sina
+        run: node .github/scripts/change-request-approval-test.mjs
 
       # Gereksinim zinciri: paydas gereksinimi -> sistem gereksinimi -> matris.
       # Ayni esleme uc yerde duruyor (SYG §4, SYG §8, izlenebilirlik matrisi); elle
@@ -157,6 +161,58 @@ jobs:
                 problems.push(
                   'Dal adindaki issue numarasi (#' + branchMatch[2] + ') PR govdesinde ' +
                   'bagli issue\'lar arasinda yok (' + linkedIssues.map(n => '#' + n).join(', ') + ').');
+              }
+            }
+
+            // --- 6. Degisiklik talebinde paydas onayi (#210) ---
+            //
+            // Onayli bir gereksinimi degistiren is, paydasin onayi KAYDA GECMEDEN
+            // birlestirilmez (TEC.2 YAKLASIM §4.1). #185'te uygulama PR'i, IK onayi
+            // kayda gecmeden 49 dakika once birlesti ve UAT'ye kuruldu.
+            // Onay, kapatilan issue'nun govdesinde (sablondaki "Paydas onayi" alani)
+            // veya bir yorumunda tarihli bir satirdir.
+            // BASLA: onay-denetimi
+            function hasStakeholderApproval(texts) {
+              const DATE = /\b(\d{2}\.\d{2}\.\d{4}|\d{4}-\d{2}-\d{2})\b/;
+              for (const text of texts) {
+                const lines = (text || '').split('\n');
+                for (let i = 0; i < lines.length; i++) {
+                  if (!/payda[şs]\s+onay/i.test(lines[i])) continue;
+                  // Sablonun urettigi baslik ("### Paydas onayi") ise deger bir sonraki
+                  // dolu satirdadir; bos alan "_No response_" olarak gelir.
+                  let value = lines[i];
+                  if (/^\s*#{1,6}\s/.test(lines[i])) {
+                    value = lines.slice(i + 1).find((l) => l.trim() !== '') || '';
+                  }
+                  if (!/_No response_/.test(value) && DATE.test(value)) return true;
+                }
+              }
+              return false;
+            }
+            // BITIR: onay-denetimi
+
+            const closingIssues = [...body.matchAll(
+              /\b(?:clos(?:e[sd]?)|fix(?:e[sd]?)?|resolv(?:e[sd]?))\s+#(\d+)/gi)]
+              .map(m => Number(m[1]));
+            for (const number of closingIssues) {
+              const { data: issue } = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: number,
+              });
+              if (!issue.labels.some(l => (l.name || l) === 'tur:degisiklik-talebi')) continue;
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: number,
+                per_page: 100,
+              });
+              if (!hasStakeholderApproval([issue.body, ...comments.map(c => c.body)])) {
+                problems.push(
+                  '#' + number + ' bir degisiklik talebi, ama paydas onayi kayitli degil.' +
+                  '\n    Onay geldiginde issue\'ya su bicimde bir yorum yazilir:' +
+                  '\n    Paydas onayi: GG.AA.YYYY — <onaylayan rol> — <kanal>' +
+                  '\n    Ayrinti: TEC.2 YAKLASIM §4.1');
               }
             }
 

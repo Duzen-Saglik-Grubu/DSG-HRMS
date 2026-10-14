@@ -1,13 +1,19 @@
 name: "Değişiklik Talebi"
 description: "Kabul edilmiş bir kapsam, gereksinim veya karar üzerinde değişiklik isteği"
 title: "[DEĞİŞİKLİK] "
-labels: ["tur:degisiklik-talebi", "surec:MAN.2"]
+labels: ["tur:degisiklik-talebi", "surec:TEC.2"]
 body:
   - type: markdown
     attributes:
       value: |
         Kilitlenmiş bir modül kapsamına sonradan gelen talepler **mevcut modüle
         eklenmez**; bu issue ile kayıt altına alınır ve önceliklendirilir (`R-04`).
+
+        Yordam: `docs/33061/TEC.2-paydas-ihtiyac-ve-gereksinimleri/YAKLASIM.md` §4.1.
+        **Uygulama PR'ı, aşağıdaki "Paydaş onayı" alanı tarihle doldurulmadan
+        birleştirilemez** (PR izlenebilirlik denetimi). Onay sonradan gelirse bu
+        issue'ya `Paydaş onayı: GG.AA.YYYY — <onaylayan rol> — <kanal>` biçiminde
+        bir yorum yazılır.
 
   - type: textarea
     id: request
@@ -51,6 +57,15 @@ body:
       placeholder: "İK Birimi — 2026-10-02 görüşmesi"
     validations:
       required: true
+
+  - type: input
+    id: approval
+    attributes:
+      label: "Paydaş onayı"
+      description: "Tarih, onaylayan rol ve kanal. Onay henüz yoksa boş bırakılır; onay gelince yorumla eklenir."
+      placeholder: "10.10.2026 — İK birim yöneticisi — e-posta (BK-nn) / toplantı kaydı"
+    validations:
+      required: false
 
   - type: textarea
     id: decision
