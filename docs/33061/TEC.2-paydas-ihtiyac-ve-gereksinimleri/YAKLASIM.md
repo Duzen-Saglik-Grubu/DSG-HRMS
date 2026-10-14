@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.2-YAK
 **Süreç:** TEC.2 — Paydaş İhtiyaç ve Gereksinimlerinin Tanımlanması
-**Son güncelleme:** 2026-09-18
+**Son güncelleme:** 2026-10-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)` sürecin dokümante edilmiş bilgi
 gereksinimleri belirlenir · `PA 2.2 (b)` bu bilginin kontrol gereksinimleri belirlenir
 
@@ -104,7 +104,7 @@ gelmeli".
 | Onay | En az bir gözden geçiren onayı (CONTRIBUTING §5) |
 | Kimlik | `PG-<MODÜL>-<no>`; numara yeniden kullanılmaz |
 | Tarih ve sahip | Her belgede "Son güncelleme" ve değişiklik geçmişi |
-| Değişiklik | Kesinleşmiş gereksinimin değişimi `tur:degisiklik-talebi` issue'su açar (`R-04`) |
+| Değişiklik | Kesinleşmiş gereksinimin değişimi `tur:degisiklik-talebi` issue'su açar (`R-04`) ve §4.1'deki yordamla işlenir. **Otomatik:** değişiklik talebini kapatan PR, issue'da tarihli paydaş onayı yoksa birleştirilemez |
 | Kişisel veri | Kayıtlar karar ve gerekçe taşır; kişisel veri içeren ekler depoya girmez |
 | Erişim | Depo kurum içi; gereksinim özetleri İK ile paylaşılır |
 
@@ -112,6 +112,26 @@ gelmeli".
 > *"paydaşların ihtiyaçlarının gereksinimlere yeterince yansıdığı konusunda mutabakatı
 > sağlanır"* der. Mutabakat, toplantı kaydındaki **katılımcı onayı** satırıyla kayda
 > geçer. Sözlü mutabakat, kanıt üretmez.
+
+### 4.1 Değişiklik talebi yordamı (#210)
+
+Onaylı bir paydaş gereksinimini değiştiren her istek bu yolu izler. Yordam T3'teki üç
+değişiklik talebinin (#77, #185, #190) deneyiminden yazıldı: yol büyük ölçüde denetimliydi,
+ama #185'te uygulama İK onayı kayda geçmeden birleşti ve UAT'ye kuruldu; onaylar ikinci
+elden kaydedildi; #190'ın kapsamı PR sırasında genişledi (T3 modül sonu denetimi M-04).
+
+| # | Adım | Kanıt |
+|---|---|---|
+| 1 | Değişiklik talebi şablonuyla issue açılır (`tur:degisiklik-talebi`, `surec:TEC.2`): ne değişsin, neden, etkilenen gereksinimler (PG, SYG, ADR, parametre), tahmini etki | Issue |
+| 2 | Etki analizi issue'ya yazılır: hangi PG ve SYG maddeleri değişir, hangi testler, kabul planı etkileniyor mu | Issue yorumu |
+| 3 | **Paydaş onayı** issue'ya yazılır: `Paydaş onayı: GG.AA.YYYY — <onaylayan rol> — <kanal>`. Kanal toplantı kaydı, e-posta veya yazılı form olabilir; yazılı bir kanıt varsa bilgi kayıt defterinde numarası verilir. Onayı Bilgi İşlem iletiyorsa "(Doğuş Uçanok bildirdi)" eklenir | Issue gövdesi veya yorumu |
+| 4 | PG, SYG, izlenebilirlik matrisi ve gerekiyorsa ADR **aynı PR'da** güncellenir. PG değişiklik geçmişine talep numarası ve onay tarihi yazılır | PR |
+| 5 | Uygulama PR'ı **3. adımdan sonra** birleşir. **Otomatik:** PR izlenebilirlik denetimi, kapatılan issue değişiklik talebiyse tarihli onay satırını arar; yoksa PR birleştirilemez | CI |
+| 6 | Kapsam PR sırasında genişlerse issue'ya **"Kapsam değişikliği"** başlıklı bir yorum yazılır ve yeni kapsam için 3. adım yinelenir | Issue yorumu |
+| 7 | Değişiklik, kabul planında İK'nın teyit edeceği yorumlar arasına (`T-xx`) eklenir ve kabulde gösterilir | Kabul planı §6.1, kabul formu |
+
+**Onay olmadan yapılabilecekler:** Etki analizi, taslak PR ve UAT dışındaki ortamlarda
+deneme. UAT'ye kurulum ve `main`'e birleştirme onaydan sonradır.
 
 ---
 
@@ -144,3 +164,4 @@ uyulmayan bir şablon, olmayan bir şablondan kötüdür: uyum varmış gibi gö
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-18 | 0.1 | İlk oluşturma — ilk İK gereksinim toplantısı öncesi (BULGU-02, BULGU-09) | Bilgi İşlem |
+| 2026-10-14 | 0.2 | §4: değişiklik talebi otomatik denetimi; §4.1 değişiklik talebi yordamı (#210) | Bilgi İşlem |

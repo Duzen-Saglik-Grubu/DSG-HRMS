@@ -1,6 +1,6 @@
 # Katkı Rehberi
 
-**Son güncelleme:** 2026-09-26
+**Son güncelleme:** 2026-10-14
 **İlgili süreçler:** TEC.7 (Gerçekleştirme), TEC.9 (Doğrulama), MAN.5 (Konfigürasyon Yönetimi), MAN.8 (Kalite Güvence)
 
 Bu belge, depoda çalışma kurallarını tanımlar. Kurallar aynı zamanda
@@ -339,6 +339,7 @@ Refs: #42
 | Şablon | `.github/PULL_REQUEST_TEMPLATE.md` doldurulur |
 | Issue bağlantısı | **Zorunlu** — `Closes #42` (görev/hata) veya `Refs #42` (gereksinim) |
 | Milestone | **Zorunlu** — PR ve issue aynı aşamaya (A0/A1/A2/A3/AS) bağlanır |
+| Değişiklik talebi | Onaylı bir gereksinimi değiştiren PR, `tur:degisiklik-talebi` issue'sunda **tarihli paydaş onayı** (`Paydaş onayı: GG.AA.YYYY — <rol> — <kanal>`) kayda geçmeden birleştirilemez; CI denetler. Yordam: TEC.2 YAKLAŞIM §4.1 (#210) |
 | Boyut | Hedef **< 400 satır** değişiklik; büyükse bölünür |
 | CI | Tüm kalite kapıları geçmeli |
 | İnceleme | En az **1 onay**. Tek kişilik düzende onay, **birleştirmeden önce** PR'a "İnceledim ve onaylıyorum." yorumu olarak yazılır; CI bunu `main`'de denetler (`KR-096`). Onay yorumunu yalnızca inceleyen yazar |
@@ -533,3 +534,4 @@ açıklamalıdır ve `CHANGELOG.md`'deki bölümle eşleşir.
 | 2026-10-04 | 1.2 | §5 ve §6: tek kişilik düzende onay yorumu (`KR-096`, #128) | Bilgi İşlem |
 | 2026-10-04 | 1.3 | §1.1 `main` kırmızıyken kuralı (#129); §9 kabul adayı etiketi (`KR-097`) | Bilgi İşlem |
 | 2026-10-13 | 1.4 | §1.1: tamamlanamayan çalışmalar ve Dal Koruma Denetimi de kayda geçer; zamanlanmış `main` sağlık taraması (#208) | Bilgi İşlem |
+| 2026-10-14 | 1.5 | §5: değişiklik talebinde paydaş onayı kuralı ve CI denetimi (#210) | Bilgi İşlem |
