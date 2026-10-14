@@ -58,7 +58,7 @@ kişi yetkin mi"** olur. Bu belge o soruların yazılı cevabıdır.
 | Rol | Kim | Sorumluluk | Yetki |
 |---|---|---|---|
 | Birim sorumlusu / teknik sorumlusu | P4 | Hiyerarşi, onay akışı ve ekip süreçlerinin doğrulanması | Kendi biriminin çalışma düzeni |
-| KVKK Sorumlusu | P6 | Kişisel veri uyumu, saklama süreleri | Uyum kararları |
+| KVKK Sorumlusu | P6 — **Doğuş Uçanok** (kurumun KVKK Sorumlusu; aynı zamanda Bilgi İşlem Birim Sorumlusu) | Kişisel veri uyumu, saklama süreleri | Uyum kararları |
 | Mali İşler / Bordro | P7 | LOGO bütünlüğü, mesai ve ücret etkileri | LOGO erişim kuralları |
 | İSG Uzmanı (iç kaynak) | P11 | İSG ve iş kazası süreç gereksinimleri | Mevzuata uygunluk |
 
@@ -186,7 +186,7 @@ gizlemediği bir gerçektir ve üst yönetime raporlanan bir konudur.
 |---|---|---|
 | 1 | ~~RACI matrisinin İK ve üst yönetimle teyidi~~ **Kapandı:** RACI 0.2 Üst Yönetim tarafından onaylandı (09.10.2026, `KR-103`) | Bilgi İşlem |
 | 2 | Birim sorumlusu / İK uzmanı sayılarının netleştirilmesi | İK |
-| 3 | KVKK Sorumlusunun projedeki rolünün resmen bildirilmesi | Üst Yönetim |
+| 3 | ~~KVKK Sorumlusunun projedeki rolünün resmen bildirilmesi~~ **Kapandı (14.10.2026):** Kurumun KVKK Sorumlusu Doğuş Uçanok'tur (kendisi bildirdi); ilk kararı saklama süreleri (`KR-109`). Aynı kişi Bilgi İşlem Birim Sorumlusu olduğu için KVKK kararlarında uygulayan ile onaylayan aynıdır; bu bağımsızlık sınırı R-05 kapsamında kayıtlıdır | Üst Yönetim |
 | 4 | Yetkinlik tablosundaki 🔄 ve ⏳ maddelerin iskelet aşamasında kapatılması | Bilgi İşlem |
 
 ---
@@ -199,3 +199,4 @@ gizlemediği bir gerçektir ve üst yönetime raporlanan bir konudur.
 | 2026-10-06 | 0.2 | §4.1 yetkinlik tablosu T3'e göre güncellendi; §5 dal koruma satırı gerçeğe göre düzeltildi. Üst Yönetim onayına sunuldu (#127) | Bilgi İşlem |
 | 2026-10-10 | 0.2 | Üst Yönetim onayı işlendi (`KR-103`, #127) | Bilgi İşlem |
 | 2026-10-14 | 0.2.1 | §7 iş 1 kapandı (`KR-103`); RACI içeriği değişmedi, yeniden onay gerekmez (#214) | Bilgi İşlem |
+| 2026-10-14 | 0.2.2 | R4 ve §7: KVKK Sorumlusu Doğuş Uçanok; §7 iş 3 kapandı (#215) | Bilgi İşlem |
