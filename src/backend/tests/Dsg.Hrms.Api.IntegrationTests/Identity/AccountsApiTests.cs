@@ -175,7 +175,7 @@ public sealed class AccountsApiTests : IClassFixture<RegistrationApiFixture>, IA
     [Fact]
     public async Task Own_account_cannot_be_deactivated_and_is_marked_in_the_list()
     {
-        // #138: yonetici kendi hesabini pasife alip sistem disinda kalmamali.
+        // SYG-KMLK-057, AN-26 (#138): yonetici kendi hesabini pasife alip sistem disinda kalmamali.
         var token = await HrSignInAsync();
         using var client = _fixture.CreateClient();
 
@@ -191,7 +191,7 @@ public sealed class AccountsApiTests : IClassFixture<RegistrationApiFixture>, IA
     [Fact]
     public async Task Last_active_system_administrator_cannot_be_deactivated()
     {
-        // #138: aktif kalan son sistem yoneticisi pasife alinirsa sistemi yonetecek kimse kalmaz.
+        // SYG-KMLK-057, AN-26 (#138): aktif kalan son sistem yoneticisi pasife alinirsa sistemi yonetecek kimse kalmaz.
         await GrantRoleAsync(2, Role.SystemAdministratorCode);
         var token = await HrSignInAsync();
         using var client = _fixture.CreateClient();

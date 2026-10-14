@@ -4,7 +4,7 @@
 **Süreç:** TEC.3 — Sistem/Yazılım Gereksinimlerinin Tanımlanması
 **Modül:** T3 Kimlik Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-KMLK.md` (23.09.2026'da İK onaylı, 56 gereksinim)
-**Son güncelleme:** 2026-10-03
+**Son güncelleme:** 2026-10-14
 **Sahibi:** Bilgi İşlem
 
 > **Paydaş gereksinimi *ne* istendiğini söyler; bu belge sistemin bunu *hangi
@@ -237,7 +237,7 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 | **SYG-KMLK-054** | Senkronizasyonda kişinin **tüm** istihdamları sona ermişse hesabı pasife alınır ve açık oturumları ile yenileme jetonları iptal edilir. | İşlevsel | REQ-KMLK-034 | Test | PRM-HSP-02 |
 | **SYG-KMLK-055** | Pasif hesapla giriş yapılamaz ve pasif hesabın sahibi hiçbir kaydı görüntüleyemez. | İşlevsel | REQ-KMLK-034 | Test | — |
 | **SYG-KMLK-056** | Pasif hesabı olan kişi için senkronizasyonda yeni bir aktif istihdam görülürse **mevcut hesap** yeniden aktifleşir; yeni hesap oluşmaz. | İşlevsel | REQ-KMLK-035 | Test | — |
-| **SYG-KMLK-057** | Yetkili kullanıcı bir hesabı gerekçe girerek elle pasife alabilir ve yeniden aktifleştirebilir. Gerekçe girilmeden işlem tamamlanmaz. | İşlevsel | REQ-KMLK-036 | Test | — |
+| **SYG-KMLK-057** | Yetkili kullanıcı bir hesabı gerekçe girerek elle pasife alabilir ve yeniden aktifleştirebilir. Gerekçe girilmeden işlem tamamlanmaz. Kullanıcı **kendi hesabını** pasife alamaz; **aktif kalan son Sistem Yöneticisi** hesabı pasife alınamaz (AN-26, #138). | İşlevsel | REQ-KMLK-036 | Test | — |
 | **SYG-KMLK-058** | Hesap durumundaki her değişiklik (oluşma, pasifleşme, yeniden aktifleşme, kilitlenme, kilit kalkması) önceki ve sonraki durumla birlikte denetim izine yazılır. | İşlevsel | REQ-KMLK-037 | Test | — |
 
 ### 4.8 Güvenlik, denetim ve KVKK
@@ -343,6 +343,7 @@ yazılıdır; kapanmamış olanlar ⏳ ile işaretlidir.
 | AN-23 | SYG-KMLK-038 hareketsizliği **kullanıcı etkileşimine** göre ölçer; sunucu etkileşimi yalnızca etkinlik sinyali ucundan (SYG-KMLK-039) öğrenebilir. SYG-KMLK-039'un son cümlesi ("istemci sinyali yalnızca medya oynarken ve sekme görünürken gönderir") harfiyen uygulansaydı, etkileşimle çalışan kullanıcının oturumu 30 dakikada kapanırdı. | Cümle, **etkileşim olmadan** gönderilen sinyali sınırlar. İstemci, görünür sekmede kullanıcı etkileşimi (tıklama, tuş, kaydırma, dokunma) olduğunda ve görünür sekmede medya oynarken sinyal gönderir; dakikada en fazla 1. Görünmeyen sekme, fare hareketi ve arka plan istekleri sinyal göndermez (`KR-087`, #95). İK teyidi kabulde alınır: T3 kabul planı §6.1, T-01 (#135). | ✅ |
 | AN-24 | SYG-KMLK-046 değişimin **ne sıklıkta** isteneceğini söylemez; Y4 taslak kataloğunda da süre parametresi yoktur. SYG-KMLK-050 "ilk giriş"in kapsamını söylemez: S-02 kararı "üyelikte belirlenen parola yeterli" gerekçesiyle parametreyi varsayılan kapalı tutar; açıldığında kimlerin değiştireceği belirsizdir. | (1) Süre yeni parametredir: `PRM-KML-21`, varsayılan 90 gün (30–365). (2) Parametre açıkken hiç giriş yapmamış **her** hesap değiştirir; parolasını üyelikte kendisi belirleyenler de dahildir. Kural açılmadan önce giriş yapmış hesaplar etkilenmez. (3) İkisi de girişte değerlendirilir ve oturumda tutulur. Değişim yapılana kadar yalnızca parola değiştirme ve oturum uçları kullanılabilir; bu kural sunucuda uygulanır (Doğuş Uçanok, 01.10.2026; `KR-092`, #113). İK teyidi kabulde alınır: T3 kabul planı §6.1, T-02 (#135). | ✅ |
 | AN-25 | SYG-KMLK-077 "50 eş zamanlı kullanıcı" der. UAT ölçümünde (02.10.2026) iki ayrı sorun çıktı. (1) Giriş ucuna, üyelik için tasarlanmış 1 saniyelik en kısa yanıt süresi uygulanmıştı (PR #94); bu durumda hedef hiçbir donanımda karşılanamaz. (2) "Eş zamanlı" sözcüğü 50 isteğin **aynı anda** gelmesi olarak okunursa, 2 çekirdekli sunucuda SYG-KMLK-049'un parola özeti alt sınırı (100 ms) korunarak hedef karşılanamaz: 50 × ≈180 ms / 2 çekirdek ≈ 4,5 sn. | (1) Alt sınır giriş ucundan kaldırıldı. Var olmayan kullanıcı için de özet hesaplandığından (SYG-KMLK-032) süreler zaten ayırt edilemez. (2) "Eş zamanlı kullanıcı", girişleri mesai başına yayılan 50 kullanıcı (60 saniyede 50 giriş) olarak tanımlandı. 50 isteğin aynı anda geldiği durum için ayrıca p95 < 5 sn üst sınırı kondu (Doğuş Uçanok, 03.10.2026; `KR-095`, #120). | ✅ |
+| AN-26 | **Türetilmiş davranış (14.10.2026'da yazıya geçirildi).** REQ-KMLK-036 ve SYG-KMLK-057 elle pasife almanın kimlere uygulanamayacağını söylemiyordu. UAT'de yönetici kendi hesabını pasife alıp sistem dışında kalabildi (#138, 03.10.2026). Düzeltme iki kural getirdi; kurallar `v0.2.0-rc.2`'den beri kodda ve testteydi ama bu belgeye yazılmamıştı (T3 modül sonu denetimi M-05, #211). | SYG-KMLK-057'ye eklendi: kişi kendi hesabını pasife alamaz; aktif kalan son Sistem Yöneticisi hesabı pasife alınamaz. Kurallar onaylı gereksinimin anlamını değiştirmez, onu güvenli biçimde sınırlar; T3 kabulünde KS-09 bu davranışla uygulandı. | ✅ |
 | AN-16 | Denetim izi ve erişim kaydı saklama süreleri (`PRM-KVK-01`, `02`) karar bekliyor. | T3'ü engellemez: kayıtlar üretilir, silme işi karar verildiğinde eklenir. | ⏳ KVKK kararı bekliyor |
 
 **Paydaşa geri bildirim (BP3):** AN-01, onaylı bir kabul kriterinin (REQ-KMLK-004)
@@ -472,3 +473,4 @@ madde `İptal` notuyla kalır.
 | 2026-10-04 | 1.3 | §2.2 API yolu `/api/v1/identity/`; §7 destekleyici sistemlerin durumu güncellendi (#133) | Bilgi İşlem |
 | 2026-10-06 | 1.4 | §7: SMTP sertifikasının yeni bitişi (#179) | Bilgi İşlem |
 | 2026-10-10 | 1.5 | Değişiklik talebi #190: SYG-KMLK-034, 035, 036 güncellendi; SYG-KMLK-080 (kullanıcının 2FA tercihi) ve SYG-KMLK-081 (İK'nın 2FA'yı kurtarma için kapatması) eklendi | Bilgi İşlem |
+| 2026-10-14 | 1.6 | SYG-KMLK-057: kendi hesabı ve son Sistem Yöneticisi kuralı; AN-26 (#138'den türetilmiş davranış, #211) | Bilgi İşlem |
