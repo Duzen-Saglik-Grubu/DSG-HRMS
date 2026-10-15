@@ -132,7 +132,7 @@ madde CI'da otomatik test olmadan tamamlanmış sayılmaz.
 | Değişiklik | Paydaş gereksiniminin anlamını değiştiren sistem gereksinimi değişikliği önce `tur:degisiklik-talebi` issue'su ve İK onayı gerektirir; yordam TEC.2 YAKLAŞIM §4.1'dedir. Uygulama PR'ı onay kayda geçmeden birleştirilemez (otomatik) |
 | **Türetilmiş davranış** | Hata düzeltmesi veya iş paketi, onaylı SYG'de yazmayan bir davranış getiriyorsa (yasak, sınır, varsayılan), **aynı PR'da** SYG'ye bir `AN-` bulgusu ve ilgili SYG maddesine metin eklenir. Davranış paydaş gereksiniminin anlamını değiştiriyorsa yukarıdaki değişiklik yolu izlenir (#211; örnek AN-26) |
 | **Geri yön kapsamı** | **Otomatik:** `ParameterCatalogScopeTests` her parametrenin bir SYG maddesinin Parametre sütununda geçtiğini ve kodda okunduğunu sınar; onaylı gereksinime dayanmayan parametre birleştirilemez (#198, #211) |
-| Tarih ve sahip | Her belgede "Son güncelleme" ve değişiklik geçmişi |
+| Tarih ve sahip | Her belgede "Son güncelleme" ve değişiklik geçmişi. **Otomatik:** başlık tarihi geçmişin son satırından eski olamaz (`doc-consistency-check.mjs`, #214); PG, SYG veya matris değişen PR o belgenin geçmişine yeni satır eklemezse birleştirilemez (PR izlenebilirlik denetimi, ADR-0011 §6 A30, #235) |
 
 **Otomatik denetim neyi yakalar?** Bağsız kalan paydaş gereksinimi; paydaş belgesinde
 olmayan kaynak kimliği; tekrar eden veya sırası bozuk kimlik; metin içinde karşılıksız
@@ -176,3 +176,4 @@ ve süreç gözden geçirmelerinde ele alınır.
 | 2026-10-14 | 0.2 | §4: türetilmiş davranış kuralı ve geri yön kapsam denetimi (#211) | Bilgi İşlem |
 | 2026-10-14 | 0.3 | §4: değişiklik yolu TEC.2 §4.1 yordamına bağlandı (#210) | Bilgi İşlem |
 | 2026-10-15 | 0.4 | §4: SYG onay noktası (onaylayan Bilgi İşlem, her değişiklik PR onay yorumuyla) ve baseline kuralı (`KR-111`, #217) | Bilgi İşlem |
+| 2026-10-15 | 0.5 | §4: değişiklik geçmişi satırı denetimi (#235) | Bilgi İşlem |
