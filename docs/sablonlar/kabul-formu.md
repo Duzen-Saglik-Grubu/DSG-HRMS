@@ -23,8 +23,8 @@
 | Personel 2 | | |
 | Personel 3 | | |
 
-> Personel katılımcıların en az yarısı Bilgi İşlem dışından ve en az iki farklı birimden
-> seçilir (TEC.11 YAKLAŞIM §2.1).
+> Katılımcıları İK seçer; İK'ya özgü ekranlar İK kullanıcılarıyla, personel ekranları
+> gerektiğinde farklı birimlerden personelle denenir (TEC.11 YAKLAŞIM §2.1).
 | Sistem yöneticisi | | Bilgi İşlem |
 
 ## 2. Senaryo sonuçları

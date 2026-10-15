@@ -45,7 +45,7 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 2. **Giriş ölçütleri kontrol edilir:**
    - G2 geçti;
    - kabul adayı sürüm etiketlendi ve UAT'ye bu etiketten kuruldu;
-   - katılımcılar §2.1'deki seçim kuralına göre belirlendi; listede olmayanların e-posta ve
+   - katılımcılar İK tarafından belirlendi (§2.1); listede olmayanların e-posta ve
      telefonları UAT izin listesine eklendi (önceki kabullerin katılımcıları listede kalır, `KR-106`);
    - katılımcılara kısa kullanım notu verildi;
    - doldurulmuş kabul formunun depoya alınma yolu hazır: Markdown kaydı ve üst verisi
@@ -63,17 +63,21 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 
 ### 2.1 Katılımcı seçimi (#219)
 
-Kabul, sistemi kullanacak personeli temsil etmelidir (`KR-048`: İK dışından en az 2–3 gerçek
-personel). Seçim kuralı:
+**Katılımcıları İK seçer** (Doğuş Uçanok'un kararı, 15.10.2026, #219). Sabit bir oran veya birim
+kuralı yoktur, çünkü modülün ekranları farklı kullanıcılara hitap eder:
 
-- **Personel katılımcıların en az yarısı Bilgi İşlem dışındandır** ve en az iki farklı birimden
-  gelir. Bilgi İşlem çalışanları katılımcı olabilir, ama çoğunluğu oluşturmaz.
-- Kabul planının istediği özellikler karşılanır (örn. T3'te: hesabı olmayan, cep telefonu
-  kayıtlı olan ve olmayan personel).
-- Seçim İK'nındır; Bilgi İşlem kuralı kabul planında hatırlatır ve sonucu kabul raporuna yazar.
+- **Yalnızca İK'nın kullanacağı ekranlar** İK kullanıcılarıyla denenir; İK dışından personel
+  bu senaryolara katılmaz.
+- **Personelin kullanacağı ekranlar** için İK, gerektiğinde Bilgi İşlem dışındaki birimlerden
+  personeli de katılımcı yapar (`KR-048`).
+- Kabul planı her senaryonun kimin ekranı olduğunu ve istenen katılımcı özelliklerini yazar (örn.
+  T3'te: hesabı olmayan, cep telefonu kayıtlı olan ve olmayan personel); İK seçimini buna göre
+  yapar.
+- Bilgi İşlem seçimi kabul raporuna yazar.
 
 > T3'te personel katılımcıların dördü de Bilgi İşlem'dendi (kabul raporu §2; alınan dersler
-> D-08). Kural bunun için yazıldı.
+> D-08). Değerlendirme: oran kuralı İK'ya özgü ekranlarda uygun değil; seçim İK'ya bırakılır,
+> kabul planı her senaryonun kullanıcısını açıkça belirtir.
 
 ---
 
@@ -150,4 +154,4 @@ gösterimine bırakılan her gereksinimin neden ekrandan denenemediğini yazar.
 | 2026-10-04 | 1.1 | §6: katılımcı notu eklendi (#154) | Bilgi İşlem |
 | 2026-10-14 | 1.2 | §6: kabul formu kopyası depoda; imzalı nüsha proje sonunda (`KR-107`, #213) | Bilgi İşlem |
 | 2026-10-14 | 1.3 | T3 modül sonu gözden geçirmesi: §2 adım 5 imza zamanı (`KR-107`); §5 etiketli sürüm ve dağıtım kaydı kuruldu (#125); §7 (g) (#214) | Bilgi İşlem |
-| 2026-10-15 | 1.4 | §2: senaryoların ekranda denenmesi, ön deneme (1a), giriş ölçütleri; §2.1 katılımcı seçimi; §3 kanıt gösterimi kuralı; §5 izin listesi (#219) | Bilgi İşlem |
+| 2026-10-15 | 1.4 | §2: senaryoların ekranda denenmesi, ön deneme (1a), giriş ölçütleri; §2.1 katılımcı seçimi İK'nın (oran kuralı yok); §3 kanıt gösterimi kuralı; §5 izin listesi (#219) | Bilgi İşlem |
