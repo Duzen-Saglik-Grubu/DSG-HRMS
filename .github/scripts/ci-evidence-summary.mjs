@@ -71,6 +71,15 @@ const lines = [
   '',
 ];
 
+// --- Islerin sonucu (#218): yapit gerektirmez, eski calismalarda da uretilir.
+// Uctan uca testler, trivy ve gitleaks gibi sayi uretmeyen kapilarin kaniti budur.
+const jobs = JSON.parse(gh('run', 'view', runId, '--json', 'jobs')).jobs;
+lines.push('## İşlerin sonucu', '', '| İş | Sonuç |', '|---|---|');
+for (const job of [...jobs].sort((a, b) => a.name.localeCompare(b.name, 'tr'))) {
+  lines.push(`| ${job.name} | ${job.conclusion || job.status} |`);
+}
+lines.push('');
+
 // --- Backend: test-ve-kapsam
 const backend = download('test-ve-kapsam');
 lines.push('## Backend', '');
@@ -136,6 +145,24 @@ if (!frontend) {
     lines.push(`**Kapsam:** satır ${percent(attr(xml, 'coverage', 'line-rate'))}, dal ${percent(attr(xml, 'coverage', 'branch-rate'))}`, '');
   } else {
     lines.push('**Kapsam raporu yok** (`cobertura-coverage.xml`).', '');
+  }
+}
+
+// --- Uctan uca: uctan-uca-sonucu (#218)
+const e2e = download('uctan-uca-sonucu');
+lines.push('## Uçtan uca testler', '');
+if (!e2e) {
+  lines.push('**Yapıt yok:** `uctan-uca-sonucu` bu çalışmada bulunamadı. Yapıt CI\'a 15.10.2026\'da eklendi (#218); daha eski çalışmalarda işin sonucu yukarıdaki tablodadır.', '');
+} else {
+  const junit = files(e2e, (n) => n.endsWith('.xml'))[0];
+  if (junit) {
+    const xml = readFileSync(junit, 'utf8');
+    const t = Number(attr(xml, 'testsuites', 'tests'));
+    const f = Number(attr(xml, 'testsuites', 'failures') ?? 0) + Number(attr(xml, 'testsuites', 'errors') ?? 0);
+    const s = Number(attr(xml, 'testsuites', 'skipped') ?? 0);
+    lines.push(`**Senaryolar:** ${t} toplam, ${t - f - s} geçti, ${f} başarısız, ${s} atlandı`, '');
+  } else {
+    lines.push('**Test sonucu yok** (`junit.xml`).', '');
   }
 }
 

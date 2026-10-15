@@ -1,6 +1,6 @@
 # Katkı Rehberi
 
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-10-15
 **İlgili süreçler:** TEC.7 (Gerçekleştirme), TEC.9 (Doğrulama), MAN.5 (Konfigürasyon Yönetimi), MAN.8 (Kalite Güvence)
 
 Bu belge, depoda çalışma kurallarını tanımlar. Kurallar aynı zamanda
@@ -492,6 +492,10 @@ Kabul edilen her modül bir **MINOR sürüm**, bir **etiket (tag)** ve bir **bas
 etiketten kurulur (`docker/deploy-uat.sh`) ve kabul formu bu etikete atıf yapar. Etiketler
 açıklamalıdır ve `CHANGELOG.md`'deki bölümle eşleşir.
 
+Sürümün adımları (hazırlık PR'ı, etiket, UAT kurulumu, kurulum sonrası kontrol, CI kanıt özeti,
+kayıt PR'ı, kabul ve modül kapanışı) tek bir kontrol listesindedir:
+`docs/33061/TEC.10-gecis/surum-kontrol-listesi.md` (#218).
+
 ---
 
 ## 10. Etiketler ve issue türleri
@@ -542,3 +546,4 @@ açıklamalıdır ve `CHANGELOG.md`'deki bölümle eşleşir.
 | 2026-10-13 | 1.4 | §1.1: tamamlanamayan çalışmalar ve Dal Koruma Denetimi de kayda geçer; zamanlanmış `main` sağlık taraması (#208) | Bilgi İşlem |
 | 2026-10-14 | 1.5 | §5: değişiklik talebinde paydaş onayı kuralı ve CI denetimi (#210) | Bilgi İşlem |
 | 2026-10-14 | 1.6 | §5: etiket ve boyut kuralları CI'da; büyük PR'da onay yorumu; §6: atlanamaz maddelerin denetimi (#216) | Bilgi İşlem |
+| 2026-10-15 | 1.7 | §9: sürüm kontrol listesine bağlantı (#218) | Bilgi İşlem |

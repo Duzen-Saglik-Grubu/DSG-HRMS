@@ -17,7 +17,10 @@ export default defineConfig({
   retries: 0,
   timeout: 60_000,
   expect: { timeout: 15_000 },
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  // CI: JUnit sonucu her calismada yapit olarak saklanir; CI kanit ozeti bunu okur (#218).
+  reporter: process.env.CI
+    ? [['list'], ['html', { open: 'never' }], ['junit', { outputFile: 'e2e-results/junit.xml' }]]
+    : 'list',
   use: {
     baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:8090',
     locale: 'tr-TR',
