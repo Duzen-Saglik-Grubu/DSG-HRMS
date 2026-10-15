@@ -32,7 +32,12 @@ Closes #
 
 ## Tamamlanma Tanımı
 
-<!-- Uygulanmayan maddeyi işaretlemeyin ve "Notlar" bölümünde gerekçesini yazın. -->
+<!--
+  Uygulanmayan maddeyi isaretlemeyin; ustunu cizip gerekcesini ayni satira yazin:
+  - [ ] ~~Madde~~ — gerekce
+  "Yetki sizintisi" ve "Maskeleme" maddeleri ATLANAMAZ: ya isaretlenir ya da ustu
+  cizilip gerekcesi yazilir; CI denetler (CONTRIBUTING §6, #216).
+-->
 
 **Kod ve test**
 - [ ] Kodlama standartlarına uygun — tanımlayıcılar İngilizce, yorumlar Türkçe; **betikler ve iş akışları dâhil** (CONTRIBUTING §3.2)
@@ -64,6 +69,13 @@ Closes #
 - [ ] **İzlenebilirlik matrisi** güncellendi — gereksinim, tasarım, kod veya test
       değiştiyse zorunlu. Ayrı bir işe bırakılan izlenebilirlik kaydı çürür
       (`docs/33061/izlenebilirlik-matrisi.md` §3)
+- [ ] **Risk defteri** gözden geçirildi (yeni veya değişen risk varsa)
+- [ ] **CHANGELOG** `[Yayımlanmamış]` bölümü güncellendi (kullanıcıya görünen değişiklikse)
+- [ ] **Bilgi kayıt defteri** güncellendi (yeni bir bilgi kümesi, depo dışı dosya veya sır doğduysa)
+
+**Etiket ve boyut**
+- [ ] PR'da `tur:` ve `surec:` etiketleri var; kapatılan issue'da `tur:` etiketi var (CI denetler)
+- [ ] Üretilen dosyalar hariç 1.500 satırı aşıyorsa **Boyut gerekçesi:** yazıldı (CI denetler)
 
 ---
 

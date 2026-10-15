@@ -17,7 +17,7 @@ name: PR izlenebilirlik denetimi
 
 on:
   pull_request:
-    types: [opened, edited, reopened, synchronize, milestoned, demilestoned]
+    types: [opened, edited, reopened, synchronize, milestoned, demilestoned, labeled, unlabeled]
 
 permissions:
   contents: read
@@ -46,6 +46,9 @@ jobs:
 
       - name: Degisiklik talebi onay kuralini sina
         run: node .github/scripts/change-request-approval-test.mjs
+
+      - name: PR disiplini kurallarini sina
+        run: node .github/scripts/pr-discipline-test.mjs
 
       # Gereksinim zinciri: paydas gereksinimi -> sistem gereksinimi -> matris.
       # Ayni esleme uc yerde duruyor (SYG §4, SYG §8, izlenebilirlik matrisi); elle
@@ -207,7 +210,14 @@ jobs:
                 repo: context.repo.repo,
                 issue_number: number,
               });
-              if (!issue.labels.some(l => (l.name || l) === 'tur:degisiklik-talebi')) continue;
+              const issueLabels = issue.labels.map(l => l.name || l);
+              // --- 7b. Kapatilan issue'nun tur etiketi (#216) ---
+              if (!issueLabels.some(n => n.startsWith('tur:'))) {
+                problems.push(
+                  '#' + number + ' issue\'sunda "tur:" etiketi yok. Issue turu (gorev, hata, ' +
+                  'duzeltici faaliyet...) olcutlerin sayimi icin gereklidir (MAN.2).');
+              }
+              if (!issueLabels.includes('tur:degisiklik-talebi')) continue;
               const comments = await github.paginate(github.rest.issues.listComments, {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -221,6 +231,85 @@ jobs:
                   '\n    Paydas onayi: GG.AA.YYYY — <onaylayan rol> — <kanal>' +
                   '\n    Ayrinti: TEC.2 YAKLASIM §4.1');
               }
+            }
+
+            // --- 7. PR etiketleri (#216) ---
+            //
+            // 04.10–13.10.2026 arasinda acilan 23 issue'nun 13'unde tur etiketi yoktu,
+            // #153–#191 PR'lari etiketsizdi; MAN.2 olcutleri (hata, duzeltici faaliyet,
+            // degisiklik talebi sayilari) bu yuzden eksik sayildi. Kural yaziliydi,
+            // denetlenmiyordu (T3 modul sonu denetimi M-09).
+            const prLabels = (pr.labels || []).map(l => l.name || l);
+            if (!prLabels.some(n => n.startsWith('tur:'))) {
+              problems.push('PR\'da "tur:" etiketi yok (orn. tur:gelistirme, tur:dokuman, tur:hata).');
+            }
+            if (!prLabels.some(n => n.startsWith('surec:'))) {
+              problems.push('PR\'da "surec:" etiketi yok (orn. surec:TEC.7). Hangi 33061 surecinin kaniti oldugunu gosterir.');
+            }
+
+            // BASLA: pr-disiplini
+            // Tamamlanma tanimindaki "atlanamaz" iki madde (CONTRIBUTING §6) PR govdesinde
+            // ya isaretlidir ya da ustu cizilip gerekcesi yazilmistir. Ornek PR'larin
+            // hicbirinde bu iki madde yoktu (T3 modul sonu denetimi, TEC.7-8).
+            const MANDATORY_DOD = [
+              { name: 'Yetki sizintisi testi', pattern: /yetki\s+s[ıi]z[ıi]nt[ıi]s[ıi]/i },
+              { name: 'Maskeleme testi', pattern: /maskeleme\s+testi/i },
+            ];
+            function missingMandatoryDod(prBody) {
+              const lines = (prBody || '').split('\n');
+              return MANDATORY_DOD.filter(({ pattern }) => !lines.some(line => {
+                if (!pattern.test(line)) return false;
+                if (/^\s*-\s*\[[xX]\]/.test(line)) return true;
+                // "- [ ] ~~Madde~~ — gerekce": ustu cizili ve gerekcesi var.
+                const struck = line.match(/^\s*-\s*\[ \]\s*~~[^~]+~~\s*[—–-]+\s*(.*)$/);
+                return Boolean(struck && struck[1].trim().length >= 5);
+              })).map(d => d.name);
+            }
+
+            // Uretilen dosyalar boyut sayimina girmez: degisikligi insan yazmadi.
+            const GENERATED = [
+              /(^|\/)src\/shared\/api\/generated\//,
+              /^docs\/api\/openapi-v1\.json$/,
+              /\/Migrations\/[^/]+\.Designer\.cs$/,
+              /ModelSnapshot\.cs$/,
+              /(^|\/)package-lock\.json$/,
+            ];
+            const SIZE_LIMIT = 1500;
+            function reviewableLines(files) {
+              return files
+                .filter(f => !GENERATED.some(p => p.test(f.filename)))
+                .reduce((sum, f) => sum + (f.additions || 0) + (f.deletions || 0), 0);
+            }
+            function needsSizeJustification(files, prBody) {
+              return reviewableLines(files) > SIZE_LIMIT && !/boyut\s+gerek[çc]esi/i.test(prBody || '');
+            }
+            // BITIR: pr-disiplini
+
+            // --- 8. Atlanamaz tamamlanma maddeleri (#216) ---
+            for (const name of missingMandatoryDod(body)) {
+              problems.push(
+                'Tamamlanma tanimindaki atlanamaz madde eksik: "' + name + '".' +
+                '\n    Ya isaretlenir (- [x]) ya da ustu cizilip gerekcesi yazilir:' +
+                '\n    - [ ] ~~' + name + '~~ — kod degisikligi yok' +
+                '\n    Ayrinti: CONTRIBUTING.md §6');
+            }
+
+            // --- 9. PR boyutu (#216) ---
+            //
+            // #191 +5.319 satir ve iki ozellik tasiyordu; inceleme bu boyutta guvenilir
+            // olmaz. Hedef 400 satirin altidir (CONTRIBUTING §5); 1.500'u asan PR,
+            // neden bolunmedigini govdede yazar.
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100,
+            });
+            if (needsSizeJustification(files, body)) {
+              problems.push(
+                'PR ' + reviewableLines(files) + ' satir degistiriyor (uretilen dosyalar haric; sinir ' + SIZE_LIMIT + ').' +
+                '\n    Bolunemiyorsa govdeye "Boyut gerekcesi:" ile neden bolunmedigi yazilir.' +
+                '\n    Ayrinti: CONTRIBUTING.md §5');
             }
 
             if (problems.length > 0) {
