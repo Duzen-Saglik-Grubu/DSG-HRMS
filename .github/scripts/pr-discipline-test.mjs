@@ -52,5 +52,40 @@ check('sinir asilinca gerekce gerekir', needsSizeJustification(big, 'govde'), tr
 check('gerekce yazilmissa gecer', needsSizeJustification(big, '**Boyut gerekçesi:** iki ozellik ayrilamazdi'), false);
 check('ASCII gerekce', needsSizeJustification(big, 'Boyut gerekcesi: ...'), false);
 
+// Gereksinim belgesinde degisiklik gecmisi satiri (#235): ayni bicimde is akisindan okunur.
+const hStart = workflowText.indexOf('// BASLA: gecmis-satiri');
+const hEnd = workflowText.indexOf('// BITIR: gecmis-satiri');
+if (hStart < 0 || hEnd < 0) {
+  console.error('gecmis-satiri blogu is akisi dosyasinda bulunamadi.');
+  process.exit(1);
+}
+const missingHistoryRows = new Function(`${workflowText.slice(hStart, hEnd)}\nreturn missingHistoryRows;`)();
+const SYG = 'docs/33061/TEC.3-sistem-yazilim-gereksinimleri/gereksinimler/SYG-KMLK.md';
+const PG = 'docs/33061/TEC.2-paydas-ihtiyac-ve-gereksinimleri/paydas-gereksinimleri/PG-KMLK.md';
+const MATRIS = 'docs/33061/izlenebilirlik-matrisi.md';
+const row = '+| 2026-10-15 | 1.9 | Degisiklik (#1) | Bilgi Islem |';
+
+console.log('Gereksinim belgesinde gecmis satiri:');
+check('SYG degisti, gecmis satiri eklendi',
+  missingHistoryRows([{ filename: SYG, status: 'modified', patch: `@@ -1 +1 @@\n-eski\n+yeni\n${row}` }]), []);
+check('SYG degisti, gecmis satiri yok',
+  missingHistoryRows([{ filename: SYG, status: 'modified', patch: '@@ -1 +1 @@\n-eski\n+yeni' }]), [SYG]);
+check('PG ve matris degisti, yalniz matriste satir var',
+  missingHistoryRows([
+    { filename: PG, status: 'modified', patch: '+| **REQ-KMLK-001** | metin |' },
+    { filename: MATRIS, status: 'modified', patch: row },
+  ]), [PG]);
+check('silinen gecmis satiri sayilmaz',
+  missingHistoryRows([{ filename: SYG, status: 'modified', patch: '-| 2026-10-14 | 1.8 | Eski | Bilgi Islem |' }]), [SYG]);
+check('sablon ve yeni dosya denetlenmez',
+  missingHistoryRows([
+    { filename: 'docs/33061/TEC.2-paydas-ihtiyac-ve-gereksinimleri/paydas-gereksinimleri/SABLON-PG.md', status: 'modified', patch: '+x' },
+    { filename: 'docs/33061/TEC.3-sistem-yazilim-gereksinimleri/gereksinimler/SYG-PRSN.md', status: 'added', patch: '+x' },
+  ]), []);
+check('baska belge denetlenmez',
+  missingHistoryRows([{ filename: 'docs/adr/ADR-0006-kimlik-dogrulama-ve-oturum.md', status: 'modified', patch: '+x' }]), []);
+check('patch yoksa (cok buyuk) gecer',
+  missingHistoryRows([{ filename: SYG, status: 'modified' }]), []);
+
 console.log(failures === 0 ? '\nTum ornekler beklendigi gibi.' : `\n${failures} ornek beklenenden farkli!`);
 process.exit(failures ? 1 : 0);

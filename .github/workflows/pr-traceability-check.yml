@@ -312,6 +312,37 @@ jobs:
                 '\n    Ayrinti: CONTRIBUTING.md §5');
             }
 
+            // --- 10. Gereksinim belgesinde degisiklik gecmisi satiri (#235) ---
+            //
+            // Onayli gereksinim belgeleri (PG, SYG) ve izlenebilirlik matrisi her
+            // degisiklikte gecmis tablosuna satir alir (TEC.3 YAKLASIM §4). Satir
+            // unutulursa belgenin hangi surumde neyin degistigi izlenemez (02.10 denetimi
+            // TEC.3-3). Baslik tarihi ↔ son satir tutarliligini doc-consistency-check,
+            // satirin hic eklenmemesini bu madde yakalar.
+            // BASLA: gecmis-satiri
+            const REQUIREMENT_DOCS = [
+              /^docs\/33061\/TEC\.2-[^/]+\/paydas-gereksinimleri\/PG-[A-Z]+\.md$/,
+              /^docs\/33061\/TEC\.3-[^/]+\/gereksinimler\/SYG-[A-Z]+\.md$/,
+              /^docs\/33061\/izlenebilirlik-matrisi\.md$/,
+            ];
+            function missingHistoryRows(changedFiles) {
+              return changedFiles
+                .filter(f => f.status === 'modified' && REQUIREMENT_DOCS.some(p => p.test(f.filename)))
+                .filter(f => {
+                  // Patch cok buyukse GitHub vermez; o zaman denetlenemez, gecer.
+                  if (typeof f.patch !== 'string') return false;
+                  return !f.patch.split('\n').some(l => /^\+\| \d{4}-\d{2}-\d{2} \| [\d.]+ \|/.test(l));
+                })
+                .map(f => f.filename);
+            }
+            // BITIR: gecmis-satiri
+            for (const filename of missingHistoryRows(files)) {
+              problems.push(
+                filename + ' degisti ama degisiklik gecmisine yeni satir eklenmedi.' +
+                '\n    Belgenin sonundaki tabloya: | YYYY-AA-GG | <yeni surum> | <degisiklik> (#issue) | Bilgi Islem |' +
+                '\n    Ayrinti: TEC.3 YAKLASIM §4');
+            }
+
             if (problems.length > 0) {
               core.setFailed(
                 'PR izlenebilirlik denetimi basarisiz:\n' +
