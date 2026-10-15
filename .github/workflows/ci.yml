@@ -394,6 +394,15 @@ jobs:
         working-directory: src/frontend/dsg-hrms-web
         run: npm run e2e
 
+      # Sonuc her calismada saklanir: CI kanit ozeti uctan uca test sayilarini buradan okur (#218).
+      - name: Sonucu sakla
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uctan-uca-sonucu
+          path: src/frontend/dsg-hrms-web/e2e-results/junit.xml
+          if-no-files-found: warn
+
       - name: API gunlugu (hata durumunda)
         if: failure()
         run: E2E_CODE_HASH_KEY=x E2E_JWT_SIGNING_KEY=x E2E_PARAMETER_PROTECTION_KEY=x docker compose -f docker/compose.e2e.yml logs api | tail -200

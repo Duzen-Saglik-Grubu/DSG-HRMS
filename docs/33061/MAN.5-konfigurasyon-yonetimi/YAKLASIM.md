@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.5-YAK
 **Süreç:** MAN.5 — Konfigürasyon Yönetimi
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-10-15
 **Karşıladığı öznitelik maddeleri:** `PA 2.1`: amaç, planlama, sorumluluk, kaynak ve arayüzler (§1–§4). `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir (§5). `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir (§6).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -64,7 +64,7 @@ Depo özeldir ve GitHub Free planındadır; sunucu tarafı dal koruma kullanıla
   - depodaki öğeler için açıklamalı Git etiketi;
   - dağıtılan yapı için dağıtım kaydı;
   - depo dışı öğeler (sunucu ayarları, sertifikalar, dış hizmet hesapları) için konfigürasyon denetimi.
-- **Ne zaman denetlenir:** Her kabul adayı etiketinde ve her modül kapanışında. Denetim "kabule sunulan yapı, kayıtlarda yazan yapı mı?" sorusunu cevaplar.
+- **Ne zaman denetlenir (`KR-110`):** Tam denetim, İK kabul oturumuna sunulacak **son adayda** ve **her modül kapanışında** yapılır. Ara adaylarda kurulum sonrası kısa kontrol yapılır ve kayıt PR'ına yazılır (sürüm kontrol listesi A6, `TEC.10-gecis/surum-kontrol-listesi.md`). Denetim "kabule sunulan yapı, kayıtlarda yazan yapı mı?" sorusunu cevaplar.
 - **Yapılan denetimler:**
 
   | Rapor | Denetlenen | Sonuç |
@@ -72,7 +72,7 @@ Depo özeldir ve GitHub Free planındadır; sunucu tarafı dal koruma kullanıla
   | `raporlar/2026-10-05-ilk-konfigurasyon-denetimi.md` | `v0.2.0-rc.2` | 12 madde: 05.10'da 10'u uygun, 2'si (D-11, D-12) sunucu erişimi gerektirdiği için sınanamadı; ikisi 06.10'da sınandı ve uygun (rapor 1.1–1.2). Uygunsuzluk yok |
   | `raporlar/2026-10-13-t3-konfigurasyon-denetimi.md` | `v0.2.0` (`149f6ee`), T3 modül kapanışı | 20 madde: 14 uygun, 4 kısmen uygun, 1 sınanamadı (D-18), 1 uygunsuzluk (D-19, `main` kırmızı denetiminin iptali). Bulgular B-1…B-4; B-1 ve UAT'deki B-3 maddeleri 13.10'da giderildi (#207), öğe listesi B-2/B-3'e göre güncellendi (#214) |
 
-  `v0.2.0-rc.3`, `rc.4` ve `rc.5` için ayrı denetim yapılmadı; kabule giren `rc.5` yapısı modül kapanış denetiminde `v0.2.0` olarak denetlendi. Denetim sıklığı kuralı #218'de ele alınıyor.
+  `v0.2.0-rc.3`, `rc.4` ve `rc.5` için ayrı denetim yapılmadı; kabule giren `rc.5` yapısı modül kapanış denetiminde `v0.2.0` olarak denetlendi. Sıklık kuralı bu yüzden `KR-110` ile netleştirildi (#218).
 
 ---
 
@@ -168,3 +168,4 @@ Bu belge her konfigürasyon denetiminde ve her modül sonu süreç denetiminde (
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
 | 2026-10-14 | 1.1 | T3 modül sonu gözden geçirmesi: §2.3 etiket listesi (`rc.3`…`rc.5`, `v0.2.0`) ve kabul etiketinde CHANGELOG bölümünün sonraki commit'te yazılması; §2.4 yapılan denetimler; §5 etiket açıklaması kuralı uygulamaya göre; §8 durumları güncellendi, madde 8 eklendi (#214) | Bilgi İşlem |
+| 2026-10-15 | 1.2 | §2.4: denetim sıklığı `KR-110`; sürüm kontrol listesi (#218) | Bilgi İşlem |

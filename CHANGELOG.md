@@ -35,7 +35,7 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ---
 
-## [0.2.0-rc.4] — 2026-10-10 · T3 Kimlik Yönetimi kabul adayı (4)
+## [0.2.0-rc.4] — 2026-10-11 · T3 Kimlik Yönetimi kabul adayı (4)
 
 `v0.2.0-rc.3`'ün yerine İK kabulüne sunulan sürüm.
 

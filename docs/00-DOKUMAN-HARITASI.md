@@ -3,7 +3,7 @@
 **Proje:** DSG-HRMS — Düzen Sağlık Grubu İnsan Kaynakları Yönetim Sistemi
 **Amaç:** Bu doküman, TS ISO/IEC TS 33061 Seviye 2 kapsamında üretilen tüm kanıtların nerede tutulduğunu tek sayfadan gösterir. Bir denetçi ya da yeni katılan bir ekip üyesi aradığı kaydı buradan bulur.
 
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-10-15
 **Doküman sahibi:** Bilgi İşlem Birim Sorumlusu
 
 ---
@@ -128,6 +128,7 @@ Aşağıdaki tablolarda "33061 Süreç Çıktısı" sütunu, standardın Madde 5
 |---|---|
 | Yaklaşım | `YAKLASIM.md` (kurulum, kesim/cut-over, geri dönüş planı) |
 | **Ortam kurulum runbook** | `uat-ortami-kurulum-runbook.md` — UAT sunucusu kurulumu, dağıtım ve doğrulama |
+| **Sürüm kontrol listesi** | `surum-kontrol-listesi.md` — aday etiketleme, UAT kurulumu, kurulum sonrası kontrol, CI kanıt özeti, kabul ve modül kapanışı adımları (`KR-110`, #218) |
 | Kurulmuş sistem | `kayitlar/uat-dagitim-kaydi.md` (UAT; sunucuda `deployments.log`). Üretim dağıtım kaydı AS aşamasında |
 | Geçiş raporu | `raporlar/` — veri göçü mutabakat raporları, kesim raporu (AS aşamasında) |
 | Kayıt | `kayitlar/` — UAT işlemleri (ör. `2026-10-10-uat-hesap-temizligi.md`); ileride göç denemeleri, kullanıcı eğitim kayıtları |
@@ -278,3 +279,4 @@ Bazı kanıtlar birden fazla sürece hizmet eder. Tek kopya tutulur:
 | 2026-09-18 | 0.3 | MAN.8 çıktılarına **süreç değerlendirme raporu** eklendi (`MAN.8.BP3`) | Bilgi İşlem |
 | 2026-09-24 | 0.4 | Sistem gereksinimi kimliği `REQ-<MODÜL>-<no>` → `SYG-<MODÜL>-<no>` (T3 paydaş gereksinimleriyle çakışma; TEC.3 YAKLASIM §3.1) | Bilgi İşlem |
 | 2026-10-14 | 0.5 | T3 modül sonu denetimi (MAN.8 Ek A, A-09; MAN.5 D-20): var olmayan dosyalara atıflar kaldırıldı (`tamamlanma-tanimi.md`, `kod-gozden-gecirme-kontrol-listesi.md`, `docs/mimari/fonksiyon-modeli.md`, `docs/mimari/entegrasyon-arayuzleri.md`); "GitHub Releases" yerine açıklamalı Git etiketi (`KR-097`); bilgi kayıt defteri, konfigürasyon öğeleri, T3 doğrulama, entegrasyon, kabul ve denetim kayıtları, MAN.1 yaklaşımı, ortak kanıtlar ve kimlik önekleri eklendi; etiket adları güncel (#214) | Bilgi İşlem |
+| 2026-10-15 | 0.6 | TEC.10: sürüm kontrol listesi eklendi (#218) | Bilgi İşlem |
