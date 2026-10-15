@@ -128,6 +128,7 @@ sayıyordu).
 | A27 | Etiketler | PR'da `tur:` ve `surec:`; kapatılan issue'da `tur:` | `pr-traceability-check.yml` · Denetle |
 | A28 | Atlanamaz tamamlanma maddeleri | "Yetki sızıntısı testi" ve "Maskeleme testi" işaretli ya da üstü çizili ve gerekçeli | `pr-traceability-check.yml` · Denetle |
 | A29 | PR boyutu | Üretilen dosyalar hariç 1.500 satırı aşan PR'da `Boyut gerekçesi:` var | `pr-traceability-check.yml` · Denetle |
+| A30 | Gereksinim belgesinde geçmiş satırı | PG, SYG veya izlenebilirlik matrisi değiştiyse o belgenin değişiklik geçmişine yeni satır eklendi (#235) | `pr-traceability-check.yml` · Denetle |
 
 **B. `main`'de çalışanlar — tespit edici; başarısızlık issue açar.**
 
@@ -224,3 +225,4 @@ dönmek ise kalite kaybı demektir.
 | 2026-10-04 | 0.3 | §6 kod gözden geçirme kapısının tek kişilik düzende kanıtı (`KR-096`, #128) | Bilgi İşlem |
 | 2026-10-14 | 0.4 | §7: ortamların Veri sütunu ADR-0018'e taşındı (`KR-108`, `KR-099`, #212) | Bilgi İşlem |
 | 2026-10-15 | 0.5 | §6: kalite kapısı tanımı ve iş akışlarındaki gerçek kapıların tek listesi; sunucu tarafı zorlamanın olmadığı yazıldı (`KR-111`, `KR-099`, BULGU-10, #217) | Bilgi İşlem |
+| 2026-10-15 | 0.6 | §6: A30 gereksinim belgesinde değişiklik geçmişi satırı (#235) | Bilgi İşlem |
