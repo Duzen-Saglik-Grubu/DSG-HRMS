@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.2-YAK
 **Süreç:** TEC.2 — Paydaş İhtiyaç ve Gereksinimlerinin Tanımlanması
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-10-15
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)` sürecin dokümante edilmiş bilgi
 gereksinimleri belirlenir · `PA 2.2 (b)` bu bilginin kontrol gereksinimleri belirlenir
 
@@ -50,6 +50,14 @@ sistemdeki veri kalitesini ölçmek, açık soruları belirlemek toplantıyı ve
 > gibi görünür ve toplantı bir onay törenine dönüşür. Taslak, tartışmayı başlatmak
 > içindir; bitirmek için değil.
 
+**Kritik performans ölçütleri (KPÖ) bilgi olarak sunulur.** Bilgi İşlem, modülün KPÖ
+taslaklarını (yanıt süresi, eş zamanlı kullanıcı, teslim süresi gibi eşikler) toplantıdan
+önce hazırlar. Taslaklar toplantıda İK'ya **bilgi olarak** sunulur ve toplantı kaydının
+"Kritik performans ölçütleri" bölümüne İK'nın görüşüyle birlikte yazılır. KPÖ'ler PG'de
+değil, SYG §5'te tutulur (§5 çıktı f; `KR-111`). Gerekçe: T3'te KPÖ-KMLK-1, UAT'de
+karşılanmayınca Bilgi İşlem kararıyla yeniden tanımlandı (AN-25, `KR-095`) ve İK'ya hiç
+gitmemişti (13.10 denetimi TEC.3-8).
+
 Taslak listeler kişisel veri içerebilir (ör. mevcut sistemden örnek kayıtlar); bu
 durumda depoya **girmez**, ilgili kişilere ayrıca iletilir.
 
@@ -78,6 +86,12 @@ yaygın nedenidir.
 ### 3.1 Kimliklendirme
 
 `PG-<MODÜL>-<no>` — modül kısaltması büyük harf, numara iki hane: `PG-KMLK-07`.
+
+**İstisna:** T3 paydaş gereksinimleri istisnaen `REQ-KMLK-<no>` kimliğiyle onaylandı
+(`REQ-KMLK-001` … `REQ-KMLK-056`). Liste bu belgeden önce hazırlanmıştı ve İK'ya bu
+kimliklerle sunuldu; imzalı toplantı kaydıyla depo arasındaki bağ kimliğin sabit kalmasına
+dayandığı için kimlikler değiştirilmez (PG-KMLK §3). Sonraki modüller `PG-<MODÜL>-<no>`
+biçimini kullanır.
 
 **Numara yeniden kullanılmaz.** Bir gereksinim iptal edilirse kaydı durur, durumu
 `İptal` olur. Silinen bir numara, eski bir belgede ona yapılan atfı anlamsız kılar.
@@ -144,7 +158,7 @@ deneme. UAT'ye kurulum ve `main`'e birleştirme onaydan sonradır.
 | c) Kısıtlar belirlenir | Toplantı kaydı §5 + `karar-kayit-defteri.md` |
 | d) Paydaş ihtiyaçları tanımlanır | Toplantı kaydı §3 |
 | e) İhtiyaçlar önceliklendirilir ve gereksinime dönüştürülür | `PG-<MODÜL>.md` |
-| f) Kritik performans ölçütleri tanımlanır | `PG` kaydındaki "Ölçüt" alanı |
+| f) Kritik performans ölçütleri tanımlanır | `SYG-<MODÜL>.md` §5 (KPÖ tablosu); taslaklar İK toplantısında bilgi olarak sunulur ve toplantı kaydına yazılır (§2.2) |
 | g) Paydaş mutabakatı sağlanır | Toplantı kaydı §7 (katılımcı onayı) |
 | h) Destekleyici sistem/hizmetler mevcut | Toplantı kaydı §6 |
 | i) İzlenebilirlik kurulur | `izlenebilirlik-matrisi.md` |
@@ -165,3 +179,4 @@ uyulmayan bir şablon, olmayan bir şablondan kötüdür: uyum varmış gibi gö
 |---|---|---|---|
 | 2026-09-18 | 0.1 | İlk oluşturma — ilk İK gereksinim toplantısı öncesi (BULGU-02, BULGU-09) | Bilgi İşlem |
 | 2026-10-14 | 0.2 | §4: değişiklik talebi otomatik denetimi; §4.1 değişiklik talebi yordamı (#210) | Bilgi İşlem |
+| 2026-10-15 | 0.3 | §2.2: KPÖ taslakları toplantıda bilgi olarak sunulur; §3.1: T3'ün `REQ-KMLK` kimlik istisnası; §5 (f): KPÖ'ler SYG §5'te, PG şablonundaki "Ölçüt" alanı kaldırıldı (`KR-111`, #217) | Bilgi İşlem |

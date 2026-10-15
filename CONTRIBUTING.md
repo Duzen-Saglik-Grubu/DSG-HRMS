@@ -342,7 +342,7 @@ Refs: #42
 | Değişiklik talebi | Onaylı bir gereksinimi değiştiren PR, `tur:degisiklik-talebi` issue'sunda **tarihli paydaş onayı** (`Paydaş onayı: GG.AA.YYYY — <rol> — <kanal>`) kayda geçmeden birleştirilemez; CI denetler. Yordam: TEC.2 YAKLAŞIM §4.1 (#210) |
 | Etiket | **Zorunlu** — PR'da en az bir `tur:` ve bir `surec:` etiketi; kapatılan issue'da `tur:` etiketi. CI denetler (#216) |
 | Boyut | Hedef **< 400 satır** değişiklik; büyükse bölünür. Üretilen dosyalar (OpenAPI belgesi, üretilen tipler, migration tasarım dosyaları, `package-lock.json`) hariç **1.500 satırı aşan** PR, gövdede `Boyut gerekçesi:` ile neden bölünmediğini yazar; CI denetler (#216) |
-| CI | Tüm kalite kapıları geçmeli |
+| CI | Tüm kalite kapıları geçmeli (tanım ve liste: ADR-0011 §6) |
 | İnceleme | En az **1 onay**. Tek kişilik düzende onay, **birleştirmeden önce** PR'a "İnceledim ve onaylıyorum." yorumu olarak yazılır; CI bunu `main`'de denetler (`KR-096`). Onay yorumunu yalnızca inceleyen yazar. Boyut gerekçesi gereken büyük PR'larda onay yorumuna neyin incelendiği kısaca eklenir (ör. "backend ve testler satır satır; üretilen tipler örneklemeyle") |
 | Birleştirme | **Squash merge** — `main` geçmişi okunabilir kalır |
 | Dal | Birleştirme sonrası **silinir** |
@@ -397,30 +397,19 @@ bildirimin erken alınmasını sağlar. Taslak PR birleştirilemez.
 
 ## 6. Tamamlanma Tanımı (Definition of Done)
 
-Bir iş, aşağıdakilerin **tamamı** sağlanmadan "bitti" sayılmaz:
+Tamamlanma Tanımının **tek kaynağı PR şablonudur**: `.github/PULL_REQUEST_TEMPLATE.md`,
+"Tamamlanma Tanımı" bölümü. Bir iş, şablondaki maddelerin **tamamı** sağlanmadan veya
+uygulanmayanlar gerekçesiyle yazılmadan "bitti" sayılmaz. Liste burada tekrarlanmaz: iki
+kopya ayrışmıştı; onay maddesi şablonda yoktu (02.10 denetimi MAN.8-4, `KR-111`, #217).
 
-- [ ] Kod yazıldı ve kodlama standartlarına uygun
-- [ ] **Birim testleri** yazıldı; kapsam eşikleri sağlanıyor (genel %75, Domain %90)
-- [ ] **Entegrasyon testleri** yazıldı (gerçek PostgreSQL — Testcontainers)
-- [ ] **Yetki sızıntısı testi** yazıldı (kapsam dışı kayıt `404` dönüyor) — *atlanamaz*
-- [ ] **Maskeleme testi** yazıldı (kişisel veri log'a düz metin düşmüyor) — *atlanamaz*
-- [ ] Mimari kuralları ihlal edilmedi (mimari testi geçiyor)
-- [ ] Denetim izi ve gerekiyorsa erişim kaydı üretiliyor (ADR-0009)
-- [ ] API değişikliği varsa OpenAPI güncel; frontend tipleri yeniden üretildi
-- [ ] Veritabanı değişikliği varsa migration yazıldı ve **geri alınabilir**
-- [ ] İlgili dokümanlar güncellendi (ADR, karar defteri, doküman haritası)
-- [ ] Yeni bir mimari karar alındıysa **ADR yazıldı**
-- [ ] Sır sızıntısı yok (`gitleaks` temiz)
-- [ ] CI'daki tüm kalite kapıları geçti
-- [ ] Kod incelemesi yapıldı ve onay **PR'a yorum olarak** yazıldı (`KR-096`)
-
-> Bu liste, ADR-0011 §2 ve §6'nın operasyonel karşılığıdır ve MAN.8 kapsamında
+> Şablondaki liste, ADR-0011 §2 ve §6'nın operasyonel karşılığıdır ve MAN.8 kapsamında
 > kalite kriteri sayılır.
 >
 > **Atlanamaz maddeler CI'da denetlenir (#216):** PR gövdesinde "Yetki sızıntısı testi" ve
 > "Maskeleme testi" maddeleri ya işaretlidir (`- [x]`) ya da üstü çizilip aynı satırda
 > gerekçesi yazılır (`- [ ] ~~Maskeleme testi~~ — kod değişikliği yok`). Uygulanmayan diğer
-> maddeler de aynı biçimde yazılır; madde sessizce silinmez.
+> maddeler de aynı biçimde yazılır; madde sessizce silinmez, gerekçe "Notlar" bölümüne
+> değil maddenin satırına yazılır.
 
 ---
 
@@ -547,3 +536,4 @@ kayıt PR'ı, kabul ve modül kapanışı) tek bir kontrol listesindedir:
 | 2026-10-14 | 1.5 | §5: değişiklik talebinde paydaş onayı kuralı ve CI denetimi (#210) | Bilgi İşlem |
 | 2026-10-14 | 1.6 | §5: etiket ve boyut kuralları CI'da; büyük PR'da onay yorumu; §6: atlanamaz maddelerin denetimi (#216) | Bilgi İşlem |
 | 2026-10-15 | 1.7 | §9: sürüm kontrol listesine bağlantı (#218) | Bilgi İşlem |
+| 2026-10-15 | 1.8 | §6: Tamamlanma Tanımının tek kaynağı PR şablonu; liste şablona taşındı, onay maddesi şablona eklendi (`KR-111`, #217) | Bilgi İşlem |

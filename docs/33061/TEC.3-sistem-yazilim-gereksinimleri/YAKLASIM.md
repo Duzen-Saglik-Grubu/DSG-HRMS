@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.3-YAK
 **Süreç:** TEC.3 — Sistem/Yazılım Gereksinimlerinin Tanımlanması
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-10-15
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)` sürecin dokümante edilmiş bilgi
 gereksinimleri belirlenir · `PA 2.2 (b)` bu bilginin kontrol gereksinimleri belirlenir
 
@@ -125,7 +125,8 @@ madde CI'da otomatik test olmadan tamamlanmış sayılmaz.
 | Kontrol | Kural |
 |---|---|
 | Sürüm | Her belge Git'te; değişiklik **Pull Request** ile yapılır |
-| Onay | En az bir gözden geçiren onayı (CONTRIBUTING §5) |
+| Onay | **Onaylayan Bilgi İşlem'dir** (RACI: TEC.3 A). SYG belgesindeki her değişiklik, birleştirmeden önce PR'a yazılan onay yorumuyla onaylanır (`KR-096`). İK onayı gerekmez; paydaş gereksiniminin anlamını değiştiren değişiklik ise aşağıdaki değişiklik yolundan geçer. Belgenin başlığındaki **Onay durumu** satırı onaylayanı ve geçerli baseline'ı gösterir (`KR-111`) |
+| Baseline | Modülün kabul etiketi (ör. `v0.2.0`) o modülün SYG baseline'ıdır (`KR-097`). Kabulden sonraki değişiklik yeni sürümün baseline'ına girer |
 | Kimlik | `SYG-<MODÜL>-<no>`; numara yeniden kullanılmaz |
 | **Kapsama** | **Otomatik:** `.github/scripts/requirement-traceability-check.mjs`, PR izlenebilirlik denetimi içinde her PR'da çalışır |
 | Değişiklik | Paydaş gereksiniminin anlamını değiştiren sistem gereksinimi değişikliği önce `tur:degisiklik-talebi` issue'su ve İK onayı gerektirir; yordam TEC.2 YAKLAŞIM §4.1'dedir. Uygulama PR'ı onay kayda geçmeden birleştirilemez (otomatik) |
@@ -174,3 +175,4 @@ ve süreç gözden geçirmelerinde ele alınır.
 | 2026-09-24 | 0.1 | İlk oluşturma — ilk SYG belgesiyle (T3) birlikte | Bilgi İşlem |
 | 2026-10-14 | 0.2 | §4: türetilmiş davranış kuralı ve geri yön kapsam denetimi (#211) | Bilgi İşlem |
 | 2026-10-14 | 0.3 | §4: değişiklik yolu TEC.2 §4.1 yordamına bağlandı (#210) | Bilgi İşlem |
+| 2026-10-15 | 0.4 | §4: SYG onay noktası (onaylayan Bilgi İşlem, her değişiklik PR onay yorumuyla) ve baseline kuralı (`KR-111`, #217) | Bilgi İşlem |

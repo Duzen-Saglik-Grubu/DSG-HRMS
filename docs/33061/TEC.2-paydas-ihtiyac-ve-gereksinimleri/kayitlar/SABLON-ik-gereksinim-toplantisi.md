@@ -123,6 +123,18 @@
 
 ---
 
+## 10. Kritik performans ölçütleri — bilgi *(TEC.2 çıktısı f)*
+
+> Bilgi İşlem'in hazırladığı KPÖ taslakları toplantıda İK'ya **bilgi olarak** sunulur
+> (TEC.2 YAKLAŞIM §2.2). Ölçütler SYG §5'te kesinleşir; burada sunulduğu ve İK'nın ne
+> dediği kayda geçer. Taslak yoksa "Bu modülde KPÖ taslağı yok" yazılır.
+
+| KPÖ taslağı | Eşik | İK'nın görüşü |
+|---|---|---|
+| | | |
+
+---
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |

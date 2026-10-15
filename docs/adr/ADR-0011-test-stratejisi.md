@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi; §7 Veri sütunu → ADR-0018
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-024`
+**Karar defteri karşılığı:** `KR-024`, `KR-111` (§6 tanımı)
 **İlgili süreç:** TEC.9 (Doğrulama), MAN.8 (Kalite Güvence)
 
 ---
@@ -81,24 +81,71 @@ konteyneri ayağa kaldırılır. Migration'lar da bu veritabanı üzerinde çal�
 
 ### 6. Kalite kapıları (CI)
 
-Pull Request, aşağıdakilerin tamamı geçmeden birleştirilemez:
+**Tanım (15.10.2026, `KR-111`):** Kalite kapısı, PR'da veya `main`'de çalışan, başarısızlığı
+birleştirmeyi durduran ya da `[HATA]`/`[DÜZELTİCİ]` issue'su açan otomatik denetim ve
+`KR-096` onay yorumudur. Kapıların **tek listesi bu bölümdür**; başka belgeler kapı sayısı
+vermez, buraya atıf yapar (18.09 gözden geçirmesi BULGU-10: üç belge 8, 11 ve 12 kapı
+sayıyordu).
 
-| Kapı | Kural |
-|---|---|
-| Derleme | Uyarı yok (`TreatWarningsAsErrors`) |
-| Birim + entegrasyon testleri | Tamamı geçmeli |
-| Kapsam eşiği | Genel %75, Domain %90 |
-| Mimari testi | Katman ve modül bağımlılık kuralları (ADR-0002 §"Bağımlılık kuralları") |
-| Statik analiz | .NET analiz kuralları + ESLint; hata seviyesinde bulgu yok |
-| Sır taraması | `gitleaks` temiz (ADR-0008 §3) |
-| Bağımlılık güvenliği | Bilinen kritik açıklı paket yok |
-| Konteyner taraması | `trivy` — kritik açık yok |
-| Migration kontrolü | Bekleyen model değişikliği yok |
-| Biçim | `dotnet format` ve Prettier temiz |
-| Kod gözden geçirme | En az bir onay. Tek kişilik düzende PR'a birleştirmeden önce yazılan onay yorumu; `main`'de denetlenir (`KR-096`) |
+> **Sunucu tarafı zorlama yoktur.** GitHub Free planında özel depoda dal koruma kuralı
+> tanımlanamaz (`KR-054`, `KR-055`; risk `R-16` kabul edildi). "Birleştirmeyi durdurur",
+> sunucunun uyguladığı bir engel değil, **uzlaşmadır**: kırmızı kapısı olan PR birleştirilmez
+> (CONTRIBUTING §5). Uzlaşmanın tutulduğu sonradan, tespit edici olarak denetlenir (B
+> tablosu) ve atlatılan kapı issue olarak kayda geçer. Kırmızıyla birleştirilen PR sayısı
+> kalite güvence ölçütü K5'tir (MAN.8 YAKLAŞIM §2.5).
+
+**A. PR'da çalışanlar — başarısızlık birleştirmeyi durdurur.** `ci.yml` ve
+`api-contract-check.yml` `main`'e gelen her commit'te de çalışır.
+
+| # | Kapı | Kural | Yer |
+|---|---|---|---|
+| A1 | Derleme ve statik analiz | Uyarı yok (`TreatWarningsAsErrors`, .NET analiz kuralları); NuGet güvenlik denetimi derlemede | `ci.yml` · `build-and-test` |
+| A2 | Biçim (backend) | `dotnet format` temiz | `ci.yml` · `build-and-test` |
+| A3 | Backend testleri | Birim, entegrasyon ve mimari testlerinin tamamı geçer; mimari testi katman ve modül sınırlarını denetler (ADR-0002, ADR-0016) | `ci.yml` · `build-and-test` |
+| A4 | Kapsam eşiği (backend) | Genel %75, Domain %90 | `ci.yml` · `build-and-test` |
+| A5 | Ön yüz bağımlılık güvenliği | `npm audit`: yüksek ve üstü açık yok | `ci.yml` · `frontend` |
+| A6 | Biçim (ön yüz) | Prettier temiz | `ci.yml` · `frontend` |
+| A7 | Kurumsal logo tek kaynak | Web imajındaki logo depodaki asıl dosyayla aynı | `ci.yml` · `frontend` |
+| A8 | Lint | ESLint; uyarı da kabul edilmez (`--max-warnings 0`) | `ci.yml` · `frontend` |
+| A9 | Tip denetimi | TypeScript hatasız | `ci.yml` · `frontend` |
+| A10 | Ön yüz testleri ve kapsam | Tamamı geçer; kapsam ≥ %70 | `ci.yml` · `frontend` |
+| A11 | Ön yüz derleme | Üretim derlemesi başarılı | `ci.yml` · `frontend` |
+| A12 | Üretilen API tipleri | OpenAPI belgesinden yeniden üretilen tipler depodakiyle aynı | `ci.yml` · `frontend` |
+| A13 | Migration kontrolü | Bekleyen model değişikliği yok | `ci.yml` · `migration-check` |
+| A14 | Bağımlılık güvenliği (backend) | Geçişli bağımlılıklar dâhil açıklı paket yok | `ci.yml` · `dependency-security` |
+| A15 | Konteyner taraması | `trivy`: API ve web imajında yaması yayımlanmış kritik veya yüksek açık yok | `ci.yml` · `container-scan` |
+| A16 | Sır taraması | `gitleaks` temiz (ADR-0008 §3) | `ci.yml` · `secret-scan` |
+| A17 | Uçtan uca testler | Playwright senaryolarının tamamı geçer (sentetik veri) | `ci.yml` · `e2e` |
+| A18 | API sözleşmesi | Koddan üretilen OpenAPI belgesi depodakiyle aynı (ADR-0010 §1) | `api-contract-check.yml` |
+| A19 | Denetim kurallarının öz sınaması | Başlık, dal adı, değişiklik talebi onayı ve PR disiplini kuralları örnek girdilerle sınanır | `pr-traceability-check.yml` |
+| A20 | Gereksinim izlenebilirliği | PG → SYG → test zinciri; SYG §8 tablosu ve izlenebilirlik matrisi SYG §4 ile aynı eşlemeyi gösterir | `pr-traceability-check.yml` · `requirement-traceability-check.mjs` |
+| A21 | Belge tutarlılığı | "Son güncelleme" geçmişin son satırından eski değil; SYG §1 sayımları §4 ve §5 ile aynı | `pr-traceability-check.yml` · `doc-consistency-check.mjs` |
+| A22 | PR başlığı | Conventional Commits (CONTRIBUTING §5.1) | `pr-traceability-check.yml` · Denetle |
+| A23 | Milestone | PR'a milestone atanmış | `pr-traceability-check.yml` · Denetle |
+| A24 | Issue bağlantısı | `Closes #` veya `Refs #` var ve doldurulmuş | `pr-traceability-check.yml` · Denetle |
+| A25 | Dal adı | CONTRIBUTING §3 önekleri; bağlı issue numarası | `pr-traceability-check.yml` · Denetle |
+| A26 | Değişiklik talebi onayı | Kapatılan issue değişiklik talebiyse tarihli paydaş onayı kayıtlı (TEC.2 YAKLAŞIM §4.1) | `pr-traceability-check.yml` · Denetle |
+| A27 | Etiketler | PR'da `tur:` ve `surec:`; kapatılan issue'da `tur:` | `pr-traceability-check.yml` · Denetle |
+| A28 | Atlanamaz tamamlanma maddeleri | "Yetki sızıntısı testi" ve "Maskeleme testi" işaretli ya da üstü çizili ve gerekçeli | `pr-traceability-check.yml` · Denetle |
+| A29 | PR boyutu | Üretilen dosyalar hariç 1.500 satırı aşan PR'da `Boyut gerekçesi:` var | `pr-traceability-check.yml` · Denetle |
+
+**B. `main`'de çalışanlar — tespit edici; başarısızlık issue açar.**
+
+| # | Kapı | Neyi yakalar | Sonuç | Yer |
+|---|---|---|---|---|
+| B1 | Dal Koruma Denetimi | PR olmadan gelen commit; birleştirmeden önce onay yorumu olmayan PR; denetimin kendisinin çalışamaması | `[DÜZELTİCİ]` issue'su | `branch-protection-check.yml` (`main`'e her gönderim) |
+| B2 | `main` kırmızı denetimi | `main`'de CI, API sözleşme denetimi veya Dal Koruma Denetiminin başarısız, iptal veya zaman aşımıyla bitmesi | `[HATA] main kırmızı` issue'su; kırmızıyken özellik birleştirilmez (CONTRIBUTING §1.1) | `main-failure-check.yml` |
+| B3 | `main` sağlık taraması | `main`'in son commit'inin izlenen iş akışlarında doğrulanmaması; B2'nin kendisinin çalışmaması | `[HATA]` issue'su | `main-health-sweep.yml` (6 saatte bir) |
+
+**C. İnsan kapısı.**
+
+| # | Kapı | Kural |
+|---|---|---|
+| C1 | Kod gözden geçirme | En az bir onay. Tek kişilik düzende inceleyen, birleştirmeden önce PR'a onay yorumu yazar; B1 bunu `main`'de denetler (`KR-096`) |
 
 Kapılar **uyarı değil, engeldir.** Geçici olarak devre dışı bırakılması gerekirse
-gerekçesi PR'da yazılır ve `duzeltici-faaliyet` etiketli bir issue açılır (MAN.8).
+gerekçesi PR'da yazılır ve `duzeltici-faaliyet` etiketli bir issue açılır (MAN.8). Yeni
+bir kapı eklendiğinde veya kaldırıldığında bu liste aynı PR'da güncellenir.
 
 ### 7. Ortamlar
 
@@ -176,3 +223,4 @@ dönmek ise kalite kaybı demektir.
 | 2026-09-09 | 0.2 | İddia kütüphanesi FluentAssertions yerine Shouldly (`KR-057`) | Bilgi İşlem |
 | 2026-10-04 | 0.3 | §6 kod gözden geçirme kapısının tek kişilik düzende kanıtı (`KR-096`, #128) | Bilgi İşlem |
 | 2026-10-14 | 0.4 | §7: ortamların Veri sütunu ADR-0018'e taşındı (`KR-108`, `KR-099`, #212) | Bilgi İşlem |
+| 2026-10-15 | 0.5 | §6: kalite kapısı tanımı ve iş akışlarındaki gerçek kapıların tek listesi; sunucu tarafı zorlamanın olmadığı yazıldı (`KR-111`, `KR-099`, BULGU-10, #217) | Bilgi İşlem |

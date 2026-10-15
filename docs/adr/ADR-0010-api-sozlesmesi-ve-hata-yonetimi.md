@@ -2,6 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
+**Karar defteri karşılığı:** `KR-093` (§5 gerçekleştirme notu)
 **İlgili süreç:** TEC.5 (Tasarım), TEC.8 (Entegrasyon)
 
 ---
@@ -87,6 +88,17 @@ Tüm hatalar tek bir biçimde döner:
   dosya yolu asla yanıta konmaz. Bunlar yalnızca sunucu log'una yazılır.
 - Beklenmeyen hatalarda `500` ve genel bir mesaj döner; ayrıntı `traceId` ile log'da
   aranır.
+
+> **Gerçekleştirme (02.10.2026, `KR-093`, #115).** HTTPS ile gelmeyen `/api/` isteği
+> yönlendirilmez; `403` ve hata türü `https-required` ile reddedilir
+> (`Dsg.Hrms.Api/Networking/HttpsRequirement.cs`, `HttpsRequiredException`). İsteğin HTTPS
+> ile geldiği yalnızca güvenilen vekilin (`ReverseProxy__TrustedNetworks`)
+> `X-Forwarded-Proto` başlığından okunur; başka kaynaktan gelen başlığa bakılmaz. Sağlık
+> uçları kapsam dışıdır. `Security:RequireHttps` varsayılan olarak açıktır, yalnızca
+> geliştirme ortamında kapalıdır. Yönlendirme yerine ret seçildi: yönlendirme anında istek
+> gövdesi (parola, doğrulama kodu) zaten şifresiz gitmiştir; ret, sertifika eksikliği gibi
+> bir yanlış yapılandırmayı görünür kılar. Doğrulama: `HttpsRequirementApiTests`
+> (SYG-KMLK-063).
 
 ### 6. Durum kodları
 
@@ -180,3 +192,4 @@ tek noktadan yapılabilir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-10-15 | 0.2 | §5: HTTPS zorunluluğunun gerçekleştirme notu (`https-required`; `KR-093`, `KR-099`, `KR-111`, #217) | Bilgi İşlem |

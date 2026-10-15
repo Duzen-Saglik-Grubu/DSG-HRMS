@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-10-15
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 
@@ -49,7 +49,7 @@ görünür — gizlenmez.
 | **Kaynak** | Paydaş gereksinimi (`PG-…`) veya kurumsal karar (`KR-…`) | TEC.2 / karar kayıt defteri |
 | **Sistem gereksinimi** | `SYG-<MODÜL>-nnn` (TEC.3 YAKLASIM §3.1) | TEC.3 |
 | **Tasarım** | `ADR-nnnn` veya `docs/mimari/` altındaki belge | TEC.5 |
-| **Gerçekleştirme** | Kod yolu + birleştiren PR numarası | TEC.7 |
+| **Gerçekleştirme** | PR numarası; kod ve test bağı SYG atfıyla CI'da izlenir (#122) | TEC.7 |
 | **Doğrulama** | Test dosyası veya CI kapısı | TEC.9 |
 | **Kabul** | Kabul formu / kabul raporu | TEC.11 |
 
@@ -248,3 +248,4 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 2026-10-11 | 2.11 | §5 Kabul sütunu: REQ-KMLK-019 → KG-09, REQ-KMLK-054 → KG-10 (#196) | Bilgi İşlem |
 | 2026-10-13 | 2.12 | §5: 56 satırın Kabul sütunu İK kabulüne göre (13.10.2026); §6 T3 ölçümü %100; SYG sayısı 81 (#204) | Bilgi İşlem |
 | 2026-10-14 | 2.13 | §5: REQ-KMLK-051, 052, 053 kaynak metni PG-KMLK 1.6 ile aynı; G2'den sonra değişen satırlar (025, 036, 037, 038, 039, 051, 052, 053) doğrulama raporu 2.0'a (14.10.2026, `v0.2.0`) işaret ediyor; başlık tarihi geçmişle eşitlendi (#214) | Bilgi İşlem |
+| 2026-10-15 | 2.14 | §2.1: "Gerçekleştirme" sütunu PR numarasını verir; kod ve test bağı SYG atfıyla CI'da izlenir (02.10 denetimi TEC.7-6, `KR-111`, #217) | Bilgi İşlem |

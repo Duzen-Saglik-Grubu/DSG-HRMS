@@ -81,7 +81,7 @@ Aşağıdaki tablolarda "33061 Süreç Çıktısı" sütunu, standardın Madde 5
 | 33061 Süreç Çıktısı | Bizdeki karşılığı |
 |---|---|
 | Yaklaşım | `YAKLASIM.md` |
-| Tasarım modeli | ADR'ler (veri modeli ADR-0005) ve `docs/mimari/` (modül listesi, paket envanteri, izin listesi). Diyagram yok (YAKLASIM §7) |
+| Tasarım modeli | ADR'ler (veri modeli ADR-0005) ve `docs/mimari/` (modül listesi, paket envanteri, izin listesi). Diyagram yok (YAKLASIM §8 açık nokta 4; #234) |
 | Tasarım gerekçesi (Design rationale) | `docs/adr/` — Mimari Karar Kayıtları |
 | Arayüz tanımı (Interface definition) | `docs/api/openapi-v1.json` (OpenAPI sözleşmesi) + `SYG-<MODÜL>.md` §2.3 dış arayüzler |
 | Tasarım değerlendirme raporu | `raporlar/YYYY-AA-GG-tasarim-gozden-gecirme.md` (henüz yazılmadı) |
@@ -225,12 +225,12 @@ Aşağıdaki tablolarda "33061 Süreç Çıktısı" sütunu, standardın Madde 5
 | 33061 Süreç Çıktısı | Bizdeki karşılığı |
 |---|---|
 | Yaklaşım | `YAKLASIM.md` |
-| Kalite kriterleri ve yöntemleri | Tamamlanma Tanımı (DoD) `CONTRIBUTING.md` §6; PR şablonu (`.github/PULL_REQUEST_TEMPLATE.md`); ADR-0011 §6 kalite kapıları; `docs/33061/00-OLGUNLUK-SEVIYESI-KRITERLERI.md` |
+| Kalite kriterleri ve yöntemleri | Tamamlanma Tanımı (DoD): tek kaynak PR şablonu (`.github/PULL_REQUEST_TEMPLATE.md`), `CONTRIBUTING.md` §6 ona atıf yapar; ADR-0011 §6 kalite kapısı tanımı ve tek kapı listesi; kalite güvence ölçütleri K1–K6 (YAKLASIM §2.5); `docs/33061/00-OLGUNLUK-SEVIYESI-KRITERLERI.md` |
 | Kalite güvence sistemi | CI/CD kalite kapıları (GitHub Actions) |
 | Düzeltici faaliyet | GitHub Issue (`[DÜZELTİCİ]`, etiket `tur:duzeltici-faaliyet`) |
-| Kalite güvence raporu | `raporlar/` — dönemsel kalite raporu |
+| Kalite güvence raporu | Ayrı rapor yazılmaz: K1–K6 değerleri MAN.2 durum raporu §3'te ve modül sonu denetiminde verilir (`KR-111`); T3 başlangıç değerleri `kayitlar/2026-10-15-kg-olcutleri-t3-baslangic.md` |
 | **Süreç değerlendirme raporu** (`MAN.8.BP3`) | `raporlar/YYYY-AA-GG-surec-gozden-gecirme-raporu.md` ve modül sonu denetimleri (`2026-10-02-t3-surec-denetimi*.md`, `2026-10-13-t3-modul-sonu-denetimi*.md`) — 33061 süreçlerinin standarda karşı değerlendirilmesi |
-| Kayıt | `kayitlar/` (ör. `2026-10-04-pr-onay-kaydi.md`) |
+| Kayıt | `kayitlar/` (ör. `2026-10-04-pr-onay-kaydi.md`, `2026-10-15-kg-olcutleri-t3-baslangic.md`) |
 | Olay ve problem kayıtları | GitHub Issue (etiket: `tur:hata`) |
 
 ---
@@ -280,3 +280,4 @@ Bazı kanıtlar birden fazla sürece hizmet eder. Tek kopya tutulur:
 | 2026-09-24 | 0.4 | Sistem gereksinimi kimliği `REQ-<MODÜL>-<no>` → `SYG-<MODÜL>-<no>` (T3 paydaş gereksinimleriyle çakışma; TEC.3 YAKLASIM §3.1) | Bilgi İşlem |
 | 2026-10-14 | 0.5 | T3 modül sonu denetimi (MAN.8 Ek A, A-09; MAN.5 D-20): var olmayan dosyalara atıflar kaldırıldı (`tamamlanma-tanimi.md`, `kod-gozden-gecirme-kontrol-listesi.md`, `docs/mimari/fonksiyon-modeli.md`, `docs/mimari/entegrasyon-arayuzleri.md`); "GitHub Releases" yerine açıklamalı Git etiketi (`KR-097`); bilgi kayıt defteri, konfigürasyon öğeleri, T3 doğrulama, entegrasyon, kabul ve denetim kayıtları, MAN.1 yaklaşımı, ortak kanıtlar ve kimlik önekleri eklendi; etiket adları güncel (#214) | Bilgi İşlem |
 | 2026-10-15 | 0.6 | TEC.10: sürüm kontrol listesi eklendi (#218) | Bilgi İşlem |
+| 2026-10-15 | 0.7 | MAN.8: DoD'nin tek kaynağı PR şablonu; kalite güvence ölçütleri K1–K6 ve T3 başlangıç kaydı; ayrı kalite raporu yok. TEC.5: diyagram notu YAKLASIM §8 ve #234'e bağlandı (`KR-111`, #217) | Bilgi İşlem |
