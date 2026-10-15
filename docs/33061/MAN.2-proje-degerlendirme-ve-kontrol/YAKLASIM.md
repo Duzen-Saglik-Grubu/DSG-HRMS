@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.2-YAK
 **Süreç:** MAN.2 — Proje Değerlendirme ve Kontrol
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-10-15
 **Karşıladığı öznitelik maddeleri:** `PA 2.1`: hedefler, izleme sıklığı, sorumluluklar, kaynaklar ve arayüzler. `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -78,7 +78,7 @@ dönemi tanımlamaz. Bu belge dönemi şöyle tanımlar:
 Raporun içeriği:
 
 1. Aşama ve modül ilerlemesi (milestone sayıları, geçilen kapılar).
-2. §3'teki ölçütlerin gerçek değerleri.
+2. §3'teki ölçütlerin gerçek değerleri; kalite güvence ölçütleri K1–K6 dâhil.
 3. Puanı 6 ve üzeri riskler; kabul bekleyen riskler (risk defteri §1, MAN.4).
 4. Plandan sapmalar, alınan kararlar, yeniden planlama ihtiyacı.
 5. Rol ve kaynak yeterliliği (tek geliştirme kanalı, `R-05`; bekleyen altyapı B2, B4, B5, B9).
@@ -99,6 +99,14 @@ Rapor Üst Yönetime iletilir; iletim tarihi ve alıcı rapora yazılır. **İlk
 | Test kapsamı yüzdesi | CI kanıt özeti (`TEC.9-dogrulama/kayitlar/`) |
 | Kabul testinde çıkan bulgu sayısı | Kabul formu, TEC.11 kayıtları |
 | Değişiklik talebi sayısı | `tur:degisiklik-talebi` etiketli issue'lar |
+
+**Kalite güvence ölçütleri (K1–K6):** Durum raporunun §3'ü yukarıdaki proje ölçütlerinin
+yanında MAN.8'in kalite güvence ölçütlerini de verir: denetim bulgusu takip oranı, denetim
+issue'su kapanma süresi, `main` CI başarı oranı ve kırmızı olaylar, PR'da ilk çalıştırmada
+geçme oranı, birleştirme disiplini ve kaçan hata. Tanımlar, veri kaynakları ve hedefler
+MAN.8 YAKLAŞIM §2.5'tedir; T3 başlangıç değerleri
+`MAN.8-kalite-guvence/kayitlar/2026-10-15-kg-olcutleri-t3-baslangic.md`'dedir. Ayrı bir
+aylık kalite raporu yazılmaz (`KR-111`, #217).
 
 ---
 
@@ -182,3 +190,4 @@ gözden geçirilir. Rapor dönemi pratikte işlemiyorsa burada değiştirilir.
 | 2026-10-06 | 1.1 | §2.5 durum raporu sıklığı onaylandı (`KR-101`, #177) | Bilgi İşlem |
 | 2026-10-13 | 1.2 | §2.2 G4 durumu ve §8 açık nokta 3: T3 kapanışı (#206) | Bilgi İşlem |
 | 2026-10-14 | 1.3 | T3 modül sonu gözden geçirmesi: §2.2 G2 yeniden kaydı ve G3 kabulü; §8 açık nokta 1, 4, 5 kapandı, 2 kısmen (#214) | Bilgi İşlem |
+| 2026-10-15 | 1.4 | §2.5 ve §3: durum raporunun §3'ü kalite güvence ölçütlerini (K1–K6, MAN.8 YAKLAŞIM §2.5) de içerir; ayrı kalite raporu yazılmaz (`KR-111`, #217) | Bilgi İşlem |

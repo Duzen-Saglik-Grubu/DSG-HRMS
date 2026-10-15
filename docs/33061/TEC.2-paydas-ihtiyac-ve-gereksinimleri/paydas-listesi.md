@@ -3,7 +3,7 @@
 **Belge kimliği:** TEC.2-PL
 **Süreç:** TEC.2 — Paydaş İhtiyaç ve Gereksinimlerinin Tanımlanması
 **33061 karşılığı:** *Stakeholder identification* (TEC.2.BP1)
-**Son güncelleme:** 2026-09-07
+**Son güncelleme:** 2026-10-15
 **Gözden geçirme:** Her modül gereksinim toplantısı öncesi
 
 ---
@@ -208,7 +208,7 @@ veya birim teknik sorumlusu katılımı sağlanacaktır.
 | 2 | İK uzmanı sayısının netleştirilmesi | İK |
 | 3 | Gereksinim toplantılarına birim sorumlusu / birim teknik sorumlusu katılımının sağlanması (`KR-047`) | İK |
 | 4 | UAT'ye en az 2–3 temsilci personelin dâhil edilmesi (`KR-048`) | İK |
-| 5 | KVKK Sorumlusundan saklama süreleri görüşü | Bilgi İşlem → KVKK Sorumlusu |
+| 5 | ~~KVKK Sorumlusundan saklama süreleri görüşü~~ — **Kapandı (14.10.2026):** saklama süreleri KVKK Sorumlusunun onayıyla kararlaştırıldı; denetim izi, erişim kaydı ve güvenlik olayları 10 yıl (`KR-109`, #215) | — |
 | 6 | ~~LOGO sürüm yükseltmelerinin önceden bildirilmesi mutabakatı~~ — **Kapandı:** süreç zaten işliyor; TRISOFT önceden bildiriyor, Mali İşler ve Bilgi İşlem tarih teyitleşiyor (`KR-049`) | — |
 | 7 | Belgelendirme kuruluşundan seviye kriterlerinin yazılı alınması | Bilgi İşlem |
 | 8 | İ20 (İSG ve İş Kazası) gereksinim toplantısına İSG uzmanının katılımının sağlanması — uzman iç kaynaktır | İK |
@@ -220,3 +220,4 @@ veya birim teknik sorumlusu katılımı sağlanacaktır.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-10-15 | 0.2 | Gözden geçirme (T3 sonrası; 02.10 denetimi TEC.2-3): liste T3 toplantısından önce gözden geçirilmişti (toplantı kaydı 23.09.2026 §1), bu değişiklik geçmişine yazılmamıştı. §5 iş 5 kapandı (`KR-109`, #215). Diğer paydaşlar ve işler değişmedi (#217) | Bilgi İşlem |

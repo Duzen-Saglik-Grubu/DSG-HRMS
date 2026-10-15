@@ -27,6 +27,11 @@
 >
 > **Kabul kriteri ölçülebilir olmalıdır.** "Hızlı açılmalı" değil, "liste 2 saniyede
 > gelmeli". TEC.11 geçerleme testi bu kriterden yazılır.
+>
+> **Kritik performans ölçütü bu belgeye yazılmaz.** KPÖ'ler (TEC.2 çıktısı f) sistem
+> gereksinimleri belgesinin §5'inde tutulur; taslakları İK toplantısında bilgi olarak
+> sunulur ve toplantı kaydına yazılır (TEC.2 YAKLAŞIM §2.2). Şablondaki eski "Ölçüt" alanı
+> hiç kullanılmadığı için 15.10.2026'da kaldırıldı (`KR-111`, #217).
 
 ### PG-&lt;MODÜL&gt;-01 — &lt;kısa başlık&gt;
 
@@ -37,7 +42,6 @@
 | **Kaynak** | &lt;Paydaş kodu ve toplantı tarihi&gt; |
 | **Öncelik** | &lt;Zorunlu / Yüksek / Orta / Düşük&gt; |
 | **Kabul kriteri** | &lt;Ölçülebilir; "şu yapıldığında şu gözlenir"&gt; |
-| **Ölçüt** *(varsa)* | &lt;Kritik performans ölçütü — TEC.2 çıktısı f&gt; |
 | **Bağımlılık** | &lt;Başka gereksinim veya modül&gt; |
 | **Durum** | &lt;Taslak / Onaylandı / Değişti / İptal&gt; |
 
@@ -65,7 +69,6 @@
 | **Kaynak** | P3 Çalışan, P1 İK — 18.09.2026 toplantısı, ihtiyaç #4 |
 | **Öncelik** | Zorunlu |
 | **Kabul kriteri** | Çalışan giriş yaptığında ana ekranda **kalan gün sayısı** görünür; "İzinlerim" sayfasında son 12 ayın izin kayıtları tarih ve gün sayısıyla listelenir. Başka bir çalışanın bakiyesi **hiçbir şekilde** görünmez. |
-| **Ölçüt** | Sayfa 2 saniyede açılmalı (500 kayıt) |
 | **Bağımlılık** | T3 Kimlik Yönetimi (giriş), İ1 İzin Yönetimi (bakiye hesabı) |
 | **Durum** | Taslak |
 

@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.1-WBS
 **Süreç:** MAN.1 — Proje Planlama
-**Son güncelleme:** 2026-10-10
+**Son güncelleme:** 2026-10-15
 **Onay:** Sürüm 0.4 onaylandı (Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026; `KR-103`)
 **33061 karşılığı:** *Work breakdown structure*
 
@@ -86,7 +86,7 @@ DSG-HRMS
 | 2.9 | Sağlık kontrolü uç noktaları ve OpenTelemetry |
 | 2.10 | Docker imajları ve Compose yığınları (dev + UAT) |
 | 2.11 | GitHub kurulumu: dal koruma, issue/PR şablonları, etiketler, Projects |
-| 2.12 | CI hattı ve **12 kalite kapısı** (ADR-0011 §6) |
+| 2.12 | CI hattı ve kalite kapıları (tanım ve tek liste: ADR-0011 §6) |
 | 2.13 | Mimari testi (katman ve modül bağımlılık kuralları) |
 | 2.14 | Testcontainers ile entegrasyon test altyapısı |
 | 2.15 | Ortak frontend bileşenleri (DataTable, PageHeader, ErrorState …) |
@@ -315,3 +315,4 @@ Bu kural, aşağıdaki üç yanlışı birden engeller:
 | 2026-09-18 | 0.3 | §5 milestone eşlemesi tamamlandı ve atama kuralı yazıldı; WBS 7 için `SK` milestone'u açıldı (BULGU-08) | Bilgi İşlem |
 | 2026-10-06 | 0.4 | §4 kritik yol gerçekleşen sıraya göre: T3 önce, T1 çekirdeği T3 içinde (`KR-040`, `KR-077`, #127) | Bilgi İşlem |
 | 2026-10-10 | 0.4 | Üst Yönetim onayı işlendi (`KR-103`, #127) | Bilgi İşlem |
+| 2026-10-15 | 0.4.1 | 2.12: kapı sayısı ("12") kaldırıldı; tanım ve tek liste ADR-0011 §6'da (BULGU-10, `KR-111`, #217). İş kapsamı değişmedi | Bilgi İşlem |

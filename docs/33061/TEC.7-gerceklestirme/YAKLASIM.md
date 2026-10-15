@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.7-YAK
 **Süreç:** TEC.7 — Gerçekleştirme
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-10-15
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir. Ayrıca `PA 2.1` için hedef, plan, sorumluluk ve kaynaklar (§1–§4).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -102,7 +102,7 @@ Node 22, Testcontainers (PostgreSQL), Docker, yerel git kancaları (`.githooks/`
 | İnceleme kaydı | PR yorumu; geçmiş onaylar `MAN.8-kalite-guvence/kayitlar/2026-10-04-pr-onay-kaydi.md` | "İnceledim ve onaylıyorum." | İnceleyen |
 | Sürüm notu | `CHANGELOG.md` | Keep a Changelog; etiketle eşleşen bölüm | Bilgi İşlem |
 | Sürüm etiketi | Git | Açıklamalı etiket (`KR-097`) | Bilgi İşlem |
-| İzlenebilirlik | `../izlenebilirlik-matrisi.md` "Gerçekleştirme" sütunu | Kod yolu + PR numarası (matris §2.1) | PR sahibi |
+| İzlenebilirlik | `../izlenebilirlik-matrisi.md` "Gerçekleştirme" sütunu | PR numarası; kod ve test bağı SYG atfıyla CI'da izlenir (matris §2.1, #122) | PR sahibi |
 
 Doküman haritası, gerçekleştirme raporunun karşılığı olarak `CHANGELOG.md` ve PR
 özetlerini sayar; `raporlar/` altında ayrı bir gerçekleştirme raporu üretilmez.
@@ -143,10 +143,10 @@ Doküman haritası, gerçekleştirme raporunun karşılığı olarak `CHANGELOG.
 | No | Açık nokta | Bağlantı |
 |---|---|---|
 | 1 | ~~Modül sınırı otomatik korunmuyor~~ — **Kapandı (05.10.2026, #171):** ADR-0016 | ADR-0016 |
-| 2 | **PR boyutu kuralı tutulmuyor.** CONTRIBUTING §5 "< 400 satır" der; T3'te sekiz PR +2.383 ile +5.103 satır arasındaydı (#75, #84, #86, #88, #94, #99, #108, #110). Kural ya gerçekçi hâle getirilmeli ya iş paketleri bölünmeli | Denetim MAN.8-5 |
-| 3 | Matris §2.1 "kod yolu + PR" ister; T3 satırları çoğunlukla yalnızca PR numarası veriyor | Denetim TEC.7-6 |
-| 4 | PR şablonundaki örnek kimlik hâlâ `REQ-KIMLIK-07`; doğrusu `SYG-KMLK-nnn` | Denetim TEC.7-6 |
-| 5 | Tamamlanma Tanımı iki yerde (CONTRIBUTING §6 ve PR şablonu) ayrı listeler olarak duruyor | Denetim MAN.8-4 |
+| 2 | ~~**PR boyutu kuralı tutulmuyor.** CONTRIBUTING §5 "< 400 satır" der; T3'te sekiz PR +2.383 ile +5.103 satır arasındaydı (#75, #84, #86, #88, #94, #99, #108, #110). Kural ya gerçekçi hâle getirilmeli ya iş paketleri bölünmeli~~ — **Kapandı (15.10.2026):** üretilen dosyalar hariç 1.500 satırı aşan PR `Boyut gerekçesi:` yazar; CI denetler | Denetim MAN.8-5 → #216 (PR #232), `KR-111` |
+| 3 | ~~Matris §2.1 "kod yolu + PR" ister; T3 satırları çoğunlukla yalnızca PR numarası veriyor~~ — **Kapandı (15.10.2026):** kural fiilî uygulamaya göre değişti: "Gerçekleştirme" sütunu PR numarasını verir; kod ve test bağı, testlerin SYG kimliğini anmasıyla CI'da izlenir (#122). Kod yolu elle tutulsaydı her yeniden düzenlemede bayatlardı | Denetim TEC.7-6 → `KR-111`, #217 |
+| 4 | ~~PR şablonundaki örnek kimlik hâlâ `REQ-KIMLIK-07`; doğrusu `SYG-KMLK-nnn`~~ — **Kapandı (15.10.2026):** şablon `SYG-KMLK-0nn` | Denetim TEC.7-6 → #217 |
+| 5 | ~~Tamamlanma Tanımı iki yerde (CONTRIBUTING §6 ve PR şablonu) ayrı listeler olarak duruyor~~ — **Kapandı (15.10.2026):** tek kaynak PR şablonu; CONTRIBUTING §6 şablona atıf yapar | Denetim MAN.8-4 → `KR-111`, #217 |
 
 ---
 
@@ -162,3 +162,4 @@ değiştiren bir değişiklikte gözden geçirilir.
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
 | 2026-10-05 | 1.1 | §8 madde 1 kapandı: ADR-0016 (#171) | Bilgi İşlem |
 | 2026-10-14 | 1.2 | §2.3 ve §6 (c): etiket listesi `v0.2.0`'a kadar güncellendi (#214) | Bilgi İşlem |
+| 2026-10-15 | 1.3 | §4: matrisin "Gerçekleştirme" sütunu PR numarası, kod ve test bağı CI'da; §7: açık nokta 2–5 kapandı (`KR-111`, #217) | Bilgi İşlem |

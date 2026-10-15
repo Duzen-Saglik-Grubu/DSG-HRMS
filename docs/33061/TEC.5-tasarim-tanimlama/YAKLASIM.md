@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.5-YAK
 **Süreç:** TEC.5 — Tasarım Tanımlama
-**Son güncelleme:** 2026-10-05
+**Son güncelleme:** 2026-10-15
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir. Ayrıca `PA 2.1` için hedef, sorumluluk, kaynak ve arayüzler (§1, §3, §4).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -149,14 +149,14 @@ riskleri R-05 ve R-23 olarak izlenir.
 
 | 33061 çıktısı (TEC.5) | Karşılığı | Durum |
 |---|---|---|
-| a) Her öğenin tasarım özellikleri tanımlanır | ADR'ler, gerçekleştirme notları, `docs/mimari/` | Var; diyagram yok |
-| b) Gereksinimler öğelere dağıtılır | SYG §2.2 (öğe düzeyi), issue başlıklarındaki SYG aralıkları | Kısmen; SYG → öğe tablosu yok |
+| a) Her öğenin tasarım özellikleri tanımlanır | ADR'ler, gerçekleştirme notları, `docs/mimari/` | Var; diyagram yok (#234) |
+| b) Gereksinimler öğelere dağıtılır | SYG §2.2 (öğe düzeyi), issue başlıklarındaki SYG aralıkları | Kısmen; SYG → öğe tablosu yok (#234) |
 | c) Tasarımı mümkün kılan araç ve kararlar | ADR-0001, `docs/mimari/paket-envanteri.md`, `KR-084` | Var |
 | d) Öğeler arası arayüzler tanımlanır | OpenAPI + sözleşme denetimi; SYG §2.3 | Var |
 | e) Tasarım alternatifleri değerlendirilir | ADR "Değerlendirilen alternatifler"; `KR-` gerekçe sütunu | Var |
 | f) Tasarım ürünleri geliştirilir | ADR güncellemeleri, migration'lar, izin listesi | Var; kodla aynı PR'da |
 | g) Destekleyici sistemler mevcut | §4 | Var |
-| h) Tasarım ile mimari öğeler arasında izlenebilirlik | Matris "Tasarım" sütunu (REQ → ADR §) | Kısmen; SYG düzeyinde değil |
+| h) Tasarım ile mimari öğeler arasında izlenebilirlik | Matris "Tasarım" sütunu (REQ → ADR §) | Kısmen; SYG düzeyinde değil (#234) |
 
 ---
 
@@ -165,10 +165,10 @@ riskleri R-05 ve R-23 olarak izlenir.
 | No | Açık nokta | Bağlantı |
 |---|---|---|
 | 1 | ~~Modül yalıtım testi fiilen boş geçiyor~~ — **Kapandı (05.10.2026, #171):** test kodun gerçek düzenine uyarlandı; modüller arası bağımlılıklar gerekçeli bir tabloda bildiriliyor ve ölçülen kümeyle birebir karşılaştırılıyor (ADR-0016, `KR-100`) | ADR-0016 |
-| 2 | SYG → tasarım öğesi tahsis tablosu yok; matrisin "Tasarım" sütunu REQ düzeyinde | Denetim TEC.5-3 |
-| 3 | Tasarım gözden geçirme raporu hiç üretilmedi; tasarımı koddan bağımsız gözden geçiren adım yok | Denetim TEC.5-6 |
-| 4 | Depoda diyagram yok (hesap/oturum durumu, üyelik akışı); `docs/mimari/entegrasyon-arayuzleri.md` yok | Denetim TEC.5-5 |
-| 5 | `KR-093` (API'de HTTPS zorunluluğu) hiçbir ADR'de geçmiyor; T3'ün mimari nitelikli kararlarının ADR'ye alınıp alınmayacağı kararlaştırılmadı | Denetim TEC.5-4 |
+| 2 | SYG → tasarım öğesi tahsis tablosu yok; matrisin "Tasarım" sütunu REQ düzeyinde | Denetim TEC.5-3 → #234 (T4'ün ilk tasarım PR'ından önce) |
+| 3 | Tasarım gözden geçirme raporu hiç üretilmedi; tasarımı koddan bağımsız gözden geçiren adım yok | Denetim TEC.5-6 → #234 (T4'ün ilk tasarım PR'ından önce) |
+| 4 | Depoda diyagram yok (hesap/oturum durumu, üyelik akışı). ~~`docs/mimari/entegrasyon-arayuzleri.md` yok~~ — bu kısım **kapandı (15.10.2026):** ayrı belge yazılmaz; entegrasyon arayüzleri OpenAPI belgesi, SYG §2.3 ve TEC.8 entegrasyon raporundadır (doküman haritası, TEC.5 ve TEC.8) | Denetim TEC.5-5 → diyagramlar #234; belge kısmı `KR-111` |
+| 5 | ~~`KR-093` (API'de HTTPS zorunluluğu) hiçbir ADR'de geçmiyor; T3'ün mimari nitelikli kararlarının ADR'ye alınıp alınmayacağı kararlaştırılmadı~~ — **Kapandı (15.10.2026):** kural §2.3 (adım 2) ve §2.4'tedir; `KR-082` (ADR-0012 §7), `KR-086` (ADR-0006 §8) ve `KR-089` (ADR-0007 §1) gerçekleştirme notları zaten vardı; `KR-093` ADR-0010 §5'e gerçekleştirme notu olarak yazıldı | Denetim TEC.5-4 → `KR-111`, #217 |
 
 ---
 
@@ -183,3 +183,4 @@ geçirilir.
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
 | 2026-10-05 | 1.1 | §8 madde 1 kapandı: ADR-0016 (#171) | Bilgi İşlem |
+| 2026-10-15 | 1.2 | §7 ve §8: madde 2, 3 ve 4'ün diyagram kısmı #234'e bağlandı; madde 4'ün entegrasyon belgesi kısmı ve madde 5 kapandı (`KR-111`, #217) | Bilgi İşlem |

@@ -22,7 +22,7 @@ Closes #
 
 ## Neden?
 
-<!-- Değişikliğin gerekçesi. Gereksinim kimliği varsa yazın: REQ-KIMLIK-07 -->
+<!-- Değişikliğin gerekçesi. Gereksinim kimliği varsa yazın: SYG-KMLK-0nn -->
 
 ## Nasıl doğrulandı?
 
@@ -33,7 +33,10 @@ Closes #
 ## Tamamlanma Tanımı
 
 <!--
-  Uygulanmayan maddeyi isaretlemeyin; ustunu cizip gerekcesini ayni satira yazin:
+  TEK KAYNAK: Tamamlanma Tanimi yalnizca bu listedir; CONTRIBUTING §6 buraya atif yapar
+  (KR-111, #217). Liste ADR-0011 §2 ve §6'nin operasyonel karsiligidir.
+  Uygulanmayan maddeyi isaretlemeyin; ustunu cizip gerekcesini ayni satira yazin
+  ("Notlar" bolumune degil). Madde silinmez:
   - [ ] ~~Madde~~ — gerekce
   "Yetki sizintisi" ve "Maskeleme" maddeleri ATLANAMAZ: ya isaretlenir ya da ustu
   cizilip gerekcesi yazilir; CI denetler (CONTRIBUTING §6, #216).
@@ -43,27 +46,28 @@ Closes #
 - [ ] Kodlama standartlarına uygun — tanımlayıcılar İngilizce, yorumlar Türkçe; **betikler ve iş akışları dâhil** (CONTRIBUTING §3.2)
 - [ ] Birim testleri yazıldı; kapsam eşikleri sağlanıyor (genel %75, Domain %90)
 - [ ] Entegrasyon testleri yazıldı (Testcontainers — gerçek PostgreSQL)
-- [ ] **Yetki sızıntısı testi** yazıldı (kapsam dışı kayıt `404` dönüyor)
-- [ ] **Maskeleme testi** yazıldı (kişisel veri log'a düz metin düşmüyor)
+- [ ] **Yetki sızıntısı testi** yazıldı (kapsam dışı kayıt `404` dönüyor) — *atlanamaz*
+- [ ] **Maskeleme testi** yazıldı (kişisel veri log'a düz metin düşmüyor) — *atlanamaz*
 - [ ] Mimari testi geçiyor (katman ve modül sınırları korunuyor)
+- [ ] CI'daki tüm kalite kapıları geçti (ADR-0011 §6)
 
 **Güvenlik ve KVKK**
 - [ ] Yetki kontrolü veri katmanında uygulanıyor (ADR-0007 §3)
-- [ ] Denetim izi / erişim kaydı üretiliyor (ADR-0009)
-- [ ] Sır, bağlantı dizesi veya anahtar koda yazılmadı (ADR-0008)
+- [ ] Denetim izi ve gerekiyorsa erişim kaydı üretiliyor (ADR-0009)
+- [ ] Sır, bağlantı dizesi veya anahtar koda yazılmadı; `gitleaks` temiz (ADR-0008)
 - [ ] Hata mesajları iç ayrıntı sızdırmıyor (ADR-0010 §5)
 
 **Veri**
-- [ ] Migration yazıldı ve **geri alınabilir**
+- [ ] Veritabanı değişikliği varsa migration yazıldı ve **geri alınabilir**
 - [ ] Yıkıcı değişiklik çok adımlı uygulandı (ekle → doldur → geçiş → temizle)
 - [ ] Yabancı anahtar ve `CHECK` kısıtları tanımlı
 
 **Sözleşme ve arayüz**
-- [ ] OpenAPI güncel; frontend tipleri yeniden üretildi
+- [ ] API değişikliği varsa OpenAPI güncel; frontend tipleri yeniden üretildi
 - [ ] Listeleme uç noktaları sayfalanmış
 
 **Doküman**
-- [ ] İlgili dokümanlar güncellendi
+- [ ] İlgili dokümanlar güncellendi (doküman haritası dâhil)
 - [ ] Yeni mimari karar alındıysa **ADR yazıldı**
 - [ ] Karar kayıt defteri güncellendi (gerekiyorsa)
 - [ ] **İzlenebilirlik matrisi** güncellendi — gereksinim, tasarım, kod veya test
@@ -77,6 +81,9 @@ Closes #
 - [ ] PR'da `tur:` ve `surec:` etiketleri var; kapatılan issue'da `tur:` etiketi var (CI denetler)
 - [ ] Üretilen dosyalar hariç 1.500 satırı aşıyorsa **Boyut gerekçesi:** yazıldı (CI denetler)
 
+**İnceleme**
+- [ ] Onay yorumu birleştirmeden önce PR'a yazılır — inceleyen yazar (`KR-096`; CI `main`'de denetler)
+
 ---
 
 ## 33061 izlenebilirliği
@@ -84,10 +91,11 @@ Closes #
 | Alan | Değer |
 |---|---|
 | İlgili süreç(ler) | <!-- TEC.7, TEC.9 … --> |
-| Gereksinim kimliği | <!-- REQ-... veya "yok" --> |
+| Gereksinim kimliği | <!-- SYG-KMLK-0nn veya "yok" --> |
 | Modül | <!-- kimlik / izin / organizasyon … --> |
 
 ## Notlar
 
-<!-- İnceleyenin bilmesi gereken her şey: bilinçli ödünler, atlanan maddelerin
-     gerekçesi, sonraki adımlar, dikkat edilmesi gereken noktalar. -->
+<!-- İnceleyenin bilmesi gereken her şey: bilinçli ödünler, sonraki adımlar, dikkat
+     edilmesi gereken noktalar. Atlanan maddenin gerekçesi burada değil, maddenin
+     kendi satırında yazılır. -->

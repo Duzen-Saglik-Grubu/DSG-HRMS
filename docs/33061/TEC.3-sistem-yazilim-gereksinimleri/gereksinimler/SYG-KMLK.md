@@ -4,8 +4,9 @@
 **Süreç:** TEC.3 — Sistem/Yazılım Gereksinimlerinin Tanımlanması
 **Modül:** T3 Kimlik Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-KMLK.md` (23.09.2026'da İK onaylı, 56 gereksinim)
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-10-15
 **Sahibi:** Bilgi İşlem
+**Onay durumu:** Bilgi İşlem (RACI TEC.3 A); baseline `v0.2.0` (13.10.2026, `KR-105`); değişiklikler PR onayıyla (`KR-096`). İlk sürüm (PR #65) onay yorumu kuralından önce birleşti; onayı geriye dönük onay kaydındadır (MAN.8 `kayitlar/2026-10-04-pr-onay-kaydi.md`).
 
 > **Paydaş gereksinimi *ne* istendiğini söyler; bu belge sistemin bunu *hangi
 > davranışla* karşılayacağını söyler.** Her madde doğrulanabilir, tek anlamlıdır ve en
@@ -476,3 +477,4 @@ madde `İptal` notuyla kalır.
 | 2026-10-14 | 1.6 | SYG-KMLK-057: kendi hesabı ve son Sistem Yöneticisi kuralı; AN-26 (#138'den türetilmiş davranış, #211) | Bilgi İşlem |
 | 2026-10-14 | 1.7 | §1 özet sayımları §4'ten yeniden sayıldı: İşlevsel 46 → 48, Test 71 → 73, parametreye bağlı 31 → 32 (SYG-KMLK-080 ve 081 sayılmamıştı); sayımlar artık CI'da denetlenir (`doc-consistency-check.mjs`, #214) | Bilgi İşlem |
 | 2026-10-14 | 1.8 | AN-16: KVKK saklama süresi kararı, 10 yıl (`KR-109`, #215) | Bilgi İşlem |
+| 2026-10-15 | 1.9 | Başlığa onay durumu satırı: onaylayan Bilgi İşlem, baseline `v0.2.0`, değişiklik PR onayıyla (TEC.3 YAKLAŞIM §4, `KR-111`, #217) | Bilgi İşlem |
