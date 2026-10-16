@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.11-YAK
 **Süreç:** TEC.11 — Geçerleme
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-10-15
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -34,12 +34,23 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
    - katılımcılar, ortam ve sürüm;
    - giriş ölçütleri ve kabul ölçütü.
 
-   İK planı gözden geçirir ve takvimi belirler.
+   Plan İK'ya sunulmadan önce Bilgi İşlem **her senaryoyu ekranda bir kez dener** ve her
+   beklenen sonucu onaylı gereksinimin kabul ölçütüyle karşılaştırır. T3'te plan metninden
+   yazılan iki adım ekranda uygulanamadı, bir beklenen sonuç gereksinimle çelişti (#196; alınan
+   dersler D-03). İK planı gözden geçirir ve takvimi belirler.
+1a. **Ön deneme (ilk kabul adayından önce):** G2'den sonra İK, UAT'de sistemi serbestçe dener;
+   Bilgi İşlem kabul senaryolarını prova eder. İlk kabul adayı bunlardan **sonra** etiketlenir.
+   T3'te bu denemeler adaylar etiketlendikten sonra yapıldı ve beş aday çıktı: bir hata
+   düzeltmesi (rc.2), iki değişiklik talebi (rc.3, rc.4) ve bir prova bulgusu (rc.5) (D-01).
 2. **Giriş ölçütleri kontrol edilir:**
    - G2 geçti;
    - kabul adayı sürüm etiketlendi ve UAT'ye bu etiketten kuruldu;
-   - katılımcıların e-posta ve telefonları UAT izin listesine eklendi;
-   - katılımcılara kısa kullanım notu verildi.
+   - katılımcılar İK tarafından belirlendi (§2.1); listede olmayanların e-posta ve
+     telefonları UAT izin listesine eklendi (önceki kabullerin katılımcıları listede kalır, `KR-106`);
+   - katılımcılara kısa kullanım notu verildi;
+   - doldurulmuş kabul formunun depoya alınma yolu hazır: Markdown kaydı ve üst verisi
+     temizlenmiş Word kopyası `kayitlar/` altında (`KR-107`; T3'te saklama yeri kabulden önce
+     belirlenmemişti, D-06).
 3. **Kabul oturumu (`BP2`):**
    - Katılımcılar senaryoları UAT'de kendileri uygular; Bilgi İşlem gözlemler ve yönlendirmez.
    - Kullanıcı arayüz ve teknik doğrulama gerektiren gereksinimler için Bilgi İşlem kanıtı gösterir (**kanıt gösterimi**). İK bu kanıtı inceler.
@@ -50,6 +61,24 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 5. **Karar (G3):** İK, kabul ölçütüne göre kararını kabul formuna yazar: kabul, koşullu kabul veya ret. Form, sürüm etiketini taşır. Form oturumda doldurulur ve depoya alınır; ıslak imza kalite belgeleriyle birlikte proje sonunda toplanır (`KR-107`; T3: `KR-105` (4)).
 6. **Kabul raporu:** Bilgi İşlem kabul raporunu yazar; izlenebilirlik matrisinin "Kabul" sütununu doldurur.
 
+### 2.1 Katılımcı seçimi (#219)
+
+**Katılımcıları İK seçer** (Doğuş Uçanok'un kararı, 15.10.2026, #219). Sabit bir oran veya birim
+kuralı yoktur, çünkü modülün ekranları farklı kullanıcılara hitap eder:
+
+- **Yalnızca İK'nın kullanacağı ekranlar** İK kullanıcılarıyla denenir; İK dışından personel
+  bu senaryolara katılmaz.
+- **Personelin kullanacağı ekranlar** için İK, gerektiğinde Bilgi İşlem dışındaki birimlerden
+  personeli de katılımcı yapar (`KR-048`).
+- Kabul planı her senaryonun kimin ekranı olduğunu ve istenen katılımcı özelliklerini yazar (örn.
+  T3'te: hesabı olmayan, cep telefonu kayıtlı olan ve olmayan personel); İK seçimini buna göre
+  yapar.
+- Bilgi İşlem seçimi kabul raporuna yazar.
+
+> T3'te personel katılımcıların dördü de Bilgi İşlem'dendi (kabul raporu §2; alınan dersler
+> D-08). Değerlendirme: oran kuralı İK'ya özgü ekranlarda uygun değil; seçim İK'ya bırakılır,
+> kabul planı her senaryonun kullanıcısını açıkça belirtir.
+
 ---
 
 ## 3. Geçerleme yöntemleri (`BP1.4`)
@@ -58,6 +87,14 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 |---|---|---|---|
 | **Senaryo** | Kullanıcının ekranda gördüğü davranış | İK ve katılımcı personel | Senaryo sonucu (form) |
 | **Kanıt gösterimi** | Kullanıcı arayüzünden gözlenemeyen davranış: veritabanında özet saklama, günlükte maskeleme, hız sınırları, LOGO senkronizasyonu | Bilgi İşlem gösterir, İK inceler | Doğrulama raporu satırı, test veya ölçüm |
+
+**Kanıt gösterimi kuralı (#219):** Ekranda gözlenebilen bir davranış kanıt gösterimiyle kabul
+edilmez; senaryoyla denenir. Bir gereksinimin işlevi başka bir modülle gelecekse (örn.
+REQ-KMLK-042 bildirim istisnası → Y1; REQ-KMLK-054 video → Eğitim Yönetimi) gereksinim
+bugünkü davranışın kanıt gösterimiyle kabul edilebilir; izlenebilirlik matrisine "ilgili
+modülün kabulünde senaryo olarak yeniden denenir" notu düşülür. T3'te 56 gereksinimin 15'i
+yalnızca kanıt gösterimiyle kabul edildi (T3 modül sonu denetimi YB-05); kabul planı, kanıt
+gösterimine bırakılan her gereksinimin neden ekrandan denenemediğini yazar.
 | **Gözlem** | Kullanım kolaylığı | Bilgi İşlem gözlemler | Gözlem notları |
 
 ---
@@ -75,7 +112,7 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 | Sistem | Durum |
 |---|---|
 | UAT ortamı (gerçek LOGO verisiyle) | Var (TEC.10 runbook) |
-| UAT izin listesi: yalnızca listedeki adreslere e-posta ve SMS gider (`KR-083`) | Var; katılımcılar her kabulde eklenir |
+| UAT izin listesi: yalnızca listedeki adreslere e-posta ve SMS gider (`KR-083`) | Var. Yeni katılımcılar eklenir; önceki kabullerin katılımcıları listede kalır (`KR-106`). Saklama koşulu KVKK Sorumlusu tarafından onaylandı (BK-22, `KR-109`) |
 | Etiketli sürüm ve dağıtım kaydı | Var (#125): UAT'ye yalnızca etiketten `deploy-uat.sh` ile kurulur; kayıt `TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`. T3 kabulü `v0.2.0-rc.5` kurulumunda yapıldı |
 | Kabul formu şablonu | `docs/sablonlar/kabul-formu.md` |
 
@@ -117,3 +154,4 @@ Geçerleme, doğrulama bittikten sonra başlar: **G2 kapısı** geçilmeden kabu
 | 2026-10-04 | 1.1 | §6: katılımcı notu eklendi (#154) | Bilgi İşlem |
 | 2026-10-14 | 1.2 | §6: kabul formu kopyası depoda; imzalı nüsha proje sonunda (`KR-107`, #213) | Bilgi İşlem |
 | 2026-10-14 | 1.3 | T3 modül sonu gözden geçirmesi: §2 adım 5 imza zamanı (`KR-107`); §5 etiketli sürüm ve dağıtım kaydı kuruldu (#125); §7 (g) (#214) | Bilgi İşlem |
+| 2026-10-15 | 1.4 | §2: senaryoların ekranda denenmesi, ön deneme (1a), giriş ölçütleri; §2.1 katılımcı seçimi İK'nın (oran kuralı yok); §3 kanıt gösterimi kuralı; §5 izin listesi (#219) | Bilgi İşlem |

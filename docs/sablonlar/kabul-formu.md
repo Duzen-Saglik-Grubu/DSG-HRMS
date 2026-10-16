@@ -22,15 +22,18 @@
 | Personel 1 | | |
 | Personel 2 | | |
 | Personel 3 | | |
+
+> Katılımcıları İK seçer; İK'ya özgü ekranlar İK kullanıcılarıyla, personel ekranları
+> gerektiğinde farklı birimlerden personelle denenir (TEC.11 YAKLAŞIM §2.1).
 | Sistem yöneticisi | | Bilgi İşlem |
 
 ## 2. Senaryo sonuçları
 
-| Senaryo | Sonuç (Geçti / Geçmedi / Koşullu) | Not / issue |
-|---|---|---|
-| KS-01 | | |
-| KS-02 | | |
-| … | | |
+| Senaryo | Sonuç (Geçti / Geçmedi / Koşullu) | Gözlem (takılma, soru, yardım istendi mi) | Not / issue |
+|---|---|---|---|
+| KS-01 | | | |
+| KS-02 | | | |
+| … | | | |
 
 ## 3. Kanıt gösterimi
 
