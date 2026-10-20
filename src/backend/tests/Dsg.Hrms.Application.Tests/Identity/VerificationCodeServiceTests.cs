@@ -325,11 +325,17 @@ public sealed class VerificationCodeServiceTests
         public string Hash(Guid codeId, string code)
         {
             LastCode = code;
-            return $"h:{codeId:N}:{new string(code.Reverse().ToArray())}";
+            return Encode(codeId, code);
         }
 
         public bool Matches(Guid codeId, string code, string storedHash) =>
-            storedHash == $"h:{codeId:N}:{new string(code.Reverse().ToArray())}";
+            storedHash == Encode(codeId, code);
+
+        // Sahte ozet hic rakam icermez: her rakam onaltilik disi bir harfe (g-p) cevrilir.
+        // Onceki surum kodu ters ceviriyordu; palindrom kodda (or. 306603) ozet kodu
+        // iceriyordu ve "ozet kodu icermez" denetimi binde bir dustu (#242).
+        private static string Encode(Guid codeId, string code) =>
+            "h:" + new string($"{codeId:N}:{code}".Select(c => char.IsAsciiDigit(c) ? (char)('g' + (c - '0')) : c).ToArray());
     }
 
     private sealed class InMemoryStore : IVerificationCodeStore
