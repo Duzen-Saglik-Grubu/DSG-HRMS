@@ -348,6 +348,17 @@ raporunda ayrıca ele alınır.
 | **Önlem** | (1) **Uygulandı (13.10.2026, #207):** UAT'deki eski sır kopyası karşılaştırıldı ve silindi; döndürme gerekmedi (R-25 önlem 7). (2) Kayıt dışı kümeler bilgi kayıt defterine eklenir; `src_old/` için imha ve parola kararı verilir (#215). (3) Her modül sonu denetiminde bilgi kayıt defteri depo dışı konumlarla karşılaştırılır (`KR-101`). |
 | **Durum** | Açık |
 
+### R-31 — Denetim kayıtlarının değiştirilemezliğinin veritabanı süper kullanıcısına karşı korunmaması
+| | |
+|---|---|
+| **Kategori** | KVKK / Güvenlik |
+| **Açıklama** | Denetim izi, erişim kaydı ve güvenlik olaylarının değiştirilemezliği (`KR-060`, `KR-094`) veritabanı tetikleyicisine dayanıyor. Uygulama UAT'de veritabanına süper kullanıcıyla bağlanıyor (`docker/compose.uat.yml`). Süper kullanıcı tetikleyiciyi kapatabilir veya silebilir; uygulamayı ele geçiren biri veya hatalı bir migration kayıtları değiştirebilir. Kan grubu işleme koşulu 3 ("erişim kayıtları değiştirilemez", `KR-116`) bu yüzden bugün tam sağlanmıyor. Kaynak: tasarım gözden geçirmesi B-01 (20.10.2026) |
+| **O / E / Puan** | 2 / 3 / **6** |
+| **Puan gerekçesi** | **Olasılık 2:** İstismar için uygulamanın veya veritabanı bağlantı bilgisinin ele geçirilmesi gerekir; sistem yalnızca kurum içinden erişilebilir (`KR-067`). **Etki 3:** KVKK kayıtlarının bütünlüğü kaybolur; "kim, kimin verisini gördü" sorusu güvenilir biçimde cevaplanamaz |
+| **Sahibi** | Bilgi İşlem |
+| **Önlem** | (1) Migration rolü ile çalışma rolü ayrılır; çalışma rolü tabloların sahibi olmaz, `audit` şemasında yalnızca INSERT ve SELECT yetkisi taşır; rolün süper kullanıcı olmadığını bir test doğrular (#244). (2) Kan grubu T1'de senkronize edilmeden önce önlem 1 tamamlanır. (3) Üretim veritabanı aynı rol ayrımıyla kurulur |
+| **Durum** | Açık |
+
 ---
 
 ## 3. Risk özeti
@@ -355,14 +366,14 @@ raporunda ayrıca ele alınır.
 | Puan | Risk sayısı | Riskler |
 |---|---:|---|
 | 9 | 1 | R-18 |
-| 6 | 9 | R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-25, R-30 |
+| 6 | 10 | R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-25, R-30, R-31 |
 | 4 | 6 | R-08, R-14, R-16, R-23, R-24, R-28 |
 | 3 | 3 | R-02, R-20, R-29 |
 | 2 | 5 | R-19, R-21, R-22, R-26, R-27 |
 | Kapandı | 6 | R-07, R-10, R-11, R-12, R-13, R-17 |
-| **Toplam** | **30** | Açık 10 · İzleniyor 11 · Kabul edildi 3 · Kapandı 6 |
+| **Toplam** | **31** | Açık 11 · İzleniyor 11 · Kabul edildi 3 · Kapandı 6 |
 
-**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-18, R-25, R-30
+**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-18, R-25, R-30, R-31
 
 **Kabul edilen riskler:** R-25 (Üst Yönetim, 09.10.2026, puan 6; `KR-103`), R-16 (Bilgi İşlem, puan 4; `KR-055`), R-19 (Bilgi İşlem, puan 2; `KR-078`). İkisinin de puanı 6'nın altında olduğu için kabul yetkisi Bilgi İşlem'dedir. 04.10.2026'daki özet R-16 için yanlışlıkla "Üst Yönetim kararı" yazıyordu (#177).
 
@@ -404,3 +415,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-14 | 1.8 | R-29: dördüncü olay (Pkcs, #223) ve önlem 4 | Bilgi İşlem |
 | 2026-10-20 | 1.9 | R-29: beşinci olay (`follow-redirects`, #250) | Bilgi İşlem |
 | 2026-10-21 | 1.10 | R-29: altıncı olay (`vite`, #255) | Bilgi İşlem |
+| 2026-10-21 | 1.11 | R-31 eklendi: denetim kayıtlarının değiştirilemezliği süper kullanıcıya karşı korunmuyor (tasarım gözden geçirmesi B-01, #234, #244) | Bilgi İşlem |

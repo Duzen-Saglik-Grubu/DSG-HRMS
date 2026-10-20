@@ -228,7 +228,7 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 5 | `PG-PERS-05` Yetkili kullanıcı "şimdi senkronize et" diyerek elle tetikleyebilir; periyodu… | — | — | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
 | 6 | `PG-PERS-06` Her senkronizasyon bir çalışma kaydı üretir: okunan, eklenen, güncellenen ve uyarı… | — | — | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
 | 7 | `PG-PERS-07` Personel listesi ve kartında "son senkronizasyon" zamanı görünür. | — | — | — | — | — |
-| 8 | `PG-PERS-08` LOGO şemasındaki beklenmeyen değişiklikler (şema sapması) günlük olarak denetlenir… | — | — | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
+| 8 | `PG-PERS-08` LOGO şemasındaki beklenmeyen değişiklikler (şema sapması) günlük olarak denetlenir… | — | — | T3'te kısmen karşılandı: denetim var, bildirim Y1'e bırakıldı (SYG-KMLK-010) | — | — |
 | 9 | `PG-PERS-09` Aynı TCKN'ye sahip farklı sicil kayıtları TEK kişi olarak gösterilir; her sicil ayrı… | — | — | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
 | 10 | `PG-PERS-10` TCKN'si olmayan LOGO kartı kişi olarak oluşturulmaz; uyarı listesine alınır. | — | — | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
 | 11 | `PG-PERS-11` Kişinin birden fazla sicili varsa kart detayında sekmeli (tab) gösterim kullanılır;… | — | — | — | — | — |
@@ -310,3 +310,4 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 2026-10-15 | 2.15 | §5: REQ-KMLK-042 Kabul hücresine Y1 notu (#219) | Bilgi İşlem |
 | 2026-10-20 | 2.16 | §7: T1 satırları açıldı — 19.10.2026 İK toplantısında onaylanan 44 gereksinim (#239) | Bilgi İşlem |
 | 2026-10-20 | 2.17 | §7: PG-PERS-45 satırı (saklama süresi parametresi, #241) | Bilgi İşlem |
+| 2026-10-20 | 2.18 | §7: PG-PERS-08 satırı "T3'te kısmen karşılandı" (#234) | Bilgi İşlem |

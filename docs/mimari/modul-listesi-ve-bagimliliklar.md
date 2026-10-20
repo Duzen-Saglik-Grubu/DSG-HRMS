@@ -118,6 +118,13 @@ altyapıyı kullanır.
 
 ## 4. Bağımlılık haritası
 
+> **Koddaki bağımlılıkların tek kaynağı (TEC.5-8, #234):** Bu bölüm modüllerin **iş ve teslim
+> sırası** bağımlılığını gösterir. Koddaki modüller arası bağımlılıklar burada tutulmaz.
+> Onların tek kaynağı mimari testindeki `LayerDependencyTests.AllowedModuleDependencies`
+> tablosudur: her bağımlılık gerekçesiyle orada bildirilir ve ölçülen kümeyle birebir
+> karşılaştırılır (ADR-0016, `KR-100`). Bir modül kodda yeni bir modüle bağlanırsa bu
+> belge değil, o tablo güncellenir.
+
 ```
                          ┌──────────────────────────┐
    TEMEL (sırayla)       │ T1 Personel Yönetimi     │  ← LOGO senkronizasyonu
@@ -465,3 +472,4 @@ Kapsam büyüklüğünün getirdiği süre riski `R-15` olarak kayıt altına al
 | 2026-09-09 | 0.3 | §7 Bildirim istisnası eklendi (mimari yerleşim, doğrulama kodu etkileşimi, İK soruları) | Bilgi İşlem |
 | 2026-09-09 | 0.4 | §7.4 İK cevapları ve §7.5 kesinleşen kurallar eklendi; A8 kapandı | Bilgi İşlem |
 | 2026-10-20 | 0.5 | T1 ve Y3 satırları: Y3 referans veri çekirdeği T1'de kurulur (`KR-115`, #241) | Bilgi İşlem |
+| 2026-10-20 | 0.6 | §4: koddaki bağımlılıkların tek kaynağı ADR-0016 ve `AllowedModuleDependencies` (TEC.5-8, #234) | Bilgi İşlem |

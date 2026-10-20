@@ -81,10 +81,10 @@ Aşağıdaki tablolarda "33061 Süreç Çıktısı" sütunu, standardın Madde 5
 | 33061 Süreç Çıktısı | Bizdeki karşılığı |
 |---|---|
 | Yaklaşım | `YAKLASIM.md` |
-| Tasarım modeli | ADR'ler (veri modeli ADR-0005) ve `docs/mimari/` (modül listesi, paket envanteri, izin listesi). Diyagram yok (YAKLASIM §8 açık nokta 4; #234) |
+| Tasarım modeli | ADR'ler (veri modeli ADR-0005) ve `docs/mimari/` (modül listesi, paket envanteri, izin listesi, `kimlik-tasarim-diyagramlari.md`); öğeler ve SYG → öğe tahsisi `SYG-<MODÜL>.md` §2.2 ve §2.5 |
 | Tasarım gerekçesi (Design rationale) | `docs/adr/` — Mimari Karar Kayıtları |
 | Arayüz tanımı (Interface definition) | `docs/api/openapi-v1.json` (OpenAPI sözleşmesi) + `SYG-<MODÜL>.md` §2.3 dış arayüzler |
-| Tasarım değerlendirme raporu | `raporlar/YYYY-AA-GG-tasarim-gozden-gecirme.md` (henüz yazılmadı) |
+| Tasarım değerlendirme raporu | `raporlar/YYYY-AA-GG-tasarim-gozden-gecirme.md` (ilki `2026-10-20`; YAKLASIM §2.5) |
 | İzlenebilirlik eşlemesi | `docs/33061/izlenebilirlik-matrisi.md` |
 
 #### TEC.7 — Gerçekleştirme (Implementation)
@@ -249,6 +249,7 @@ Bazı kanıtlar birden fazla sürece hizmet eder. Tek kopya tutulur:
 | GitHub Projects panosu | GitHub | MAN.1, MAN.2 |
 | Mevcut sistem ve süreç analizleri | `docs/analiz/` | TEC.2, TEC.10 |
 | Modül listesi ve bağımlılık haritası | `docs/mimari/modul-listesi-ve-bagimliliklar.md` | TEC.2, TEC.5, MAN.1 |
+| Tasarım diyagramları | `docs/mimari/kimlik-tasarim-diyagramlari.md` | TEC.5 |
 | Vizyon ve kapsam belgesi | `docs/mimari/vizyon-ve-kapsam.md` | TEC.2 |
 | Paket envanteri ve izin listesi | `docs/mimari/paket-envanteri.md`, `docs/mimari/izin-listesi.md` | TEC.5, TEC.7, MAN.5 |
 | API sözleşmesi | `docs/api/openapi-v1.json` | TEC.5, TEC.8, TEC.9 |
@@ -282,3 +283,4 @@ Bazı kanıtlar birden fazla sürece hizmet eder. Tek kopya tutulur:
 | 2026-10-15 | 0.6 | TEC.10: sürüm kontrol listesi eklendi (#218) | Bilgi İşlem |
 | 2026-10-15 | 0.7 | MAN.8: DoD'nin tek kaynağı PR şablonu; kalite güvence ölçütleri K1–K6 ve T3 başlangıç kaydı; ayrı kalite raporu yok. TEC.5: diyagram notu YAKLASIM §8 ve #234'e bağlandı (`KR-111`, #217) | Bilgi İşlem |
 | 2026-10-20 | 0.8 | TEC.2: T1 toplantı kaydı ve `PG-PERS.md` (#239) | Bilgi İşlem |
+| 2026-10-20 | 0.9 | TEC.5: tasarım gözden geçirme raporu, kimlik tasarım diyagramları, SYG §2.5 tahsis (#234) | Bilgi İşlem |

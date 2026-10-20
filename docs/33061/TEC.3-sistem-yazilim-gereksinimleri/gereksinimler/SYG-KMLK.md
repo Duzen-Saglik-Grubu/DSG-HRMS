@@ -4,7 +4,7 @@
 **Süreç:** TEC.3 — Sistem/Yazılım Gereksinimlerinin Tanımlanması
 **Modül:** T3 Kimlik Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-KMLK.md` (23.09.2026'da İK onaylı, 56 gereksinim)
-**Son güncelleme:** 2026-10-15
+**Son güncelleme:** 2026-10-20
 **Sahibi:** Bilgi İşlem
 **Onay durumu:** Bilgi İşlem (RACI TEC.3 A); baseline `v0.2.0` (13.10.2026, `KR-105`); değişiklikler PR onayıyla (`KR-096`). İlk sürüm (PR #65) onay yorumu kuralından önce birleşti; onayı geriye dönük onay kaydındadır (MAN.8 `kayitlar/2026-10-04-pr-onay-kaydi.md`).
 
@@ -56,16 +56,24 @@ Sonraki tüm modüller bu altyapının üzerinde çalışır.
 
 ### 2.2 Öğeler
 
-| Öğe | Ne yapar | Konum (ADR-0002, ADR-0015) |
-|---|---|---|
-| Kimlik ekranları | Giriş, üyelik, kod doğrulama, parola, İK hesap işlemleri, parametre | `src/frontend/dsg-hrms-web/src/features/identity/` |
-| Kimlik API'si | Üyelik, oturum, parola, davet, hesap işlemleri, senkronizasyon tetikleme | `Dsg.Hrms.Api` — `/api/v1/identity/` (AN-21) |
-| Kimlik uygulama hizmetleri | İş kuralları: eşleştirme, kanal seçimi, kod, oturum, kilit, parola politikası | `Dsg.Hrms.Application` |
-| Kişi / istihdam modeli | Kişi (TCKN tekil) ve istihdam (sicil tekil) kayıtları — `KR-077` sınırında | `Dsg.Hrms.Domain` |
-| LOGO senkronizasyon işi | Periyodik ve elle tetiklenen salt-okunur aktarım | `Dsg.Hrms.Infrastructure` (arka plan hizmeti) |
-| İleti kuyruğu | Doğrulama kodu, sıfırlama ve davet iletilerinin arka planda gönderimi | `Dsg.Hrms.Infrastructure` |
-| Parametre deposu | T3 parametrelerinin değeri, türü, aralığı | PostgreSQL |
-| Denetim izi | Mevcut altyapı (ADR-0009) — kimlik olayları eklenir | PostgreSQL `audit` şeması |
+Öğe tablosu 20.10.2026'da tasarım gözden geçirmesiyle genişletildi (#234): dört öğe
+eklendi, konumlar katmanlara göre yazıldı ve her öğenin karşıladığı SYG'ler eklendi. Bir
+SYG birden çok öğeye dağılabilir. Madde madde tahsis §2.5'tedir.
+
+| Öğe | Ne yapar | Konum (ADR-0002, ADR-0015) | Karşıladığı SYG-KMLK |
+|---|---|---|---|
+| Kimlik ekranları | Giriş, üyelik, kod doğrulama, parola, İK hesap işlemleri, parametre | `src/frontend/dsg-hrms-web/src/features/identity/`; ayrıca `features/system/`, `shared/auth/` (oturum yönetimi), `app/` (oturum koruması), `shared/utils/nationalId.ts`, `shared/branding.ts` | 013–014, 016–020, 023–024, 028, 031–032, 034–035, 037–039, 042–048, 050–053, 055, 057, 064–070, 073, 076, 080–081 |
+| Kimlik API'si | Üyelik, oturum, parola, davet, hesap işlemleri, senkronizasyon tetikleme | `Dsg.Hrms.Api/Identity` — `/api/v1/identity/` (AN-21) | 010, 013–015, 018–020, 028, 031–032, 034–035, 037–040, 042–044, 046–048, 050–051, 053, 055, 057, 059, 063–064, 069–077, 080–081 |
+| Kimlik uygulama hizmetleri | İş kuralları: eşleştirme, kanal seçimi, kod, oturum, kilit, parola politikası | `Dsg.Hrms.Application/Identity` | 008, 011, 013, 015–028, 030–061, 073–074, 077, 080–081 |
+| Kimlik alan modeli ve depoları | Hesap, oturum, kod, davet, üyelik denemesi; veritabanı erişimi, kod ve parola özetleme | `Dsg.Hrms.Domain/Identity`, `Dsg.Hrms.Infrastructure/Identity` | 008, 019, 021–025, 027, 033, 035, 037–041, 045–046, 049–050, 052–056, 058–059, 073–074, 077 |
+| Eylem yetkisi altyapısı | Rol, izin ve izin denetimi (`KR-089`) | `Dsg.Hrms.Application/Identity/Authorization`, `Dsg.Hrms.Api/Identity/PermissionAuthorization.cs`; `identity.role`, `identity.permission` tabloları | 074 |
+| Kişi / istihdam modeli | Kişi (TCKN tekil) ve istihdam (sicil tekil) kayıtları — `KR-077` sınırında | `Dsg.Hrms.Domain/Personnel` | 001, 005, 007–009, 013–014 |
+| LOGO senkronizasyon işi | Periyodik ve elle tetiklenen salt-okunur aktarım | `Dsg.Hrms.Application/Personnel/Sync` (iş kuralları), `Dsg.Hrms.Infrastructure/Personnel` (arka plan hizmeti), `Dsg.Hrms.Infrastructure/Logo` | 002–012, 054, 056, 072, 078 |
+| İleti kuyruğu | Doğrulama kodu, sıfırlama ve davet iletilerinin arka planda gönderimi | `Dsg.Hrms.Infrastructure/Notifications` | 015, 026, 029–030, 051, 062, 079 |
+| Parametre deposu | T3 parametrelerinin değeri, türü, aralığı | PostgreSQL `system_parameter`; `Dsg.Hrms.Application/Settings`, `Dsg.Hrms.Infrastructure/Settings` | 004, 010, 017, 019, 022–024, 028–030, 033–035, 037–038, 041, 044, 046–047, 050–052, 054, 059, 062, 069–070, 073, 075–076, 078, 080 |
+| Sistem API'si | Parametre ekranı ve kurumsal logo uçları | `Dsg.Hrms.Api/Settings` — `/api/v1/system/` | 035, 069, 075–076 |
+| Denetim izi | Mevcut altyapı (ADR-0009) — kimlik olayları eklenir | PostgreSQL `audit` şeması; `Dsg.Hrms.Infrastructure/Audit` | 026, 033, 040, 042, 053, 057–060, 075, 080–081 |
+| Çapraz kesen altyapı (A1) | Günlükte maskeleme, HTTPS ve güvenilen vekil, sağlık ucu, hata yanıtı, OpenAPI | `Dsg.Hrms.Infrastructure/Logging`, `Dsg.Hrms.Api/Networking`, `Dsg.Hrms.Api/Health` (`/health/sync`), `Dsg.Hrms.Api/ErrorHandling`, `Dsg.Hrms.Api/OpenApi` | 010, 059, 061, 063, 071 |
 
 ### 2.3 Dış arayüzler
 
@@ -101,6 +109,107 @@ işlemleri ekranı (SYG-KMLK-073).
 > her biri yalnızca T3'ün ihtiyacı kadar kurulur ve sahibi olan modül bunu
 > **genişletir, yeniden yazmaz.**
 
+### 2.5 SYG → öğe tahsisi (TEC.5 çıktısı b)
+
+Her sistem gereksiniminin hangi öğe(ler)de ve hangi ana bileşende karşılandığı. Tablo
+20.10.2026'da koddan çıkarıldı (kod araması ve kod yorumlarındaki `SYG-KMLK-nnn` atıfları;
+tasarım gözden geçirme raporu `TEC.5-tasarim-tanimlama/raporlar/2026-10-20-tasarim-gozden-gecirme.md`).
+Kodun yeri değiştiğinde tablo aynı PR'da güncellenir. ADR sütunu izlenebilirlik matrisinin
+"Tasarım" sütunundan gelir; 2FA satırlarına ADR-0017, yetki satırına ADR-0007 eklendi (matris
+düzeltmesi #246).
+
+**Öğe kısaltmaları:** `E` Ekran · `P` API · `U` Uygulama · `M` Alan modeli · `K` Kişi/istihdam · `L` LOGO senk. · `I` İleti · `R` Parametre · `D` Denetim · `Y` Yetki · `S` Sistem API · `X` Altyapı.
+**Yol kısaltmaları:** `Api/`, `App/`, `Dom/`, `Inf/` = `src/backend/Dsg.Hrms.{Api,Application,Domain,Infrastructure}/`;
+`F/` = `src/frontend/dsg-hrms-web/src/`; `FI/` = `F/features/identity/`.
+
+| SYG | Öğe | Ana bileşen | ADR |
+|---|---|---|---|
+| SYG-KMLK-001 | `K` | `Dom/Personnel/Person.cs`, `Employment.cs` | 0003; 0005 §1–2; 0006 §1 |
+| SYG-KMLK-002 | `L` | `App/Personnel/Sync/ILogoPersonnelSource.cs`, `Inf/Logo/LogoDbContext.cs` | 0003; 0006 §1 |
+| SYG-KMLK-003 | `L` | `docker/logo/read-only-login.sql` (kod dışı); `LogoReadOnlyAccessTests` | 0003; 0006 §1 |
+| SYG-KMLK-004 | `L` `R` | `Inf/Personnel/PersonnelSyncWorker.cs`, `App/Personnel/Sync/PersonnelSynchronizer.cs`, `PersonnelSyncService.cs` | 0003 §4; 0006 |
+| SYG-KMLK-005 | `L` `K` | `Dom/Personnel/Sync/PersonnelSyncRun.cs`, `PersonnelSyncService.cs` | 0003 §4; 0009 §3.1 |
+| SYG-KMLK-006 | `L` | `Inf/Logo/LogoPersonnelSource.cs` | 0003 §4; 0005 §1; 0006 §1 |
+| SYG-KMLK-007 | `L` `K` | `Dom/Personnel/NationalId.cs`, `Dom/Personnel/Sync/PersonnelSyncWarning.cs` | 0003 §5 |
+| SYG-KMLK-008 | `L` `K` `U` `M` | `Dom/Personnel/ContactNormalizer.cs`, `Person.cs`, `Inf/Identity/SessionStore.cs` | 0003 §5; 0006 §8 |
+| SYG-KMLK-009 | `L` `K` | `Dom/Personnel/ContactNormalizer.cs` | 0003 §5 |
+| SYG-KMLK-010 | `L` `P` `R` `X` | `Api/Health/PersonnelSyncHealthCheck.cs`, `App/Personnel/Sync/IPersonnelSyncStatus.cs` | 0003 §4; 0009 §3.1 |
+| SYG-KMLK-011 | `L` `U` | `Inf/Logo/LogoPersonnelSource.cs`, `PersonnelSyncService.cs` | 0003; 0006 §1 |
+| SYG-KMLK-012 | `L` | `Inf/Logo/LogoSchema.cs`, `ILogoPersonnelSource.cs` | 0003; 0006 §1 |
+| SYG-KMLK-013 | `E` `P` `U` `K` | `App/Identity/Registration/RegistrationService.cs`, `Api/Identity/RegistrationsController.cs`, `FI/components/registration/IdentityStep.tsx` | 0006 §1; 0003 §4; 0005 §1 |
+| SYG-KMLK-014 | `E` `P` `K` | `Dom/Personnel/NationalId.cs`, `F/shared/utils/nationalId.ts`, `Api/Identity/RegistrationContracts.cs` | 0003 §4; 0005 §1; 0006 §1 |
+| SYG-KMLK-015 | `P` `U` `I` | `Api/Identity/MinimumResponseTimeAttribute.cs`, `RegistrationService.cs`, `Inf/Notifications/InMemoryNotificationDispatch.cs` | 0012 §5 |
+| SYG-KMLK-016 | `E` `U` | `RegistrationService.cs`, `FI/components/verification/ChannelStep.tsx`, `CodeStep.tsx` | 0012 §3, §5; 0008 §7; 0015 |
+| SYG-KMLK-017 | `E` `U` `R` | `RegistrationService.cs`, `App/Identity/Verification/VerificationCodeService.cs`, `ChannelStep.tsx` | 0008 §7; 0012 §3; 0003 §5; 0006 §1; 0015 |
+| SYG-KMLK-018 | `E` `P` `U` | `ChannelStep.tsx`, `RegistrationContracts.cs`, `VerificationCodeService.cs` | 0012 §5 |
+| SYG-KMLK-019 | `E` `P` `U` `M` `R` | `VerificationCodeService.cs`, `Dom/Identity/VerificationCode.cs`, `CodeStep.tsx` | 0006 §1 |
+| SYG-KMLK-020 | `E` `P` `U` | `RegistrationService.cs`, `FI/pages/RegistrationPage.tsx` | 0012 §5; 0005 §1–2; 0006 |
+| SYG-KMLK-021 | `U` `M` | `Dom/Identity/UserAccount.cs`, `Inf/Data/Configurations/UserAccountConfiguration.cs`, `Inf/Identity/RegistrationStore.cs` | 0005 §1–2; 0006 |
+| SYG-KMLK-022 | `U` `M` `R` | `VerificationCodeService.cs`, `Dom/Identity/VerificationCode.cs` | 0006 §3 |
+| SYG-KMLK-023 | `E` `U` `M` `R` | `Dom/Identity/VerificationCode.cs`, `CodeStep.tsx` | 0006 §3 |
+| SYG-KMLK-024 | `E` `U` `M` `R` | `Dom/Identity/VerificationCode.cs`, `CodeStep.tsx` | 0006 §3 |
+| SYG-KMLK-025 | `U` `M` | `Inf/Identity/HmacVerificationCodeHasher.cs`, `CodeHashOptions.cs` | 0006 §3 |
+| SYG-KMLK-026 | `U` `I` `D` | `Inf/Notifications/NotificationDispatcher.cs`, `App/Notifications/OutboundMessage.cs`, `Dom/Notifications/NotificationDelivery.cs` | 0006 §3; 0009 §4 |
+| SYG-KMLK-027 | `U` `M` | `Inf/Identity/VerificationCodeStore.cs`, `VerificationCodeService.cs` | 0004 §4 |
+| SYG-KMLK-028 | `E` `P` `U` `R` | `FI/hooks/useCountdown.ts`, `CodeStep.tsx`, `VerificationCodeService.cs` | 0015 |
+| SYG-KMLK-029 | `I` `R` | `Inf/Notifications/NetGsmSmsSender.cs` | 0008 §7; 0012 §2 |
+| SYG-KMLK-030 | `I` `U` `R` | `Inf/Notifications/SmtpEmailSender.cs`, `App/Identity/Verification/VerificationMessages.cs` | 0008 §7; 0012 §3; 0015 |
+| SYG-KMLK-031 | `E` `P` `U` | `App/Identity/Sessions/SessionService.cs`, `Api/Identity/SessionsController.cs`, `FI/pages/LoginPage.tsx` | 0006 §8 |
+| SYG-KMLK-032 | `E` `P` `U` | `SessionService.cs`, `FI/components/login/CredentialsStep.tsx` | 0006 §5 |
+| SYG-KMLK-033 | `U` `M` `R` `D` | `SessionService.cs`, `Dom/Identity/SessionRecords.cs` (`LoginThrottle`) | 0006 §5 |
+| SYG-KMLK-034 | `E` `P` `U` `R` | `SessionService.cs`, `SessionsController.cs`, `LoginPage.tsx` | 0006 §7; 0017 |
+| SYG-KMLK-035 | `E` `P` `U` `M` `R` `S` | `App/Identity/Sessions/TwoFactorImpact.cs`, `Inf/Identity/TwoFactorImpactStore.cs`, `F/features/system/pages/ParametersPage.tsx` | 0006 §7; 0017 |
+| SYG-KMLK-036 | `U` | Kısıt; üretim kodunda ayrı bileşeni yok. Testler: `SessionApiTests`, `TwoFactorPreferenceApiTests` | 0006 §7; 0017 |
+| SYG-KMLK-037 | `E` `P` `U` `M` `R` | `Api/Identity/Authentication.cs`, `Dom/Identity/UserSession.cs`, `F/shared/auth/sessionManager.ts` | 0006 §8 |
+| SYG-KMLK-038 | `E` `P` `U` `M` `R` | `UserSession.cs`, `F/shared/auth/useSessionActivity.ts`, `SessionActivity.tsx` | 0006 §8 |
+| SYG-KMLK-039 | `E` `P` `U` `M` | `SessionsController.cs`, `UserSession.cs`, `F/shared/auth/sessionApi.ts` | 0006 §8 |
+| SYG-KMLK-040 | `P` `U` `M` `D` | `SessionService.cs`, `UserSession.cs`, `SessionRecords.cs` | 0006 §8 |
+| SYG-KMLK-041 | `U` `M` `R` | `SessionService.cs`, `UserSession.cs` | 0006 §8 |
+| SYG-KMLK-042 | `E` `P` `U` `D` | `App/Identity/Sessions/SessionContracts.cs`, `Inf/Data/Interceptors/SessionEndAuditInterceptor.cs`, `LoginPage.tsx` | 0006 §8 |
+| SYG-KMLK-043 | `E` `P` `U` | `SessionService.cs`, `SessionsController.cs`, `F/app/AppLayout.tsx` | 0006 §8 |
+| SYG-KMLK-044 | `E` `P` `U` `R` | `App/Identity/Passwords/PasswordPolicy.cs`, `FI/components/registration/PasswordStep.tsx` | 0008 §7; 0006 §6 |
+| SYG-KMLK-045 | `E` `U` `M` | `Inf/Identity/Passwords/EmbeddedCommonPasswordList.cs`, `PasswordPolicy.cs` | 0006 §6 |
+| SYG-KMLK-046 | `E` `P` `U` `M` `R` | `Api/Identity/PasswordChangeGate.cs`, `UserAccount.cs`, `FI/pages/ChangePasswordPage.tsx` | 0006 §6 |
+| SYG-KMLK-047 | `E` `P` `U` `R` | `Api/Identity/PasswordResetsController.cs`, `RegistrationService.cs`, `FI/pages/ForgotPasswordPage.tsx` | 0006 §6 |
+| SYG-KMLK-048 | `E` `P` `U` | `Api/Identity/AccountController.cs`, `SessionService.cs`, `ChangePasswordPage.tsx` | 0006 §6 |
+| SYG-KMLK-049 | `U` `M` | `Inf/Identity/Passwords/Pbkdf2PasswordHasher.cs` | 0006 §6 |
+| SYG-KMLK-050 | `E` `P` `U` `M` `R` | `PasswordChangeGate.cs`, `UserAccount.cs`, `F/app/RequireSession.tsx` | ADR yok (`KR-092`) |
+| SYG-KMLK-051 | `E` `P` `U` `I` `R` | `App/Identity/Invitations/InvitationService.cs`, `Api/Identity/InvitationsController.cs`, `FI/pages/InvitePage.tsx` | 0012 §3 |
+| SYG-KMLK-052 | `E` `U` `M` `R` | `Dom/Identity/AccountInvitation.cs` | 0012 §3 |
+| SYG-KMLK-053 | `E` `P` `U` `M` `D` | `InvitationsController.cs`, `AccountInvitation.cs`, `FI/pages/AccountsPage.tsx` | 0012 §3; 0009 §2 |
+| SYG-KMLK-054 | `L` `U` `M` `R` | `PersonnelSynchronizer.cs`, `UserAccount.cs`, `SessionService.cs` | 0003 §4; 0006 |
+| SYG-KMLK-055 | `E` `P` `U` `M` | `UserAccount.cs`, `SessionContracts.cs`, `F/app/RequireSession.tsx` | 0003 §4; 0006 |
+| SYG-KMLK-056 | `L` `U` `M` | `PersonnelSynchronizer.cs`, `UserAccount.cs` | 0006 |
+| SYG-KMLK-057 | `E` `P` `U` `D` | `App/Identity/Accounts/AccountAdministration.cs`, `Api/Identity/AccountsController.cs`, `AccountsPage.tsx` | 0006 |
+| SYG-KMLK-058 | `U` `M` `D` | `AccountAdministration.cs`, `UserAccount.cs`, `SessionService.cs` | 0009 §2 |
+| SYG-KMLK-059 | `P` `U` `M` `R` `D` `X` | `RegistrationService.cs`, `Dom/Identity/RegistrationAttempt.cs`, `RegistrationCodeRequest.cs`, `Api/Networking/ReverseProxyRegistration.cs` | 0006 §5 |
+| SYG-KMLK-060 | `D` `U` | `Inf/Audit/SecurityEventLog.cs`, `Dom/Audit/SecurityEventEntry.cs`, `App/Common/Abstractions/ISecurityEventLog.cs` | 0003 §4; 0009 §3.1 |
+| SYG-KMLK-061 | `U` `X` | `Inf/Logging/MaskingDestructuringPolicy.cs`, `App/Common/Security/MaskRules.cs` | 0009 §4 |
+| SYG-KMLK-062 | `I` `R` | `Dom/Notifications/NotificationPurposeRules.cs`, `NotificationDispatcher.cs` | ADR yok (`KR-056`, `KR-094`) |
+| SYG-KMLK-063 | `P` `X` | `Api/Networking/HttpsRequirement.cs`, `Api/Program.cs` | 0006 §8 |
+| SYG-KMLK-064 | `E` `P` | `F/locales/tr/common.json`, `FI/components/verification/FlowError.tsx`, `App/Settings/ParameterDefinition.cs` | 0010; 0015 |
+| SYG-KMLK-065 | `E` | `FI/components/AuthLayout.tsx` | 0015 |
+| SYG-KMLK-066 | `E` | `LoginPage.tsx`, `RegistrationPage.tsx`, `ForgotPasswordPage.tsx` | 0015 §7 |
+| SYG-KMLK-067 | `E` | `FlowError.tsx` | 0009 §2 |
+| SYG-KMLK-068 | `E` | `AuthLayout.tsx`, `FI/components/BrandPanel.tsx` | 0015 |
+| SYG-KMLK-069 | `E` `P` `R` `S` | `AuthLayout.tsx`, `F/shared/branding.ts`, `Api/Settings/BrandingController.cs`, `App/Settings/BrandingService.cs` | 0015 |
+| SYG-KMLK-070 | `E` `P` `R` | `AuthLayout.tsx`, `Api/Identity/PublicSettingsController.cs` | 0015 |
+| SYG-KMLK-071 | `P` `X` | `Api/OpenApi/OpenApiRegistration.cs`, `Api/ErrorHandling/ProblemDetailsExceptionHandler.cs` | 0010; 0015 |
+| SYG-KMLK-072 | `P` `L` | `Api/Identity/SyncRunsController.cs`, `Inf/Personnel/PersonnelSyncTrigger.cs` | 0003; 0006 §1 |
+| SYG-KMLK-073 | `E` `P` `U` `M` `R` | `AccountsPage.tsx`, `AccountsController.cs`, `Inf/Identity/AccountAdministrationStore.cs` | 0012 §3; 0006 |
+| SYG-KMLK-074 | `P` `U` `M` `Y` | `App/Identity/Authorization/AccessControl.cs`, `Permissions.cs`, `Api/Identity/PermissionAuthorization.cs`, `Dom/Identity/Roles.cs` | 0012 §3; 0006; 0007 |
+| SYG-KMLK-075 | `R` `P` `D` `S` | `App/Settings/ParameterCatalog.cs`, `Inf/Settings/SystemParameters.cs`, `SystemParameterEditor.cs`, `AesGcmSecretProtector.cs` | 0008 §7; 0012 §2–3; 0006 §6; 0015 |
+| SYG-KMLK-076 | `E` `P` `R` `S` | `F/features/system/pages/ParametersPage.tsx`, `Api/Settings/SystemParametersController.cs` | 0008 §7; 0015 |
+| SYG-KMLK-077 | `P` `U` `M` | `SessionsController.cs`, `Pbkdf2PasswordHasher.cs` (ölçüm `SignInTimingTests`) | 0006 §8 |
+| SYG-KMLK-078 | `L` `R` | `PersonnelSynchronizer.cs`, `PersonnelSyncRun.cs` | 0003 §4 |
+| SYG-KMLK-079 | `I` | `Inf/Notifications/NotificationDispatcher.cs` | 0012 §2; 0006 §1, §3 |
+| SYG-KMLK-080 | `E` `P` `U` `R` `D` | `App/Identity/Sessions/SessionService.TwoFactorPreference.cs`, `AccountController.cs`, `FI/pages/AccountSecurityPage.tsx` | 0006 §7; 0017 |
+| SYG-KMLK-081 | `E` `P` `U` `D` | `AccountAdministration.cs`, `AccountsController.cs`, `AccountsPage.tsx` | 0009 §2; 0006 §7; 0017 |
+
+**Kod yorumunda SYG atfı olmayan bileşenler:** SYG-KMLK-006, 029, 061 ve 071'in bileşeni bulundu
+ama kodda `SYG-KMLK-nnn` atfı yok; doğrulamaları testlerdeki atıfla izleniyor (TEC.9).
+SYG-KMLK-003 ve 036 kısıttır; kanıtları veritabanı betiği ve testlerdir.
+
 ---
 
 ## 3. Durumlar ve kipler (TEC.3 BP2)
@@ -123,6 +232,13 @@ işlemleri ekranı (SYG-KMLK-073).
 | Pasif → Aktif | Yeni aktif istihdam (senkronizasyon) veya elle | SYG-KMLK-056, 057 |
 
 Her geçiş denetim izine yazılır (SYG-KMLK-058).
+
+> **Gerçekleştirme notu (20.10.2026, #234):** Kodda hesabın yalnızca iki durumu vardır:
+> Aktif ve Pasif (nedeniyle birlikte). "Kilitli" hesabın durumu değil, **girilen e-posta
+> adresine bağlı** bir sayaçtır (`LoginThrottle`). Var olmayan adres için de aynı davranışın
+> görülmesi bu yüzdendir (SYG-KMLK-033). Kilit süre dolunca veya parola sıfırlama ve davet
+> kabulünde kalkar. Yukarıdaki tablo davranışı doğru anlatır; durum modeli
+> `docs/mimari/kimlik-tasarim-diyagramlari.md` §1–§2'dedir.
 
 ### 3.2 Doğrulama kodunun durumları
 
@@ -478,3 +594,4 @@ madde `İptal` notuyla kalır.
 | 2026-10-14 | 1.7 | §1 özet sayımları §4'ten yeniden sayıldı: İşlevsel 46 → 48, Test 71 → 73, parametreye bağlı 31 → 32 (SYG-KMLK-080 ve 081 sayılmamıştı); sayımlar artık CI'da denetlenir (`doc-consistency-check.mjs`, #214) | Bilgi İşlem |
 | 2026-10-14 | 1.8 | AN-16: KVKK saklama süresi kararı, 10 yıl (`KR-109`, #215) | Bilgi İşlem |
 | 2026-10-15 | 1.9 | Başlığa onay durumu satırı: onaylayan Bilgi İşlem, baseline `v0.2.0`, değişiklik PR onayıyla (TEC.3 YAKLAŞIM §4, `KR-111`, #217) | Bilgi İşlem |
+| 2026-10-20 | 1.10 | §2.2 öğe tablosu genişletildi (dört öğe, katmanlı konumlar, SYG aralıkları); §2.5 SYG → öğe tahsisi (81 madde); §3.1 gerçekleştirme notu: kilit e-posta sayacıdır (tasarım gözden geçirmesi, #234) | Bilgi İşlem |
