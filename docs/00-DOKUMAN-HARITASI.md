@@ -3,7 +3,7 @@
 **Proje:** DSG-HRMS — Düzen Sağlık Grubu İnsan Kaynakları Yönetim Sistemi
 **Amaç:** Bu doküman, TS ISO/IEC TS 33061 Seviye 2 kapsamında üretilen tüm kanıtların nerede tutulduğunu tek sayfadan gösterir. Bir denetçi ya da yeni katılan bir ekip üyesi aradığı kaydı buradan bulur.
 
-**Son güncelleme:** 2026-10-15
+**Son güncelleme:** 2026-10-20
 **Doküman sahibi:** Bilgi İşlem Birim Sorumlusu
 
 ---
@@ -56,10 +56,10 @@ Aşağıdaki tablolarda "33061 Süreç Çıktısı" sütunu, standardın Madde 5
 | Yaklaşım (Approach) | `YAKLASIM.md` |
 | Paydaş tanımlama (Stakeholder identification) | `paydas-listesi.md` |
 | Hayat döngüsü kavramları (Life cycle concepts) | `docs/mimari/vizyon-ve-kapsam.md` |
-| Paydaş gereksinimleri (Stakeholder requirements) | `paydas-gereksinimleri/PG-<MODÜL>.md` (şablon `SABLON-PG.md`; T3: `PG-KMLK.md`) |
+| Paydaş gereksinimleri (Stakeholder requirements) | `paydas-gereksinimleri/PG-<MODÜL>.md` (şablon `SABLON-PG.md`; T3: `PG-KMLK.md`; T1: `PG-PERS.md`) |
 | Geçerleme kriterleri (Validation criteria) | Her paydaş gereksiniminin "Kabul Kriteri" bölümü |
 | İzlenebilirlik eşlemesi (Traceability mapping) | `docs/33061/izlenebilirlik-matrisi.md` |
-| Kayıt (Record) | `kayitlar/YYYY-AA-GG-<modül>-gereksinim-toplantisi.md` (şablon `kayitlar/SABLON-ik-gereksinim-toplantisi.md`; T3: `2026-09-23-kimlik-gereksinim-toplantisi.md`); değişiklik talepleri `tur:degisiklik-talebi` issue'su ve paydaş onayı (YAKLASIM §4) |
+| Kayıt (Record) | `kayitlar/YYYY-AA-GG-<modül>-gereksinim-toplantisi.md` (şablon `kayitlar/SABLON-ik-gereksinim-toplantisi.md`; T3: `2026-09-23-kimlik-gereksinim-toplantisi.md`; T1: `2026-10-19-personel-gereksinim-toplantisi.md`); değişiklik talepleri `tur:degisiklik-talebi` issue'su ve paydaş onayı (YAKLASIM §4) |
 
 > **Kaynak:** Gereksinimler, İK birimi ile yapılan modül toplantılarında toplanır. Her toplantı bir kayıt dosyası üretir ve ilgili paydaş gereksinimlerine referans verir.
 
@@ -281,3 +281,4 @@ Bazı kanıtlar birden fazla sürece hizmet eder. Tek kopya tutulur:
 | 2026-10-14 | 0.5 | T3 modül sonu denetimi (MAN.8 Ek A, A-09; MAN.5 D-20): var olmayan dosyalara atıflar kaldırıldı (`tamamlanma-tanimi.md`, `kod-gozden-gecirme-kontrol-listesi.md`, `docs/mimari/fonksiyon-modeli.md`, `docs/mimari/entegrasyon-arayuzleri.md`); "GitHub Releases" yerine açıklamalı Git etiketi (`KR-097`); bilgi kayıt defteri, konfigürasyon öğeleri, T3 doğrulama, entegrasyon, kabul ve denetim kayıtları, MAN.1 yaklaşımı, ortak kanıtlar ve kimlik önekleri eklendi; etiket adları güncel (#214) | Bilgi İşlem |
 | 2026-10-15 | 0.6 | TEC.10: sürüm kontrol listesi eklendi (#218) | Bilgi İşlem |
 | 2026-10-15 | 0.7 | MAN.8: DoD'nin tek kaynağı PR şablonu; kalite güvence ölçütleri K1–K6 ve T3 başlangıç kaydı; ayrı kalite raporu yok. TEC.5: diyagram notu YAKLASIM §8 ve #234'e bağlandı (`KR-111`, #217) | Bilgi İşlem |
+| 2026-10-20 | 0.8 | TEC.2: T1 toplantı kaydı ve `PG-PERS.md` (#239) | Bilgi İşlem |
