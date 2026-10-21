@@ -138,6 +138,16 @@ Hangi verilerin tarih aralıklı tutulacağı ADR-0005'te belirlenmiştir.
 - Arama alanlarında `citext` yerine, açıkça normalize edilmiş (`lower()`) kolonlar ve
   ifade dizinleri tercih edilir.
 
+> **Gerçekleştirme notu (21.10.2026, #244):** Kural kolon düzeyinde uygulanır: kişi adı ve
+> soyadı `tr-TR-x-icu` ile tanımlıdır (`DatabaseCollations.Turkish`). Veritabanının `tr_TR`
+> yerel ayarı Alpine tabanlı PostgreSQL imajında Türkçe kuralları uygulamıyordu: sıralama
+> harf kodu sırasıydı ve `lower('IŞIK')` "işik" veriyordu (tasarım gözden geçirmesi B-05).
+> LOGO adları tamamen büyük harfle yazdığı için (21.10.2026: 1.373 kişinin tamamı) "ışık"
+> araması IŞIK'ı bulmuyordu. **Sonuç:** Aramada ASCII `I` Türkçedeki gibi `ı` sayılır;
+> `ISMAIL` araması `İSMAİL`i bulmaz, `ismail` ve `İSMAİL` bulur. Türkçe karaktersiz arama
+> (`isik` → IŞIK) ayrı bir normalize edilmiş arama kolonu gerektirir; T1'de kararlaştırılır
+> (#245). T1'nin yeni metin kolonları (şube, birim, ünvan, görev adları) aynı kuralı kullanır.
+
 ## Gerekçe
 
 - `snake_case` PostgreSQL'in doğal biçimidir; tırnaklama gerektirmez, elle yazılan
@@ -184,3 +194,4 @@ değiştirmek veri göçü gerektirir. Bu nedenle iskelet aşamasında kesinleş
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-10-21 | 0.2 | §10: Türkçe ICU kuralı kişi adı ve soyadı kolonlarında uygulandı (#244, B-05) | Bilgi İşlem |

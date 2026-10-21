@@ -1304,7 +1304,8 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("first_name");
+                        .HasColumnName("first_name")
+                        .UseCollation("tr-TR-x-icu");
 
                     b.Property<bool>("IsEmailShared")
                         .HasColumnType("boolean")
@@ -1313,7 +1314,8 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("last_name");
+                        .HasColumnName("last_name")
+                        .UseCollation("tr-TR-x-icu");
 
                     b.Property<string>("MobilePhone")
                         .HasColumnType("text")

@@ -42,7 +42,8 @@ public sealed class AccountAdministrationStore : IAccountAdministrationStore
             }
             else
             {
-                // ILIKE: buyuk/kucuk harf duyarsiz; veritabani Turkce dil ayariyla kurulur (ADR-0004).
+                // ILIKE: buyuk/kucuk harf duyarsiz; ad ve soyad kolonlari Turkce ICU kuraliyla
+                // tanimlidir, "ışık" IŞIK'i, "ismail" İSMAİL'i bulur (ADR-0004 §10, #244 B-05).
                 var pattern = $"%{EscapeLike(term)}%";
                 persons = persons.Where(p =>
                     EF.Functions.ILike(p.FirstName, pattern, "\\")
