@@ -115,6 +115,15 @@ olarak uygulanır. Her çağrı yerinde elle yapılmaz — unutulur.
 Maskeleme kurallarının çalıştığı **birim testleriyle doğrulanır**; maskelenmemiş bir
 alanın log'a düşmesi test hatası üretir.
 
+> **Gerçekleştirme notu (21.10.2026, #244):** Erişim kaydındaki **serbest arama metni**
+> (`q`, `Search`, `Term`, `Query` süzgeçleri) ayrı bir kuralla maskelenir. Metindeki e-posta
+> adresleri ve en az 6 rakamlı diziler maskelenir: 11 rakam TCKN kuralıyla, cep telefonu
+> telefon kuralıyla, diğerleri tamamen. Ad gibi düz metin okunur kalır, çünkü erişim kaydı
+> "ne arandı" sorusunu cevaplamalıdır. Önceden süzgeç adı tanınmadığı için arama kutusuna
+> yazılan TCKN düz metin kaydediliyordu (tasarım gözden geçirmesi B-07). Liste
+> görüntülemesinde ekranda gösterilen kişilerin kimliklerinin kaydedilip kaydedilmeyeceği
+> T1 tasarımında kararlaştırılır (#245).
+
 ### 5. Özel nitelikli verinin saklanması
 
 - Özel nitelikli alanlar veritabanında **uygulama seviyesinde şifrelenir**
@@ -216,3 +225,4 @@ veri sızıntısı incelemesi mümkün olur.
 | 2026-10-03 | 0.3 | §3.1 kimlik olayı kaydı gerçekleştirme notu (`KR-094`, #119) | Bilgi İşlem |
 | 2026-10-14 | 0.4 | §6: KVKK saklama süresi kararı (`KR-109`); §7 → ADR-0018 (`KR-108`) (#215) | Bilgi İşlem |
 | 2026-10-21 | 0.5 | §2: denetim kayıtlarının değiştirilemezliğinin ikinci katmanı, sahip olmayan çalışma rolü (`KR-118`, #244) | Bilgi İşlem |
+| 2026-10-21 | 0.6 | §4: serbest arama metninin maskelenmesi (#244, B-07) | Bilgi İşlem |

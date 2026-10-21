@@ -132,6 +132,51 @@ public sealed class MaskTests
     }
 
     // ------------------------------------------------------------------
+    // Serbest arama metni (#244, B-07)
+    // ------------------------------------------------------------------
+
+    [Theory]
+    [InlineData("12345678901", "123*****901")]                        // TCKN
+    [InlineData("ahmet 12345678901", "ahmet 123*****901")]            // ad + TCKN
+    [InlineData("5321234567", "532*****67")]                          // telefon
+    [InlineData("0532 123 45 67", "532*****67")]                      // bosluklu telefon
+    [InlineData("+90 (532) 123-45-67", "532*****67")]                 // ayiricili telefon
+    [InlineData("ahmet.yilmaz@duzen.com.tr", "ah***@duzen.com.tr")]   // e-posta
+    [InlineData("1234567", "***")]                                    // tanimsiz uzun numara: tamamen
+    [InlineData("Ahmet Yilmaz", "Ahmet Yilmaz")]                      // ad okunur kalir
+    [InlineData("10452", "10452")]                                    // sicil (5 hane) okunur kalir
+    [InlineData("", "")]
+    public void Search_text_masks_numbers_and_emails_but_keeps_names(string input, string expected)
+    {
+        Mask.SearchText(input).ShouldBe(expected);
+        Mask.ByKind(PersonalDataKind.SearchText, input).ShouldBe(expected);
+    }
+
+    [Fact]
+    public void Search_text_masks_every_number_in_the_text()
+    {
+        var masked = Mask.SearchText("12345678901 ve 5321234567")!;
+
+        masked.ShouldNotContain("45678");
+        masked.ShouldNotContain("1234567");
+        masked.ShouldBe("123*****901 ve 532*****67");
+    }
+
+    [Fact]
+    public void Adjacent_numbers_separated_only_by_spaces_are_masked_together()
+    {
+        // Yalnizca boslukla ayrilan iki numara tek dizi sayilir ve tamamen maskelenir:
+        // fazla maskeleme, sizdirmaya tercih edilir (fail-closed).
+        Mask.SearchText("12345678901 5321234567").ShouldBe(Mask.Redacted);
+    }
+
+    [Fact]
+    public void Search_text_keeps_null_as_null()
+    {
+        Mask.SearchText(null).ShouldBeNull();
+    }
+
+    // ------------------------------------------------------------------
     // Tur bazli secim
     // ------------------------------------------------------------------
 

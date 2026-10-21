@@ -26,4 +26,10 @@ public enum PersonalDataKind
 
     /// <summary>IBAN.</summary>
     Iban = 4,
+
+    /// <summary>
+    /// Kullanicinin yazdigi serbest arama metni. Icindeki uzun rakam dizileri (TCKN,
+    /// telefon) ve e-posta adresleri maskelenir; ad gibi duz metin okunur kalir (#244, B-07).
+    /// </summary>
+    SearchText = 5,
 }

@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Dsg.Hrms.Application.Common.Security;
 
 /// <summary>
@@ -16,7 +18,7 @@ namespace Dsg.Hrms.Application.Common.Security;
 /// izole olarak test edilebilir. Maskeleme kurallarinin tek kaynagi burasidir.
 /// </para>
 /// </remarks>
-public static class Mask
+public static partial class Mask
 {
     /// <summary>Tamamen gizlenmis deger.</summary>
     public const string Redacted = "***";
@@ -126,6 +128,59 @@ public static class Mask
     }
 
     /// <summary>
+    /// Serbest arama metnini maskeler: <c>ahmet 12345678901</c> → <c>ahmet 123*****901</c>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Arama kutusu ad, sicil, TCKN, telefon veya e-posta alabilir. Erisim kaydi "ne
+    /// arandi" sorusunu cevaplamalidir; bu yuzden ad gibi duz metin okunur kalir. Ama
+    /// metindeki kisisel numaralar kayda duz metin dusmemelidir (KR-059, #244 B-07).
+    /// </para>
+    /// <list type="bullet">
+    /// <item>E-posta adresi: <see cref="Email"/> kurali.</item>
+    /// <item>
+    /// En az 6 rakamli dizi (aradaki bosluk, tire, nokta, parantez ve <c>+</c> dahil):
+    /// 11 rakam TCKN kuraliyla, 10-12 rakamli Turkiye cep telefonu telefon kuraliyla,
+    /// digerleri tamamen maskelenir. Bosluklu yazilan telefon (<c>532 123 45 67</c>)
+    /// boylece kacmaz.
+    /// </item>
+    /// <item>5 ve daha az rakamli diziler (sicil, kisa sayilar) okunur kalir.</item>
+    /// </list>
+    /// </remarks>
+    public static string? SearchText(string? value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        var masked = EmailPattern().Replace(value, match => Email(match.Value)!);
+        return DigitRunPattern().Replace(masked, match =>
+        {
+            var digits = OnlyDigits(match.Value);
+            if (digits.Length < 6)
+            {
+                return match.Value;
+            }
+
+            if (digits.Length == 11 && !digits.StartsWith('0'))
+            {
+                return NationalId(digits)!;
+            }
+
+            // Cep telefonu degilse Phone zaten tamamen maskeler (fail-closed).
+            return Phone(digits)!;
+        });
+    }
+
+    [GeneratedRegex(@"[^\s@]+@[^\s@]+", RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 1000)]
+    private static partial Regex EmailPattern();
+
+    // Rakamla baslayip rakamla biten, arada ayirici iceren dizi. "+90 532 ..." de yakalanir.
+    [GeneratedRegex(@"\+?\d[\d\s\-().]*\d|\d", RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 1000)]
+    private static partial Regex DigitRunPattern();
+
+    /// <summary>
     /// Sir niteligindeki degerlerin yerine yazilan sabit.
     /// </summary>
     /// <remarks>
@@ -145,6 +200,7 @@ public static class Mask
         PersonalDataKind.Phone => Phone(value),
         PersonalDataKind.Email => Email(value),
         PersonalDataKind.Iban => Iban(value),
+        PersonalDataKind.SearchText => SearchText(value),
 
         // Tanimlanmamis bir tur gelirse en guvenli davranis tamamen maskelemektir.
         _ => value is null ? null : Redacted,
