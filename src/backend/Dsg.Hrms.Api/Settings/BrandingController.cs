@@ -3,6 +3,7 @@ using Dsg.Hrms.Application.Common.Exceptions;
 using Dsg.Hrms.Application.Identity.Authorization;
 using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Settings;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
@@ -32,6 +33,7 @@ public sealed class BrandingController : ControllerBase
     /// <response code="304">Tarayicidaki surum guncel.</response>
     /// <response code="404">Logo yuklenmemis; varsayilan kullanilir.</response>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType<FileContentResult>(StatusCodes.Status200OK, "image/png", "image/jpeg")]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]

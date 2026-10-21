@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-021`, `KR-022`, `KR-089`
+**Karar defteri karşılığı:** `KR-021`, `KR-022`, `KR-089`, `KR-117`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **İlgili riskler:** `R-03`
 
@@ -110,6 +110,17 @@ geçmişe dönük sorgularda o tarihteki atama kullanılır.
 Bu kuralı doğrulamak için her modülde **yetki sızıntısı testi** yazılır: kapsam dışı
 bir kaydın kimliğiyle yapılan istek `404` döndürmelidir.
 
+> **Gerçekleştirme notu (21.10.2026, `KR-117`, #244):** Varsayılan yetki politikası
+> (`FallbackPolicy`) **oturum ister**. Hiçbir yetki işareti taşımayan uç nokta anonim kalmaz;
+> anonim olması gereken uçlar `[AllowAnonymous]` ile açıkça işaretlenir: üyelik, parola
+> sıfırlama, giriş ve iki adımlı doğrulama, oturum yenileme ve çıkış, davet bağlantısı,
+> giriş ekranının ayarları ve logosu, sağlık uçları ve OpenAPI belgesi. Mimari testi
+> (`EndpointAuthorizationTests`) her eylemin açık bir işaret taşıdığını ve anonim uç
+> listesinin incelenmiş listeyle birebir aynı olduğunu denetler. Sınıf düzeyinde
+> `[AllowAnonymous]` ile eylem düzeyinde yetki birlikte kullanılmaz: ASP.NET Core'da
+> sınıftaki `[AllowAnonymous]` eylemdeki `[Authorize]`'ı geçersiz kılar. Kaynak: tasarım
+> gözden geçirmesi B-04 (20.10.2026).
+
 ### 4. `403` yerine `404`
 
 Kapsam dışı bir kayda erişim denendiğinde **`403 Forbidden` değil `404 Not Found`**
@@ -188,3 +199,4 @@ eklenmesi istenirse yeni bir kapsam türü olarak eklenir, mevcut davranış boz
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-29 | 0.2 | §1: eylem yetkisinin gerçekleştirme notu (`KR-089`, #100) | Bilgi İşlem |
+| 2026-10-21 | 0.3 | §3: varsayılan yetki politikası oturum ister; anonim uçlar açıkça işaretlenir (`KR-117`, #244) | Bilgi İşlem |

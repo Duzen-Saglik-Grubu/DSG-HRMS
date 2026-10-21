@@ -4,6 +4,7 @@ using Dsg.Hrms.Application.Identity.Invitations;
 using Dsg.Hrms.Application.Identity.Passwords;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsg.Hrms.Api.Identity;
@@ -69,6 +70,7 @@ public sealed class InvitationsController : ControllerBase
     /// <response code="200">Baglanti gecerli.</response>
     /// <response code="404">Baglanti gecersiz, kullanilmis veya suresi dolmus.</response>
     [HttpPost("api/v1/identity/invitations/lookup")]
+    [AllowAnonymous]
     [ProducesResponseType<InvitationInfoResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<InvitationInfoResponse> LookupAsync(InvitationTokenRequest request, CancellationToken cancellationToken)
@@ -88,6 +90,7 @@ public sealed class InvitationsController : ControllerBase
     /// <response code="403">Hesap kullanima kapali.</response>
     /// <response code="404">Baglanti gecersiz, kullanilmis veya suresi dolmus.</response>
     [HttpPost("api/v1/identity/invitations/acceptance")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]

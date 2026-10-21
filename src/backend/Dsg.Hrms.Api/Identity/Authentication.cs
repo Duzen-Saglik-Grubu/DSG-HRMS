@@ -101,7 +101,11 @@ public static class AuthenticationRegistration
 
         // Eylem yetkisi (ADR-0007 §3): [HasPermission] politikalari istek aninda uretilir;
         // yetkisiz istek Problem Details ile 403 doner.
-        services.AddAuthorization();
+        // Varsayilan politika: isareti olmayan her uc nokta oturum ister (#244, B-04). Anonim
+        // kalmasi gereken uclar [AllowAnonymous] ile acikca isaretlenir; liste mimari testinde
+        // tutulur (EndpointAuthorizationTests). Isaretini unutan yeni bir uc anonim kalmaz.
+        services.AddAuthorization(options =>
+            options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();
         services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemDetailsAuthorizationResultHandler>();
