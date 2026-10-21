@@ -9,8 +9,10 @@
 #   1. Dagitilacak commit'i belirler; temiz ve GitHub'a gonderilmis olmasini sart kosar
 #   2. Kaynagi bu commit'ten (git archive) sunucuya aktarir
 #   3. Imajlari sunucuda derler; "uat" ve surum etiketiyle, commit'i etikete yazarak isaretler
-#   4. Veritabani semasini idempotent betikle uygular
-#   5. Yigini baslatir ve DOGRULAR; calisan imajin commit'i dagitilanla ayni olmali
+#   4. Veritabanini baslatir; semayi idempotent betikle, sonra uygulamanin calisma
+#      rolunu uygular (#244, B-01)
+#   5. Yigini baslatir ve DOGRULAR; calisan imajin commit'i dagitilanla ayni olmali,
+#      uygulama sahip olmayan calisma roluyle baglanmis olmali
 #   6. Dagitimi sunucudaki kayda ve depodaki dagitim kaydina yazar (TEC.10, #125)
 #
 # Belirli bir surumu kurmak icin once o etikete gecin:
@@ -62,6 +64,9 @@ info 'Ortam dosyasi kontrol ediliyor'
 # Sir uretimi dagitimin isi degildir; yoksa kurulum adimlari uygulanmalidir.
 ssh "$SERVER" "test -f $SECRETS_FILE" \
   || fail "Sunucuda $SECRETS_FILE yok. Runbook §2.2'yi uygulayin."
+# Calisma rolunun parolasi (#244, B-01). Yoksa yigin baslamaz; once runbook §2.2.1.
+ssh "$SERVER" "grep -q '^HRMS_APP_DB_PASSWORD=' $SECRETS_FILE" \
+  || fail "$SECRETS_FILE icinde HRMS_APP_DB_PASSWORD yok. Runbook §2.2.1'i uygulayin."
 
 info 'Kaynak aktariliyor'
 # git archive: yalnizca commit'teki dosyalar gider. Calisma kopyasindaki yerel
@@ -87,8 +92,9 @@ ssh "$SERVER" "cd $APP_DIR \
   && docker build -t dsg-hrms-web:uat -t dsg-hrms-web:$VERSION \
        --label org.opencontainers.image.revision=$COMMIT --label org.opencontainers.image.version=$VERSION src/frontend/dsg-hrms-web"
 
-info 'Yigin baslatiliyor'
-ssh "$SERVER" "cd $APP_DIR/docker && docker compose -f compose.uat.yml --env-file $SECRETS_FILE up -d"
+info 'Veritabani baslatiliyor'
+# Once yalnizca veritabani: sema ve calisma rolu hazir olmadan uygulama baslamaz.
+ssh "$SERVER" "cd $APP_DIR/docker && docker compose -f compose.uat.yml --env-file $SECRETS_FILE up -d --wait postgres"
 
 info 'Sema uygulaniyor'
 # Veritabaninin hazir olmasi beklenir; aksi hâlde ilk dagitimda yaris olusur.
@@ -96,6 +102,14 @@ ssh "$SERVER" "cd $APP_DIR/docker && set -a && . $SECRETS_FILE && set +a \
   && for i in \$(seq 1 30); do docker exec dsg-hrms-uat-postgres pg_isready -U \"\$POSTGRES_USER\" -q && break; sleep 2; done \
   && docker exec -i dsg-hrms-uat-postgres psql -U \"\$POSTGRES_USER\" -d \"\$POSTGRES_DB\" -v ON_ERROR_STOP=1 < $APP_DIR/sema.sql > /dev/null \
   && echo 'sema uygulandi'"
+
+info 'Uygulama rolu uygulaniyor'
+# Sema'dan SONRA: betik var olan semalarin tablolarina yetki verir (#244, B-01; KR-118).
+ssh "$SERVER" "cd $APP_DIR/docker && set -a && . $SECRETS_FILE && set +a \
+  && bash postgres/apply-app-role.sh dsg-hrms-uat-postgres"
+
+info 'Yigin baslatiliyor'
+ssh "$SERVER" "cd $APP_DIR/docker && docker compose -f compose.uat.yml --env-file $SECRETS_FILE up -d"
 
 info 'Dogrulaniyor'
 
@@ -137,6 +151,18 @@ fi
 server_ip="${SERVER#*@}"
 external_status=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "http://$server_ip:5299/health/live" || true)
 [[ "$external_status" == '000' ]] || fail "API disariya acik gorunuyor (durum: $external_status)"
+
+# Uygulama sahip olmayan calisma roluyle mi bagli? (#244, B-01; R-31) Parola yazdirilmaz;
+# yalnizca kullanici adi okunur.
+app_user=$(ssh "$SERVER" "docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' dsg-hrms-uat-api \
+  | grep '^Database__Hrms=' | grep -o 'Username=[^;]*' | cut -d= -f2")
+[[ -n "$app_user" && "$app_user" != 'postgres' ]] || fail "API calisma roluyle baglanmiyor (kullanici: ${app_user:-yok})"
+role_flags=$(ssh "$SERVER" "cd $APP_DIR/docker && set -a && . $SECRETS_FILE && set +a \
+  && docker exec dsg-hrms-uat-postgres psql -U \"\$POSTGRES_USER\" -d \"\$POSTGRES_DB\" -tAc \\
+     \"SELECT rolsuper::text || ',' || (SELECT count(*) FROM pg_stat_activity WHERE usename = '$app_user')::text FROM pg_roles WHERE rolname = '$app_user'\"")
+[[ "${role_flags%%,*}" == 'false' ]] || fail "Calisma rolu super kullanici veya yok ($app_user: ${role_flags:-yok})"
+[[ "${role_flags##*,}" -gt 0 ]] || fail "API veritabanina $app_user ile baglanmamis"
+echo "  Uygulama rolu: $app_user (super kullanici degil, ${role_flags##*,} baglanti)"
 
 # Calisan konteynerler gercekten bu commit'ten mi? Eski bir imaj ayakta kaldiysa
 # kayit yanlis bir surumu gosterirdi.

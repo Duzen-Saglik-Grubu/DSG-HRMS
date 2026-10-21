@@ -49,7 +49,10 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       # Baglanti dizesi ORTAM DEGISKENINDEN gelir; imajda veya depoda yer almaz
       # (ADR-0008, KR-038).
-      Database__Hrms: 'Host=postgres;Port=5432;Database=${POSTGRES_DB:-dsg_hrms};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}'
+      # UAT ve uretimle ayni: uygulama sahip olmayan calisma roluyle baglanir (#244, B-01).
+      # Rol bir kez ve yeni sema ekleyen her migration'dan sonra kurulur:
+      #   set -a && . docker/.env && set +a && bash docker/postgres/apply-app-role.sh dsg-hrms-postgres
+      Database__Hrms: 'Host=postgres;Port=5432;Database=${POSTGRES_DB:-dsg_hrms};Username=${HRMS_APP_DB_USER:-hrms_app};Password=${HRMS_APP_DB_PASSWORD:?HRMS_APP_DB_PASSWORD tanimli olmalidir}'
       ApplicationLogging__FilePath: '/app/logs/dsg-hrms-.json'
       # LOGO salt-okunur oturumu (KR-004). Bos birakilirsa personel senkronizasyonu
       # DEVRE DISI kalir ve uygulama calismaya devam eder. Deger sir dosyasinda durur.

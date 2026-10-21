@@ -54,7 +54,10 @@ services:
       # ayrintisi sizmaz. UAT'nin gelistirme gibi davranmasi, uretimde ortaya
       # cikacak sorunlari gizlerdi.
       ASPNETCORE_ENVIRONMENT: Production
-      Database__Hrms: 'Host=postgres;Port=5432;Database=${POSTGRES_DB:-dsg_hrms_uat};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}'
+      # Uygulama SAHIP OLMAYAN calisma roluyle baglanir (#244, B-01; KR-118): denetim
+      # kayitlarinda yalnizca okuma ve ekleme, DDL yok. Migration'lar POSTGRES_USER ile
+      # uygulanir. Rol dagitimda docker/postgres/apply-app-role.sh ile kurulur.
+      Database__Hrms: 'Host=postgres;Port=5432;Database=${POSTGRES_DB:-dsg_hrms_uat};Username=${HRMS_APP_DB_USER:-hrms_app};Password=${HRMS_APP_DB_PASSWORD:?HRMS_APP_DB_PASSWORD tanimli olmalidir (runbook 2.2)}'
       ApplicationLogging__FilePath: '/app/logs/dsg-hrms-.json'
       # LOGO salt-okunur oturumu (KR-004). Bos birakilirsa personel senkronizasyonu
       # DEVRE DISI kalir ve uygulama calismaya devam eder. Deger sir dosyasinda durur.

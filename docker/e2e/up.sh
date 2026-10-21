@@ -37,6 +37,12 @@ Identity__JwtSigningKey="$E2E_JWT_SIGNING_KEY" \
 echo '==> Sentetik veri'
 "${COMPOSE[@]}" exec -T postgres psql -U postgres -d dsg_hrms -v ON_ERROR_STOP=1 -q < docker/e2e/seed.sql
 
+echo '==> Uygulama rolu'
+# API, UAT ve uretimdeki gibi sahip olmayan rolle baglanir; e2e testleri butun akislarin bu
+# kisitli yetkilerle calistigini gosterir (#244, B-01). Parola yalnizca bu atilabilir yigin icindir.
+{ printf '%s\n' '\set app_role hrms_app' '\set app_password e2e-uygulama-test'; cat docker/postgres/app-role.sql; } \
+  | "${COMPOSE[@]}" exec -T postgres psql -U postgres -d dsg_hrms -v ON_ERROR_STOP=1 -q
+
 echo '==> API ve web'
 "${COMPOSE[@]}" up -d --build --wait api web
 
