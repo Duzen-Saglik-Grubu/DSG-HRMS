@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.6-BKD
 **Süreç:** MAN.6 — Bilgi Yönetimi (`MAN.6.BP1`–`BP4`)
-**Son güncelleme:** 2026-10-14 · **Sahibi:** Bilgi İşlem
+**Son güncelleme:** 2026-10-20 · **Sahibi:** Bilgi İşlem
 **Kaynak:** T3 süreç denetimi, bulgu BULGU-06 (#131)
 
 > Proje boyunca üretilen veya kullanılan her bilgi kümesinin **nerede durduğu, kimin
@@ -43,6 +43,7 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 |---|---|---|---|---|---|---|
 | BK-10 | UAT veritabanı: personel, hesaplar, denetim izi, güvenlik olayları | UAT sunucusu, Docker volume `dsg-hrms-uat_uat-postgres-data` | Bilgi İşlem | **Gizli**: gerçek personel verisi (R-25) | UAT kullanıldıkça tutulur; düzenli yedeklenmez (`KR-098`) | Üretime geçişten sonra veya UAT kapatıldığında volume silinir (`docker compose down -v`); silme kayda geçer |
 | BK-19 | Denetim izi, erişim kaydı ve güvenlik olayları (uygulama veritabanında; UAT'de BK-10 içinde, üretimde üretim veritabanında) | `audit` şeması: `change_log`, erişim kaydı, `security_event` | Bilgi İşlem | **Gizli**: kim, neyi, ne zaman; IP | **10 yıl** (KVKK Sorumlusu kararı, 14.10.2026, `KR-109`). Kayıtlar değiştirilemez (`KR-060`, `KR-094`) | Süre dolunca silinir veya anonimleştirilir; imha işi Y2 Denetim ve KVKK modülünde geliştirilir, imha kayda geçer (ADR-0009 §6) |
+| BK-29 | HRMS personel verisi: kişi ve istihdam kayıtları, LOGO'dan senkronize alanlar, HRMS'te tutulan bilgiler (evlilik bilgisi, görev, acil durum kişisi; `KR-112`) ve kan grubu | Uygulama veritabanı (UAT'de BK-10, yerelde BK-15 içinde; üretimde üretim veritabanında) | Bilgi İşlem; verinin kaynağı LOGO ve İK | **Gizli**: kişisel veri; kan grubu özel nitelikli (§3.1) | Sistem Yönetimi parametresinde tanımlanan süre (KVKK Sorumlusu kararı, 20.10.2026, `KR-116`; PG-PERS-45) | Süresi dolan kaydın imhası Y2'de geliştirilir; o zamana kadar silinmez |
 | BK-11 | UAT uygulama günlükleri | UAT, volume `dsg-hrms-uat_uat-api-logs` | Bilgi İşlem | Kurum içi: kişisel veri maskelenir (#119) | **90 dosya (gün)**: `RetainedFileCountLimit`, ADR-0009 | Otomatik: eski dosya silinir |
 | BK-12 | UAT sır dosyası ve TLS özel anahtarı | `/opt/dsg-hrms/secrets/.env.uat`; TLS sertifikası ve özel anahtarı `/opt/dsg-hrms/tls/` (KÖ-31) | Bilgi İşlem | **Gizli** | UAT kullanıldıkça | UAT kapatıldığında silinir. Bir sır değiştirildiğinde eski değer dosyada tutulmaz. Dosyanın yedek kopyası bırakılmaz; 27.09 tarihli kopya 13.10.2026'da silindi (#207) |
 | BK-13 | UAT geçici veritabanı kopyaları | `/opt/dsg-hrms/yedek-*.sql.gz` | Bilgi İşlem | **Gizli** | Yalnızca riskli işlem sürince (`KR-098`) | İşlem doğrulanınca silinir |
@@ -56,6 +57,17 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 > `/root/kr058-yedek-2026-09-25/` dizini (sır dosyasının bir kopyasını içeriyordu)
 > silindi; issue kapandı. Bu defter, böyle geçici kopyaların **oluştuğu anda** kayda
 > geçmesini sağlar (BK-13).
+
+### 3.1 Kan grubu işleme koşulları
+
+KVKK Sorumlusu kararı, 20.10.2026 (`KR-116`). Kan grubu özel nitelikli kişisel veridir (KVKK
+md. 6, sağlık; `KR-113`). HRMS'te yalnızca aşağıdaki koşullarla işlenir:
+
+| # | Koşul | Nasıl karşılanır |
+|---|---|---|
+| 1 | Kriptografik yöntemlerle şifrelenerek saklanır | Veritabanında kolon bazlı şifreleme (ADR-0009 §5); T1'de uygulanır, SYG-PERS'te doğrulanır |
+| 2 | Veriye erişen personelden gizlilik taahhüdü alınır | Laboratuvarda çalışan tüm personelin gizlilik sözleşmesi bulunuyor. Kan grubunu yalnızca İK, Sistem Yöneticisi ve kişinin kendisi görür (PG-PERS-36) |
+| 3 | Kimin ne zaman eriştiği değiştirilemez kayıtta tutulur | Erişim kaydı (BK-19) değiştirilemez (`KR-060`, `KR-094`); kart görüntülemesi erişim kaydına yazılır (PG-PERS-28) |
 
 ## 4. Depo dışındaki çalışma dosyaları
 
@@ -91,3 +103,4 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 | 2026-10-14 | 1.5 | BK-23, BK-24, BK-26: doldurulmuş formlar depoda; Ö-3 kapandı (`KR-107`, #213) | Bilgi İşlem |
 | 2026-10-14 | 1.6 | Modül sonu karşılaştırmasında bulunan kümeler eklendi: BK-06 (`src_old/`, AS sonuna kadar), BK-16, BK-17, BK-18, BK-27, BK-28; BK-12'ye TLS anahtarı; BK-20 ve BK-21'den iki dosya silindi (#215) | Bilgi İşlem |
 | 2026-10-14 | 1.7 | KVKK Sorumlusu kararı: "Öneri" ibareleri kaldırıldı; BK-19 denetim kayıtları 10 yıl; Ö-2 kapandı (`KR-109`, #215) | Bilgi İşlem |
+| 2026-10-20 | 1.8 | BK-29: HRMS personel verisi, saklama süresi parametresi; §3.1 kan grubu işleme koşulları (KVKK Sorumlusu kararı, `KR-116`, #241) | Bilgi İşlem |

@@ -215,7 +215,7 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 
 > Gereksinimler **19.10.2026 İK toplantısında onaylandı**
 > (`TEC.2/kayitlar/2026-10-19-personel-gereksinim-toplantisi.md`); 44 satırın tamamı
-> açıldı. Kaynak metinlerin tamamı: `TEC.2/paydas-gereksinimleri/PG-PERS.md`. Sistem
+> açıldı. PG-PERS-45 toplantı sonrası teyitle eklendi (20.10.2026, #241). Kaynak metinlerin tamamı: `TEC.2/paydas-gereksinimleri/PG-PERS.md`. Sistem
 > gereksinimi sütunu SYG-PERS yazılınca, diğer halkalar işin yapıldığı PR'larda dolar (§3).
 > Bölüm, geçmiş kayıtların "matris §6" atıflarını bozmamak için §6'nın arkasına eklendi.
 
@@ -265,6 +265,7 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 42 | `PG-PERS-42` Dışa aktarmada (Excel/PDF) hangi alanların aktarılacağı seçilebilir. Excel'e düz… | — | — | — | — | — |
 | 43 | `PG-PERS-43` Kişi kartında Görevi alanı bulunur ve HRMS içinden girilir. Görev, Y3 Referans Veri… | — | — | — | — | — |
 | 44 | `PG-PERS-44` Kişinin acil durumda aranacak kişi bilgisi (yakınlığı, adı, soyadı, cep telefonu)… | — | — | — | — | — |
+| 45 | `PG-PERS-45` HRMS'teki personel verisinin saklama süresi Sistem Yönetimi parametresinde tanımlanır… | — | — | — | — | — |
 
 ---
 
@@ -308,3 +309,4 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 2026-10-15 | 2.14 | §2.1: "Gerçekleştirme" sütunu PR numarasını verir; kod ve test bağı SYG atfıyla CI'da izlenir (02.10 denetimi TEC.7-6, `KR-111`, #217) | Bilgi İşlem |
 | 2026-10-15 | 2.15 | §5: REQ-KMLK-042 Kabul hücresine Y1 notu (#219) | Bilgi İşlem |
 | 2026-10-20 | 2.16 | §7: T1 satırları açıldı — 19.10.2026 İK toplantısında onaylanan 44 gereksinim (#239) | Bilgi İşlem |
+| 2026-10-20 | 2.17 | §7: PG-PERS-45 satırı (saklama süresi parametresi, #241) | Bilgi İşlem |

@@ -255,7 +255,10 @@ KPÖ'lerle ilişkili gereksinimler (PG-PERS-39, 40, 41) olduğu gibi onaylandı.
 > birbiriyle ve mevcut kararlarla tutarlılığı incelenirken yazıldı. Hiçbiri **İK kararını
 > değiştirmez**; kararın uygulanma biçimine ilişkin önerilerdir. İK ile teyit edilecektir.
 
-### 11.1 Y3 Referans Veri bağımlılığı (PG-PERS-21, 43)
+> **Durum (20.10.2026):** Maddeler İK ve KVKK Sorumlusu tarafından cevaplandı; bkz. §12.
+> Üç ayrıntı açık kaldı (§12.2).
+
+### 11.1 Y3 Referans Veri bağımlılığı (PG-PERS-21, 43) — ✅ karar verildi (§12)
 
 Ünvan karşılıkları ve görev tanımları Y3'ten alınacak. Ancak Y3 henüz yok; modül
 listesinde T4'e bağlı olarak A3'te planlı.
@@ -267,7 +270,7 @@ Alternatif, T1'i Y3'ü bekletmektir. Bu da T1'i A3'e kadar erteler.
 
 **Karar gerekiyor:** Bilgi İşlem + İK.
 
-### 11.2 HRMS'te tutulan alanlar (PG-PERS-03, 19, 43, 44)
+### 11.2 HRMS'te tutulan alanlar (PG-PERS-03, 19, 43, 44) — a, b, c ✅; d, e açık (§12.2)
 
 Toplantıda dört bilginin LOGO'da olmadığı ve HRMS'te girileceği kararlaştırıldı: evlilik
 tarihi, evlilik yardımı, görev ve acil durum kişisi. PG-PERS-03 ("HRMS'te düzenlenemez")
@@ -284,7 +287,7 @@ alanlar içindir. Yorum PG-PERS-03'ün gerekçesine ve `KR-112`'ye yazıldı.
 | d | Evlilik tarihi ve evlilik yardımını kimler görür? | Kartı görebilen herkes. Daha dar olması isteniyorsa İK, Sistem Yöneticisi ve kişinin kendisi |
 | e | Medeni hâl LOGO'da Evli'den Bekar'a dönerse girilmiş evlilik bilgisi ne olur? | Silinmez, gizlenir; denetim izi korunur |
 
-### 11.3 Kan grubu (PG-PERS-36)
+### 11.3 Kan grubu (PG-PERS-36) — ✅ işleme koşulları belirlendi (§12)
 
 Kan grubu KVKK md. 6'ya göre sağlık verisidir, yani özel nitelikli kişisel veridir.
 Karar, KVKK Sorumlusu olarak Doğuş Uçanok'un toplantıdaki değerlendirmesiyle alındı
@@ -305,7 +308,7 @@ LOGO'da kan grubu 585 aktif kartın yalnızca 89'unda dolu (20.10.2026). Veri ka
 raporuna "kan grubu boş" uyarısı eklenmesi İK'ya sorulabilir. Toplantıda istenmediği için
 eklenmedi.
 
-### 11.4 Ayrılan personelin süresiz görünürlüğü (PG-PERS-38)
+### 11.4 Ayrılan personelin süresiz görünürlüğü (PG-PERS-38) — ✅ (§12)
 
 Karar ekrandaki **görünürlüğü** düzenler: ayrılan personel, parametreye süre girilene
 kadar filtreyle görünür. Kaydın **saklanma ve imha** süresi ayrı konudur. ADR-0009 §6 bu
@@ -318,7 +321,7 @@ kapsıyor.
 verisinin saklama süresi Y2 Denetim ve Erişim Kayıtları modülünden önce KVKK
 Sorumlusunun kararıyla bilgi kayıt defterine işlenmeli.
 
-### 11.5 Filtre ve dışa aktarmada görme yetkisi (PG-PERS-14, 42)
+### 11.5 Filtre ve dışa aktarmada görme yetkisi (PG-PERS-14, 42) — ✅ teyit edildi
 
 "Bilgilerin tamamı için filtre" kararı, görme yetkisiyle birlikte uygulanmalıdır. Örnek:
 adresi göremeyen bir kullanıcı adres filtresiyle aradığında, dönen sonuç ona kimin hangi
@@ -326,13 +329,13 @@ adreste oturduğunu söyler. Bu nedenle kullanıcının göremediği alan ne fil
 aktarma seçeneği olarak sunulur. Bu kural PG-PERS-14 ve 42'nin gerekçe ve kabul
 kriterine yazıldı. **İK teyidi istenir.**
 
-### 11.6 Bilgi İşlem'in yazdığı alanlar (PG-PERS-42, 43, 44)
+### 11.6 Bilgi İşlem'in yazdığı alanlar (PG-PERS-42, 43, 44) — ✅ İK onayladı
 
 Toplantıda eklenen iki satırda öncelik ve kabul kriteri boş kaldı. S-08 cevabından doğan
 PG-PERS-44 de yeni yazıldı. Üçü için öncelik **Zorunlu** önerildi; kabul kriterlerini
 Bilgi İşlem yazdı. **İK teyidi istenir.**
 
-### 11.7 Kıdem süresi (PG-PERS-21)
+### 11.7 Kıdem süresi (PG-PERS-21) — ✅ gösterim belirlendi; ayrılan istihdam açık (§12.2)
 
 İK, kıdemin işe giriş tarihinden hesaplanmasını istedi.
 
@@ -340,7 +343,7 @@ Bilgi İşlem yazdı. **İK teyidi istenir.**
 istihdamda çıkış tarihine kadar sayılır. Toplam kıdem (birden fazla sicili olan kişide
 dönemlerin toplamı) istenirse ayrıca belirtilmeli. **İK teyidi istenir.**
 
-### 11.8 P7 Mali İşler
+### 11.8 P7 Mali İşler — ✅ gönderilmeyecek
 
 P7 toplantıda yoktu. HRMS LOGO'ya yazmadığı için (`KR-004`) bordro sürecine etkisi yok.
 Ücret de kapsam dışı (S-06). Paydaş listesine göre P7 "bilgilendirilen" paydaştır.
@@ -355,8 +358,39 @@ medeni hâlin hangi satırdan okunacağı sorusu böylece kapandı.
 
 ---
 
+## 12. Toplantı sonrası teyit — 2026-10-20
+
+Doğuş Uçanok, §11'deki maddeleri İK ile görüştü ve KVKK Sorumlusu olarak kendi kararlarını
+ekledi (#241). Kararlar aşağıda Doğuş Uçanok'un bildirdiği biçimde aktarılmıştır.
+
+### 12.1 Kararlar
+
+| § | Konu | Karar | Etkisi |
+|---|---|---|---|
+| 11.1 | Y3 bağımlılığı | Öneri kabul edildi: T3'te olduğu gibi T1 yalnızca kendisine gereken referans veri çekirdeğini kurar (tanım listesi ve basit bir yönetim ekranı); Y3 sonra genişletir | `KR-115`; PG-PERS-21, 43 |
+| 11.2 a | Görevi kim girer? | İK veya Sistem Yöneticisi | PG-PERS-43 |
+| 11.2 b | Görev sicile mi bağlı, tarih aralıklı mı? | Sicile bağlıdır ve tarih aralıklı tutulur | PG-PERS-43, 12 |
+| 11.2 c | Birden fazla acil durum kişisi? | Evet, bir kişiye birden fazla acil durum kişisi girilebilir | PG-PERS-44 |
+| 11.3 | Kan grubu | KVKK Sorumlusu işleme koşullarını belirledi: (1) kan grubu kriptografik yöntemlerle şifrelenerek saklanır (veritabanında şifreli); (2) veriye erişen personelden gizlilik taahhüdü alınır; laboratuvarda çalışan tüm personelin gizlilik sözleşmesi bulunuyor; (3) kimin ne zaman eriştiği değiştirilemez erişim kayıtlarında tutulur; altyapı bu şekilde kuruldu | `KR-116`; PG-PERS-36; bilgi kayıt defteri BK-29, §3.1 |
+| 11.4 | Personel verisinin saklama süresi | HRMS'teki personel verisinin saklama süresi Sistem Yönetimi parametresinde tanımlanır | `KR-116`; PG-PERS-45 eklendi |
+| 11.5 | Görme yetkisi olmayan alan | Kullanıcının göremediği alan (adres, kan grubu) ne filtrede ne dışa aktarmada seçenek olarak sunulur; kural mutlaka olmalı | PG-PERS-14, 42 |
+| 11.6 | PG-PERS-42, 43, 44 öncelik ve kabul kriterleri | İK onayladı | PG-PERS-42, 43, 44 |
+| 11.7 | Kıdem | İşe başlama tarihinden içinde bulunulan tarihe kadar geçen süre; gösterim "XX Yıl YY Ay ZZ Gün"; yıl dolmadıysa yalnızca ay ve gün, ay dolmadıysa yalnızca gün | PG-PERS-21 |
+| 11.8 | P7 Mali İşler | PG özetinin bu aşamada Mali İşlere gönderilmesine gerek yok | — |
+
+### 12.2 Açık kalanlar
+
+| # | Soru | Sahibi | Ne zamana kadar |
+|---|---|---|---|
+| 11.2 d | Evlilik tarihi ve evlilik yardımını kimler görür? | İK | SYG-PERS onayından önce |
+| 11.2 e | Medeni hâl LOGO'da Evli'den Bekar'a dönerse girilmiş evlilik bilgisi ne olur? | İK | SYG-PERS onayından önce |
+| 11.7 | Ayrılan istihdam sekmesinde kıdem çıkış tarihinde mi durur, yoksa bugüne kadar mı sayılır? | İK | SYG-PERS onayından önce |
+
+---
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-20 | 1.0 | Toplantı kaydı (#239) | Bilgi İşlem |
+| 2026-10-20 | 1.1 | §12: toplantı sonrası teyit (İK ve KVKK Sorumlusu, 20.10.2026); §11 başlıklarına durum; üç açık ayrıntı (#241) | Bilgi İşlem |
