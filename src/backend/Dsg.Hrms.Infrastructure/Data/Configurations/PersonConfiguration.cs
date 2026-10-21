@@ -35,8 +35,10 @@ public sealed class PersonConfiguration : IEntityTypeConfiguration<Person>
         builder.HasKey(person => person.Id);
 
         builder.Property(person => person.NationalId).IsRequired();
-        builder.Property(person => person.FirstName).IsRequired();
-        builder.Property(person => person.LastName).IsRequired();
+        // Turkce siralama ve buyuk/kucuk harf duyarsiz arama (ADR-0004 §10, #244 B-05): LOGO adlari
+        // tamamen buyuk harfle yazar (IŞIK, İSMAİL); "ışık" aramasi ve Ç/İ/Ö/Ş/Ü sirasi bu kuralla dogru calisir.
+        builder.Property(person => person.FirstName).IsRequired().UseCollation(DatabaseCollations.Turkish);
+        builder.Property(person => person.LastName).IsRequired().UseCollation(DatabaseCollations.Turkish);
         builder.Property(person => person.BirthDate).IsRequired();
 
         builder.HasIndex(person => person.NationalId).IsUnique();

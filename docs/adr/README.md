@@ -56,7 +56,7 @@ değildir.
 | [ADR-0001](ADR-0001-teknoloji-yigini.md) | Teknoloji Yığını | Kabul Edildi | 2026-09-09 (0.2) | .NET 10 LTS, React 19, PostgreSQL; AutoMapper/MediatR/QuestPDF reddi |
 | [ADR-0002](ADR-0002-cozum-yapisi-ve-katmanli-mimari.md) | Çözüm Yapısı ve Katmanlı Mimari | Kabul Edildi; modül düzeni → ADR-0016 | 2026-10-05 (0.2) | Modüler monolit, 4 katman, bağımlılık kuralları, mimari testi |
 | [ADR-0003](ADR-0003-logo-entegrasyon-stratejisi.md) | LOGO Entegrasyon Stratejisi | Kabul Edildi | 2026-09-26 (0.2) | Salt okuma, yalıtım katmanı, 15 dk snapshot senkronizasyon, şema sapma denetimi |
-| [ADR-0004](ADR-0004-veritabani-tasarim-standartlari.md) | Veritabanı Tasarım Standartları | Kabul Edildi | 2026-09-06 (0.1) | Adlandırma, tipler, soft delete, tarih aralıklı tablolar, migration kuralları |
+| [ADR-0004](ADR-0004-veritabani-tasarim-standartlari.md) | Veritabanı Tasarım Standartları | Kabul Edildi | 2026-10-21 (0.2) | Adlandırma, tipler, soft delete, tarih aralıklı tablolar, migration kuralları |
 | [ADR-0005](ADR-0005-cekirdek-veri-modeli.md) | Çekirdek Veri Modeli | Kabul Edildi | 2026-09-06 (0.1) | Kişi/İstihdam ayrımı, tarih farkındalığı, yönetici grafı |
 | [ADR-0006](ADR-0006-kimlik-dogrulama-ve-oturum.md) | Kimlik Doğrulama, Üyelik ve Oturum | Kabul Edildi; §7'nin iki kuralı → ADR-0017 | 2026-10-14 (1.2) | Üyelik akışı, doğrulama kodu, parola politikası, JWT + yenileme jetonu |
 | [ADR-0007](ADR-0007-yetkilendirme-modeli.md) | Yetkilendirme Modeli | Kabul Edildi | 2026-10-21 (0.3) | Rol (eylem) × Kapsam (satır); `404` tercihi; yetki sızıntısı testi; varsayılan politika oturum ister |

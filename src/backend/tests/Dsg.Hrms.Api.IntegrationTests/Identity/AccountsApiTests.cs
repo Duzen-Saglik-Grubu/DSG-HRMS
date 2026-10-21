@@ -82,7 +82,9 @@ public sealed class AccountsApiTests : IClassFixture<RegistrationApiFixture>, IA
         var token = await HrSignInAsync();
         using var client = _fixture.CreateClient();
 
-        var (_, all) = await GetAsync(client, $"{Accounts}?q=yIlMaZ&pageSize=2&page=2", token);
+        // Buyuk/kucuk harf duyarsiz arama Turkce kurala uyar: "Yilmaz"in buyugu "YİLMAZ"dir;
+        // ASCII "I" Turkcede "ı" sayilir (ADR-0004 §10, #244 B-05).
+        var (_, all) = await GetAsync(client, $"{Accounts}?q=yİlMaZ&pageSize=2&page=2", token);
         all.GetProperty("totalCount").GetInt32().ShouldBe(5);
         all.GetProperty("totalPages").GetInt32().ShouldBe(3);
         all.GetProperty("page").GetInt32().ShouldBe(2);
