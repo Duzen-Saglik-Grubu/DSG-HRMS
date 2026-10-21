@@ -26,3 +26,4 @@ doğrulama geçtikten sonra ekler; satır PR ile commit edilir. Aynı bilgi sunu
 > `v0.2.0-rc.5` ile aynı commit. UAT'ye yeniden kurulum yapılmadı; 12.10.2026 19:51 UTC
 > kurulumu geçerlidir (`KR-097`, `KR-105`). Dağıtım betiği satırı yeniden kurulumda yazar;
 > bu not elle eklendi (#218).
+| 2026-10-21T11:33:58Z | v0.2.0-27-ge488898 | `e488898` | Doğuş Uçanok |
