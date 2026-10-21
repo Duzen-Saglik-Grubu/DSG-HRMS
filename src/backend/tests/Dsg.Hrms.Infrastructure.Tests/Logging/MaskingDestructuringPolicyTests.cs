@@ -1,5 +1,6 @@
 using System.Globalization;
 using Dsg.Hrms.Application.Common.Security;
+using Dsg.Hrms.Domain.Common;
 using Dsg.Hrms.Infrastructure.Logging;
 using Serilog;
 using Serilog.Core;

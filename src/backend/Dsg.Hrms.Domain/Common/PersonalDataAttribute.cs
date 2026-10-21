@@ -1,4 +1,4 @@
-namespace Dsg.Hrms.Application.Common.Security;
+namespace Dsg.Hrms.Domain.Common;
 
 /// <summary>
 /// Isaretlendigi ozelligin gunluk ve denetim kayitlarinda maskelenmesini saglar.

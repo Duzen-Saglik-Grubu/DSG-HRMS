@@ -1,7 +1,7 @@
-using Dsg.Hrms.Application.Common.Security;
 using Dsg.Hrms.Application.Identity.Authorization;
 using Dsg.Hrms.Application.Identity.Invitations;
 using Dsg.Hrms.Application.Identity.Passwords;
+using Dsg.Hrms.Domain.Common;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;

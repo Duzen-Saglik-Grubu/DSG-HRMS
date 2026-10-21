@@ -1,4 +1,3 @@
-using Dsg.Hrms.Application.Common.Security;
 using Dsg.Hrms.Domain.Common;
 using Dsg.Hrms.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +30,10 @@ public sealed class SampleRecord : Entity, IAuditable, ISoftDeletable
     /// <summary>Sir alanlarin denetim izine hic yazilmadigini dogrulamak icin.</summary>
     [Secret]
     public string? PasswordHash { get; set; }
+
+    /// <summary>Ozel nitelikli verinin denetim izinde yalnizca "degisti" olarak gorundugunu dogrulamak icin.</summary>
+    [SpecialCategoryData]
+    public string? BloodType { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
 

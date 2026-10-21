@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Identity.Sessions;
+using Dsg.Hrms.Domain.Common;
 using Dsg.Hrms.Domain.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -198,8 +199,8 @@ public sealed class SessionsController : ControllerBase
 /// <param name="Email">Kurumsal e-posta.</param>
 /// <param name="Password">Parola.</param>
 public sealed record SignInRequest(
-    [property: Application.Common.Security.PersonalData(Application.Common.Security.PersonalDataKind.Email)] string Email,
-    [property: Application.Common.Security.Secret] string Password)
+    [property: PersonalData(PersonalDataKind.Email)] string Email,
+    [property: Secret] string Password)
 {
     /// <inheritdoc />
     public override string ToString() => nameof(SignInRequest);

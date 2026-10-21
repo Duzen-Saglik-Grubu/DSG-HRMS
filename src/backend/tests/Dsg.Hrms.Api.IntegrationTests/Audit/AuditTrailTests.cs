@@ -181,6 +181,31 @@ public sealed class AuditTrailTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Special_category_data_appears_only_as_changed_in_the_audit_trail()
+    {
+        // KVKK md. 6 verisi (ornek: kan grubu) denetim izinde DEGERSIZ yer alir: alanin
+        // degistigi gorunur, eski ve yeni deger gorunmez (ADR-0009 §4; #244, B-02).
+        await using var context = CreateContext();
+        var record = new SampleRecord { Title = "Ozel nitelikli", BloodType = "A Rh+" };
+        context.SampleRecords.Add(record);
+        await context.SaveChangesAsync();
+
+        record.BloodType = "0 Rh-";
+        await context.SaveChangesAsync();
+
+        var entries = await context.ChangeLog.AsNoTracking()
+            .Where(entry => entry.EntityId == record.PublicId)
+            .ToListAsync();
+
+        entries.Count.ShouldBe(2);
+        foreach (var entry in entries)
+        {
+            entry.Changes.ShouldContain(nameof(SampleRecord.BloodType));
+            entry.Changes.ShouldNotContain("Rh");
+        }
+    }
+
+    [Fact]
     public async Task Audit_fields_are_not_duplicated_into_the_change_payload()
     {
         await using var context = CreateContext();

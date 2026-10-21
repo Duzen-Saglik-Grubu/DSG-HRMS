@@ -1,4 +1,5 @@
 using System.Reflection;
+using Dsg.Hrms.Domain.Common;
 
 namespace Dsg.Hrms.Application.Common.Security;
 
@@ -140,10 +141,24 @@ public static class MaskRules
             return new MaskDecision(MaskAction.Exclude, PersonalDataKind.Unspecified);
         }
 
+        // Ozel nitelikli veri (KVKK md. 6): deger hic yazilmaz; denetim izinde yalnizca alanin
+        // degistigi gorunur (ADR-0009 §4; #244, B-02).
+        if (member.GetCustomAttribute<SpecialCategoryDataAttribute>() is not null)
+        {
+            return new MaskDecision(MaskAction.Exclude, PersonalDataKind.Unspecified);
+        }
+
         var personalData = member.GetCustomAttribute<PersonalDataAttribute>();
         if (personalData is not null)
         {
             return new MaskDecision(MaskAction.Mask, personalData.Kind);
+        }
+
+        // Bilerek acik yazilan alan (gerekceli). Ad tabanli hassas alanlara verilemez; mimari
+        // testi bunu denetler (DataClassificationTests).
+        if (member.GetCustomAttribute<AuditVisibleAttribute>() is not null)
+        {
+            return MaskDecision.None;
         }
 
         return ForName(member.Name);

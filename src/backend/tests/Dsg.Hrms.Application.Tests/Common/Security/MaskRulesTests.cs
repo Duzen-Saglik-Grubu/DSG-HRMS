@@ -1,4 +1,5 @@
 using Dsg.Hrms.Application.Common.Security;
+using Dsg.Hrms.Domain.Common;
 
 namespace Dsg.Hrms.Application.Tests.Common.Security;
 
@@ -17,6 +18,12 @@ public sealed class MaskRulesTests
 
         [Secret]
         public string? OneTimeCode { get; init; }
+
+        [SpecialCategoryData]
+        public string? BloodType { get; init; }
+
+        [AuditVisible("Test icin: bilerek acik yazilan bir alan")]
+        public string? Surname { get; init; }
 
         public string? Title { get; init; }
     }
@@ -52,6 +59,25 @@ public sealed class MaskRulesTests
         var decision = DecisionFor<MarkedSample>(nameof(MarkedSample.Address));
 
         MaskRules.Apply(decision, "Ankara, Cankaya").ShouldBe(Mask.Redacted);
+    }
+
+    [Fact]
+    public void Special_category_attribute_writes_no_value_at_all()
+    {
+        // Kan grubu gibi az degerli alanda kismi gosterim degerin kendisidir (#244, B-02).
+        var decision = DecisionFor<MarkedSample>(nameof(MarkedSample.BloodType));
+
+        decision.Action.ShouldBe(MaskAction.Exclude);
+        MaskRules.Apply(decision, "A Rh+").ShouldBe(Mask.SecretPlaceholder);
+    }
+
+    [Fact]
+    public void Audit_visible_attribute_keeps_the_value_readable()
+    {
+        var decision = DecisionFor<MarkedSample>(nameof(MarkedSample.Surname));
+
+        decision.ShouldBe(MaskDecision.None);
+        MaskRules.Apply(decision, "YILMAZ").ShouldBe("YILMAZ");
     }
 
     [Fact]

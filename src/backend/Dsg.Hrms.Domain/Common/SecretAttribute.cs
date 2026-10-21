@@ -1,4 +1,4 @@
-namespace Dsg.Hrms.Application.Common.Security;
+namespace Dsg.Hrms.Domain.Common;
 
 /// <summary>
 /// Isaretlendigi ozelligin gunluge <b>hicbir bicimde</b> yazilmamasini saglar.

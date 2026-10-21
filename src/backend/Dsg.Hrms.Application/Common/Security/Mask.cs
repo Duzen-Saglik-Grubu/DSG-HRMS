@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Dsg.Hrms.Domain.Common;
 
 namespace Dsg.Hrms.Application.Common.Security;
 
