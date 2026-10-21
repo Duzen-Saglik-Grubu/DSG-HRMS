@@ -1,7 +1,7 @@
 # Modül Listesi ve Bağımlılık Haritası
 
 **Belge kimliği:** MIM-002
-**Son güncelleme:** 2026-10-20
+**Son güncelleme:** 2026-10-21
 **İlgili süreç:** TEC.2 (Kapsam), TEC.5 (Tasarım), MAN.1 (Planlama)
 **İlgili kararlar:** `KR-040`, `KR-045`, `KR-046`, `KR-050`, `KR-051`, `KR-052`, `KR-053`, `KR-056`
 
@@ -43,7 +43,7 @@ değildir; diğer tüm modüllerin ön koşuludur.
 
 | # | Modül | Ön koşul | Göç kapsamı | Not |
 |---|---|---|---|---|
-| T1 | **Personel Yönetimi** | — | Yok (LOGO'dan gelir) | LOGO senkronizasyonu, kişi/istihdam modeli, veri kalitesi raporu. Ünvan ve görev tanımları için Y3 çekirdeğini kendisi kurar (`KR-115`) |
+| T1 | **Personel Yönetimi** | — | Yok (LOGO'dan gelir) | LOGO senkronizasyonu, kişi/istihdam modeli, veri kalitesi raporu. Ünvan ve görev tanımları için Y3 çekirdeğini (`KR-115`), denetim ve erişim kayıtları için Y2 görüntüleme çekirdeğini (`KR-119`) kendisi kurar |
 | T2 | **Organizasyon Yönetimi** | T1 | Yok (LOGO'dan gelir) | Firma, şube, birim, hiyerarşi, yönetici ataması |
 | T3 | **Kullanıcı Girişi ve Üyelik (Kimlik Yönetimi)** | T1 | Yok | **İlk teslim edilecek modül** (`KR-040`) |
 | T4 | **Rol ve Yetki Yönetimi** | T2, T3 | Yok | Rol tanımı, izin atama, satır bazlı kapsam |
@@ -67,7 +67,7 @@ altyapıyı kullanır.
 | # | Modül | Ön koşul | Göç kapsamı | Kimler kullanır |
 |---|---|---|---|---|
 | Y1 | **Bildirim Merkezi** | T3 | Yok | Neredeyse tüm modüller. **Bildirim istisnası** burada merkezî olarak uygulanır (§7) |
-| Y2 | **Denetim ve Erişim Kayıtları** | T4 | Yok | Tüm modüller — **temelle birlikte inşa edilir** |
+| Y2 | **Denetim ve Erişim Kayıtları** | T4 | Yok | Tüm modüller — **temelle birlikte inşa edilir**. Görüntüleme çekirdeği (salt okunur liste, yalnızca Sistem Yöneticisi) T1'de kurulur; Y2 genişletir (`KR-119`) |
 | Y3 | **Referans Veri Yönetimi** | T4 | Kısmi | Tüm modüller — sistem genelinde kullanılan **temel tanımların** yönetimi. Çekirdeği (tanım listesi, basit yönetim ekranı) T1'de kurulur; Y3 genişletir (`KR-115`) |
 | Y4 | **Sistem Yönetimi** | T4 | Kısmi | Yöneticiler (senkronizasyon, sistem sağlığı, parametreler) |
 | Y5 | **İş Akışı Yönetimi (Workflow)** | T4, Y1 | Yok | İzin, Terfi, Disiplin, Varlık, İşten Çıkış, Pozisyon Değişikliği, Ödül, İSG |
@@ -473,3 +473,4 @@ Kapsam büyüklüğünün getirdiği süre riski `R-15` olarak kayıt altına al
 | 2026-09-09 | 0.4 | §7.4 İK cevapları ve §7.5 kesinleşen kurallar eklendi; A8 kapandı | Bilgi İşlem |
 | 2026-10-20 | 0.5 | T1 ve Y3 satırları: Y3 referans veri çekirdeği T1'de kurulur (`KR-115`, #241) | Bilgi İşlem |
 | 2026-10-20 | 0.6 | §4: koddaki bağımlılıkların tek kaynağı ADR-0016 ve `AllowedModuleDependencies` (TEC.5-8, #234) | Bilgi İşlem |
+| 2026-10-21 | 0.7 | T1 ve Y2 satırları: Y2 görüntüleme çekirdeği T1'de kurulur (`KR-119`, #245) | Bilgi İşlem |
