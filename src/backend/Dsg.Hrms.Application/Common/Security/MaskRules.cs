@@ -79,6 +79,14 @@ public static class MaskRules
             // bicimi olmadigi icin tamamen maskelenir.
             ["BirthDate"] = new(MaskAction.Mask, PersonalDataKind.Unspecified),
 
+            // Serbest arama metni (erisim kaydi suzgeci): icindeki TCKN, telefon ve e-posta
+            // maskelenir, ad gibi metin okunur kalir (#244, B-07).
+            ["q"] = new(MaskAction.Mask, PersonalDataKind.SearchText),
+            ["Search"] = new(MaskAction.Mask, PersonalDataKind.SearchText),
+            ["SearchTerm"] = new(MaskAction.Mask, PersonalDataKind.SearchText),
+            ["Term"] = new(MaskAction.Mask, PersonalDataKind.SearchText),
+            ["Query"] = new(MaskAction.Mask, PersonalDataKind.SearchText),
+
             // --- Sir: hic yazilmaz ---
             ["Password"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),
             ["PasswordHash"] = new(MaskAction.Exclude, PersonalDataKind.Unspecified),

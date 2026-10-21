@@ -138,6 +138,26 @@ public sealed class AccessLogTests : IAsyncLifetime
         entry.Filters.ShouldContain("Biyokimya");
     }
 
+    [Fact]
+    public async Task Free_text_search_is_masked_but_names_stay_readable()
+    {
+        // Hesap listesindeki arama kutusu "q" suzgecine yazilir; kullanici TCKN veya telefon
+        // yazabilir (#244, tasarim gozden gecirmesi B-07).
+        var filters = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["q"] = $"ahmet {NationalIdValue} veya 0532 123 45 67",
+        };
+
+        await CreateLogger().LogAsync(AccessRecord.List("Person", 1, filters));
+
+        await using var context = CreateContext();
+        var entry = await context.AccessLog.AsNoTracking().SingleAsync();
+
+        entry.Filters.ShouldNotContain(NationalIdValue);
+        entry.Filters.ShouldNotContain("123 45 67");
+        entry.Filters.ShouldContain("ahmet 123*****901 veya 532*****67");
+    }
+
     // ------------------------------------------------------------------
     // Butunluk
     // ------------------------------------------------------------------
