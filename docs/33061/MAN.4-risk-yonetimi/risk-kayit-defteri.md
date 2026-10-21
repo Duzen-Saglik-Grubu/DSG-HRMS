@@ -356,7 +356,7 @@ raporunda ayrıca ele alınır.
 | **O / E / Puan** | 2 / 3 / **6** |
 | **Puan gerekçesi** | **Olasılık 2:** İstismar için uygulamanın veya veritabanı bağlantı bilgisinin ele geçirilmesi gerekir; sistem yalnızca kurum içinden erişilebilir (`KR-067`). **Etki 3:** KVKK kayıtlarının bütünlüğü kaybolur; "kim, kimin verisini gördü" sorusu güvenilir biçimde cevaplanamaz |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) Migration rolü ile çalışma rolü ayrılır; çalışma rolü tabloların sahibi olmaz, `audit` şemasında yalnızca INSERT ve SELECT yetkisi taşır; rolün süper kullanıcı olmadığını bir test doğrular (#244). (2) Kan grubu T1'de senkronize edilmeden önce önlem 1 tamamlanır. (3) Üretim veritabanı aynı rol ayrımıyla kurulur |
+| **Önlem** | (1) **Uygulandı (21.10.2026, `KR-118`):** Migration rolü ile çalışma rolü ayrıldı; çalışma rolü `hrms_app` tabloların sahibi değil, `audit` şemasında yalnızca INSERT ve SELECT yetkisi taşıyor. Yetkileri `ApplicationRoleTests` sınıyor; dağıtım betiği API'nin bu rolle bağlandığını ve rolün süper kullanıcı olmadığını doğruluyor. UAT'de etkin olması dağıtımla gerçekleşir (#244). (2) Kan grubu T1'de senkronize edilmeden önce önlem 1 tamamlanır. (3) Üretim veritabanı aynı rol ayrımıyla kurulur |
 | **Durum** | Açık |
 
 ---
@@ -416,3 +416,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-20 | 1.9 | R-29: beşinci olay (`follow-redirects`, #250) | Bilgi İşlem |
 | 2026-10-21 | 1.10 | R-29: altıncı olay (`vite`, #255) | Bilgi İşlem |
 | 2026-10-21 | 1.11 | R-31 eklendi: denetim kayıtlarının değiştirilemezliği süper kullanıcıya karşı korunmuyor (tasarım gözden geçirmesi B-01, #234, #244) | Bilgi İşlem |
+| 2026-10-21 | 1.12 | R-31: önlem 1 uygulandı (`KR-118`, #244) | Bilgi İşlem |

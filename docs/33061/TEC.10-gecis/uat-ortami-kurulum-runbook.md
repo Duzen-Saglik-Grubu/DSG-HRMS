@@ -1,7 +1,7 @@
 # UAT Ortamı — Kurulum ve Dağıtım Runbook'u
 
 **Belge kimliği:** TEC.10-RB-001
-**Son güncelleme:** 2026-10-13
+**Son güncelleme:** 2026-10-21
 **İlgili süreçler:** TEC.10 (Geçiş), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-024`, `KR-038`, `KR-065`, `KR-097`
 
@@ -88,6 +88,20 @@ SON
 
 chmod 600 /opt/dsg-hrms/secrets/.env.uat
 ```
+
+### 2.2.1 Uygulamanın çalışma rolü (#244)
+
+Uygulama veritabanına **sahip olmayan, süper kullanıcı olmayan** `hrms_app` rolüyle bağlanır
+(`KR-118`). Rol denetim kayıtlarında (`audit` şeması) yalnızca okuma ve ekleme yapabilir;
+şemayı değiştiremez ve kayıtları koruyan tetikleyiciyi kapatamaz. Migration'lar
+`POSTGRES_USER` ile uygulanmaya devam eder. Rolün parolası bir kez üretilir:
+
+```bash
+# Sunucuda; değer ekrana yazılmaz, yedek kopya bırakılmaz:
+printf 'HRMS_APP_DB_PASSWORD=%s\n' "$(openssl rand -hex 32)" >> /opt/dsg-hrms/secrets/.env.uat
+```
+
+Rolü dağıtım betiği her dağıtımda şemadan sonra kurar ve yetkilerini günceller (§3.3a).
 
 > **Port değerlerine `127.0.0.1:` öneki YAZILMAZ.** Önek artık `compose.uat.yml`
 > içinde sabittir. Önceden güvenli bağlama, elle yazılan bu dosyanın biçimine
@@ -183,6 +197,24 @@ docker exec -i dsg-hrms-uat-postgres \
 
 > **Şema değişikliği uygulamanın açılışında yapılmaz** (`KR-065`). Üretimde şema
 > değişikliği kontrollü bir adımdır, uygulama başlatmanın yan etkisi değil.
+
+Şemadan önce yalnızca veritabanı başlatılır:
+`docker compose -f compose.uat.yml --env-file /opt/dsg-hrms/secrets/.env.uat up -d --wait postgres`.
+
+### 3.3a Uygulamanın çalışma rolünü uygula
+
+```bash
+# Sunucuda, şemadan SONRA:
+cd /opt/dsg-hrms/docker
+set -a && . /opt/dsg-hrms/secrets/.env.uat && set +a
+bash postgres/apply-app-role.sh dsg-hrms-uat-postgres
+```
+
+Betik (`docker/postgres/app-role.sql`) idempotenttir. Veri şemalarında okuma, ekleme,
+güncelleme ve silme; `audit` şemasında yalnızca okuma ve ekleme yetkisi verir. Parola
+komut satırına yazılmaz; psql'e standart girdiden verilir. Mevcut şemalara eklenen yeni
+tablolar varsayılan yetkilerle kendiliğinden kapsanır. Yeni şema ekleyen migration'dan
+sonra betiğin çalışması gerekir; dağıtım bunu her seferinde yapar.
 
 ### 3.4 Yığını başlat
 
@@ -640,3 +672,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-10-06 | 1.9 | §1 erişim (SSH anahtarı); §4 doğrulama HTTPS'e göre; §6 güvenlik notları güncellendi, Webmin bulgusu (#177) | Bilgi İşlem |
 | 2026-10-06 | 1.10 | §6: Webmin kaldırıldı, açık portlar; §10.5: SMTP sertifikasının güncel durumu (#179) | Bilgi İşlem |
 | 2026-10-13 | 1.11 | §6: Avahi ve CUPS kapatıldı, eski sır kopyası silindi; UDP dinleyiciler, işletim sistemi güncellemeleri ve yeniden başlatma (#207) | Bilgi İşlem |
+| 2026-10-21 | 1.12 | §2.2.1 ve §3.3a: uygulamanın çalışma rolü `hrms_app`; şemadan önce yalnızca veritabanı başlatılır (`KR-118`, #244) | Bilgi İşlem |

@@ -24,6 +24,8 @@
     <!-- LOGO test semasi ve uretimdeki salt-okunur oturum betigi; testler DOSYANIN KENDISINI calistirir. -->
     <None Include="Logo\logo-test-schema.sql" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\..\..\docker\logo\read-only-login.sql" Link="Logo\read-only-login.sql" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Uygulamanin calisma rolu betigi (#244, B-01); test DOSYANIN KENDISINI calistirir. -->
+    <None Include="..\..\..\..\docker\postgres\app-role.sql" Link="Data\app-role.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

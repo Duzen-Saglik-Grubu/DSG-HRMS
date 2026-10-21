@@ -43,7 +43,9 @@ services:
     image: dsg-hrms-api:e2e
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      Database__Hrms: 'Host=postgres;Port=5432;Database=dsg_hrms;Username=postgres;Password=e2e-yalnizca-test'
+      # Uygulama sahip olmayan calisma roluyle baglanir (UAT ve uretimle ayni; #244, B-01).
+      # Rol docker/e2e/up.sh icinde docker/postgres/app-role.sql ile kurulur.
+      Database__Hrms: 'Host=postgres;Port=5432;Database=dsg_hrms;Username=hrms_app;Password=e2e-uygulama-test'
       ApplicationLogging__FilePath: '/app/logs/dsg-hrms-.json'
       ReverseProxy__TrustedNetworks: '172.16.0.0/12'
       # Yigin duz HTTP ile calisir; sertifika yoktur.

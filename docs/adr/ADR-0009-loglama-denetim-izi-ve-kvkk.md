@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi; §7 → ADR-0018
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-023`
+**Karar defteri karşılığı:** `KR-023`, `KR-118`
 **İlgili süreç:** TEC.5 (Tasarım), MAN.6 (Bilgi Yönetimi)
 **İlgili riskler:** `R-03`
 
@@ -58,6 +58,17 @@ aktifleştirme/pasifleştirme ve sistem yöneticisi rolüyle yapılan her eylem
 
 **Denetim kayıtları değiştirilemez ve silinemez.** Uygulama bu tabloya yalnızca ekleme
 yapar; güncelleme ve silme uç noktası yoktur.
+
+> **Gerçekleştirme notu (21.10.2026, `KR-118`, #244):** Değiştirilemezlik iki katmanla
+> sağlanır. (1) Tetikleyici: `UPDATE`, `DELETE` ve `TRUNCATE` veritabanında reddedilir.
+> (2) **Yetki:** uygulama veritabanına tabloların sahibi olmayan, süper kullanıcı olmayan
+> `hrms_app` rolüyle bağlanır. Bu rol `audit` şemasında yalnızca okuma ve ekleme yapabilir;
+> tetikleyiciyi kapatamaz, şemayı değiştiremez. Önceden uygulama süper kullanıcıyla
+> bağlanıyordu ve tetikleyici tek korumaydı (tasarım gözden geçirmesi B-01, R-31). Rol
+> `docker/postgres/app-role.sql` ile kurulur; migration'lar sahip rolle uygulanır. Yetkiler
+> `ApplicationRoleTests` ile gerçek PostgreSQL'de, uygulamanın bu rolle çalıştığı e2e
+> yığınında sınanır. Sahip rol ve süper kullanıcı yine tetikleyiciyi kapatabilir; bu yetki
+> yalnızca dağıtımı yapan Bilgi İşlem'dedir.
 
 ### 3. Erişim kaydı (görüntüleme kaydı)
 
@@ -204,3 +215,4 @@ veri sızıntısı incelemesi mümkün olur.
 | 2026-09-10 | 0.2 | §4 maskeleme biçimleri kesinleştirildi (telefon, IBAN); gerçekleştirme `KR-059` ile iki katmanlı yapıldı | Bilgi İşlem |
 | 2026-10-03 | 0.3 | §3.1 kimlik olayı kaydı gerçekleştirme notu (`KR-094`, #119) | Bilgi İşlem |
 | 2026-10-14 | 0.4 | §6: KVKK saklama süresi kararı (`KR-109`); §7 → ADR-0018 (`KR-108`) (#215) | Bilgi İşlem |
+| 2026-10-21 | 0.5 | §2: denetim kayıtlarının değiştirilemezliğinin ikinci katmanı, sahip olmayan çalışma rolü (`KR-118`, #244) | Bilgi İşlem |
