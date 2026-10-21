@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.5-YAK
 **Süreç:** TEC.5 — Tasarım Tanımlama
-**Son güncelleme:** 2026-10-15
+**Son güncelleme:** 2026-10-20
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir. Ayrıca `PA 2.1` için hedef, sorumluluk, kaynak ve arayüzler (§1, §3, §4).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -33,7 +33,8 @@ yorumunda kalır (`docs/adr/README.md`, "Ne zaman ADR yazılır?").
 | Mimari karar ve gerekçesi | Modüler monolit, LOGO'ya salt okuma, JWT + yenileme jetonu | `docs/adr/ADR-NNNN-*.md` |
 | Kurumsal veya teknik karar ("ne") | `KR-084` denetleyici + FluentValidation, `KR-094` kimlik olayları tablosu | `docs/karar-kayit-defteri.md` |
 | Gereksinim yorumu | AN-01…AN-24 (ör. AN-05: kilit sayacı girilen e-postaya bağlı) | `SYG-<MODÜL>.md` §6 |
-| Öğeler ve gereksinim tahsisi | Öğe → konum tablosu | `SYG-<MODÜL>.md` §2.2 |
+| Öğeler ve gereksinim tahsisi | Öğe → konum ve SYG aralığı tablosu; madde madde SYG → öğe ve bileşen tahsisi | `SYG-<MODÜL>.md` §2.2 ve §2.5 |
+| Durum ve akış diyagramları | Hesap ve oturum durumları, üyelik akışı (Mermaid, koddan çıkarılmış ve kanıtlı) | `docs/mimari/<modül>-tasarim-diyagramlari.md` (T3: `kimlik-tasarim-diyagramlari.md`) |
 | Arayüz | HTTP API sözleşmesi; LOGO, NetGSM, SMTP, tarayıcı | `docs/api/openapi-v1.json`; `SYG-<MODÜL>.md` §2.3 |
 | Yardımcı mimari belgeler | Modül listesi, izin listesi, paket envanteri | `docs/mimari/` |
 
@@ -88,6 +89,21 @@ koddan bağımsız gözden geçiren bir adım yoktur (§8).
 
 Her durumda README dizini (durum ve "Son değişiklik" sütunu) aynı PR'da güncellenir.
 
+### 2.5 Tasarım gözden geçirmesi (#234)
+
+Her modülün tasarımı **ilk kod PR'ından önce** bir kez gözden geçirilir. İlk örnek T3 için
+yapıldı ve T1'e girdi oldu (`raporlar/2026-10-20-tasarim-gozden-gecirme.md`).
+
+| Adım | Ne yapılır |
+|---|---|
+| 1. Kapsam | Bilgi İşlem, modülün ADR'lerini, SYG §2.2–§2.5'i ve ilgili kodu belirler |
+| 2. Bağımsız inceleme | Ayrı bir alt ajan ADR'leri ve kodu okur. Önceki denetim raporlarını ve Bilgi İşlem görüşünü görmeden çalışır. Bulgular raporda değiştirilmeden ayrı bölümde gösterilir (Doğuş Uçanok'un kararı, 15.10.2026) |
+| 3. Tahsis ve diyagram | SYG → öğe tahsisi ve durum/akış diyagramları güncellenir |
+| 4. Değerlendirme | Bilgi İşlem bulguları doğrular. Her bulgu ya bir issue'ya bağlanır ya da gerekçeyle kabul edilir (MAN.8 YAKLAŞIM §2.3) |
+
+**Bağımsızlık sınırı:** Alt ajan, geliştirme yardımcısıyla aynı model ailesindendir.
+İnceleme kurum dışı veya insan bağımsızlığı sağlamaz; kalan risk R-23'tür.
+
 ---
 
 ## 3. Roller ve kaynaklar (`PA 2.1`)
@@ -128,7 +144,8 @@ riskleri R-05 ve R-23 olarak izlenir.
 | Veri modeli | `src/backend/Dsg.Hrms.Infrastructure/Data/Configurations/`, `Migrations/` | EF Core yapılandırması ve migration'lar (ADR-0004 kuralları) | PR sahibi |
 | Mimari belgeler | `docs/mimari/` | Modül listesi, izin listesi, paket envanteri, vizyon | Bilgi İşlem |
 | İzlenebilirlik | `../izlenebilirlik-matrisi.md` "Tasarım" sütunu | `ADR-nnnn` §, `KR-` | PR sahibi |
-| Tasarım gözden geçirme raporu | `raporlar/YYYY-AA-GG-tasarim-gozden-gecirme.md` | Doküman haritasında öngörülü; **henüz üretilmedi** (§8) | Bilgi İşlem |
+| Tasarım gözden geçirme raporu | `raporlar/YYYY-AA-GG-tasarim-gozden-gecirme.md` | Kapsam, yöntem ve bağımsızlık sınırı, Bilgi İşlem bulguları (BG), bağımsız inceleme bulguları (B), sonraki modüle girdi (§2.5). İlki: `2026-10-20` | Bilgi İşlem; bağımsız bölüm alt ajan |
+| Durum ve akış diyagramları | `docs/mimari/<modül>-tasarim-diyagramlari.md` | Mermaid; her geçişin altında dosya ve satır kanıtı | Bilgi İşlem |
 
 ---
 
@@ -149,14 +166,14 @@ riskleri R-05 ve R-23 olarak izlenir.
 
 | 33061 çıktısı (TEC.5) | Karşılığı | Durum |
 |---|---|---|
-| a) Her öğenin tasarım özellikleri tanımlanır | ADR'ler, gerçekleştirme notları, `docs/mimari/` | Var; diyagram yok (#234) |
-| b) Gereksinimler öğelere dağıtılır | SYG §2.2 (öğe düzeyi), issue başlıklarındaki SYG aralıkları | Kısmen; SYG → öğe tablosu yok (#234) |
+| a) Her öğenin tasarım özellikleri tanımlanır | ADR'ler, gerçekleştirme notları, `docs/mimari/` (T3 diyagramları dahil) | Var (diyagramlar #234) |
+| b) Gereksinimler öğelere dağıtılır | SYG §2.2 (öğe → SYG aralığı) ve §2.5 (SYG → öğe ve bileşen) | Var (#234) |
 | c) Tasarımı mümkün kılan araç ve kararlar | ADR-0001, `docs/mimari/paket-envanteri.md`, `KR-084` | Var |
 | d) Öğeler arası arayüzler tanımlanır | OpenAPI + sözleşme denetimi; SYG §2.3 | Var |
 | e) Tasarım alternatifleri değerlendirilir | ADR "Değerlendirilen alternatifler"; `KR-` gerekçe sütunu | Var |
 | f) Tasarım ürünleri geliştirilir | ADR güncellemeleri, migration'lar, izin listesi | Var; kodla aynı PR'da |
 | g) Destekleyici sistemler mevcut | §4 | Var |
-| h) Tasarım ile mimari öğeler arasında izlenebilirlik | Matris "Tasarım" sütunu (REQ → ADR §) | Kısmen; SYG düzeyinde değil (#234) |
+| h) Tasarım ile mimari öğeler arasında izlenebilirlik | Matris "Tasarım" sütunu (REQ → ADR §); SYG düzeyinde SYG §2.5 | Var (#234); matristeki eksik ADR atıfları #246 |
 
 ---
 
@@ -165,9 +182,9 @@ riskleri R-05 ve R-23 olarak izlenir.
 | No | Açık nokta | Bağlantı |
 |---|---|---|
 | 1 | ~~Modül yalıtım testi fiilen boş geçiyor~~ — **Kapandı (05.10.2026, #171):** test kodun gerçek düzenine uyarlandı; modüller arası bağımlılıklar gerekçeli bir tabloda bildiriliyor ve ölçülen kümeyle birebir karşılaştırılıyor (ADR-0016, `KR-100`) | ADR-0016 |
-| 2 | SYG → tasarım öğesi tahsis tablosu yok; matrisin "Tasarım" sütunu REQ düzeyinde | Denetim TEC.5-3 → #234 (T4'ün ilk tasarım PR'ından önce) |
-| 3 | Tasarım gözden geçirme raporu hiç üretilmedi; tasarımı koddan bağımsız gözden geçiren adım yok | Denetim TEC.5-6 → #234 (T4'ün ilk tasarım PR'ından önce) |
-| 4 | Depoda diyagram yok (hesap/oturum durumu, üyelik akışı). ~~`docs/mimari/entegrasyon-arayuzleri.md` yok~~ — bu kısım **kapandı (15.10.2026):** ayrı belge yazılmaz; entegrasyon arayüzleri OpenAPI belgesi, SYG §2.3 ve TEC.8 entegrasyon raporundadır (doküman haritası, TEC.5 ve TEC.8) | Denetim TEC.5-5 → diyagramlar #234; belge kısmı `KR-111` |
+| 2 | ~~SYG → tasarım öğesi tahsis tablosu yok~~ — **Kapandı (20.10.2026, #234):** SYG-KMLK §2.2 ve §2.5 | Denetim TEC.5-3 |
+| 3 | ~~Tasarım gözden geçirme raporu hiç üretilmedi~~ — **Kapandı (20.10.2026, #234):** ilk rapor yazıldı; adım §2.5'te tanımlandı. Bulgular #244, #245, #246 | Denetim TEC.5-6 |
+| 4 | ~~Depoda diyagram yok (hesap/oturum durumu, üyelik akışı)~~ — **Kapandı (20.10.2026, #234):** `docs/mimari/kimlik-tasarim-diyagramlari.md`. ~~`docs/mimari/entegrasyon-arayuzleri.md` yok~~ — bu kısım **kapandı (15.10.2026):** ayrı belge yazılmaz; entegrasyon arayüzleri OpenAPI belgesi, SYG §2.3 ve TEC.8 entegrasyon raporundadır (doküman haritası, TEC.5 ve TEC.8) | Denetim TEC.5-5 → #234; belge kısmı `KR-111` |
 | 5 | ~~`KR-093` (API'de HTTPS zorunluluğu) hiçbir ADR'de geçmiyor; T3'ün mimari nitelikli kararlarının ADR'ye alınıp alınmayacağı kararlaştırılmadı~~ — **Kapandı (15.10.2026):** kural §2.3 (adım 2) ve §2.4'tedir; `KR-082` (ADR-0012 §7), `KR-086` (ADR-0006 §8) ve `KR-089` (ADR-0007 §1) gerçekleştirme notları zaten vardı; `KR-093` ADR-0010 §5'e gerçekleştirme notu olarak yazıldı | Denetim TEC.5-4 → `KR-111`, #217 |
 
 ---
@@ -184,3 +201,4 @@ geçirilir.
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
 | 2026-10-05 | 1.1 | §8 madde 1 kapandı: ADR-0016 (#171) | Bilgi İşlem |
 | 2026-10-15 | 1.2 | §7 ve §8: madde 2, 3 ve 4'ün diyagram kısmı #234'e bağlandı; madde 4'ün entegrasyon belgesi kısmı ve madde 5 kapandı (`KR-111`, #217) | Bilgi İşlem |
+| 2026-10-20 | 1.3 | §1.1, §5: SYG §2.5 tahsis ve diyagram belgesi; §2.5 tasarım gözden geçirmesi adımı; §7 a, b, h ve §8 madde 2, 3, 4 kapandı (#234) | Bilgi İşlem |
