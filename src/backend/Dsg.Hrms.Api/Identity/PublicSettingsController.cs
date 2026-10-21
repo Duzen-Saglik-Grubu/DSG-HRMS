@@ -1,4 +1,5 @@
 using Dsg.Hrms.Application.Settings;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsg.Hrms.Api.Identity;
@@ -19,6 +20,7 @@ namespace Dsg.Hrms.Api.Identity;
 /// </para>
 /// </remarks>
 [ApiController]
+[AllowAnonymous]
 [Route("api/v1/identity/public-settings")]
 [Produces("application/json")]
 public sealed class PublicSettingsController : ControllerBase

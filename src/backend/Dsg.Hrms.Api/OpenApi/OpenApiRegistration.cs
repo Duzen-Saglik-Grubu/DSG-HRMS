@@ -106,7 +106,7 @@ public static class OpenApiRegistration
     {
         ArgumentNullException.ThrowIfNull(app);
 
-        app.MapOpenApi();
+        app.MapOpenApi().AllowAnonymous();
 
         if (app.Environment.IsDevelopment())
         {

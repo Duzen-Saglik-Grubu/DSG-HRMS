@@ -70,21 +70,21 @@ public static class HealthCheckRegistration
         {
             Predicate = _ => false,
             ResponseWriter = WriteResponseAsync,
-        });
+        }).AllowAnonymous();
 
         // Hazir olma: bagimliliklar erisilebilir mi?
         app.MapHealthChecks("/health/ready", new HealthCheckOptions
         {
             Predicate = registration => registration.Tags.Contains(ReadyTag),
             ResponseWriter = WriteResponseAsync,
-        });
+        }).AllowAnonymous();
 
         // Senkronizasyon: LOGO senkronizasyonunun son durumu (SYG-KMLK-010).
         app.MapHealthChecks("/health/sync", new HealthCheckOptions
         {
             Predicate = registration => registration.Tags.Contains(SyncTag),
             ResponseWriter = WriteResponseAsync,
-        });
+        }).AllowAnonymous();
 
         // Bildirim kanallari: SMTP kimlik dogrulamasi ve NetGSM bakiye/baslik sorgusu.
         // Hicbir ileti gonderilmez.
@@ -92,7 +92,7 @@ public static class HealthCheckRegistration
         {
             Predicate = registration => registration.Tags.Contains(NotificationsTag),
             ResponseWriter = WriteResponseAsync,
-        });
+        }).AllowAnonymous();
 
         return app;
     }

@@ -1,6 +1,6 @@
 # Mimari Karar Kayıtları (ADR)
 
-**Son güncelleme:** 2026-10-15
+**Son güncelleme:** 2026-10-21
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama) — *"Design rationale"* çıktısı
 
 ---
@@ -59,7 +59,7 @@ değildir.
 | [ADR-0004](ADR-0004-veritabani-tasarim-standartlari.md) | Veritabanı Tasarım Standartları | Kabul Edildi | 2026-09-06 (0.1) | Adlandırma, tipler, soft delete, tarih aralıklı tablolar, migration kuralları |
 | [ADR-0005](ADR-0005-cekirdek-veri-modeli.md) | Çekirdek Veri Modeli | Kabul Edildi | 2026-09-06 (0.1) | Kişi/İstihdam ayrımı, tarih farkındalığı, yönetici grafı |
 | [ADR-0006](ADR-0006-kimlik-dogrulama-ve-oturum.md) | Kimlik Doğrulama, Üyelik ve Oturum | Kabul Edildi; §7'nin iki kuralı → ADR-0017 | 2026-10-14 (1.2) | Üyelik akışı, doğrulama kodu, parola politikası, JWT + yenileme jetonu |
-| [ADR-0007](ADR-0007-yetkilendirme-modeli.md) | Yetkilendirme Modeli | Kabul Edildi | 2026-09-29 (0.2) | Rol (eylem) × Kapsam (satır); `404` tercihi; yetki sızıntısı testi |
+| [ADR-0007](ADR-0007-yetkilendirme-modeli.md) | Yetkilendirme Modeli | Kabul Edildi | 2026-10-21 (0.3) | Rol (eylem) × Kapsam (satır); `404` tercihi; yetki sızıntısı testi; varsayılan politika oturum ister |
 | [ADR-0008](ADR-0008-sir-ve-yapilandirma-yonetimi.md) | Sır ve Yapılandırma Yönetimi | Kabul Edildi | 2026-09-26 (0.2) | User Secrets / ortam değişkeni, `gitleaks`, açılışta doğrulama |
 | [ADR-0009](ADR-0009-loglama-denetim-izi-ve-kvkk.md) | Loglama, Denetim İzi ve KVKK | Kabul Edildi; §7 → ADR-0018 | 2026-10-14 (0.4) | Üç kayıt türü, maskeleme, erişim kaydı, saklama ve imha |
 | [ADR-0010](ADR-0010-api-sozlesmesi-ve-hata-yonetimi.md) | API Sözleşmesi ve Hata Yönetimi | Kabul Edildi | 2026-10-15 (0.2) | OpenAPI, Problem Details, sayfalama, eşzamanlılık; API'de HTTPS zorunluluğu (`KR-093`) |
@@ -114,3 +114,4 @@ değerlendirilmelidir:
 | 2026-10-14 | 0.6 | ADR-0009 durumu ve son değişikliği (#215) | Bilgi İşlem |
 | 2026-10-15 | 0.7 | ADR-0010 (KR-093 gerçekleştirme notu) ve ADR-0011 (§6 kalite kapısı tanımı) son değişiklikleri (`KR-111`, #217) | Bilgi İşlem |
 | 2026-10-15 | 0.8 | ADR-0011 son değişikliği (#235) | Bilgi İşlem |
+| 2026-10-21 | 0.9 | ADR-0007 0.3 (#244) | Bilgi İşlem |

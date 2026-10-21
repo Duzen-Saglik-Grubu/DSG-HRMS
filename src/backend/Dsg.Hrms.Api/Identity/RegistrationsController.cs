@@ -4,6 +4,7 @@ using Dsg.Hrms.Application.Identity.Registration;
 using Dsg.Hrms.Domain.Identity;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsg.Hrms.Api.Identity;
@@ -23,6 +24,7 @@ namespace Dsg.Hrms.Api.Identity;
 /// </para>
 /// </remarks>
 [ApiController]
+[AllowAnonymous]
 [Route("api/v1/identity/registrations")]
 [Produces("application/json")]
 public sealed class RegistrationsController : ControllerBase

@@ -48,6 +48,7 @@ public sealed class SessionsController : ControllerBase
     /// <response code="403">Hesap kullanima kapali.</response>
     /// <response code="429">Cok fazla hatali deneme; e-posta gecici olarak kilitli.</response>
     [HttpPost]
+    [AllowAnonymous]
     [ProducesResponseType<SignInResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
@@ -72,6 +73,7 @@ public sealed class SessionsController : ControllerBase
     /// <response code="422">Kanal kullanilamaz.</response>
     /// <response code="429">Cok fazla kod istendi.</response>
     [HttpPost("challenges/{challengeId:guid}/code")]
+    [AllowAnonymous]
     [ProducesResponseType<CodeRequestedResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
@@ -89,6 +91,7 @@ public sealed class SessionsController : ControllerBase
     /// <response code="403">Hesap kullanima kapali.</response>
     /// <response code="404">Giris isleminin suresi doldu.</response>
     [HttpPost("challenges/{challengeId:guid}/verification")]
+    [AllowAnonymous]
     [ProducesResponseType<TwoFactorVerificationResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -107,6 +110,7 @@ public sealed class SessionsController : ControllerBase
     /// <response code="200">Yeni oturum bilgisi.</response>
     /// <response code="401">Oturum sona erdi; hata turu nedeni tasir (<c>session-ended/…</c>).</response>
     [HttpPost("refresh")]
+    [AllowAnonymous]
     [ProducesResponseType<SessionResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public async Task<SessionResponse> RefreshAsync(CancellationToken cancellationToken)
@@ -145,6 +149,7 @@ public sealed class SessionsController : ControllerBase
     /// <summary>Cikis: oturum ve yenileme jetonu sunucuda iptal edilir (SYG-KMLK-043).</summary>
     /// <response code="204">Cikis yapildi (oturum zaten kapaliysa da).</response>
     [HttpDelete("current")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> SignOutAsync(CancellationToken cancellationToken)
     {
