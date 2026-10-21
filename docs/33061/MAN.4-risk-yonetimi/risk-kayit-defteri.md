@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-10-20
+**Son güncelleme:** 2026-10-21
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -330,7 +330,7 @@ raporunda ayrıca ele alınır.
 | | |
 |---|---|
 | **Kategori** | Güvenlik / Bakım (TEC.13) |
-| **Açıklama** | Kodda değişiklik olmadan, yeni yayımlanan açıklar nedeniyle CI kırmızıya dönüyor. İki haftada üç yüksek önemli açık: 30.09.2026 API imajının taban katmanında CVE-2026-84782 (`main` yaklaşık 21 saat kırmızı kaldı; olay kaydı), 04.10.2026 ön yüz geliştirme bağımlılığında `brace-expansion` (#149), 06.10.2026 ön yüz derleme araçlarında `source-map-js` (#175). 14.10.2026'da dördüncüsü: backend'de dolaylı gelen `System.Security.Cryptography.Pkcs` 10.0.0'da CVE-2026-84008 (#223). 20.10.2026'da beşincisi: ön yüzde `axios` üzerinden dolaylı gelen `follow-redirects` 1.16.0'da iki yüksek önemli açık (GHSA-q3jh-wrc6-jgq8, GHSA-8r9p-f939-6h3c; #250). Yalnızca Node.js bağdaştırıcısında kullanıldığı için tarayıcı paketinde istismar edilemez; açık, ilgisiz bir PR'ın (#249) kapısında yakalandı. Her biri birleştirmeyi durdurur ve plansız iş üretir. |
+| **Açıklama** | Kodda değişiklik olmadan, yeni yayımlanan açıklar nedeniyle CI kırmızıya dönüyor. İki haftada üç yüksek önemli açık: 30.09.2026 API imajının taban katmanında CVE-2026-84782 (`main` yaklaşık 21 saat kırmızı kaldı; olay kaydı), 04.10.2026 ön yüz geliştirme bağımlılığında `brace-expansion` (#149), 06.10.2026 ön yüz derleme araçlarında `source-map-js` (#175). 14.10.2026'da dördüncüsü: backend'de dolaylı gelen `System.Security.Cryptography.Pkcs` 10.0.0'da CVE-2026-84008 (#223). 20.10.2026'da beşincisi: ön yüzde `axios` üzerinden dolaylı gelen `follow-redirects` 1.16.0'da iki yüksek önemli açık (GHSA-q3jh-wrc6-jgq8, GHSA-8r9p-f939-6h3c; #250). Yalnızca Node.js bağdaştırıcısında kullanıldığı için tarayıcı paketinde istismar edilemez; açık, ilgisiz bir PR'ın (#249) kapısında yakalandı. 21.10.2026'da altıncısı: ön yüz geliştirme aracı `vite` 8.3.0'da (`launch-editor`) üç açık (GHSA-698v-4r3x-3vcv, GHSA-r825-w8mm-5pxw, GHSA-587h-7wmj-h5pm; #255). 20.10'da bunlardan biri orta önemdeydi ve kapının altında kaldı; gece eklenen iki duyuruyla yüksek öneme çıktı ve `main`'i kırmızıya düşürdü. Açık yalnızca geliştirme sunucusunda bulunuyor, üretim paketinde yok. Her biri birleştirmeyi durdurur ve plansız iş üretir. |
 | **O / E / Puan** | 3 / 1 / **3** |
 | **Puan gerekçesi** | **Olasılık 3:** Örüntü gerçekleşiyor; yeni açıklar kurumun denetimi dışında yayımlanıyor. **Etki 1:** Üç açığın üçü de taramalarla birleştirmeden önce yakalandı; ön yüz açıkları üretime giden pakette değildi (#149, #175). Etki, plansız iş ve birleştirme gecikmesidir. |
 | **Sahibi** | Bilgi İşlem |
@@ -403,3 +403,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-13 | 1.7 | R-28: önlem 1, 2, 3 ve 5 uygulandı (#208) | Bilgi İşlem |
 | 2026-10-14 | 1.8 | R-29: dördüncü olay (Pkcs, #223) ve önlem 4 | Bilgi İşlem |
 | 2026-10-20 | 1.9 | R-29: beşinci olay (`follow-redirects`, #250) | Bilgi İşlem |
+| 2026-10-21 | 1.10 | R-29: altıncı olay (`vite`, #255) | Bilgi İşlem |
