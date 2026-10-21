@@ -34,14 +34,24 @@ jobs:
           script: |
             const sha = context.sha;
 
-            const { data: prs } =
-              await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                commit_sha: sha,
-              });
-
-            const mergedPrs = prs.filter(pr => pr.merged_at !== null);
+            // Commit-PR iliskisi birlestirmeden hemen sonra API'de gecikmeli gorunebilir.
+            // 20.10.2026'da denetim birlestirmeden 3 sn sonra basladi, #249'u bulamadi ve
+            // yanlis alarm verdi (#252, #253). PR bulunamazsa 15 sn arayla 4 kez daha
+            // sorulur; ancak hala bulunamazsa uygunsuzluk sayilir.
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            let mergedPrs = [];
+            for (let attempt = 1; attempt <= 5; attempt++) {
+              const { data: prs } =
+                await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  commit_sha: sha,
+                });
+              mergedPrs = prs.filter(pr => pr.merged_at !== null);
+              if (mergedPrs.length > 0 || attempt === 5) break;
+              core.info(`Deneme ${attempt}: commit icin birlesmis PR gorunmuyor; 15 sn sonra yeniden sorulacak.`);
+              await sleep(15000);
+            }
 
             if (mergedPrs.length > 0) {
               const pr = mergedPrs[0];
