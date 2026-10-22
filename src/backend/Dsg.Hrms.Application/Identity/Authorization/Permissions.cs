@@ -26,11 +26,50 @@ public static class Permissions
     /// <summary>Parola olusturma baglantisi gonderme (SYG-KMLK-051).</summary>
     public const string InviteCreate = "identity.invite.create";
 
-    /// <summary>Senkronizasyonun son calisma bilgisini okuma (SYG-KMLK-072).</summary>
-    public const string SyncView = "identity.sync.view";
+    /// <summary>
+    /// Senkronizasyonun durumunu gorme (SYG-KMLK-072, SYG-PERS-008). T3'te
+    /// <c>identity.sync.view</c> idi; senkronizasyon personel modulunundur (SYG-PERS-009).
+    /// </summary>
+    public const string SyncView = "personnel.sync.view";
 
-    /// <summary>Senkronizasyonu elle tetikleme (SYG-KMLK-072).</summary>
-    public const string SyncCreate = "identity.sync.create";
+    /// <summary>Senkronizasyonu elle baslatma (SYG-KMLK-072, SYG-PERS-009); T3'te <c>identity.sync.create</c>.</summary>
+    public const string SyncCreate = "personnel.sync.create";
+
+    /// <summary>Tum personeli gorme; kapsam <c>All</c> (ADR-0019 §1, SYG-PERS-050).</summary>
+    public const string PersonView = "personnel.person.view";
+
+    /// <summary>Tam TCKN'yi gorme ve TCKN ile arama (SYG-PERS-030, 053).</summary>
+    public const string PersonViewNationalId = "personnel.person.view_national_id";
+
+    /// <summary>Adres, kan grubu, acil durum kisileri ve evlilik bilgisini gorme (SYG-PERS-052).</summary>
+    public const string PersonViewSensitive = "personnel.person.view_sensitive";
+
+    /// <summary>HRMS'te tutulan alanlari girme: gorev, evlilik bilgisi, acil durum kisisi (KR-112).</summary>
+    public const string PersonUpdate = "personnel.person.update";
+
+    /// <summary>Personel listesini disa aktarma (SYG-PERS-032).</summary>
+    public const string PersonExport = "personnel.person.export";
+
+    /// <summary>"IK'ya bildir" taleplerini gorme (SYG-PERS-048).</summary>
+    public const string CorrectionView = "personnel.correction.view";
+
+    /// <summary>"IK'ya bildir" taleplerini kapatma (SYG-PERS-048).</summary>
+    public const string CorrectionUpdate = "personnel.correction.update";
+
+    /// <summary>Veri kalitesi raporunu gorme (SYG-PERS-070).</summary>
+    public const string QualityView = "personnel.quality.view";
+
+    /// <summary>Veri kalitesi raporunu disa aktarma (SYG-PERS-070).</summary>
+    public const string QualityExport = "personnel.quality.export";
+
+    /// <summary>Referans tanimlarini (unvan, gorev) gorme (SYG-PERS-072).</summary>
+    public const string ReferenceView = "reference.definition.view";
+
+    /// <summary>Referans tanimlarini ekleme, adini degistirme, pasife alma (SYG-PERS-072).</summary>
+    public const string ReferenceUpdate = "reference.definition.update";
+
+    /// <summary>Denetim kayitlarini gorme; yalnizca Sistem Yoneticisi (SYG-PERS-069, KR-119).</summary>
+    public const string AuditLogView = "audit.log.view";
 
     /// <summary>Sistem parametrelerini gorme (SYG-KMLK-076).</summary>
     public const string ParameterView = "system.parameter.view";
@@ -48,6 +87,18 @@ public static class Permissions
         [SyncCreate] = "Senkronizasyonu elle başlatma",
         [ParameterView] = "Sistem parametrelerini görme",
         [ParameterUpdate] = "Sistem parametrelerini değiştirme",
+        [PersonView] = "Tüm personeli görme",
+        [PersonViewNationalId] = "Tam T.C. kimlik numarasını görme",
+        [PersonViewSensitive] = "Adres, kan grubu, acil durum kişileri ve evlilik bilgisini görme",
+        [PersonUpdate] = "Görev, evlilik bilgisi ve acil durum kişisini girme",
+        [PersonExport] = "Personel listesini dışa aktarma",
+        [CorrectionView] = "Düzeltme taleplerini görme",
+        [CorrectionUpdate] = "Düzeltme taleplerini kapatma",
+        [QualityView] = "Veri kalitesi raporunu görme",
+        [QualityExport] = "Veri kalitesi raporunu dışa aktarma",
+        [ReferenceView] = "Ünvan ve görev tanımlarını görme",
+        [ReferenceUpdate] = "Ünvan ve görev tanımlarını değiştirme",
+        [AuditLogView] = "Denetim kayıtlarını görme",
     };
 
     /// <summary>Hazir rollerin izinleri (SYG-KMLK-074).</summary>
@@ -55,8 +106,14 @@ public static class Permissions
     {
         [Role.SystemAdministratorCode] = [.. All.Keys],
 
-        // Kapsam T4'e kadar tum personeldir; parametre ve elle senkronizasyon sistem
-        // yoneticisinindir.
-        [Role.HrIdentityOperationsCode] = [AccountView, AccountUpdate, InviteCreate, SyncView],
+        // Kapsam T4'e kadar tum personeldir. Parametreler ve denetim kayitlari Sistem
+        // Yoneticisinindir; elle senkronizasyon T1'den itibaren IK'da da vardir (KR-126,
+        // SYG-PERS-055).
+        [Role.HrIdentityOperationsCode] =
+        [
+            AccountView, AccountUpdate, InviteCreate, SyncView, SyncCreate,
+            PersonView, PersonViewNationalId, PersonViewSensitive, PersonUpdate, PersonExport,
+            CorrectionView, CorrectionUpdate, QualityView, QualityExport, ReferenceView, ReferenceUpdate,
+        ],
     };
 }

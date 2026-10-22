@@ -60,6 +60,7 @@ public sealed class AccessControlServiceTests
             permissions.ShouldAllBe(p => Permissions.All.ContainsKey(p), $"{role} rolunde listede olmayan izin var.");
         }
 
-        Permissions.All.Keys.ShouldAllBe(p => System.Text.RegularExpressions.Regex.IsMatch(p, "^[a-z]+\\.[a-z]+\\.[a-z]+$"));
+        // Eylem tek sozcuk veya alan duzeyinde gorme icin view_<alan> (ADR-0007 §1, ADR-0019 §4).
+        Permissions.All.Keys.ShouldAllBe(p => System.Text.RegularExpressions.Regex.IsMatch(p, "^[a-z]+\\.[a-z]+\\.([a-z]+|view(_[a-z]+)+)$"));
     }
 }

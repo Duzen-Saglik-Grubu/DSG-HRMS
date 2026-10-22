@@ -41,7 +41,7 @@ public sealed class AccessControlApiTests : IClassFixture<RegistrationApiFixture
     public Task DisposeAsync() => Task.CompletedTask;
 
     [Fact]
-    public async Task Seeded_roles_carry_the_fixed_T3_permissions()
+    public async Task Seeded_roles_carry_the_fixed_permissions()
     {
         var grants = await _fixture.WithDbAsync(async context =>
             await (from grant in context.Set<RoleGrant>()
@@ -51,7 +51,25 @@ public sealed class AccessControlApiTests : IClassFixture<RegistrationApiFixture
         grants.Where(g => g.Code == Role.SystemAdministratorCode).Select(g => g.Permission)
             .ShouldBe(Permissions.All.Keys, ignoreOrder: true);
         grants.Where(g => g.Code == Role.HrIdentityOperationsCode).Select(g => g.Permission)
-            .ShouldBe([Permissions.AccountView, Permissions.AccountUpdate, Permissions.InviteCreate, Permissions.SyncView], ignoreOrder: true);
+            .ShouldBe(Permissions.ByRole[Role.HrIdentityOperationsCode], ignoreOrder: true);
+    }
+
+    [Fact]
+    public async Task Hr_role_has_every_T1_permission_except_the_audit_log_and_parameters()
+    {
+        // SYG-PERS-055 (KR-126): T1 izinleri IK'da ve Sistem Yoneticisinde; denetim kayitlari ve
+        // parametreler yalnizca Sistem Yoneticisinde. Rolun gorunen adi "Insan Kaynaklari".
+        var (name, grants) = await _fixture.WithDbAsync(async context =>
+        {
+            var role = await context.Set<Role>().SingleAsync(r => r.Code == Role.HrIdentityOperationsCode);
+            return (role.Name, await context.Set<RoleGrant>().Where(g => g.RoleId == role.Id).Select(g => g.Permission).ToListAsync());
+        });
+
+        name.ShouldBe("İnsan Kaynakları");
+        grants.ShouldBe(
+            Permissions.All.Keys.Except([Permissions.AuditLogView, Permissions.ParameterView, Permissions.ParameterUpdate]),
+            ignoreOrder: true);
+        grants.ShouldNotContain("identity.sync.view");
     }
 
     [Fact]
@@ -100,16 +118,19 @@ public sealed class AccessControlApiTests : IClassFixture<RegistrationApiFixture
     }
 
     [Fact]
-    public async Task Hr_role_can_view_the_sync_status_but_cannot_start_a_run()
+    public async Task Hr_role_can_view_and_start_a_sync_run()
     {
+        // SYG-PERS-009 (KR-126): elle senkronizasyon T1'den itibaren IK'da da var. Bu ortamda
+        // senkronizasyon tanimli olmadigi icin istek yetkiden gecer ve 422 alir (403 degil).
         await AssignRoleAsync(1, Role.HrIdentityOperationsCode);
         using var client = _fixture.CreateClient();
         var (token, permissions) = await SignInAsync(client, UserEmail);
 
         permissions.ShouldContain(Permissions.SyncView);
-        permissions.ShouldNotContain(Permissions.SyncCreate);
+        permissions.ShouldContain(Permissions.SyncCreate);
+        Permissions.SyncCreate.ShouldBe("personnel.sync.create");
         (await SendAsync(client, HttpMethod.Get, SyncRuns + "/latest", token)).Status.ShouldBe(HttpStatusCode.OK);
-        (await SendAsync(client, HttpMethod.Post, SyncRuns, token)).Status.ShouldBe(HttpStatusCode.Forbidden);
+        (await SendAsync(client, HttpMethod.Post, SyncRuns, token)).Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
     }
 
     [Fact]

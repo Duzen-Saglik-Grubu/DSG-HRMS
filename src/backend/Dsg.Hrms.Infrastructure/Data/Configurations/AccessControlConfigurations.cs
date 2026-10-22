@@ -19,7 +19,7 @@ internal static class AccessControlSeed
     public static readonly (long Id, Guid PublicId, string Code, string Name)[] Roles =
     [
         (1, new Guid("0192a3b4-0001-7000-8000-000000000001"), Role.SystemAdministratorCode, "Sistem Yöneticisi"),
-        (2, new Guid("0192a3b4-0002-7000-8000-000000000002"), Role.HrIdentityOperationsCode, "İK Kimlik İşlemleri"),
+        (2, new Guid("0192a3b4-0002-7000-8000-000000000002"), Role.HrIdentityOperationsCode, "İnsan Kaynakları"),
     ];
 
     /// <summary>Yukleme ani (denetim alani zorunludur).</summary>

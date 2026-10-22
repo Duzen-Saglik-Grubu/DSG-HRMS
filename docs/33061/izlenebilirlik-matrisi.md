@@ -226,7 +226,7 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 2 | `PG-PERS-02` LOGO'ya hiçbir koşulda yazma, güncelleme veya silme yapılmaz. | SYG-PERS-002 | `ADR-0003` §1 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
 | 3 | `PG-PERS-03` Personel bilgileri HRMS üzerinden DÜZENLENEMEZ; düzeltme LOGO'da yapılır ve… | SYG-PERS-006 | `KR-112`; `ADR-0021` §1 | — | — | — |
 | 4 | `PG-PERS-04` Senkronizasyon 15 dakikada bir otomatik çalışır; periyot Sistem Yönetimi… | SYG-PERS-007 | `ADR-0003` §4 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
-| 5 | `PG-PERS-05` Yetkili kullanıcı "şimdi senkronize et" diyerek elle tetikleyebilir; periyodu… | SYG-PERS-008, 009, 055 | `ADR-0003` §4 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
+| 5 | `PG-PERS-05` Yetkili kullanıcı "şimdi senkronize et" diyerek elle tetikleyebilir; periyodu… | SYG-PERS-008, 009, 055 | `ADR-0003` §4 | T3'te karşılandı (`KR-077`). SYG-055 (`personnel.sync.*`, elle başlatma İK'da da; `KR-126`) · PR #276 — senkronizasyon ekranı (SYG-008, 009) sonraki iş | `AccessControlApiTests` | — |
 | 6 | `PG-PERS-06` Her senkronizasyon bir çalışma kaydı üretir: okunan, eklenen, güncellenen ve uyarı… | SYG-PERS-008 | `ADR-0003` §4 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
 | 7 | `PG-PERS-07` Personel listesi ve kartında "son senkronizasyon" zamanı görünür. | SYG-PERS-010 | `ADR-0003` §4 | — | — | — |
 | 8 | `PG-PERS-08` LOGO şemasındaki beklenmeyen değişiklikler (şema sapması) günlük olarak denetlenir… | SYG-PERS-011, 012 | `ADR-0003` §6; `ADR-0021` §4 | T3'te kısmen karşılandı: denetim var, bildirim Y1'e bırakıldı (SYG-KMLK-010) | — | — |
@@ -242,21 +242,21 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 18 | `PG-PERS-18` Ad, soyad, sicil numarası veya TCKN üzerinden tek kutudan hızlı arama yapılabilir. | SYG-PERS-030 | `ADR-0021` §7 | — | — | — |
 | 19 | `PG-PERS-19` Kart detayında Genel Bilgiler bölümü: fotoğraf, ad, soyad, cinsiyet, doğum tarihi,… | SYG-PERS-003, 034, 036, 052, 066 | `ADR-0021` §1 | — | — | — |
 | 20 | `PG-PERS-20` İletişim Bilgileri bölümü: e-posta, telefon, adres. Adresi yalnızca İK, Sistem… | SYG-PERS-003, 037, 052, 054 | `ADR-0019` §2 | — | — | — |
-| 21 | `PG-PERS-21` Çalışma Hayatı bölümü: şehir, firma, şube, birim, ünvanı, görevi (PG-PERS-43),… | SYG-PERS-003, 038, 039, 072 | `ADR-0021` §1, §3; `ADR-0022` §1 | — | — | — |
-| 22 | `PG-PERS-22` Yaş, doğum tarihinden hesaplanarak gösterilir; ayrı bir alan olarak saklanmaz. | SYG-PERS-035 | `ADR-0021` §1 | — | — | — |
+| 21 | `PG-PERS-21` Çalışma Hayatı bölümü: şehir, firma, şube, birim, ünvanı, görevi (PG-PERS-43),… | SYG-PERS-003, 038, 039, 072 | `ADR-0021` §1, §3; `ADR-0022` §1 | **Kısmen:** SYG-039 (kıdem hesabı, çıkış günü dahil; `KR-127`) · PR #276 — diğer alanlar ve ekran sonraki iş | `SeniorityAndAgeTests`, `PersonCardApiTests` | — |
+| 22 | `PG-PERS-22` Yaş, doğum tarihinden hesaplanarak gösterilir; ayrı bir alan olarak saklanmaz. | SYG-PERS-035 | `ADR-0021` §1 | **Kısmen:** SYG-035 (yaş hesabı, 29 Şubat) · PR #276 (API) — ekran sonraki iş | `SeniorityAndAgeTests` | — |
 | 23 | `PG-PERS-23` Fotoğraf LOGO'daki personel resminden alınır; resmi olmayan kişide ad-soyad baş… | SYG-PERS-014, 040, 041 | `ADR-0021` §5 | — | — | — |
 | 24 | `PG-PERS-24` Bir personel yalnızca kendisine DOĞRUDAN atanmış astlarını görüntüleyebilir; astının… | SYG-PERS-050 | `ADR-0007` §2 (T2) | — | — | — |
-| 25 | `PG-PERS-25` Her personel rol yetkisinden bağımsız olarak KENDİ kaydını görüntüleyebilir. | SYG-PERS-044, 050 | `ADR-0007` §5; `ADR-0019` §1 | — | — | — |
-| 26 | `PG-PERS-26` Kapsam filtresi veri katmanında uygulanır; kapsam dışı bir kaydın kimliğiyle… | SYG-PERS-041, 051, 074 | `ADR-0007` §3; `ADR-0019` §1 | — | — | — |
-| 27 | `PG-PERS-27` Kapsam dışı kayıt için 403 değil 404 döndürülür. | SYG-PERS-051 | `ADR-0007` §4; `ADR-0019` §1 | — | — | — |
-| 28 | `PG-PERS-28` Bir personelin kişisel verisinin görüntülenmesi erişim kaydına yazılır: kim, kimin… | SYG-PERS-057, 058, 059, 064, 067, 069 | `ADR-0009` §3; `ADR-0019` §5 | — | — | — |
+| 25 | `PG-PERS-25` Her personel rol yetkisinden bağımsız olarak KENDİ kaydını görüntüleyebilir. | SYG-PERS-044, 050 | `ADR-0007` §5; `ADR-0019` §1 | **Kısmen:** SYG-044, 050 (`/persons/me`, kapsam `Self`) · PR #276 (API) — Profilim ekranı sonraki iş | `PersonCardApiTests`, `PersonFieldVisibilityTests` | — |
+| 26 | `PG-PERS-26` Kapsam filtresi veri katmanında uygulanır; kapsam dışı bir kaydın kimliğiyle… | SYG-PERS-041, 051, 074 | `ADR-0007` §3; `ADR-0019` §1 | **Kısmen:** SYG-051 (kapsam veri katmanında, `IPersonnelQuery`) · PR #276 — fotoğraf ucu (041) sonraki iş | `PersonCardApiTests` | — |
+| 27 | `PG-PERS-27` Kapsam dışı kayıt için 403 değil 404 döndürülür. | SYG-PERS-051 | `ADR-0007` §4; `ADR-0019` §1 | SYG-051 (kapsam dışı ve olmayan kayıt aynı `404`) · PR #276; sonraki uçlar aynı bileşenden geçer | `PersonCardApiTests` | — |
+| 28 | `PG-PERS-28` Bir personelin kişisel verisinin görüntülenmesi erişim kaydına yazılır: kim, kimin… | SYG-PERS-057, 058, 059, 064, 067, 069 | `ADR-0009` §3; `ADR-0019` §5 | **Kısmen:** SYG-057 (kart açılışı `View`, kendi kartı dahil) · PR #276 — liste ve süzgeç kaydı sonraki iş | `PersonCardApiTests` | — |
 | 29 | `PG-PERS-29` Dışa aktarma (Excel/PDF) ayrı bir yetkidir; görüntüleme yetkisi dışa aktarma hakkı… | SYG-PERS-032, 055 | `ADR-0014` §4; `ADR-0019` §4 | — | — | — |
 | 30 | `PG-PERS-30` Her dışa aktarma işlemi kaydedilir: kim, hangi filtreyle, kaç kayıt aktardı. | SYG-PERS-033, 069 | `ADR-0014` §4; `ADR-0022` §4 | — | — | — |
-| 31 | `PG-PERS-31` TCKN ekranda maskelenmiş gösterilir (örn. 123*89). İK ve Sistem Yöneticisi tam… | SYG-PERS-052, 053 | `ADR-0019` §2 | — | — | — |
+| 31 | `PG-PERS-31` TCKN ekranda maskelenmiş gösterilir (örn. 123*89). İK ve Sistem Yöneticisi tam… | SYG-PERS-052, 053 | `ADR-0019` §2 | **Kısmen:** SYG-052, 053 (ekran maskesi `123******01`, tam TCKN `view_national_id`) · PR #276 (API) — ekran sonraki iş | `PersonCardApiTests`, `PersonFieldVisibilityTests` | — |
 | 32 | `PG-PERS-32` Senkronizasyonda uyarı üreten kayıtlar (TCKN yok, doğum tarihi yok, iletişim bilgisi… | SYG-PERS-055, 070 | `ADR-0003` §5 | — | — | — |
 | 33 | `PG-PERS-33` Veri kalitesi raporu, T3 Kimlik Yönetimi'nin üyelik akışını etkileyen kayıtları… | SYG-PERS-071 | `ADR-0003` §5 | — | — | — |
 | 34 | `PG-PERS-34` "Yöneticisi" filtresi T2 Organizasyon Yönetimi ile BİRLİKTE devreye alınır; T2 hazır… | SYG-PERS-056 | `ADR-0007` §2 (T2) | — | — | — |
-| 35 | `PG-PERS-35` T2 Organizasyon Yönetimi ve T4 Rol ve Yetki Yönetimi devreye girene kadar geçiş… | SYG-PERS-050, 055 | `ADR-0019` §1 | — | — | — |
+| 35 | `PG-PERS-35` T2 Organizasyon Yönetimi ve T4 Rol ve Yetki Yönetimi devreye girene kadar geçiş… | SYG-PERS-050, 055 | `ADR-0019` §1 | **Kısmen:** SYG-050, 055 (kapsam `All`/`Self`, T1 izinleri, rol adı "İnsan Kaynakları") · PR #276 (API) — ekranlar sonraki iş | `PersonCardApiTests`, `AccessControlApiTests` | — |
 | 36 | `PG-PERS-36` Din ve sağlık bilgileri LOGO'dan senkronize edilmez, HRMS'te saklanmaz ve hiçbir… | SYG-PERS-004, 005, 049, 052, 054, 057, 059, 060, 061, 062, 063, 064, 065, 067 | `ADR-0020`; `ADR-0019` §2; `ADR-0021` §4 | — | — | — |
 | 37 | `PG-PERS-37` Personel kendi kartında hatalı bir bilgi gördüğünde "İK'ya bildir" düğmesine basar,… | SYG-PERS-045, 046, 047, 048, 049, 055, 075 | `ADR-0022` §3 | — | — | — |
 | 38 | `PG-PERS-38` İşten ayrılan personelin kaydı, ayrılış tarihinden sonra Sistem Yönetimi… | SYG-PERS-022, 028, 075 | `ADR-0022` §5 | — | — | — |
@@ -316,3 +316,4 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 2026-10-22 | 2.20 | §7: 45 satırın "Tasarım" sütunu T1 tasarım kararlarıyla (ADR-0019…0022, #245) | Bilgi İşlem |
 | 2026-10-22 | 2.21 | §7: PG-PERS-12 kaynak metni değişiklik talebi #270'e göre | Bilgi İşlem |
 | 2026-10-22 | 2.22 | §7: 45 satırın "Sistem gereksinimi" sütunu SYG-PERS ile (#274) | Bilgi İşlem |
+| 2026-10-22 | 2.23 | §7: PG-PERS-05, 21, 22, 25, 26, 27, 28, 31, 35 gerçekleştirme ve doğrulama sütunları (kişi okuma temeli, #276) | Bilgi İşlem |

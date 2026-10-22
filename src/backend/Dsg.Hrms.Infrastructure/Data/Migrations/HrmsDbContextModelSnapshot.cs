@@ -656,7 +656,7 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                             Code = "hr-identity-operations",
                             CreatedAt = new DateTimeOffset(new DateTime(2026, 9, 29, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             IsSystem = true,
-                            Name = "İK Kimlik İşlemleri",
+                            Name = "İnsan Kaynakları",
                             PublicId = new Guid("0192a3b4-0002-7000-8000-000000000002")
                         });
                 });
@@ -699,12 +699,12 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         new
                         {
                             RoleId = 1L,
-                            Permission = "identity.sync.view"
+                            Permission = "personnel.sync.view"
                         },
                         new
                         {
                             RoleId = 1L,
-                            Permission = "identity.sync.create"
+                            Permission = "personnel.sync.create"
                         },
                         new
                         {
@@ -715,6 +715,66 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         {
                             RoleId = 1L,
                             Permission = "system.parameter.update"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "personnel.person.view"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "personnel.person.view_national_id"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "personnel.person.view_sensitive"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "personnel.person.update"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "personnel.person.export"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "personnel.correction.view"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "personnel.correction.update"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "personnel.quality.view"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "personnel.quality.export"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "reference.definition.view"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "reference.definition.update"
+                        },
+                        new
+                        {
+                            RoleId = 1L,
+                            Permission = "audit.log.view"
                         },
                         new
                         {
@@ -734,7 +794,67 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         new
                         {
                             RoleId = 2L,
-                            Permission = "identity.sync.view"
+                            Permission = "personnel.sync.view"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "personnel.sync.create"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "personnel.person.view"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "personnel.person.view_national_id"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "personnel.person.view_sensitive"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "personnel.person.update"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "personnel.person.export"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "personnel.correction.view"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "personnel.correction.update"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "personnel.quality.view"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "personnel.quality.export"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "reference.definition.view"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "reference.definition.update"
                         });
                 });
 
@@ -1676,12 +1796,12 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         },
                         new
                         {
-                            Code = "identity.sync.view",
+                            Code = "personnel.sync.view",
                             Description = "Senkronizasyon durumunu görme"
                         },
                         new
                         {
-                            Code = "identity.sync.create",
+                            Code = "personnel.sync.create",
                             Description = "Senkronizasyonu elle başlatma"
                         },
                         new
@@ -1693,6 +1813,66 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         {
                             Code = "system.parameter.update",
                             Description = "Sistem parametrelerini değiştirme"
+                        },
+                        new
+                        {
+                            Code = "personnel.person.view",
+                            Description = "Tüm personeli görme"
+                        },
+                        new
+                        {
+                            Code = "personnel.person.view_national_id",
+                            Description = "Tam T.C. kimlik numarasını görme"
+                        },
+                        new
+                        {
+                            Code = "personnel.person.view_sensitive",
+                            Description = "Adres, kan grubu, acil durum kişileri ve evlilik bilgisini görme"
+                        },
+                        new
+                        {
+                            Code = "personnel.person.update",
+                            Description = "Görev, evlilik bilgisi ve acil durum kişisini girme"
+                        },
+                        new
+                        {
+                            Code = "personnel.person.export",
+                            Description = "Personel listesini dışa aktarma"
+                        },
+                        new
+                        {
+                            Code = "personnel.correction.view",
+                            Description = "Düzeltme taleplerini görme"
+                        },
+                        new
+                        {
+                            Code = "personnel.correction.update",
+                            Description = "Düzeltme taleplerini kapatma"
+                        },
+                        new
+                        {
+                            Code = "personnel.quality.view",
+                            Description = "Veri kalitesi raporunu görme"
+                        },
+                        new
+                        {
+                            Code = "personnel.quality.export",
+                            Description = "Veri kalitesi raporunu dışa aktarma"
+                        },
+                        new
+                        {
+                            Code = "reference.definition.view",
+                            Description = "Ünvan ve görev tanımlarını görme"
+                        },
+                        new
+                        {
+                            Code = "reference.definition.update",
+                            Description = "Ünvan ve görev tanımlarını değiştirme"
+                        },
+                        new
+                        {
+                            Code = "audit.log.view",
+                            Description = "Denetim kayıtlarını görme"
                         });
                 });
 

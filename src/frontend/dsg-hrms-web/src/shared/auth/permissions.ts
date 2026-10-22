@@ -6,8 +6,8 @@ export const permissions = {
   accountView: 'identity.account.view',
   accountUpdate: 'identity.account.update',
   inviteCreate: 'identity.invite.create',
-  syncView: 'identity.sync.view',
-  syncCreate: 'identity.sync.create',
+  syncView: 'personnel.sync.view',
+  syncCreate: 'personnel.sync.create',
   parameterView: 'system.parameter.view',
   parameterUpdate: 'system.parameter.update',
 } as const;

@@ -397,6 +397,97 @@
         }
       }
     },
+    "/api/v1/personnel/persons/me": {
+      "get": {
+        "tags": [
+          "Persons"
+        ],
+        "summary": "Kullanicinin kendi karti (\"Profilim\"). Izin gerektirmez.",
+        "responses": {
+          "200": {
+            "description": "Kart.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonCardResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Hesaba bagli kisi kaydi yok.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/persons/{personId}": {
+      "get": {
+        "tags": [
+          "Persons"
+        ],
+        "summary": "Kisinin karti.",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kart.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonCardResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi yok veya kullanicinin kapsami disinda (ikisi ayirt edilemez).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/identity/account/password": {
       "post": {
         "tags": [
@@ -2237,7 +2328,7 @@
             }
           },
           "403": {
-            "description": "Yetki yok (`identity.sync.view`).",
+            "description": "Yetki yok (`personnel.sync.view`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2277,7 +2368,7 @@
             }
           },
           "403": {
-            "description": "Yetki yok (`identity.sync.create`).",
+            "description": "Yetki yok (`personnel.sync.create`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2483,6 +2574,49 @@
           }
         },
         "description": "Hesap olusturma istegi."
+      },
+      "EmploymentCardResponse": {
+        "required": [
+          "registryCode",
+          "companyName",
+          "hireDate",
+          "terminationDate",
+          "isActive",
+          "seniority"
+        ],
+        "type": "object",
+        "properties": {
+          "registryCode": {
+            "type": "string",
+            "description": "Sicil numarasi."
+          },
+          "companyName": {
+            "type": "string",
+            "description": "Firma."
+          },
+          "hireDate": {
+            "type": "string",
+            "description": "Ise giris tarihi.",
+            "format": "date"
+          },
+          "terminationDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Isten cikis tarihi; aktifse bos.",
+            "format": "date"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Istihdam suruyor mu."
+          },
+          "seniority": {
+            "description": "Kidem suresi.",
+            "$ref": "#/components/schemas/SeniorityResponse"
+          }
+        },
+        "description": "Kartta bir istihdam."
       },
       "EntityTagHeaderValue": {
         "type": "object",
@@ -2838,6 +2972,85 @@
         },
         "description": "Parola kurallari."
       },
+      "PersonCardResponse": {
+        "required": [
+          "personId",
+          "firstName",
+          "lastName",
+          "nationalId",
+          "isNationalIdMasked",
+          "birthDate",
+          "age",
+          "email",
+          "mobilePhone",
+          "isSelf",
+          "employments"
+        ],
+        "type": "object",
+        "properties": {
+          "personId": {
+            "type": "string",
+            "description": "Dis kimlik.",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Ad (LOGO'daki gibi)."
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Soyad."
+          },
+          "nationalId": {
+            "type": "string",
+            "description": "TCKN; tam degeri gorme izni yoksa `123******01` bicimde maskeli."
+          },
+          "isNationalIdMasked": {
+            "type": "boolean",
+            "description": "TCKN maskeli mi."
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "Dogum tarihi.",
+            "format": "date"
+          },
+          "age": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Yas.",
+            "format": "int32"
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Kurumsal e-posta; kayitli degilse bos."
+          },
+          "mobilePhone": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Cep telefonu; kayitli degilse bos."
+          },
+          "isSelf": {
+            "type": "boolean",
+            "description": "Kart kullanicinin kendisine mi ait."
+          },
+          "employments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmploymentCardResponse"
+            },
+            "description": "Istihdamlar; once aktifler, ise giris tarihi yeniden eskiye."
+          }
+        },
+        "description": "Kisi karti."
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -2970,6 +3183,49 @@
           }
         },
         "description": "Parola sifirlama istegi (SYG-KMLK-047)."
+      },
+      "SeniorityResponse": {
+        "required": [
+          "years",
+          "months",
+          "days",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "years": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Tam yil.",
+            "format": "int32"
+          },
+          "months": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Yildan arta kalan tam ay.",
+            "format": "int32"
+          },
+          "days": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Aydan arta kalan gun.",
+            "format": "int32"
+          },
+          "text": {
+            "type": "string",
+            "description": "Ekran metni: \"X Yil Y Ay Z Gun\"; sifir olan bas birimler yazilmaz."
+          }
+        },
+        "description": "Kidem suresi (SYG-PERS-039)."
       },
       "SessionResponse": {
         "required": [
@@ -3511,6 +3767,9 @@
     },
     {
       "name": "SystemParameters"
+    },
+    {
+      "name": "Persons"
     },
     {
       "name": "Account"

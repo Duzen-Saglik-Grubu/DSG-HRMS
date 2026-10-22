@@ -47,6 +47,28 @@ public static partial class Mask
     }
 
     /// <summary>
+    /// TCKN'yi EKRAN icin maskeler: <c>12345678901</c> → <c>123******01</c> (SYG-PERS-053).
+    /// </summary>
+    /// <remarks>
+    /// Gunluk maskesinden (<see cref="NationalId"/>, REQ-KMLK-041) farklidir ve PG-PERS-31'e
+    /// dayanir: son iki hane kontrol hanesidir ve ilk dokuz haneden hesaplanir; yalnizca
+    /// onlari gostermek gizli haneler hakkinda neredeyse bilgi vermez. Gunluk bicimi onayli
+    /// bir gereksinimde yazili oldugu icin degistirilmedi.
+    /// </remarks>
+    public static string? NationalIdForDisplay(string? value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        var trimmed = value.Trim();
+        return IsAllDigits(trimmed) && trimmed.Length == 11
+            ? $"{trimmed[..3]}******{trimmed[^2..]}"
+            : Redacted;
+    }
+
+    /// <summary>
     /// Cep telefonu maskeler: <c>5321234567</c> → <c>532*****67</c>
     /// </summary>
     /// <remarks>

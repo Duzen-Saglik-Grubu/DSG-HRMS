@@ -369,6 +369,116 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/persons/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kullanicinin kendi karti ("Profilim"). Izin gerektirmez. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Kart. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PersonCardResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Hesaba bagli kisi kaydi yok. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/persons/{personId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kisinin karti. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Kart. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PersonCardResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi yok veya kullanicinin kapsami disinda (ikisi ayirt edilemez). */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/account/password": {
         parameters: {
             query?: never;
@@ -2193,7 +2303,7 @@ export interface paths {
                         "application/json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Yetki yok (`identity.sync.view`). */
+                /** @description Yetki yok (`personnel.sync.view`). */
                 403: {
                     headers: {
                         [name: string]: unknown;
@@ -2249,7 +2359,7 @@ export interface paths {
                         "application/json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Yetki yok (`identity.sync.create`). */
+                /** @description Yetki yok (`personnel.sync.create`). */
                 403: {
                     headers: {
                         [name: string]: unknown;
@@ -2352,6 +2462,27 @@ export interface components {
         CompleteRegistrationRequest: {
             /** @description Parola. */
             password: string;
+        };
+        /** @description Kartta bir istihdam. */
+        EmploymentCardResponse: {
+            /** @description Sicil numarasi. */
+            registryCode: string;
+            /** @description Firma. */
+            companyName: string;
+            /**
+             * Format: date
+             * @description Ise giris tarihi.
+             */
+            hireDate: string;
+            /**
+             * Format: date
+             * @description Isten cikis tarihi; aktifse bos.
+             */
+            terminationDate: null | string;
+            /** @description Istihdam suruyor mu. */
+            isActive: boolean;
+            /** @description Kidem suresi. */
+            seniority: components["schemas"]["SeniorityResponse"];
         };
         EntityTagHeaderValue: {
             tag?: components["schemas"]["StringSegment"];
@@ -2501,6 +2632,40 @@ export interface components {
             /** @description Buyuk/kucuk harf, rakam ve simge zorunlu mu (PRM-KML-06). */
             requireComplexity: boolean;
         };
+        /** @description Kisi karti. */
+        PersonCardResponse: {
+            /**
+             * Format: uuid
+             * @description Dis kimlik.
+             */
+            personId: string;
+            /** @description Ad (LOGO'daki gibi). */
+            firstName: string;
+            /** @description Soyad. */
+            lastName: string;
+            /** @description TCKN; tam degeri gorme izni yoksa `123******01` bicimde maskeli. */
+            nationalId: string;
+            /** @description TCKN maskeli mi. */
+            isNationalIdMasked: boolean;
+            /**
+             * Format: date
+             * @description Dogum tarihi.
+             */
+            birthDate: string;
+            /**
+             * Format: int32
+             * @description Yas.
+             */
+            age: number | string;
+            /** @description Kurumsal e-posta; kayitli degilse bos. */
+            email: null | string;
+            /** @description Cep telefonu; kayitli degilse bos. */
+            mobilePhone: null | string;
+            /** @description Kart kullanicinin kendisine mi ait. */
+            isSelf: boolean;
+            /** @description Istihdamlar; once aktifler, ise giris tarihi yeniden eskiye. */
+            employments: components["schemas"]["EmploymentCardResponse"][];
+        };
         ProblemDetails: {
             type?: null | string;
             title?: null | string;
@@ -2549,6 +2714,26 @@ export interface components {
         ResetPasswordRequest: {
             /** @description Yeni parola. */
             password: string;
+        };
+        /** @description Kidem suresi (SYG-PERS-039). */
+        SeniorityResponse: {
+            /**
+             * Format: int32
+             * @description Tam yil.
+             */
+            years: number | string;
+            /**
+             * Format: int32
+             * @description Yildan arta kalan tam ay.
+             */
+            months: number | string;
+            /**
+             * Format: int32
+             * @description Aydan arta kalan gun.
+             */
+            days: number | string;
+            /** @description Ekran metni: "X Yil Y Ay Z Gun"; sifir olan bas birimler yazilmaz. */
+            text: string;
         };
         /** @description Acik oturum. Yenileme jetonu burada DEGIL, HttpOnly cerezdedir. */
         SessionResponse: {
