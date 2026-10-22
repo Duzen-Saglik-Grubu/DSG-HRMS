@@ -83,15 +83,15 @@ altyapısı yoktur:
 |---|---|
 | CI ve otomatik testler | Sentetik |
 | **Yerel geliştirme** | **Senkronize edilmez.** Senkronizasyon ayarı `Logo:SyncSpecialCategoryData` yerelde kapalıdır; alan boş kalır |
-| **UAT** | Kabul testi için senkronize edilir; şifreli, erişimi sınırlı. **KVKK Sorumlusunun onayına bağlıdır** (aşağıda) |
+| **UAT** | Kabul testi için senkronize edilir; şifreli, erişimi sınırlı. **KVKK Sorumlusu onayladı (22.10.2026, `KR-125`)** |
 | Üretim | Senkronize edilir |
 
 Yerel ortamda gerçek kan grubunun bulunmasının bir faydası yoktur. Geliştirici şifreleme
 ve görünürlük davranışını CI'daki sentetik veriyle ve UAT'de dener.
 
-> **Açık nokta (KVKK Sorumlusu):** UAT'de gerçek kan grubunun senkronize edilmesi. R-25'in
-> kabulü T3 verisi içindi. Onay verilmezse UAT'de de ayar kapalı kalır; kabulde kan grubu
-> davranışı sentetik bir kayıtla gösterilir.
+> **Karar (22.10.2026, `KR-125`):** KVKK Sorumlusu UAT'de gerçek kan grubunun bulunmasını
+> kabul testi için onayladı; yerel geliştirme ortamında bulunmaz. R-25'in kapsamı buna göre
+> güncellendi.
 
 ## Gerekçe
 
@@ -141,3 +141,4 @@ yeniden senkronizasyonla uygulanabilir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-22 | 1.0 | İlk sürüm: T1 tasarım kararları (#245 maddeler 3, 4) | Bilgi İşlem |
+| 2026-10-22 | 1.1 | §6: UAT'de gerçek kan grubu KVKK Sorumlusu tarafından onaylandı (`KR-125`, #265) | Bilgi İşlem |

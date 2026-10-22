@@ -255,8 +255,8 @@ KPÖ'lerle ilişkili gereksinimler (PG-PERS-39, 40, 41) olduğu gibi onaylandı.
 > birbiriyle ve mevcut kararlarla tutarlılığı incelenirken yazıldı. Hiçbiri **İK kararını
 > değiştirmez**; kararın uygulanma biçimine ilişkin önerilerdir. İK ile teyit edilecektir.
 
-> **Durum (20.10.2026):** Maddeler İK ve KVKK Sorumlusu tarafından cevaplandı; bkz. §12.
-> Üç ayrıntı açık kaldı (§12.2).
+> **Durum (22.10.2026):** Bütün maddeler İK ve KVKK Sorumlusu tarafından cevaplandı; bkz. §12
+> ve §13. Açık ayrıntı kalmadı.
 
 ### 11.1 Y3 Referans Veri bağımlılığı (PG-PERS-21, 43) — ✅ karar verildi (§12)
 
@@ -388,9 +388,28 @@ ekledi (#241). Kararlar aşağıda Doğuş Uçanok'un bildirdiği biçimde aktar
 
 ---
 
+## 13. İkinci teyit — 2026-10-22
+
+§12.2'deki üç ayrıntı İK tarafından cevaplandı; T1 tasarım kararlarının (ADR-0019…0022) açık
+noktaları karara bağlandı. Doğuş Uçanok bildirdi (#265).
+
+| # | Soru | Cevap | Etkisi |
+|---|---|---|---|
+| 11.2 d | Evlilik tarihi ve evlilik yardımını kimler görür? | **Yalnızca İK ve Sistem Yöneticisi**; kişinin kendisi de görmez | PG-PERS-19; ADR-0019 §2 |
+| 11.2 e | Medeni hâl Bekar'a dönerse girilmiş evlilik bilgisi ne olur? | **Görülebilir kalır** | PG-PERS-19 |
+| 11.7 | Ayrılan istihdamda kıdem | **Ayrılan istihdamda işe giriş ile işten çıkış arasında; aktif istihdamda bugüne kadar** | PG-PERS-21 |
+| ADR-0021 §7 | Adların gösterimi | **LOGO'daki gibi tamamı büyük harfle** | ADR-0021 §7 |
+| ADR-0020 §6 | UAT'de gerçek kan grubu | **Bulunur** (kabul testi için); yerelde bulunmaz. KVKK Sorumlusu kararı | ADR-0020 §6; `KR-125` |
+| ADR-0019 §5 | Liste görüntülemesinde gösterilen kişilerin kaydı | **Yazılır** | ADR-0019 §5 |
+| ADR-0019 §4 | T1 izinleri | Mevcut İK rolüne verilir; rolün adı "İnsan Kaynakları" | ADR-0019 §4 |
+| ADR-0021 §5 | Fotoğrafların yeri | Veritabanında (ADR-0013 istisnası) onaylandı | ADR-0021 §5 |
+
+---
+
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-20 | 1.0 | Toplantı kaydı (#239) | Bilgi İşlem |
 | 2026-10-20 | 1.1 | §12: toplantı sonrası teyit (İK ve KVKK Sorumlusu, 20.10.2026); §11 başlıklarına durum; üç açık ayrıntı (#241) | Bilgi İşlem |
+| 2026-10-22 | 1.2 | §13: ikinci teyit (22.10.2026); §12.2'deki üç ayrıntı ve T1 ADR açık noktaları cevaplandı (#265) | Bilgi İşlem |
