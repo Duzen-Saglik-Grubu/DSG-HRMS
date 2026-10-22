@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Dsg.Hrms.Application.Common.Security;
+using Dsg.Hrms.Domain.Common;
 using Dsg.Hrms.Domain.Personnel;
 using FluentValidation;
 

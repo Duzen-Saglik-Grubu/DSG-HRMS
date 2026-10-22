@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi; §7 → ADR-0018
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-023`, `KR-118`
+**Karar defteri karşılığı:** `KR-023`, `KR-118`, `KR-120`
 **İlgili süreç:** TEC.5 (Tasarım), MAN.6 (Bilgi Yönetimi)
 **İlgili riskler:** `R-03`
 
@@ -124,6 +124,24 @@ alanın log'a düşmesi test hatası üretir.
 > görüntülemesinde ekranda gösterilen kişilerin kimliklerinin kaydedilip kaydedilmeyeceği
 > T1 tasarımında kararlaştırılır (#245).
 
+> **Gerçekleştirme notu (21.10.2026, `KR-120`, #244):** Varlık alanlarının sınıflandırması
+> **zorunludur.** Personel varlıklarının (`Dsg.Hrms.Domain.Personnel`) her metin ve tarih
+> alanı tam olarak bir öznitelik taşır:
+>
+> | Öznitelik | Denetim izinde ve günlükte |
+> |---|---|
+> | `[PersonalData(tür)]` | Türün kuralıyla kısmen maskelenir (TCKN, telefon, e-posta) veya tamamen (`Unspecified`) |
+> | `[SpecialCategoryData]` | **Değer hiç yazılmaz**; yalnızca alanın değiştiği görünür (kan grubu gibi KVKK md. 6 verisi) |
+> | `[Secret]` | Hiç yazılmaz |
+> | `[AuditVisible("gerekçe")]` | Bilerek açık yazılır; gerekçe zorunlu (ad, soyad, sicil, istihdam tarihleri) |
+>
+> Öznitelikler Domain katmanına taşındı (`Dsg.Hrms.Domain.Common`); önceden Application
+> katmanındaydı ve Domain varlıkları onları göremiyordu. Maskeleme bu yüzden yalnızca ad
+> listesine dayanıyordu ve listede olmayan bir ad (ör. `BloodType`, `Address`) düz metin
+> yazılırdı (tasarım gözden geçirmesi B-02). `DataClassificationTests` işaretsiz alanı,
+> gerekçesiz `[AuditVisible]`'ı ve hassas ada (`NationalId`, `Email`) verilmiş
+> `[AuditVisible]`'ı yakalar. Ad listesi ikinci savunma hattı olarak kalır.
+
 ### 5. Özel nitelikli verinin saklanması
 
 - Özel nitelikli alanlar veritabanında **uygulama seviyesinde şifrelenir**
@@ -226,3 +244,4 @@ veri sızıntısı incelemesi mümkün olur.
 | 2026-10-14 | 0.4 | §6: KVKK saklama süresi kararı (`KR-109`); §7 → ADR-0018 (`KR-108`) (#215) | Bilgi İşlem |
 | 2026-10-21 | 0.5 | §2: denetim kayıtlarının değiştirilemezliğinin ikinci katmanı, sahip olmayan çalışma rolü (`KR-118`, #244) | Bilgi İşlem |
 | 2026-10-21 | 0.6 | §4: serbest arama metninin maskelenmesi (#244, B-07) | Bilgi İşlem |
+| 2026-10-21 | 0.7 | §4: varlık alanlarının zorunlu sınıflandırması; `[SpecialCategoryData]` ve `[AuditVisible]` (`KR-120`, #244) | Bilgi İşlem |

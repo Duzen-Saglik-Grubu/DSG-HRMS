@@ -1,3 +1,5 @@
+using Dsg.Hrms.Domain.Common;
+
 namespace Dsg.Hrms.Domain.Personnel.Sync;
 
 /// <summary>
@@ -26,9 +28,11 @@ public sealed class PersonnelSyncWarning
     public SyncWarningCode Code { get; private set; }
 
     /// <summary>Uyarinin ilgili oldugu kartin sicil kodu.</summary>
+    [AuditVisible("IK karti LOGO'da sicil koduyla bulur; uyari kaydinin amaci budur")]
     public string RegistryCode { get; private set; } = string.Empty;
 
     /// <summary>Aciklama. Kisisel veri icermez.</summary>
+    [AuditVisible("Uyari aciklamasi kisisel veri icermeyecek bicimde uretilir (PersonnelSynchronizer)")]
     public string Detail { get; private set; } = string.Empty;
 
     /// <summary>Yeni uyari olusturur.</summary>

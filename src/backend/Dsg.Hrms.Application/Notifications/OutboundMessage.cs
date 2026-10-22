@@ -1,4 +1,5 @@
 using Dsg.Hrms.Application.Common.Security;
+using Dsg.Hrms.Domain.Common;
 using Dsg.Hrms.Domain.Notifications;
 
 namespace Dsg.Hrms.Application.Notifications;

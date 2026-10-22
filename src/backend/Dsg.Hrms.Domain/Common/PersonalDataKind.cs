@@ -1,4 +1,4 @@
-namespace Dsg.Hrms.Application.Common.Security;
+namespace Dsg.Hrms.Domain.Common;
 
 /// <summary>
 /// Maskeleme kuralini belirleyen kisisel veri turu (ADR-0009 §4).

@@ -30,6 +30,7 @@ public sealed class Employment : Entity, IAuditable
     public Person Person { get; private set; } = null!;
 
     /// <summary>LOGO sicil kodu. Veritabani genelinde tekildir.</summary>
+    [AuditVisible("Kurum ici tanimlayici; kaydi LOGO'da bulmak icin gerekir")]
     public string RegistryCode { get; private set; } = string.Empty;
 
     /// <summary>Firmanin kimligi.</summary>
@@ -39,9 +40,11 @@ public sealed class Employment : Entity, IAuditable
     public Company Company { get; private set; } = null!;
 
     /// <summary>Ise giris tarihi.</summary>
+    [AuditVisible("Istihdam donemi; kidem ve aktiflik kararinin denetimi icin gerekir")]
     public DateOnly HireDate { get; private set; }
 
     /// <summary>Isten cikis tarihi (son calisma gunu). Aktif istihdamda <c>null</c>.</summary>
+    [AuditVisible("Istihdam donemi; hesabin pasife alinma kararinin denetimi icin gerekir")]
     public DateOnly? TerminationDate { get; private set; }
 
     /// <summary>

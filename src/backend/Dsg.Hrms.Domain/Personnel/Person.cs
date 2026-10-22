@@ -11,11 +11,10 @@ namespace Dsg.Hrms.Domain.Personnel;
 /// hesabi kisiye baglanir, istihdama degil (<c>KR-014</c>).
 /// </para>
 /// <para>
-/// <b>Ozellik adlari bilincli secildi:</b> <see cref="NationalId"/>, <see cref="Email"/>,
-/// <see cref="MobilePhone"/> ve <see cref="BirthDate"/>, denetim izinde ad tabanli
-/// maskeleme kuralina takilir (ADR-0009 §4). Domain katmani uygulama katmanindaki
-/// <c>[PersonalData]</c> ozniteligini goremedigi icin maskelemenin tek dayanagi bu
-/// adlardir; yeniden adlandirilirlarsa kisisel veri denetim izine duz metin duser.
+/// <b>Her metin ve tarih alani siniflandirilmistir</b> (<c>[PersonalData]</c>,
+/// <c>[SpecialCategoryData]</c>, <c>[Secret]</c> veya gerekceli <c>[AuditVisible]</c>);
+/// denetim izi ve gunluk maskelemesi bu oznitelige bakar (ADR-0009 §4). Isaretsiz yeni alan
+/// mimari testini dusurur (#244, B-02). Ad tabanli kural ikinci savunma hatti olarak kalir.
 /// </para>
 /// </remarks>
 public sealed class Person : Entity, IAuditable
@@ -27,20 +26,25 @@ public sealed class Person : Entity, IAuditable
     }
 
     /// <summary>T.C. Kimlik Numarasi. Tekildir.</summary>
+    [PersonalData(PersonalDataKind.NationalId)]
     public string NationalId { get; private set; } = string.Empty;
 
     /// <summary>Ad.</summary>
+    [AuditVisible("Denetim izinin okunabilmesi icin gerekir: hangi kisinin kaydinin degistigi ve ad degisikligi (LOGO duzeltmesi) gorunmelidir")]
     public string FirstName { get; private set; } = string.Empty;
 
     /// <summary>Soyad.</summary>
+    [AuditVisible("Denetim izinin okunabilmesi icin gerekir; soyadi degisikligi (evlilik) IK icin anlamli bir kayittir")]
     public string LastName { get; private set; } = string.Empty;
 
     /// <summary>Dogum tarihi. Uyelikte kimlik dogrulama unsurudur (SYG-KMLK-013).</summary>
+    [PersonalData(PersonalDataKind.Unspecified)]
     public DateOnly BirthDate { get; private set; }
 
     /// <summary>
     /// LOGO'da tanimli kurumsal e-posta (normallestirilmis). Tanimli degilse <c>null</c>.
     /// </summary>
+    [PersonalData(PersonalDataKind.Email)]
     public string? Email { get; private set; }
 
     /// <summary>
@@ -52,6 +56,7 @@ public sealed class Person : Entity, IAuditable
     /// <summary>
     /// Gecerli cep telefonu (<c>5XXXXXXXXX</c>). Tanimli degilse veya gecersizse <c>null</c>.
     /// </summary>
+    [PersonalData(PersonalDataKind.Phone)]
     public string? MobilePhone { get; private set; }
 
     /// <summary>Kisinin istihdamlari.</summary>

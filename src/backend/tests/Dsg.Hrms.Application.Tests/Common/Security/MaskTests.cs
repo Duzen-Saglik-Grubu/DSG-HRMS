@@ -1,4 +1,5 @@
 using Dsg.Hrms.Application.Common.Security;
+using Dsg.Hrms.Domain.Common;
 
 namespace Dsg.Hrms.Application.Tests.Common.Security;
 

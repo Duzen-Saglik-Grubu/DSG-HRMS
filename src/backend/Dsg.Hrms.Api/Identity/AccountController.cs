@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Dsg.Hrms.Application.Common.Security;
 using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Application.Identity.Sessions;
+using Dsg.Hrms.Domain.Common;
 using Dsg.Hrms.Domain.Identity;
 using FluentValidation;
 using FluentValidation.Results;

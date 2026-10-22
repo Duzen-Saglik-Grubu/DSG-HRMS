@@ -4,6 +4,7 @@ using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Notifications;
 using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Audit;
+using Dsg.Hrms.Domain.Common;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Notifications;
 using Microsoft.Extensions.Logging;
@@ -254,7 +255,7 @@ public sealed record VerificationRequest(
     long PersonId,
     VerificationPurpose Purpose,
     VerificationChannel Channel,
-    [property: Common.Security.PersonalData(Common.Security.PersonalDataKind.Unspecified)] string Recipient)
+    [property: PersonalData(PersonalDataKind.Unspecified)] string Recipient)
 {
     /// <inheritdoc />
     public override string ToString() => $"{PersonId} {Purpose} {Channel}";
