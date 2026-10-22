@@ -73,6 +73,14 @@ Api  →  Application  →  Domain
 Bu kurallar **mimari testi** ile otomatik doğrulanacaktır (NetArchTest veya eşdeğeri);
 kural ihlali derlemeyi değil, **testi** kırar ve PR birleştirilemez.
 
+> **Gerçekleştirme notu (22.10.2026, #246):** Kural 4'teki "başlangıç dosyası" kompozisyon
+> köküdür: `Program` ve servis kayıt uzantıları (adı `Registration` ile biten sınıflar, ör.
+> `HealthCheckRegistration`). Bu sınıflar Infrastructure'daki seçenek doğrulama yardımcısını
+> kullanır. Denetleyiciler ve diğer Api tipleri Infrastructure'a dokunmaz. Kural 4 önceden
+> test edilmiyordu; artık `LayerDependencyTests.Api_touches_infrastructure_only_in_the_composition_root`
+> denetler (tasarım gözden geçirmesi B-10). Kural 5'in ölçümüne Api katmanı da eklendi: Api'deki
+> modüller arası bağımlılıklar da ADR-0016 tablosunda gerekçesiyle bildirilir.
+
 ### Modül sınırlarının ihlali nasıl önlenir?
 
 - Her modülün dışa açık yüzeyi `Modules/<Modül>/Abstractions/` altında toplanır.
@@ -129,3 +137,4 @@ mümkündür. Katman yapısından dönmek ise pratikte yeniden yazım demektir.
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-10-05 | 0.2 | Durum: modül düzeni ve modül sınırı denetimi ADR-0016 ile değiştirildi (`KR-099`, #171) | Bilgi İşlem |
+| 2026-10-22 | 0.3 | Kural 4: kompozisyon kökü tanımı ve testi; Kural 5 ölçümüne Api katmanı (#246) | Bilgi İşlem |

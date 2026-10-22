@@ -103,17 +103,58 @@ public sealed class LayerDependencyTests
     }
 
     // ------------------------------------------------------------------
+    // Kural 4: Api, Infrastructure'a yalnizca kompozisyon kokunde dokunur (ADR-0002).
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Api_touches_infrastructure_only_in_the_composition_root()
+    {
+        // Kompozisyon koku: Program ve servis kayit uzantilari (adi "Registration" ile biten
+        // siniflar). Denetleyiciler ve diger Api tipleri Infrastructure'i dogrudan kullanirsa
+        // katmanlar arasindaki arayuz atlanir (#246, B-10).
+        var result = Types.InAssembly(typeof(Program).Assembly)
+            .That().DoNotHaveNameEndingWith("Registration")
+            .And().DoNotHaveName("Program")
+            .ShouldNot().HaveDependencyOn(InfrastructureLayer)
+            .GetResult();
+
+        ViolationMessage(result,
+                "Api, Infrastructure'a yalnizca Program ve *Registration siniflarinda dokunur (ADR-0002, Kural 4).")
+            .ShouldBeNull();
+    }
+
+    [Fact]
+    public void Composition_root_rule_is_not_vacuous()
+    {
+        // Pozitif kontrol: kayit sinifi Infrastructure'a gercekten bagimli; kural bunu taniyor.
+        Types.InAssembly(typeof(Program).Assembly)
+            .That().HaveName("HealthCheckRegistration")
+            .Should().HaveDependencyOn(InfrastructureLayer)
+            .GetResult().IsSuccessful.ShouldBeTrue();
+    }
+
+    // ------------------------------------------------------------------
     // Kural 4b: LOGO yalitimi (ADR-0003 §2, KR-003).
     // ------------------------------------------------------------------
 
     private const string LogoNamespace = "Dsg.Hrms.Infrastructure.Logo";
 
-    /// <summary>LOGO'ya erisim saglayan tipler; yalnizca Logo klasorunde kullanilabilir.</summary>
-    private static readonly string[] LogoAccessTypes =
+    /// <summary>
+    /// LOGO'ya erisim saglayan ad alanlari; yalnizca Logo klasorunde kullanilabilir. Onceden
+    /// yalnizca adi sayilmis uc tip korunuyordu; Logo ad alanina eklenen yeni bir tip veya
+    /// SQL Server saglayicisiyla kurulan ikinci bir baglam yakalanmazdi (#246, B-11).
+    /// </summary>
+    /// <remarks>
+    /// <c>LogoOptions</c> istisnadir: yalnizca LOGO baglantisinin tanimli olup olmadigini tasir,
+    /// LOGO'ya erisim saglamaz; senkronizasyon isi ve durumu onu okur.
+    /// </remarks>
+    private static string[] LogoAccessTypes =>
     [
         "Microsoft.Data.SqlClient",
-        "Dsg.Hrms.Infrastructure.Logo.LogoDbContext",
-        "Dsg.Hrms.Infrastructure.Logo.LogoPersonnelSource",
+        "Microsoft.EntityFrameworkCore.SqlServer",
+        .. InfrastructureAssembly.GetTypes()
+            .Where(t => t.Namespace == LogoNamespace && t.Name != "LogoOptions" && !t.Name.StartsWith('<'))
+            .Select(t => t.FullName!),
     ];
 
     [Fact]
@@ -175,7 +216,12 @@ public sealed class LayerDependencyTests
     /// ortak olarak siniflandirilmadikca test duser; boylece yeni modul sessizce denetim
     /// disinda kalmaz.
     /// </summary>
-    private static readonly string[] SharedNamespaces = ["Common", "Data", "Configuration", "Logging", "Time", "Logo"];
+    private static readonly string[] SharedNamespaces =
+    [
+        "Common", "Data", "Configuration", "Logging", "Time", "Logo",
+        // Api'nin yatay ad alanlari (#246): istek boru hatti, saglik, gozlemlenebilirlik.
+        "Validation", "OpenApi", "Observability", "Networking", "Health", "ErrorHandling",
+    ];
 
     /// <summary>Bildirilen moduller arasi bagimliliklar (katman: kaynak -> hedef) ve gerekceleri.</summary>
     private static readonly Dictionary<string, string> AllowedModuleDependencies = new(StringComparer.Ordinal)
@@ -201,6 +247,11 @@ public sealed class LayerDependencyTests
         ["Application: Personnel -> Settings"] = "senkronizasyon periyodu",
         ["Infrastructure: Personnel -> Settings"] = "senkronizasyon periyodu",
         ["Infrastructure: Notifications -> Settings"] = "SMTP ve NetGSM parametreleri",
+
+        // Api katmani (#246, B-10).
+        ["Api: Identity -> Personnel"] = "uyelik isteginde TCKN bicim dogrulamasi (Domain.Personnel.NationalId)",
+        ["Api: Identity -> Settings"] = "giris ekraninin herkese acik ayarlari (SYG-KMLK-070)",
+        ["Api: Settings -> Identity"] = "parametre ve logo uclarinda yetki ozniteligi ve izin kodlari (SYG-KMLK-074)",
     };
 
     [Fact]
@@ -238,7 +289,9 @@ public sealed class LayerDependencyTests
     // Yardimcilar
     // ------------------------------------------------------------------
 
-    private static Assembly[] LayerAssemblies => [DomainAssembly, ApplicationAssembly, InfrastructureAssembly];
+    // Api de olculur (#246, B-10): denetleyiciler baska bir modulun uygulama hizmetini
+    // kullanirsa bu da moduller arasi bagimliliktir.
+    private static Assembly[] LayerAssemblies => [DomainAssembly, ApplicationAssembly, InfrastructureAssembly, typeof(Program).Assembly];
 
     private static string LayerName(Assembly assembly) => assembly.GetName().Name!["Dsg.Hrms.".Length..];
 

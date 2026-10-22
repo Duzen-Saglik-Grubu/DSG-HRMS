@@ -89,6 +89,10 @@ Kaydedilecek olaylar:
 Dışa aktarma kayıtlarında **kaç kişinin verisinin** dışarı çıktığı da tutulur; bu,
 olası bir veri sızıntısı incelemesinin ilk sorusudur.
 
+> **Gerçekleştirme notu (22.10.2026, #246):** Erişim kaydı iş işleminden **ayrı bir bağlam ve
+> işlemle** yazılır (`AccessLogger`, `KR-061`). İş işlemi geri alınsa da görüntüleme kaydı
+> kalır; kayıt yazılamazsa veri sunulmaz (fail-closed).
+
 ### 3.1 Kimlik olayı kaydı
 
 *Gerçekleştirme (03.10.2026, `KR-094`, #119):* Giriş, kod, parola, oturum ve davet olayları
@@ -189,6 +193,11 @@ telefon, e-posta ve özel nitelikli alanlar gerçek değerlerini taşımaz. Bu, 
 - Kritik olaylar (senkronizasyon hatası, yapılandırma hatası, jeton yeniden kullanımı,
   SMS/e-posta gönderim hatası) yöneticiye bildirim üretir.
 
+> **Gerçekleştirme notu (22.10.2026, #246):** Yöneticiye bildirim **Y1 Bildirim Merkezi'ne
+> ertelendi** (SYG-KMLK-010). Bugün bu olaylar günlüğe, güvenlik olayı kaydına ve ilgili
+> kayıtlara yazılır; senkronizasyon ve bildirim kanallarının durumu `/health/sync` ve
+> `/health/notifications` ile izlenir (tasarım gözden geçirmesi B-08).
+
 ## Gerekçe
 
 - Üç kayıt türünün ayrılması, her birinin farklı saklama süresi, farklı erişim yetkisi
@@ -245,3 +254,4 @@ veri sızıntısı incelemesi mümkün olur.
 | 2026-10-21 | 0.5 | §2: denetim kayıtlarının değiştirilemezliğinin ikinci katmanı, sahip olmayan çalışma rolü (`KR-118`, #244) | Bilgi İşlem |
 | 2026-10-21 | 0.6 | §4: serbest arama metninin maskelenmesi (#244, B-07) | Bilgi İşlem |
 | 2026-10-21 | 0.7 | §4: varlık alanlarının zorunlu sınıflandırması; `[SpecialCategoryData]` ve `[AuditVisible]` (`KR-120`, #244) | Bilgi İşlem |
+| 2026-10-22 | 0.8 | §3 erişim kaydının ayrı işlemi; §8 yönetici bildirimi Y1'e ertelendi (#246) | Bilgi İşlem |

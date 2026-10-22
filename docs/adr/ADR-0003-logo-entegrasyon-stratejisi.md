@@ -37,6 +37,13 @@ taahhüt değil, **uygulanmış bir kontroldür**:
 - Ek olarak, uygulama tarafında LOGO için kullanılan `DbContext`
   **`SaveChanges` çağrısında istisna fırlatacaktır** ve varsayılan olarak `NoTracking`
   çalışacaktır — ikinci bir kilit.
+
+> **Sınır (22.10.2026, #246):** İkinci kilit yalnızca `SaveChanges` yolunu kapatır;
+> `ExecuteUpdate`, `ExecuteDelete` ve ham SQL (`ExecuteSqlRaw`) yollarını kapsamaz. Asıl
+> koruma veritabanındaki `DENY` yetkisidir (birinci kilit); üçüncü kilit onun kaldırılmadığını
+> denetler. Mimari testi LOGO'ya erişen kodun yalnızca `Infrastructure/Logo` altında kalmasını
+> sağlar: Logo ad alanının tüm tipleri (yalnızca `LogoOptions` hariç), `Microsoft.Data.SqlClient`
+> ve SQL Server EF sağlayıcısı başka yerde kullanılamaz (tasarım gözden geçirmesi B-11).
 - **Üçüncü kilit (2026-09-26):** Senkronizasyon **her çalışmadan önce** oturumun yazma
   yetkisi olmadığını `HAS_PERMS_BY_NAME` ile denetler; bu denetim hiçbir şey yazmaz.
   Yazma yetkisi görürse çalışmayı reddeder ve kritik düzeyde günlüğe yazar. `DENY` bir
@@ -65,6 +72,10 @@ public interface ILogoPersonnelSource
     Task<LogoSchemaCheckResult> VerifySchemaAsync(CancellationToken ct);
 }
 ```
+
+> **Gerçekleştirme notu (22.10.2026, #246):** `FindByNationalIdAsync` uygulanmadı. Üyelik ve
+> giriş LOGO'yu canlı sorgulamaz; HRMS tablolarındaki anlık görüntüyü kullanır (§4, `KR-077`).
+> Arayüzün bugünkü üyeleri: tüm kayıtları okuma ve şema denetimi.
 
 Bu, **yolsuzluk önleyici katmandır** (anti-corruption layer): LOGO'nun tablo adları,
 kolon kodları ve alan anlamları uygulamanın geri kalanına sızmaz. Kaynak sistem yarın
@@ -102,7 +113,7 @@ Personel ana verisi HRMS veritabanına kopyalanır; ekranlar ve raporlar **HRMS'
 | Yöntem | Kaynaktan tam liste okunur, HRMS'teki kayıtlarla karşılaştırılır, fark uygulanır |
 | Kimlik eşleştirme | **TCKN** (kişi) ve **sicil numarası** (istihdam) |
 | Tarihçe | Her senkronizasyon tarihli bir çalışma kaydı üretir: okunan, eklenen, güncellenen, uyarı üretilen kayıt sayıları |
-| Hata davranışı | Senkronizasyon hatası **sessiz kalmaz**; kayıt altına alınır ve yöneticiye bildirim üretir |
+| Hata davranışı | Senkronizasyon hatası **sessiz kalmaz**; kayıt altına alınır ve yöneticiye bildirim üretir. **Bildirim Y1 Bildirim Merkezi'ne ertelendi** (SYG-KMLK-010): bugün hata çalışma kaydına ve günlüğe yazılır, `/health/sync` ile izlenir (#246, B-08) |
 | LOGO erişilemezse | Sistem **çalışmaya devam eder**; son anlık görüntü kullanılır, ekranda "son güncelleme" bilgisi gösterilir |
 
 ### 5. Veri kalitesi kuralları
@@ -176,3 +187,4 @@ değişir.
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-26 | 0.2 | §1 üçüncü kilit (her çalışmadan önce yetki denetimi), CI kanıtı ve `--context` notu eklendi (#74) | Bilgi İşlem |
+| 2026-10-22 | 0.3 | §1 ikinci kilidin sınırı ve genişletilen yalıtım testi; §2 `FindByNationalIdAsync` uygulanmadı; §4 bildirim Y1'e ertelendi (#246) | Bilgi İşlem |
