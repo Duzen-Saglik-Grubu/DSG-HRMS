@@ -1,7 +1,7 @@
 # İzin Listesi
 
 **Belge kimliği:** MIM-IZIN
-**Son güncelleme:** 2026-09-29
+**Son güncelleme:** 2026-10-22
 **Sahibi:** Bilgi İşlem
 **İlgili:** ADR-0007 §1, `KR-021`, `KR-089`, SYG-KMLK-074
 
@@ -12,7 +12,9 @@
 
 ## Biçim
 
-`<modül>.<kaynak>.<eylem>`. Eylemler: `view`, `create`, `update`, `delete`, `report`, `export`, `approve`.
+`<modül>.<kaynak>.<eylem>`. Eylemler: `view`, `create`, `update`, `delete`, `report`, `export`, `approve`; ayrıca alan düzeyinde görme için `view_<alan>` (ör. `personnel.person.view_sensitive`; ADR-0007 §1, ADR-0019 §4).
+
+> **T1'de eklenecek izinler** ADR-0019 §4 ve ADR-0022'de listelidir. Bu belgeye izinler kodla birlikte, aynı PR'da eklenir.
 
 - `export` ve `view` ayrı izinlerdir. Veriyi ekranda görebilmek, dışa aktarabilmek anlamına gelmez.
 - Reddetme (deny) izni yoktur. Kullanıcının izinleri, rollerinin izinlerinin birleşimidir.
@@ -44,3 +46,4 @@
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-29 | 0.1 | İlk oluşturma: T3 izinleri ve hazır iki rol (#100) | Bilgi İşlem |
+| 2026-10-22 | 0.2 | Biçim: `view_<alan>` eylemi; T1 izinlerine atıf (ADR-0019 §4, #268) | Bilgi İşlem |

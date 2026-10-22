@@ -2,7 +2,7 @@
 
 **Durum:** **Kabul Edildi**
 **Tarih:** 2026-10-22
-**Karar defteri karşılığı:** `KR-123`
+**Karar defteri karşılığı:** `KR-123`, `KR-126`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **Genişlettiği:** ADR-0003 (LOGO entegrasyonu), ADR-0004 §3, §5, §7, §10; ADR-0005 §3, §5
 **Ayrıldığı yer:** ADR-0013 §2 (fotoğraflar veritabanında; gerekçe §5)
@@ -40,7 +40,8 @@ senkronizasyon İK'nın girdiğini ezerdi.
 
 | Tablo | Kaynak | İçerik |
 |---|---|---|
-| `person` (genişler) | LOGO | Cinsiyet, önceki soyadı, medeni hâl, eğitim (tanımın adı), adres, kan grubu (şifreli, ADR-0020) |
+| `person` (genişler) | LOGO | Cinsiyet, önceki soyadı, medeni hâl, eğitim (tanımın adı) |
+| `person_sensitive` (yeni, kişi başına bir satır) | LOGO | **Korumalı alanlar:** adres, kan grubu (şifreli, ADR-0020) |
 | `person_photo` (yeni) | LOGO | Fotoğrafın küçük hâli ve kaynak özeti (§5) |
 | `employment_assignment` (yeni, tarih aralıklı) | LOGO | Şube, birim, ünvan kodu, statü, SGK meslek kodu ve adı |
 | `employment_duty` (yeni, tarih aralıklı) | HRMS | Görev (referans veri tanımı) |
@@ -49,8 +50,21 @@ senkronizasyon İK'nın girdiğini ezerdi.
 | `branch`, `department` (yeni) | LOGO | Şube (şehir dahil) ve birim tanımları, firma altında |
 
 ADR-0005 §3, görev ve ünvanı aynı `employment_assignment` tablosunda öngörüyordu. Görev
-artık HRMS'te girildiği için ayrı tabloya alınır; ünvan LOGO'dan geldiği için
-atamada kalır.
+artık HRMS'te girildiği için ayrı tabloya alınır; ünvan LOGO'dan geldiği için atamada kalır.
+"Çalışma şekli" de ADR-0005 §3'te atamada sayılıyordu. LOGO'da verisi olmadığı için
+(`WORKTYPE`, 588 aktif kartın tamamında 0) değişiklik talebiyle PG-PERS-12'den çıkarıldı
+(#270, `KR-126`); modelde yer almaz (revizyon 1.2, B-05).
+
+**Korumalı alanların ayrı tabloda tutulması** (revizyon 1.2, B-11): Adres ve kan grubu
+`person` tablosunda olsaydı, `Person`'ı okuyan her kod bunları da yüklerdi; Kimlik modülünün
+hesap listesi ve oturum deposu dahil. Ayrı tabloda dururlarsa yalnızca kapsamlı sorgu
+bileşeni ve senkronizasyon onlara erişir. Mimari testi bunu tip düzeyinde denetler
+(ADR-0019 §1, §3). Evlilik bilgisi ve acil durum kişileri zaten ayrı tablolardadır.
+
+**`branch` ve `department` ile ADR-0005'teki `organization_unit`** (revizyon 1.2, B-16): T1
+LOGO'daki iki düz tanımı kurar. ADR-0005 §5'teki `organization_unit`, birimleri hiyerarşiyle
+birbirine bağlayan T2 yapısıdır. T2, `department`'ı ya bu yapıya taşır ya da onunla eşler;
+karar T2 tasarımına aittir. T1 `organization_unit` tablosunu kurmaz.
 
 ### 2. Tarih aralıkları
 
@@ -59,11 +73,25 @@ atamada kalır.
   - aynı istihdamda çakışan aralık `EXCLUDE USING gist` ile engellenir;
   - açık uçlu kayıt en fazla bir tanedir.
   Bunun için `btree_gist` eklentisi migration ile kurulur. Eklenti PostgreSQL 13'ten beri
-  güvenilir sayılır ve tablo sahibi tarafından kurulabilir.
+  güvenilir (trusted) sayılır; veritabanında `CREATE` yetkisi olan rol kurabilir. Migration'ı
+  uygulayan sahip rolde bu yetki vardır; çalışma rolü `hrms_app` eklentiyi kurmaz, yalnızca
+  kısıtlı tablolara yazar (`KR-118`; revizyon 1.2, B-19).
 - **LOGO yalnızca bugünkü değeri verir.** Senkronizasyon, değer değiştiğinde açık kaydı
   değişikliği gördüğü günle kapatır ve yeni kaydı açar. Geçmiş, T1'in devreye girdiği günden
   başlar. Önceki dönemler için geçmiş yoktur ve uydurulmaz.
 - Görev değişikliğini İK girer. Önceki görev yeni görevin başlangıç tarihiyle kapanır.
+
+**Tarih aralığı kuralları** (revizyon 1.2, B-06). Her biri bir entegrasyon testiyle sınanır.
+
+| Durum | Kural |
+|---|---|
+| Gün sınırı | **Europe/Istanbul** takvim günü. "Değişikliği gördüğü gün" UTC'ye göre değil, İstanbul saatine göre belirlenir |
+| Aynı gün ikinci değişiklik | Aynı gün açılmış açık kayıt **güncellenir**, yeni kayıt açılmaz. Böylece sıfır uzunlukta aralık oluşmaz; günün son değeri geçerli olur |
+| Yumuşak silme ve çakışma | `EXCLUDE` kısıtı yalnızca silinmemiş kayıtlara uygulanır (`WHERE deleted_at IS NULL`); silinmiş görev, yerine girilen görevle çakışmaz |
+| Geçmişe dönük görev girişi | İK, başlangıcı geçmişte olan bir görev girebilir. Mevcut kayıtlarla çakışırsa giriş reddedilir; mevcut kaydı kısaltmak için önce o kayıt düzeltilir |
+| İstihdam bitince | Açık görev ve açık atama, istihdamın **çıkış tarihinin ertesi günü** kapanır (dışlayan üst sınır) |
+| Çakışma hatası | Veritabanının çakışma hatası (23P01) `409 Conflict` olarak, Problem Details biçiminde döner; `500` dönmez |
+| T1 öncesi bir tarih | Sorgu o tarih için kayıt bulamaz ve "kayıt yok" döner. Değer tahmin edilmez |
 
 ### 3. Organizasyon tanımları
 
@@ -88,9 +116,17 @@ gerçekleştirme notu düşülür.
 ### 5. Fotoğraf
 
 - **Değişiklik tespiti sunucuda yapılır.** LOGO, SQL Server 2019'dur (15.0). Senkronizasyon
-  her çalışmada yalnızca `HASHBYTES('SHA2_256', LDATA)` özetini okur. Görüntünün kendisi
-  yalnızca özet değiştiyse okunur (PG-PERS-41). Böylece her 15 dakikada yaklaşık 271 MB
-  okunmaz.
+  her çalışmada yalnızca `HASHBYTES('SHA2_256', CAST(LDATA AS varbinary(max)))` özetini okur;
+  `LDATA` eski `image` türündedir, bu yüzden `CAST` gerekir. Görüntünün kendisi yalnızca özet
+  değiştiyse okunur (PG-PERS-41). Böylece her 15 dakikada yaklaşık 271 MB ağdan taşınmaz.
+- **LOGO sunucusundaki yük** (revizyon 1.2, B-13): Özet, sunucunun bütün görüntüleri okumasını
+  gerektirir; aile/resim tablosunda değiştirilme tarihi yoktur (toplantı kaydı §11.9 ve T1
+  tasarım gözden geçirmesi BG-03). Yük **UAT'de ölçülür**: süre ve okunan sayfa sayısı. Ölçüm
+  kabul edilemezse sırasıyla şunlar uygulanır:
+  1. Özetten önce `DATALENGTH` karşılaştırılır; boyutu değişmeyen fotoğrafın özeti yalnızca
+     günde bir kez alınır.
+  2. Fotoğraf özeti 15 dakikalık çalışmadan ayrılıp günde bir kez gece alınır.
+  Seçilen yöntem ve ölçüm bu ADR'ye gerçekleştirme notu olarak yazılır.
 - **HRMS orijinali saklamaz.** Görüntü senkronizasyonda en fazla 400 piksele küçültülür ve
   JPEG olarak `person_photo` tablosunda tutulur (tahmini ≈30 KB, toplam ≈15 MB). Liste
   sayfası bu küçük hâli kullanır. 24 orijinal fotoğraf yaklaşık 6,7 MB eder;
@@ -102,8 +138,11 @@ gerçekleştirme notu düşülür.
 - **Küçültme kütüphanesi:** SkiaSharp (MIT). Linux konteyneri için bağımlılıksız yerel
   paket kullanılır. ImageSharp'ın lisansı ciroya bağlı olduğu için kullanılmaz (`KR-025`
   ile aynı ilke). Paket envanterine eklenir.
-- Fotoğraf ucu, kart ile aynı kapsam ve görünürlük kurallarına tabidir (ADR-0019). Tarayıcı
-  önbelleği için ETag olarak kaynak özeti kullanılır.
+- Fotoğraf ucu, kart ile aynı kapsam ve görünürlük kurallarına tabidir (ADR-0019); kapsam
+  dışı kişinin fotoğrafı `404` döner. Tarayıcı önbelleği için ETag olarak kaynak özeti
+  kullanılır. Yanıt `Cache-Control: private` taşır; ortak önbelleklerde (vekil) saklanmaz.
+  Fotoğraf ayrıca erişim kaydı üretmez: fotoğraf, erişim kaydı yazılan kart veya liste
+  görüntülemesinin parçasıdır (revizyon 1.2, B-18).
 
 ### 6. Veritabanı kuralları (#246'dan)
 
@@ -113,10 +152,17 @@ gerçekleştirme notu düşülür.
   kısıtı yoksa test düşer (ADR-0004 §3 notu).
 - **Yumuşak silme** ilk kez kullanılır: acil durum kişisi ve görev kaydı silinmez,
   `ISoftDeletable` ile işaretlenir (ADR-0004 §5). Evlilik bilgisi de aynı kuralla silinir.
-- **Sınıflandırma:** Her yeni metin ve tarih alanı `KR-120`'ye göre sınıflandırılır:
-  - adres, telefon ve önceki soyadı `[PersonalData]` ile işaretlenir;
-  - kan grubu `[SpecialCategoryData]` ile işaretlenir;
-  - şube, birim ve ünvan `[AuditVisible]` ile, gerekçesiyle işaretlenir.
+- **Sınıflandırma:** Her yeni alan `KR-120`'ye göre sınıflandırılır:
+  - `[PersonalData]`: adres, telefon, önceki soyadı, evlilik tarihi, evlilik yardımı,
+    acil durum kişisinin adı, soyadı, yakınlığı ve telefonu, cinsiyet, medeni hâl;
+  - `[SpecialCategoryData]`: kan grubu ve düzeltme talebinde önerilen kan grubu;
+  - `[AuditVisible]` (gerekçesiyle): şube, birim, ünvan, statü, SGK meslek kodu ve adı,
+    eğitim, görev.
+- **Sınıflandırma testinin kapsamı genişler** (revizyon 1.2, B-12). `DataClassificationTests`
+  yalnızca metin ve tarih alanlarını değil, kimlik ve yabancı anahtarlar dışındaki **bütün
+  skaler alanları** tarar: `bool`, enum ve sayılar dahil. Kapsamına `Dsg.Hrms.Domain.Personnel`'e
+  ek olarak `Reference` ve bildirim ad alanlarının T1'de eklenen varlıkları (`inbox_item`,
+  düzeltme talebi) da girer.
 - **Karşılaştırma kuralı:** Şube, birim, ünvan ve görev adları ile önceki soyadı Türkçe ICU
   kuralını kullanır (ADR-0004 §10).
 
@@ -124,7 +170,14 @@ gerçekleştirme notu düşülür.
 
 - Kişi için bir **arama anahtarı** kolonu tutulur: ad, soyad, önceki soyadı ve sicil, Türkçe
   harflerden arındırılmış küçük harfle yazılır (ç→c, ğ→g, ı→i, İ→i, ö→o, ş→s, ü→u).
-  Kolonu uygulama yazar ve üzerinde bir ifade dizini bulunur.
+  Kolonu uygulama yazar.
+- **Önceki soyadı** anahtara yalnızca ekranda gösterildiği koşulda girer: kadın personelde ve
+  LOGO'da doluysa (PG-PERS-19). Gösterilmeyen bir değerle bulunabilmek, değerin varlığını ele
+  verirdi (revizyon 1.2, B-17).
+- **Dizin:** Arama "içinde geçen" biçimdedir; B-tree dizini bu aramada kullanılmaz. T1
+  ölçeğinde (≈1.400 kişi) sıralı tarama yeterlidir. Ölçüm KPÖ-PERS-1'i karşılamazsa `pg_trgm`
+  dizini eklenir (revizyon 1.2, B-17).
+- TCKN ile arama yalnızca tam TCKN'yi görme izni olana açıktır (ADR-0019 §2).
 - Arama terimi aynı kuralla dönüştürülür. "isik" IŞIK'ı, "ismail" İSMAİL'i bulur; "ışık"
   yazmak da aynı sonucu verir. Bu, ADR-0004 §10'un "açıkça normalize edilmiş kolon" ilkesidir.
 - **Sıralama** Türkçe ICU kuralıyla ad ve soyad kolonlarından yapılır (#261).
@@ -171,6 +224,9 @@ gerçekleştirme notu düşülür.
 - ADR-0005 §3 ve §5'e gerçekleştirme notu düşülür (görev ayrı tabloda; birim firmaya bağlı).
 - Paket envanterine SkiaSharp eklenir.
 - `LogoSchema`, okunan alan listesi testi ve şema denetimi yeni tablolarla aynı PR'da gelir.
+- `ApplicationRoleTests`'e `hrms_app` ile `EXCLUDE` kısıtlı tabloya ekleme ve çakışma
+  senaryosu eklenir (B-19); tarih aralığı kurallarının her biri için entegrasyon testi yazılır (B-06).
+- Fotoğraf özetinin LOGO yükü UAT'de ölçülür ve sonucu bu ADR'ye yazılır (B-13).
 
 ## Geri dönüş maliyeti
 
@@ -183,3 +239,4 @@ yeniden üretilebilir.
 |---|---|---|---|
 | 2026-10-22 | 1.0 | İlk sürüm: T1 tasarım kararları (#245 maddeler 5, 7, 12, 13) | Bilgi İşlem |
 | 2026-10-22 | 1.1 | §7: ad gösterimi LOGO'daki gibi büyük harf (İK, 22.10.2026, #265) | Bilgi İşlem |
+| 2026-10-22 | 1.2 | Revizyon (#267, #268): korumalı alanlar `person_sensitive` tablosunda (B-11); çalışma şekli kapsam dışı (#270, B-05); `branch`/`department` ile `organization_unit` (B-16); tarih aralığı kuralları (B-06); `btree_gist` yetkisi (B-19); `HASHBYTES` için `CAST` ve LOGO yükü ölçümü (B-13); fotoğraf ucu önbellek ve kayıt (B-18); sınıflandırma kapsamı (B-12); arama anahtarı ve dizin (B-17) | Bilgi İşlem |

@@ -232,8 +232,9 @@ veri sızıntısı incelemesi mümkün olur.
 **Olumsuz / kabul edilen ödünler:**
 - Erişim kaydı yüksek hacimlidir (her personel görüntüleme bir satır). Tabloların
   bölümlenmesi (partitioning) ve arşivleme planlanacaktır.
-- Kolon bazlı şifreleme, o alanlarda arama ve sıralamayı imkânsız kılar; bu alanlar
-  filtre olarak kullanılamaz.
+- Kolon bazlı şifreleme, o alanlarda veritabanında arama ve sıralamayı imkânsız kılar.
+  **Düzeltme (22.10.2026, #268, B-16):** Bu alanlar veritabanında filtrelenemez, ama küçük veri
+  hacminde filtre uygulama belleğinde yapılabilir (ADR-0020 §4); sıralama yine yapılmaz.
 
 **Yükümlülükler:**
 - Maskeleme testleri yazılacak ve kalite kapısına dâhil edilecektir.
@@ -261,3 +262,4 @@ veri sızıntısı incelemesi mümkün olur.
 | 2026-10-21 | 0.7 | §4: varlık alanlarının zorunlu sınıflandırması; `[SpecialCategoryData]` ve `[AuditVisible]` (`KR-120`, #244) | Bilgi İşlem |
 | 2026-10-22 | 0.8 | §3 erişim kaydının ayrı işlemi; §8 yönetici bildirimi Y1'e ertelendi (#246) | Bilgi İşlem |
 | 2026-10-22 | 0.9 | §5: kolon şifrelemesi (`KR-122`, ADR-0020) | Bilgi İşlem |
+| 2026-10-22 | 0.10 | Sonuçlar: şifreli alanda bellek içi filtre (ADR-0020 §4; #268, B-16) | Bilgi İşlem |

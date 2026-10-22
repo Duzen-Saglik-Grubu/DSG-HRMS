@@ -47,6 +47,7 @@ Ayrıntı için toplantı kaydı §4'e bakılabilir.
 | Toplantı sonucu eklenen | 3 (PG-PERS-42, 43 İK'nın eklediği; PG-PERS-44 S-08 cevabından) |
 | Toplantı sonrası teyitle eklenen | 1 (PG-PERS-45, KVKK Sorumlusu kararı, 20.10.2026) |
 | **Toplam onaylı gereksinim** | **45** |
+| Onaydan sonraki değişiklik talebi | 1 (#270: PG-PERS-12'den "çalışma şekli" çıkarıldı) — gereksinim sayısı değişmedi |
 
 **Toplantı sonrası teyit (20.10.2026):** Toplantı kaydı §11'deki değerlendirmeler İK ve KVKK
 Sorumlusu tarafından cevaplandı (kayıt §12, #241). PG-PERS-14, 21, 36, 38, 42, 43 ve 44
@@ -87,7 +88,7 @@ numarayla kurulur. Taslakta olmayan `PG-PERS-44` (S-08 cevabı) sona eklendi.
 | **PG-PERS-09** | Aynı TCKN'ye sahip farklı sicil kayıtları TEK kişi olarak gösterilir; her sicil ayrı bir istihdam kaydıdır. | LOGO'da 1.547 kart 1.371 kişiye karşılık geliyor; 143 kişinin birden fazla sicili, 13 kişinin aynı anda birden fazla AKTİF sicili var (16.10.2026 ölçümü). (ADR-0005 §1) T3'te karşılandı. | Zorunlu | Üç sicili olan bir kişi listede bir kez görünüyor, kartında üç istihdam listeleniyor. | Onaylandı |
 | **PG-PERS-10** | TCKN'si olmayan LOGO kartı kişi olarak oluşturulmaz; uyarı listesine alınır. | Sistem kartları ve eksik kayıtlar gerçek kişi gibi görünmemelidir. Sicil numarasıyla tek tek dışlamak kırılgandır. (KR-043) T3'te karşılandı. | Zorunlu | TCKN'si boş kart kişi listesinde yok, uyarı listesinde var. | Onaylandı |
 | **PG-PERS-11** | Kişinin birden fazla sicili varsa kart detayında sekmeli (tab) gösterim kullanılır; her sekme bir istihdam dönemidir. | İK talebi (20.09.2026). Tek ekranda birleştirmek, hangi bilginin hangi istihdama ait olduğunu belirsizleştirir. | Zorunlu | İki sicilli kişinin kartında iki sekme var; sekme başlığında sicil numarası ve durumu yazıyor. | Onaylandı |
-| **PG-PERS-12** | Değişen nitelikler (şube, birim, görev, çalışma şekli) tarih aralıklı tutulur; "geçen yıl bu personel hangi şubedeydi" sorusu cevaplanabilir. | Tarih farkındalığı olmayan İK sistemi ikinci yılında raporlanamaz hâle gelir. (ADR-0005 §3) | Zorunlu | Geçmiş bir tarih verildiğinde o tarihteki şube/birim/görev döndürülüyor. | Onaylandı |
+| **PG-PERS-12** | Değişen nitelikler (şube, birim, görev, ~~çalışma şekli~~) tarih aralıklı tutulur; "geçen yıl bu personel hangi şubedeydi" sorusu cevaplanabilir. | Tarih farkındalığı olmayan İK sistemi ikinci yılında raporlanamaz hâle gelir. (ADR-0005 §3) **Değişiklik talebi #270 (İK onayı 22.10.2026):** "çalışma şekli" çıkarıldı; LOGO'da verisi yok (`WORKTYPE`, 588 aktif kartın tamamında 0). | Zorunlu | Geçmiş bir tarih verildiğinde o tarihteki şube/birim/görev döndürülüyor. | Onaylandı; değişiklik talebi #270, İK onaylı (22.10.2026) |
 
 ### Liste ekranı
 
@@ -170,3 +171,4 @@ Sistem gereksinimi, tasarım, kod ve test halkaları, işin yapıldığı PR'da 
 | 2026-10-20 | 1.1 | Toplantı sonrası teyit (İK ve KVKK Sorumlusu, 20.10.2026; Doğuş Uçanok bildirdi): PG-PERS-21 kıdem gösterimi; 36 kan grubu işleme koşulları; 43 görevi İK/Sistem Yöneticisi girer, sicile bağlı ve tarih aralıklı; 44 birden fazla acil durum kişisi; 14 ve 42 görme yetkisi kuralı; 42–44 öncelik ve kabul kriteri onaylı; PG-PERS-45 saklama süresi parametresi eklendi; Y3 çekirdeği `KR-115` (#241) | Bilgi İşlem |
 | 2026-10-20 | 1.2 | PG-PERS-08 gerekçesi: T3'te kısmen karşılandı, bildirim Y1'e bırakıldı (tasarım gözden geçirmesi BG-08, #234) | Bilgi İşlem |
 | 2026-10-22 | 1.3 | İK teyidi (22.10.2026; Doğuş Uçanok bildirdi): PG-PERS-19 evlilik bilgisini yalnızca İK ve Sistem Yöneticisi görür, medeni hâl Bekar'a dönünce korunur; PG-PERS-21 ayrılan istihdamda kıdem çıkış tarihine kadar (#265) | Bilgi İşlem |
+| 2026-10-22 | 1.4 | **Değişiklik talebi #270** (İK onayı 22.10.2026, Doğuş Uçanok bildirdi): PG-PERS-12'den "çalışma şekli" çıkarıldı; LOGO'da verisi yok (T1 tasarım gözden geçirmesi B-05) | Bilgi İşlem |

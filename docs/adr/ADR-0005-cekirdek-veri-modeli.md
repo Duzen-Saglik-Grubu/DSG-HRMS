@@ -88,7 +88,7 @@ ayrı tarih aralıklı tablolarda tutulur (ADR-0004 §7 kuralları geçerlidir).
 
 | Tablo | İçerik |
 |---|---|
-| `employment_assignment` | Şube, birim, görev/ünvan, çalışma şekli |
+| `employment_assignment` | Şube, birim, görev/ünvan, ~~çalışma şekli~~ (T1'de kapsam dışı; LOGO'da verisi yok, #270) |
 | `employment_manager` | Yönetici ataması (bkz. §4) |
 | `organization_unit_history` | Birimin bağlı olduğu üst birim, adı, durumu |
 
@@ -209,3 +209,4 @@ anlamına gelir. Bu nedenle ölçüme dayandırılmış ve İK ile doğrulanmı�
 | 2026-10-22 | 0.2 | §1 notu: `gender` ve şube/birim alanları T1'de (#246) | Bilgi İşlem |
 | 2026-10-22 | 0.3 | §3: görev ayrı tabloda (`KR-123`, ADR-0021) | Bilgi İşlem |
 | 2026-10-22 | 0.4 | §5: LOGO'da birim firmaya bağlı (`KR-123`, ADR-0021) | Bilgi İşlem |
+| 2026-10-22 | 0.5 | §3: çalışma şekli T1'de kapsam dışı (değişiklik talebi #270) | Bilgi İşlem |
