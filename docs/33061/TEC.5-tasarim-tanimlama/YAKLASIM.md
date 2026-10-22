@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.5-YAK
 **Süreç:** TEC.5 — Tasarım Tanımlama
-**Son güncelleme:** 2026-10-20
+**Son güncelleme:** 2026-10-22
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir. Ayrıca `PA 2.1` için hedef, sorumluluk, kaynak ve arayüzler (§1, §3, §4).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -100,6 +100,8 @@ yapıldı ve T1'e girdi oldu (`raporlar/2026-10-20-tasarim-gozden-gecirme.md`).
 | 2. Bağımsız inceleme | Ayrı bir alt ajan ADR'leri ve kodu okur. Önceki denetim raporlarını ve Bilgi İşlem görüşünü görmeden çalışır. Bulgular raporda değiştirilmeden ayrı bölümde gösterilir (Doğuş Uçanok'un kararı, 15.10.2026) |
 | 3. Tahsis ve diyagram | SYG → öğe tahsisi ve durum/akış diyagramları güncellenir |
 | 4. Değerlendirme | Bilgi İşlem bulguları doğrular. Her bulgu ya bir issue'ya bağlanır ya da gerekçeyle kabul edilir (MAN.8 YAKLAŞIM §2.3) |
+
+**Uygulamalar:** T3 (`raporlar/2026-10-20-tasarim-gozden-gecirme.md`), T1 (`raporlar/2026-10-22-t1-tasarim-gozden-gecirme.md`; dört yüksek önemli bulgu, ADR revizyonu #268).
 
 **Bağımsızlık sınırı:** Alt ajan, geliştirme yardımcısıyla aynı model ailesindendir.
 İnceleme kurum dışı veya insan bağımsızlığı sağlamaz; kalan risk R-23'tür.
@@ -202,3 +204,4 @@ geçirilir.
 | 2026-10-05 | 1.1 | §8 madde 1 kapandı: ADR-0016 (#171) | Bilgi İşlem |
 | 2026-10-15 | 1.2 | §7 ve §8: madde 2, 3 ve 4'ün diyagram kısmı #234'e bağlandı; madde 4'ün entegrasyon belgesi kısmı ve madde 5 kapandı (`KR-111`, #217) | Bilgi İşlem |
 | 2026-10-20 | 1.3 | §1.1, §5: SYG §2.5 tahsis ve diyagram belgesi; §2.5 tasarım gözden geçirmesi adımı; §7 a, b, h ve §8 madde 2, 3, 4 kapandı (#234) | Bilgi İşlem |
+| 2026-10-22 | 1.4 | §2.5: T1 tasarım gözden geçirmesi uygulandı (#267) | Bilgi İşlem |
