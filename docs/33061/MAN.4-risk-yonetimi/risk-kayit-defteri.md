@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-10-21
+**Son güncelleme:** 2026-10-22
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -292,7 +292,7 @@ raporunda ayrıca ele alınır.
 | **O / E / Puan** | 2 / 3 / **6** |
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | (1) UAT'de ileti gönderimi `AllowList` kipindedir; yalnızca listedeki adreslere gider (`KR-083`). Liste kurum çalışanı kabul katılımcılarıyla sınırlıdır; katılımcılar sonraki kabuller için listede kalır (`KR-106`, 13.10.2026). (2) UAT yalnızca kurum içinden erişilebilir ve TLS ile yayındadır; API ve veritabanı dışarıya kapalıdır. (3) Günlükte kişisel veri maskelenir; hesap işlemleri ekranı yalnızca ad, sicil ve firmayı gösterir. (4) Sırlar kaynak ağacının dışında tutulur; dağıtım yerel ortam dosyalarını sunucuya taşımaz (#125). (5) SSH (06.10.2026, `KR-102`, #174): erişim anahtarla yapılıyor ve sunucu parolası artık yazışmaya girmiyor; `root` parolası değiştirildi. Parola ile giriş, erişimin tamamen kaybolmaması için bilerek açık bırakıldı. UAT yedekleme kuralı `KR-098`. (6) Sunucuda belgelenmemiş Webmin yönetim paneli (10000 portu, ağa açık) bulundu ve 06.10.2026'de kaldırıldı (#177, #179); dışarıya açık portlar 22, 80, 443. (7) 13.10.2026 modül sonu denetiminde `/opt/dsg-hrms/secrets/` altında kayıt dışı eski bir sır kopyası (`.env.uat.yedek-20260929`) bulundu. **Uygulandı (13.10.2026, #207):** Kopya güncel dosyayla değişken adı düzeyinde karşılaştırıldı; içindeki sırların hepsi güncel dosyada aynı değerle vardı, başka yerde geçerli ek sır yoktu; döndürme gerekmedi ve dosya silindi. Bu tür kopyalar ayrıca **R-30** altında izlenir |
-| **Durum** | **Kabul edildi** — Üst Yönetim, Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026 (`KR-103`; onay kaydı `MAN.1-proje-planlama/kayitlar/2026-10-06-plan-ve-raci-onay-talebi.md`). Önlemler izlenmeye devam eder |
+| **Durum** | **Kabul edildi** — Üst Yönetim, Elvan Laleli Şahin (Yönetim Kurulu Üyesi), 09.10.2026 (`KR-103`; onay kaydı `MAN.1-proje-planlama/kayitlar/2026-10-06-plan-ve-raci-onay-talebi.md`). Önlemler izlenmeye devam eder. **Kapsam (22.10.2026, `KR-125`):** T1'den itibaren UAT'de özel nitelikli veri (kan grubu) de bulunur; KVKK Sorumlusu kabul testi için onayladı. Kan grubu şifreli saklanır, yalnızca İK, Sistem Yöneticisi ve kişinin kendisi görür (ADR-0020). Yerel geliştirme ortamında bulunmaz |
 
 ### R-26 — Geliştirme makinesindeki commit edilmemiş çalışmanın kaybı
 | | |
@@ -417,3 +417,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-21 | 1.10 | R-29: altıncı olay (`vite`, #255) | Bilgi İşlem |
 | 2026-10-21 | 1.11 | R-31 eklendi: denetim kayıtlarının değiştirilemezliği süper kullanıcıya karşı korunmuyor (tasarım gözden geçirmesi B-01, #234, #244) | Bilgi İşlem |
 | 2026-10-21 | 1.12 | R-31: önlem 1 uygulandı (`KR-118`, #244) | Bilgi İşlem |
+| 2026-10-22 | 1.13 | R-25: UAT'de kan grubu kapsamı (`KR-125`, #265) | Bilgi İşlem |

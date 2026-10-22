@@ -129,9 +129,8 @@ gerçekleştirme notu düşülür.
   yazmak da aynı sonucu verir. Bu, ADR-0004 §10'un "açıkça normalize edilmiş kolon" ilkesidir.
 - **Sıralama** Türkçe ICU kuralıyla ad ve soyad kolonlarından yapılır (#261).
 
-> **Açık nokta (İK):** Adların kartta ve listede nasıl gösterileceği. LOGO adları büyük
-> harfle yazıyor. Öneri: ekranda Türkçe kurala göre baş harfi büyük gösterim (`İsmail Işık`),
-> saklanan değer değişmez. İK'nın teyidi istenir.
+> **Karar (22.10.2026, İK):** Adlar ekranda **LOGO'daki gibi tamamı büyük harfle** gösterilir;
+> gösterim için dönüşüm yapılmaz.
 
 ## Gerekçe
 
@@ -183,3 +182,4 @@ yeniden üretilebilir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-22 | 1.0 | İlk sürüm: T1 tasarım kararları (#245 maddeler 5, 7, 12, 13) | Bilgi İşlem |
+| 2026-10-22 | 1.1 | §7: ad gösterimi LOGO'daki gibi büyük harf (İK, 22.10.2026, #265) | Bilgi İşlem |

@@ -58,6 +58,7 @@ politikayı atlayabilir (ADR-0016 notu, #246).
   | Adres | `personnel.person.view_sensitive` izni veya kişinin kendisi |
   | Kan grubu | `personnel.person.view_sensitive` izni veya kişinin kendisi |
   | Acil durum kişileri | `personnel.person.view_sensitive` izni veya kişinin kendisi |
+  | Evlilik tarihi ve evlilik yardımı | Yalnızca `personnel.person.view_sensitive` izni (İK, Sistem Yöneticisi); **kişinin kendisi dahil değil** (İK teyidi 22.10.2026) |
   | Diğer kart alanları | Kaydı görebilen herkes |
 
 - Aynı politika **üç yerde** kullanılır ve başka yerde yeniden yazılmaz:
@@ -155,3 +156,4 @@ ve testlerin bu bileşenlere dayanmasıdır.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-22 | 1.0 | İlk sürüm: T1 tasarım kararları (#245 maddeler 1, 2, 8, 13) | Bilgi İşlem |
+| 2026-10-22 | 1.1 | §2: evlilik bilgisi yalnızca İK ve Sistem Yöneticisi; §4 ve §5 kararları onaylandı (22.10.2026, #265) | Bilgi İşlem |
