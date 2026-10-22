@@ -51,6 +51,10 @@ gender                          is_active
                                 logo_ref
 ```
 
+> **Gerçekleştirme notu (22.10.2026, #246):** T3 yalnızca kendi gereksinimlerinin gerektirdiği
+> alanları kurdu (`KR-077`). `gender` ve şube/birim bağları henüz yoktur; T1'de onaylı
+> gereksinimlerle (PG-PERS-19, 21) eklenir (tasarım gözden geçirmesi B-12).
+
 | Varlık | Anlamı | Yaşam süresi |
 |---|---|---|
 | `person` | **Kişi.** TCKN ile tekil. Ömür boyu tek kayıt | Kalıcı |
@@ -193,3 +197,4 @@ anlamına gelir. Bu nedenle ölçüme dayandırılmış ve İK ile doğrulanmı�
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-10-22 | 0.2 | §1 notu: `gender` ve şube/birim alanları T1'de (#246) | Bilgi İşlem |

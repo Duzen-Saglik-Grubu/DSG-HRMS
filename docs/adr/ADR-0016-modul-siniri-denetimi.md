@@ -66,6 +66,15 @@ Tablo: `src/backend/tests/Dsg.Hrms.Architecture.Tests/LayerDependencyTests.cs`, 
 - Yeni modül eklenince `Modules` dizisine, yeni teknik ad alanı eklenince `SharedNamespaces` dizisine yazılır.
 - Tabloya eklenen her bağımlılık bir gerekçe taşır ve PR açıklamasında anılır.
 
+> **Gerçekleştirme notu (22.10.2026, #246):** (1) Ölçüme **Api katmanı** da eklendi; Api'nin
+> yatay ad alanları (`Health`, `Observability`, `OpenApi`...) ortak sayılır, Api'deki üç modüller
+> arası bağımlılık tabloda gerekçesiyle bildirildi. (2) Kimlik modülü `Person` tablosunu
+> doğrudan sorgular (`AccountAdministrationStore`, `RegistrationStore`). T1'de alan düzeyinde
+> görünürlük politikası (adres, kan grubu, tam TCKN) Personnel'in sorgularına uygulanacak;
+> Kimlik'in doğrudan sorguları bu politikayı atlayabilir. T1 tasarımında (#245) Kimlik'in
+> yalnızca kendi gereksinimi olan alanları okuması veya Personnel'in okuma arayüzüne geçmesi
+> kararlaştırılır (tasarım gözden geçirmesi, ADR'si olmayan kararlar).
+
 ## Geri dönüş maliyeti
 
 **Düşük.** Karar yalnızca bir testi ve bu belgeyi kapsar. İleride `Abstractions` düzenine
@@ -78,3 +87,4 @@ geçilirse test o düzene göre yeniden yazılır.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 0.1 | İlk oluşturma (#171) | Bilgi İşlem |
+| 2026-10-22 | 0.2 | Sonuçlar: Api katmanı ölçüme girdi; Kimlik'in `Person` tablosunu doğrudan sorgulaması T1 görünürlük politikası için not (#246) | Bilgi İşlem |

@@ -125,6 +125,12 @@ Kilitlenme ve sınır aşımı olayları denetim kaydına yazılır (ADR-0009).
 > **Not:** NetGSM standart servisinde aynı numaraya 1 dakikada 20'den fazla görev
 > oluşturulamaz (hata `85`). Yukarıdaki sınırlar bunun çok altındadır.
 
+> **Gerçekleştirme notu (22.10.2026, #246):** Kilidin tek doğru kaynağı `LoginThrottle`'daki
+> e-posta sayacıdır. `UserAccount.LockedUntil` yalnızca denetim izine yazılır ve süre dolunca
+> kendiliğinden temizlenmez (başarılı giriş, parola sıfırlama veya davet kabulüyle temizlenir).
+> Bir rapor veya ekran "hesap kilitli mi" sorusunu bu alandan cevaplamamalıdır (tasarım
+> gözden geçirmesi BG-04; `docs/mimari/kimlik-tasarim-diyagramlari.md` §2.1).
+
 ### 6. Parola politikası
 
 - En az **6 karakter** (`KR-070`, 21.09.2026). Karmaşıklık kuralı (büyük/küçük/rakam/simge)
@@ -298,3 +304,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | 2026-10-01 | 1.0 | §6: zorunlu parola değişimi gerçekleştirme notu (`KR-092`, #113) | Bilgi İşlem |
 | 2026-10-10 | 1.1 | §7: kullanıcı tercihine bağlı 2FA gerçekleştirme notu (`KR-104`, #190) | Bilgi İşlem |
 | 2026-10-14 | 1.2 | §5: sınır değerleri #185'e göre ve parametre kimlikleriyle; §7: kullanıcı tercihine bağlı 2FA ADR-0017'ye taşındı (`KR-099`); başlıkta `KR-092`, `KR-104` (#212) | Bilgi İşlem |
+| 2026-10-22 | 1.3 | §5 notu: kilidin tek doğru kaynağı `LoginThrottle` (#246) | Bilgi İşlem |

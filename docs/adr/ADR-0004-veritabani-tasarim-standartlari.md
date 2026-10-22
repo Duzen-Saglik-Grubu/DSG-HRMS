@@ -27,6 +27,12 @@ gerektiriyor.
 | Ara tablo | `<a>_<b>` | `role_permission` |
 | Dizin | `ix_<tablo>_<kolonlar>` | `ix_person_national_id` |
 | Tekillik kısıtı | `uq_<tablo>_<kolonlar>` | `uq_person_national_id` |
+
+> **Gerçekleştirme notu (22.10.2026, #246):** EF Core tekilliği **benzersiz dizinle** sağlar ve
+> adlandırma uzlaşımı dizini `ix_` önekiyle adlandırır; 14 tekil dizin bu yüzden `ix_` taşır
+> (ör. `ix_person_national_id`). Karar: tekil dizinler `ix_` kalır, `uq_` yalnızca elle yazılan
+> `UNIQUE` kısıtları içindir. Yeniden adlandırma bir fayda üretmediği için yapılmadı
+> (tasarım gözden geçirmesi B-09).
 | Kontrol kısıtı | `ck_<tablo>_<kural>` | `ck_leave_end_after_start` |
 | Şema | Modül başına ayrı şema | `identity`, `organization`, `personnel`, `leave`, `training`, `audit` |
 
@@ -51,6 +57,16 @@ C# tarafında `PascalCase` kullanılır. Ad eşlemesi elle yazılmaz.
 | Metin | `text` | PostgreSQL'de `varchar(n)` performans avantajı sağlamaz; uzunluk kısıtı `CHECK` ile |
 | Para | `numeric(19,4)` | Kayan noktalı tip kullanılmaz |
 | Sayısal kod / durum | Küçük tamsayı + `CHECK`, C# tarafında `enum` | Metin durum kodu kullanılmaz |
+
+> **Gerçekleştirme notu (22.10.2026, #246):** İki sapma vardır (tasarım gözden geçirmesi B-09).
+> (1) **Kayıt tablolarında enum metin olarak saklanır:** `audit.change_log.operation`,
+> `audit.access_log.access_type`, `audit.security_event.event_type`, `personnel.sync_run`
+> (tetikleyici, durum, hata nedeni) ve `personnel.sync_warning.code`. Bu bilinçli bir
+> istisnadır: kayıtlar uzun ömürlüdür (10 yıl, `KR-109`) ve SQL ile okunur; enum değerleri
+> yeniden numaralandırılırsa sayısal kayıtların anlamı geriye dönük değişirdi. Değiştirilemez
+> denetim tablolarında tür dönüşümü de pahalıdır. (2) **İş tablolarında** enum tamsayıdır, ama
+> `CHECK` kısıtı 9 kolondan yalnızca birinde var (`registration_attempt.purpose`). Eksik
+> kısıtlar ve kuralı zorunlu kılan bir veritabanı kural testi T1 tasarımına bağlandı (#245).
 | Yapılandırılmamış ek veri | `jsonb` | Yalnızca gerçekten şemasız veri için; iş kuralı taşıyan alan JSON'a konmaz |
 
 **Zaman dilimi kuralı:** Veritabanında her şey UTC'dir. Kullanıcıya gösterim
@@ -80,6 +96,11 @@ elle yazılmaz.
 - Referans/tanım verileri (izin türü, rol) silinmez, **pasife alınır** (`is_active`).
 - Gerçek fiziksel silme yalnızca KVKK imha süreci kapsamında ve kayıt altına alınarak
   yapılır (`KR-023`).
+
+> **Gerçekleştirme notu (22.10.2026, #246):** `ISoftDeletable` altyapısı (ara katman ve sorgu
+> süzgeci) A1'den beri vardır ve testle doğrulanır, ama T3'te hiçbir varlık onu kullanmadı:
+> T3 kayıtları ya kalıcıdır ya da süreli kayıtlar (kod, oturum) zaman aşımıyla geçersizleşir.
+> İlk kullanım T1'de beklenir (acil durum kişisi, görev; #245).
 
 ### 6. Referans bütünlüğü
 
@@ -195,3 +216,4 @@ değiştirmek veri göçü gerektirir. Bu nedenle iskelet aşamasında kesinleş
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-10-21 | 0.2 | §10: Türkçe ICU kuralı kişi adı ve soyadı kolonlarında uygulandı (#244, B-05) | Bilgi İşlem |
+| 2026-10-22 | 0.3 | §1 tekil dizinlerin `ix_` adı; §3 kayıt tablolarında metin enum ve eksik `CHECK` kısıtları (#246) | Bilgi İşlem |

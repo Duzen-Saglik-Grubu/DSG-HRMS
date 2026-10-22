@@ -70,6 +70,13 @@ Hata kodlarının tamamı ve her biri için "yeniden denenecek mi" kararı
 - Okundu/okunmadı durumu, ilişkili kayda bağlantı ve tür bilgisi taşır.
 - Kalıcı kayıttır; saklama süresi `KR-023` kapsamındadır.
 
+> **Gerçekleştirme notu (22.10.2026, #246):** Uygulama içi bildirim ve veritabanı tabanlı
+> kuyruk henüz yoktur; T3'te ileti kuyruğu bellektedir (`KR-082`). Sonuçları: uygulama yeniden
+> başlarsa bekleyen ileti kaybolur; kuyruk doluysa kod kaydedilir ama gönderilmez, kullanıcıya
+> hata dönmez, yalnızca günlüğe yazılır ve kullanıcı kodu yeniden ister (tasarım gözden
+> geçirmesi BG-02). Kalıcı kuyruk ve uygulama içi bildirim, T1'in "İK'ya bildir" ihtiyacıyla
+> (PG-PERS-37) birlikte kararlaştırılır (#245 madde 9).
+
 ### 5. Dayanıklılık kuralları
 
 | Kural | Değer |
@@ -178,3 +185,4 @@ ibarettir.
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-27 | 0.2 | §7: içeriği log'a yazan göndericiler yerine gönderim kipleri; kodlu ileti veritabanına yazılmaz; kanal sağlığı (`KR-082`, `KR-083`, #85) | Bilgi İşlem |
 | 2026-09-27 | 0.3 | §3: gönderen adresi ve görünen ad (Düzen İK Sistemi) yazıldı (#85) | Bilgi İşlem |
+| 2026-10-22 | 0.4 | §4: uygulama içi bildirim ve kalıcı kuyruk henüz yok; bellek içi kuyruğun sınırları (#246) | Bilgi İşlem |
