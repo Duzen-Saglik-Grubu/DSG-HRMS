@@ -77,6 +77,11 @@ Hata kodlarının tamamı ve her biri için "yeniden denenecek mi" kararı
 > geçirmesi BG-02). Kalıcı kuyruk ve uygulama içi bildirim, T1'in "İK'ya bildir" ihtiyacıyla
 > (PG-PERS-37) birlikte kararlaştırılır (#245 madde 9).
 
+> **Gerçekleştirme notu (22.10.2026, `KR-124`):** En küçük uygulama içi bildirim T1'de kurulur
+> (`notification.inbox_item`, okunmamış sayacı). İlk kullanım: "İK'ya bildir". Talep ve bildirim
+> aynı işlemde veritabanına yazılır; e-posta değer içermez. Y1 bu çekirdeği genişletir.
+> Ayrıntı: ADR-0022 §3.
+
 ### 5. Dayanıklılık kuralları
 
 | Kural | Değer |
@@ -186,3 +191,4 @@ ibarettir.
 | 2026-09-27 | 0.2 | §7: içeriği log'a yazan göndericiler yerine gönderim kipleri; kodlu ileti veritabanına yazılmaz; kanal sağlığı (`KR-082`, `KR-083`, #85) | Bilgi İşlem |
 | 2026-09-27 | 0.3 | §3: gönderen adresi ve görünen ad (Düzen İK Sistemi) yazıldı (#85) | Bilgi İşlem |
 | 2026-10-22 | 0.4 | §4: uygulama içi bildirim ve kalıcı kuyruk henüz yok; bellek içi kuyruğun sınırları (#246) | Bilgi İşlem |
+| 2026-10-22 | 0.5 | §4: uygulama içi bildirim çekirdeği T1'de (`KR-124`, ADR-0022) | Bilgi İşlem |

@@ -76,6 +76,10 @@ zamanda alınan rapor arasındaki fark açıklanamaz.
   rapor, hangi filtre, **kaç kayıt**. Kayıt sayısının tutulması, olası bir sızıntı
   incelemesinin ilk sorusudur.
 
+> **Gerçekleştirme notu (22.10.2026, `KR-121`, `KR-124`):** Seçilebilir alanlar görünürlük
+> politikasından gelir (ADR-0019 §2). Erişim kaydına aktarılan alanların listesi de yazılır.
+> PDF'te fotoğraf, küçük hâliyle eklenir (ADR-0021 §5, ADR-0022 §4).
+
 ### 5. Büyük raporlar
 
 - Rapor üretimi **eşzamanlı (senkron)** yapılır ve satır sınırı uygulanır
@@ -153,3 +157,4 @@ etkiler.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-10-22 | 0.2 | §4: alan seçmeli dışa aktarma (`KR-121`, `KR-124`) | Bilgi İşlem |

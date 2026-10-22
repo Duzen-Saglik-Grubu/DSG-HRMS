@@ -154,6 +154,11 @@ alanın log'a düşmesi test hatası üretir.
 - Şifreli alanlar üzerinde arama yapılmaz; gerekiyorsa ayrı bir arama anahtarı
   (hash) tasarlanır.
 
+> **Gerçekleştirme notu (22.10.2026, `KR-122`):** Kolon şifrelemesi T1'de kan grubu için kurulur:
+> AES-256-GCM, ayrı ve anahtar kimlikli veri anahtarı, zorunlu açılış doğrulaması, kişiye bağlı
+> ilişkilendirilmiş veri (AAD). Arama ve sıralama yoktur; filtre bellekte yapılır. Ayrıntı:
+> ADR-0020.
+
 ### 6. Saklama süresi ve imha
 
 `KR-023` uyarınca:
@@ -255,3 +260,4 @@ veri sızıntısı incelemesi mümkün olur.
 | 2026-10-21 | 0.6 | §4: serbest arama metninin maskelenmesi (#244, B-07) | Bilgi İşlem |
 | 2026-10-21 | 0.7 | §4: varlık alanlarının zorunlu sınıflandırması; `[SpecialCategoryData]` ve `[AuditVisible]` (`KR-120`, #244) | Bilgi İşlem |
 | 2026-10-22 | 0.8 | §3 erişim kaydının ayrı işlemi; §8 yönetici bildirimi Y1'e ertelendi (#246) | Bilgi İşlem |
+| 2026-10-22 | 0.9 | §5: kolon şifrelemesi (`KR-122`, ADR-0020) | Bilgi İşlem |

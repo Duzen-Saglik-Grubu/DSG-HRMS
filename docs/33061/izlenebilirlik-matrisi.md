@@ -217,55 +217,56 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 > (`TEC.2/kayitlar/2026-10-19-personel-gereksinim-toplantisi.md`); 44 satırın tamamı
 > açıldı. PG-PERS-45 toplantı sonrası teyitle eklendi (20.10.2026, #241). Kaynak metinlerin tamamı: `TEC.2/paydas-gereksinimleri/PG-PERS.md`. Sistem
 > gereksinimi sütunu SYG-PERS yazılınca, diğer halkalar işin yapıldığı PR'larda dolar (§3).
+> "Tasarım" sütunu T1 tasarım kararlarıyla dolduruldu (ADR-0019…0022, 22.10.2026, #245).
 > Bölüm, geçmiş kayıtların "matris §6" atıflarını bozmamak için §6'nın arkasına eklendi.
 
 | # | Kaynak | Sistem gereksinimi | Tasarım | Gerçekleştirme | Doğrulama | Kabul |
 |---|---|---|---|---|---|---|
-| 1 | `PG-PERS-01` Personel verisinin kaynağı LOGO Bordro veritabanıdır; HRMS bu veriyi kendi… | — | — | T3'te kısmen karşılandı (`KR-077`) | — | — |
-| 2 | `PG-PERS-02` LOGO'ya hiçbir koşulda yazma, güncelleme veya silme yapılmaz. | — | — | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
-| 3 | `PG-PERS-03` Personel bilgileri HRMS üzerinden DÜZENLENEMEZ; düzeltme LOGO'da yapılır ve… | — | — | — | — | — |
-| 4 | `PG-PERS-04` Senkronizasyon 15 dakikada bir otomatik çalışır; periyot Sistem Yönetimi… | — | — | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
-| 5 | `PG-PERS-05` Yetkili kullanıcı "şimdi senkronize et" diyerek elle tetikleyebilir; periyodu… | — | — | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
-| 6 | `PG-PERS-06` Her senkronizasyon bir çalışma kaydı üretir: okunan, eklenen, güncellenen ve uyarı… | — | — | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
-| 7 | `PG-PERS-07` Personel listesi ve kartında "son senkronizasyon" zamanı görünür. | — | — | — | — | — |
-| 8 | `PG-PERS-08` LOGO şemasındaki beklenmeyen değişiklikler (şema sapması) günlük olarak denetlenir… | — | — | T3'te kısmen karşılandı: denetim var, bildirim Y1'e bırakıldı (SYG-KMLK-010) | — | — |
-| 9 | `PG-PERS-09` Aynı TCKN'ye sahip farklı sicil kayıtları TEK kişi olarak gösterilir; her sicil ayrı… | — | — | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
-| 10 | `PG-PERS-10` TCKN'si olmayan LOGO kartı kişi olarak oluşturulmaz; uyarı listesine alınır. | — | — | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
-| 11 | `PG-PERS-11` Kişinin birden fazla sicili varsa kart detayında sekmeli (tab) gösterim kullanılır;… | — | — | — | — | — |
-| 12 | `PG-PERS-12` Değişen nitelikler (şube, birim, görev, çalışma şekli) tarih aralıklı tutulur;… | — | — | — | — | — |
-| 13 | `PG-PERS-13` Personel listesi, kişi kartlarından oluşan ızgara (grid) düzeninde gösterilir; üstte… | — | — | — | — | — |
-| 14 | `PG-PERS-14` Kişi kartında gösterilen bilgilerin tamamı için filtre yapılabilir. Seçim listesi… | — | — | — | — | — |
-| 15 | `PG-PERS-15` Filtreler birlikte uygulanır (VE mantığı); seçili filtreler ekranda görünür ve tek… | — | — | — | — | — |
-| 16 | `PG-PERS-16` Liste varsayılan olarak yalnızca AKTİF çalışanları gösterir; ayrılanlar filtreyle… | — | — | — | — | — |
-| 17 | `PG-PERS-17` Liste sayfalanır; sayfa boyutu ve toplam kayıt sayısı gösterilir. Varsayılan ve en… | — | — | — | — | — |
-| 18 | `PG-PERS-18` Ad, soyad, sicil numarası veya TCKN üzerinden tek kutudan hızlı arama yapılabilir. | — | — | — | — | — |
-| 19 | `PG-PERS-19` Kart detayında Genel Bilgiler bölümü: fotoğraf, ad, soyad, cinsiyet, doğum tarihi,… | — | — | — | — | — |
-| 20 | `PG-PERS-20` İletişim Bilgileri bölümü: e-posta, telefon, adres. Adresi yalnızca İK, Sistem… | — | — | — | — | — |
-| 21 | `PG-PERS-21` Çalışma Hayatı bölümü: şehir, firma, şube, birim, ünvanı, görevi (PG-PERS-43),… | — | — | — | — | — |
-| 22 | `PG-PERS-22` Yaş, doğum tarihinden hesaplanarak gösterilir; ayrı bir alan olarak saklanmaz. | — | — | — | — | — |
-| 23 | `PG-PERS-23` Fotoğraf LOGO'daki personel resminden alınır; resmi olmayan kişide ad-soyad baş… | — | — | — | — | — |
-| 24 | `PG-PERS-24` Bir personel yalnızca kendisine DOĞRUDAN atanmış astlarını görüntüleyebilir; astının… | — | — | — | — | — |
-| 25 | `PG-PERS-25` Her personel rol yetkisinden bağımsız olarak KENDİ kaydını görüntüleyebilir. | — | — | — | — | — |
-| 26 | `PG-PERS-26` Kapsam filtresi veri katmanında uygulanır; kapsam dışı bir kaydın kimliğiyle… | — | — | — | — | — |
-| 27 | `PG-PERS-27` Kapsam dışı kayıt için 403 değil 404 döndürülür. | — | — | — | — | — |
-| 28 | `PG-PERS-28` Bir personelin kişisel verisinin görüntülenmesi erişim kaydına yazılır: kim, kimin… | — | — | — | — | — |
-| 29 | `PG-PERS-29` Dışa aktarma (Excel/PDF) ayrı bir yetkidir; görüntüleme yetkisi dışa aktarma hakkı… | — | — | — | — | — |
-| 30 | `PG-PERS-30` Her dışa aktarma işlemi kaydedilir: kim, hangi filtreyle, kaç kayıt aktardı. | — | — | — | — | — |
-| 31 | `PG-PERS-31` TCKN ekranda maskelenmiş gösterilir (örn. 123*89). İK ve Sistem Yöneticisi tam… | — | — | — | — | — |
-| 32 | `PG-PERS-32` Senkronizasyonda uyarı üreten kayıtlar (TCKN yok, doğum tarihi yok, iletişim bilgisi… | — | — | — | — | — |
-| 33 | `PG-PERS-33` Veri kalitesi raporu, T3 Kimlik Yönetimi'nin üyelik akışını etkileyen kayıtları… | — | — | — | — | — |
-| 34 | `PG-PERS-34` "Yöneticisi" filtresi T2 Organizasyon Yönetimi ile BİRLİKTE devreye alınır; T2 hazır… | — | — | — | — | — |
-| 35 | `PG-PERS-35` T2 Organizasyon Yönetimi ve T4 Rol ve Yetki Yönetimi devreye girene kadar geçiş… | — | — | — | — | — |
-| 36 | `PG-PERS-36` Din ve sağlık bilgileri LOGO'dan senkronize edilmez, HRMS'te saklanmaz ve hiçbir… | — | — | — | — | — |
-| 37 | `PG-PERS-37` Personel kendi kartında hatalı bir bilgi gördüğünde "İK'ya bildir" düğmesine basar,… | — | — | — | — | — |
-| 38 | `PG-PERS-38` İşten ayrılan personelin kaydı, ayrılış tarihinden sonra Sistem Yönetimi… | — | — | — | — | — |
-| 39 | `PG-PERS-39` Personel listesinin bir sayfası (fotoğraflarla birlikte) ve kişi kartı, aynı anda 20… | — | — | — | — | — |
-| 40 | `PG-PERS-40` Personel listesi, kişi kartı, kendi profilim ve "İK'ya bildir" ekranları telefonda… | — | — | — | — | — |
-| 41 | `PG-PERS-41` Fotoğraflar yalnızca LOGO'da değiştiğinde aktarılır; fotoğraflı senkronizasyon… | — | — | — | — | — |
-| 42 | `PG-PERS-42` Dışa aktarmada (Excel/PDF) hangi alanların aktarılacağı seçilebilir. Excel'e düz… | — | — | — | — | — |
-| 43 | `PG-PERS-43` Kişi kartında Görevi alanı bulunur ve HRMS içinden girilir. Görev, Y3 Referans Veri… | — | — | — | — | — |
-| 44 | `PG-PERS-44` Kişinin acil durumda aranacak kişi bilgisi (yakınlığı, adı, soyadı, cep telefonu)… | — | — | — | — | — |
-| 45 | `PG-PERS-45` HRMS'teki personel verisinin saklama süresi Sistem Yönetimi parametresinde tanımlanır… | — | — | — | — | — |
+| 1 | `PG-PERS-01` Personel verisinin kaynağı LOGO Bordro veritabanıdır; HRMS bu veriyi kendi… | — | `ADR-0003`; `ADR-0021` §4 | T3'te kısmen karşılandı (`KR-077`) | — | — |
+| 2 | `PG-PERS-02` LOGO'ya hiçbir koşulda yazma, güncelleme veya silme yapılmaz. | — | `ADR-0003` §1 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
+| 3 | `PG-PERS-03` Personel bilgileri HRMS üzerinden DÜZENLENEMEZ; düzeltme LOGO'da yapılır ve… | — | `KR-112`; `ADR-0021` §1 | — | — | — |
+| 4 | `PG-PERS-04` Senkronizasyon 15 dakikada bir otomatik çalışır; periyot Sistem Yönetimi… | — | `ADR-0003` §4 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
+| 5 | `PG-PERS-05` Yetkili kullanıcı "şimdi senkronize et" diyerek elle tetikleyebilir; periyodu… | — | `ADR-0003` §4 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
+| 6 | `PG-PERS-06` Her senkronizasyon bir çalışma kaydı üretir: okunan, eklenen, güncellenen ve uyarı… | — | `ADR-0003` §4 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
+| 7 | `PG-PERS-07` Personel listesi ve kartında "son senkronizasyon" zamanı görünür. | — | `ADR-0003` §4 | — | — | — |
+| 8 | `PG-PERS-08` LOGO şemasındaki beklenmeyen değişiklikler (şema sapması) günlük olarak denetlenir… | — | `ADR-0003` §6; `ADR-0021` §4 | T3'te kısmen karşılandı: denetim var, bildirim Y1'e bırakıldı (SYG-KMLK-010) | — | — |
+| 9 | `PG-PERS-09` Aynı TCKN'ye sahip farklı sicil kayıtları TEK kişi olarak gösterilir; her sicil ayrı… | — | `ADR-0005` §1 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
+| 10 | `PG-PERS-10` TCKN'si olmayan LOGO kartı kişi olarak oluşturulmaz; uyarı listesine alınır. | — | `ADR-0003` §5 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
+| 11 | `PG-PERS-11` Kişinin birden fazla sicili varsa kart detayında sekmeli (tab) gösterim kullanılır;… | — | `ADR-0005` §1 | — | — | — |
+| 12 | `PG-PERS-12` Değişen nitelikler (şube, birim, görev, çalışma şekli) tarih aralıklı tutulur;… | — | `ADR-0021` §2 | — | — | — |
+| 13 | `PG-PERS-13` Personel listesi, kişi kartlarından oluşan ızgara (grid) düzeninde gösterilir; üstte… | — | `ADR-0015`; `ADR-0021` §5 | — | — | — |
+| 14 | `PG-PERS-14` Kişi kartında gösterilen bilgilerin tamamı için filtre yapılabilir. Seçim listesi… | — | `ADR-0019` §2; `ADR-0021` §7 | — | — | — |
+| 15 | `PG-PERS-15` Filtreler birlikte uygulanır (VE mantığı); seçili filtreler ekranda görünür ve tek… | — | `ADR-0015` §6 | — | — | — |
+| 16 | `PG-PERS-16` Liste varsayılan olarak yalnızca AKTİF çalışanları gösterir; ayrılanlar filtreyle… | — | `ADR-0022` §5 | — | — | — |
+| 17 | `PG-PERS-17` Liste sayfalanır; sayfa boyutu ve toplam kayıt sayısı gösterilir. Varsayılan ve en… | — | `ADR-0010` §4; `ADR-0022` §5 | — | — | — |
+| 18 | `PG-PERS-18` Ad, soyad, sicil numarası veya TCKN üzerinden tek kutudan hızlı arama yapılabilir. | — | `ADR-0021` §7 | — | — | — |
+| 19 | `PG-PERS-19` Kart detayında Genel Bilgiler bölümü: fotoğraf, ad, soyad, cinsiyet, doğum tarihi,… | — | `ADR-0021` §1 | — | — | — |
+| 20 | `PG-PERS-20` İletişim Bilgileri bölümü: e-posta, telefon, adres. Adresi yalnızca İK, Sistem… | — | `ADR-0019` §2 | — | — | — |
+| 21 | `PG-PERS-21` Çalışma Hayatı bölümü: şehir, firma, şube, birim, ünvanı, görevi (PG-PERS-43),… | — | `ADR-0021` §1, §3; `ADR-0022` §1 | — | — | — |
+| 22 | `PG-PERS-22` Yaş, doğum tarihinden hesaplanarak gösterilir; ayrı bir alan olarak saklanmaz. | — | `ADR-0021` §1 | — | — | — |
+| 23 | `PG-PERS-23` Fotoğraf LOGO'daki personel resminden alınır; resmi olmayan kişide ad-soyad baş… | — | `ADR-0021` §5 | — | — | — |
+| 24 | `PG-PERS-24` Bir personel yalnızca kendisine DOĞRUDAN atanmış astlarını görüntüleyebilir; astının… | — | `ADR-0007` §2 (T2) | — | — | — |
+| 25 | `PG-PERS-25` Her personel rol yetkisinden bağımsız olarak KENDİ kaydını görüntüleyebilir. | — | `ADR-0007` §5; `ADR-0019` §1 | — | — | — |
+| 26 | `PG-PERS-26` Kapsam filtresi veri katmanında uygulanır; kapsam dışı bir kaydın kimliğiyle… | — | `ADR-0007` §3; `ADR-0019` §1 | — | — | — |
+| 27 | `PG-PERS-27` Kapsam dışı kayıt için 403 değil 404 döndürülür. | — | `ADR-0007` §4; `ADR-0019` §1 | — | — | — |
+| 28 | `PG-PERS-28` Bir personelin kişisel verisinin görüntülenmesi erişim kaydına yazılır: kim, kimin… | — | `ADR-0009` §3; `ADR-0019` §5 | — | — | — |
+| 29 | `PG-PERS-29` Dışa aktarma (Excel/PDF) ayrı bir yetkidir; görüntüleme yetkisi dışa aktarma hakkı… | — | `ADR-0014` §4; `ADR-0019` §4 | — | — | — |
+| 30 | `PG-PERS-30` Her dışa aktarma işlemi kaydedilir: kim, hangi filtreyle, kaç kayıt aktardı. | — | `ADR-0014` §4; `ADR-0022` §4 | — | — | — |
+| 31 | `PG-PERS-31` TCKN ekranda maskelenmiş gösterilir (örn. 123*89). İK ve Sistem Yöneticisi tam… | — | `ADR-0019` §2 | — | — | — |
+| 32 | `PG-PERS-32` Senkronizasyonda uyarı üreten kayıtlar (TCKN yok, doğum tarihi yok, iletişim bilgisi… | — | `ADR-0003` §5 | — | — | — |
+| 33 | `PG-PERS-33` Veri kalitesi raporu, T3 Kimlik Yönetimi'nin üyelik akışını etkileyen kayıtları… | — | `ADR-0003` §5 | — | — | — |
+| 34 | `PG-PERS-34` "Yöneticisi" filtresi T2 Organizasyon Yönetimi ile BİRLİKTE devreye alınır; T2 hazır… | — | `ADR-0007` §2 (T2) | — | — | — |
+| 35 | `PG-PERS-35` T2 Organizasyon Yönetimi ve T4 Rol ve Yetki Yönetimi devreye girene kadar geçiş… | — | `ADR-0019` §1 | — | — | — |
+| 36 | `PG-PERS-36` Din ve sağlık bilgileri LOGO'dan senkronize edilmez, HRMS'te saklanmaz ve hiçbir… | — | `ADR-0020`; `ADR-0019` §2; `ADR-0021` §4 | — | — | — |
+| 37 | `PG-PERS-37` Personel kendi kartında hatalı bir bilgi gördüğünde "İK'ya bildir" düğmesine basar,… | — | `ADR-0022` §3 | — | — | — |
+| 38 | `PG-PERS-38` İşten ayrılan personelin kaydı, ayrılış tarihinden sonra Sistem Yönetimi… | — | `ADR-0022` §5 | — | — | — |
+| 39 | `PG-PERS-39` Personel listesinin bir sayfası (fotoğraflarla birlikte) ve kişi kartı, aynı anda 20… | — | `ADR-0021` §5 | — | — | — |
+| 40 | `PG-PERS-40` Personel listesi, kişi kartı, kendi profilim ve "İK'ya bildir" ekranları telefonda… | — | `ADR-0015` | — | — | — |
+| 41 | `PG-PERS-41` Fotoğraflar yalnızca LOGO'da değiştiğinde aktarılır; fotoğraflı senkronizasyon… | — | `ADR-0021` §5 | — | — | — |
+| 42 | `PG-PERS-42` Dışa aktarmada (Excel/PDF) hangi alanların aktarılacağı seçilebilir. Excel'e düz… | — | `ADR-0022` §4; `ADR-0019` §2 | — | — | — |
+| 43 | `PG-PERS-43` Kişi kartında Görevi alanı bulunur ve HRMS içinden girilir. Görev, Y3 Referans Veri… | — | `ADR-0021` §1–§2; `ADR-0022` §1 | — | — | — |
+| 44 | `PG-PERS-44` Kişinin acil durumda aranacak kişi bilgisi (yakınlığı, adı, soyadı, cep telefonu)… | — | `ADR-0021` §1; `ADR-0019` §2 | — | — | — |
+| 45 | `PG-PERS-45` HRMS'teki personel verisinin saklama süresi Sistem Yönetimi parametresinde tanımlanır… | — | `ADR-0022` §5; `ADR-0009` §6 | — | — | — |
 
 ---
 
@@ -312,3 +313,4 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 2026-10-20 | 2.17 | §7: PG-PERS-45 satırı (saklama süresi parametresi, #241) | Bilgi İşlem |
 | 2026-10-20 | 2.18 | §7: PG-PERS-08 satırı "T3'te kısmen karşılandı" (#234) | Bilgi İşlem |
 | 2026-10-22 | 2.19 | §5 "Tasarım" sütunu: REQ-KMLK-025, 051, 052, 053'e ADR-0017; REQ-KMLK-011, 036'ya ADR-0007 §1 (tasarım gözden geçirmesi BG-07, #246) | Bilgi İşlem |
+| 2026-10-22 | 2.20 | §7: 45 satırın "Tasarım" sütunu T1 tasarım kararlarıyla (ADR-0019…0022, #245) | Bilgi İşlem |

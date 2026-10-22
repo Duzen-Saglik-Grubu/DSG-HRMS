@@ -95,6 +95,11 @@ ayrı tarih aralıklı tablolarda tutulur (ADR-0004 §7 kuralları geçerlidir).
 Her kayıt `valid_from` / `valid_to` taşır. Böylece **"X tarihinde durum neydi"**
 sorusu tek sorguyla cevaplanır.
 
+> **Gerçekleştirme notu (22.10.2026, `KR-123`):** T1'de görev, HRMS'te girildiği için ayrı tarih
+> aralıklı `employment_duty` tablosunda tutulur. `employment_assignment` yalnızca LOGO kaynaklı
+> nitelikleri taşır (şube, birim, ünvan, statü, SGK mesleği). Bir satırda iki kaynak birlikte
+> durmaz. Ayrıntı: ADR-0021 §1–§2.
+
 ### 4. Yönetici ataması bir graftır, ağaç değil
 
 İK biriminin tanımladığı yapı:
@@ -138,6 +143,10 @@ tasarlanır; firma, yetki kapsamında ve raporlamada birinci sınıf bir boyuttu
 
 Organizasyon kayıtları da tarih aralıklıdır: şube açılır/kapanır, birim birleşir,
 bağlılık değişir. Geçmişe dönük raporlar o tarihteki organizasyona göre üretilir.
+
+> **Gerçekleştirme notu (22.10.2026, `KR-123`):** LOGO'da birim şubeye değil firmaya bağlıdır.
+> T1 şube ve birimi ayrı ayrı firmaya bağlı tanımlar olarak kurar. Hiyerarşi T2'de gelir.
+> Ayrıntı: ADR-0021 §3.
 
 ### 6. LOGO referansı
 
@@ -198,3 +207,5 @@ anlamına gelir. Bu nedenle ölçüme dayandırılmış ve İK ile doğrulanmı�
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-10-22 | 0.2 | §1 notu: `gender` ve şube/birim alanları T1'de (#246) | Bilgi İşlem |
+| 2026-10-22 | 0.3 | §3: görev ayrı tabloda (`KR-123`, ADR-0021) | Bilgi İşlem |
+| 2026-10-22 | 0.4 | §5: LOGO'da birim firmaya bağlı (`KR-123`, ADR-0021) | Bilgi İşlem |

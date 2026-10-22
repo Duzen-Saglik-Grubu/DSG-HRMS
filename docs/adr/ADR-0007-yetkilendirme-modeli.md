@@ -121,6 +121,11 @@ bir kaydın kimliğiyle yapılan istek `404` döndürmelidir.
 > sınıftaki `[AllowAnonymous]` eylemdeki `[Authorize]`'ı geçersiz kılar. Kaynak: tasarım
 > gözden geçirmesi B-04 (20.10.2026).
 
+> **Gerçekleştirme notu (22.10.2026, `KR-121`):** Kapsam altyapısı T1'de kurulur.
+> `ICurrentUserScope` (`All`, `Self`) izinden türetilir; kişi okumaları tek bir kapsamlı sorgu
+> bileşeninden geçer. EF genel sorgu süzgeci kullanılmaz. Alan düzeyinde görünürlük tek bir
+> politikayla API yanıtına, filtreye ve dışa aktarmaya uygulanır. Ayrıntı: ADR-0019.
+
 ### 4. `403` yerine `404`
 
 Kapsam dışı bir kayda erişim denendiğinde **`403 Forbidden` değil `404 Not Found`**
@@ -200,3 +205,4 @@ eklenmesi istenirse yeni bir kapsam türü olarak eklenir, mevcut davranış boz
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-29 | 0.2 | §1: eylem yetkisinin gerçekleştirme notu (`KR-089`, #100) | Bilgi İşlem |
 | 2026-10-21 | 0.3 | §3: varsayılan yetki politikası oturum ister; anonim uçlar açıkça işaretlenir (`KR-117`, #244) | Bilgi İşlem |
+| 2026-10-22 | 0.4 | §3: kapsam ve alan görünürlüğü T1'de (`KR-121`, ADR-0019) | Bilgi İşlem |
