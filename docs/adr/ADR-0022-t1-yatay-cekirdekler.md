@@ -81,6 +81,10 @@ Onaylanmamış gereksinime dayanan hiçbir şey yazılmaz (`KR-068`).
 - **Kalıcı gönderim:** Talep ve bildirim kaydı veritabanına aynı işlemde yazılır. E-posta
   bugünkü bellek içi kuyrukla gider. Kuyruk kaybında İK talebi yine uygulama içinde görür;
   kaybolan yalnızca e-postadır (ADR-0012 §4 notu, BG-02). Kalıcı kuyruk Y1'dedir.
+- **İkinci bildirim türü** (SYG-PERS AN-06, #274): Şema sapması ve başarısız senkronizasyon,
+  `PRM-BLD-01`'deki roldeki kullanıcılara aynı çekirdekle uygulama içi bildirim olarak yazılır
+  (PG-PERS-08). T3 bu bildirimi Y1'e bırakmıştı; çekirdek T1'de kurulduğu için yeni altyapı
+  gerekmez. E-posta ve tercihler Y1'de kalır.
 
 ### 4. Dışa aktarma (ADR-0014)
 
@@ -156,3 +160,4 @@ Düşük–orta. Çekirdekler küçüktür ve kendi ad alanlarındadır.
 |---|---|---|---|
 | 2026-10-22 | 1.0 | İlk sürüm: T1 tasarım kararları (#245 maddeler 6, 8, 9, 10, 11) | Bilgi İşlem |
 | 2026-10-22 | 1.1 | Revizyon (#267, #268): önerilen değer talep kapanınca silinir, talebin saklama süresi ve izinleri (B-03, B-14, B-18); e-posta konu satırı (B-18); dışa aktarmada kişi kimlikleri (B-09); özel nitelikli senkronizasyon parametre değil (B-04); görünür kalma süresinin başlangıcı (B-15) | Bilgi İşlem |
+| 2026-10-22 | 1.2 | §3: şema sapması ve başarısız senkronizasyon için ikinci bildirim türü (SYG-PERS AN-06, #274) | Bilgi İşlem |
