@@ -62,6 +62,10 @@ GET /api/v1/personnel/persons?page=1&pageSize=25&sort=lastName&order=asc&q=...
 - `pageSize` üst sınırı **100**'dür; aşan istek `400` alır.
 - Sayfasız liste dönen uç nokta yazılmaz.
 
+> **Gerçekleştirme notu (22.10.2026, `KR-124`):** Varsayılan sayfa boyutu Sistem Yönetimi
+> parametresidir (T1 kart ızgarasında 24). Kodda kalan 100 tavanı güvenlik sınırıdır;
+> parametre bunu aşamaz. Ayrıntı: ADR-0022 §5.
+
 ### 5. Hata yanıtı: RFC 9457 Problem Details
 
 Tüm hatalar tek bir biçimde döner:
@@ -193,3 +197,4 @@ tek noktadan yapılabilir.
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-10-15 | 0.2 | §5: HTTPS zorunluluğunun gerçekleştirme notu (`https-required`; `KR-093`, `KR-099`, `KR-111`, #217) | Bilgi İşlem |
+| 2026-10-22 | 0.3 | §4: sayfa boyutu parametresi ve kod tavanı (`KR-124`, ADR-0022) | Bilgi İşlem |

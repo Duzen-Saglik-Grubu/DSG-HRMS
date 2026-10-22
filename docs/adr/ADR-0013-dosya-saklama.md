@@ -52,6 +52,10 @@ Uygulama katmanı NAS'ı, dosya yolunu veya SMB bağlamasını **bilmez**. Bugü
 **Gerekçe:** Veritabanı yedekleri şişer, geri yükleme süresi uzar, bellek kullanımı
 artar. Ayrıca NAS zaten yedeklenen bir kaynaktır.
 
+> **İstisna (22.10.2026, `KR-123`):** Personel fotoğrafları bu kurala tabi değildir. LOGO'nun
+> kopyasıdırlar, küçültülerek (≈30 KB) veritabanında tutulurlar ve kaybolursa yeniden
+> senkronize edilirler. Kural kullanıcının yüklediği belgeler için geçerlidir. Ayrıntı: ADR-0021 §5.
+
 ### 3. Dosya adı ve dizin düzeni
 
 - Kullanıcının verdiği ad **depoda kullanılmaz**; yalnızca üst veride saklanır ve
@@ -161,3 +165,4 @@ mevcut dosyaların taşınması ayrı bir göç işidir.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-10-22 | 0.2 | §2: personel fotoğrafı istisnası (`KR-123`, ADR-0021) | Bilgi İşlem |
