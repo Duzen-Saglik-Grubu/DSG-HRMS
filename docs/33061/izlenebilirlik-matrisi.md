@@ -233,7 +233,7 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 9 | `PG-PERS-09` Aynı TCKN'ye sahip farklı sicil kayıtları TEK kişi olarak gösterilir; her sicil ayrı… | — | `ADR-0005` §1 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
 | 10 | `PG-PERS-10` TCKN'si olmayan LOGO kartı kişi olarak oluşturulmaz; uyarı listesine alınır. | — | `ADR-0003` §5 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
 | 11 | `PG-PERS-11` Kişinin birden fazla sicili varsa kart detayında sekmeli (tab) gösterim kullanılır;… | — | `ADR-0005` §1 | — | — | — |
-| 12 | `PG-PERS-12` Değişen nitelikler (şube, birim, görev, çalışma şekli) tarih aralıklı tutulur;… | — | `ADR-0021` §2 | — | — | — |
+| 12 | `PG-PERS-12` Değişen nitelikler (şube, birim, görev) tarih aralıklı tutulur (#270);… | — | `ADR-0021` §2 | — | — | — |
 | 13 | `PG-PERS-13` Personel listesi, kişi kartlarından oluşan ızgara (grid) düzeninde gösterilir; üstte… | — | `ADR-0015`; `ADR-0021` §5 | — | — | — |
 | 14 | `PG-PERS-14` Kişi kartında gösterilen bilgilerin tamamı için filtre yapılabilir. Seçim listesi… | — | `ADR-0019` §2; `ADR-0021` §7 | — | — | — |
 | 15 | `PG-PERS-15` Filtreler birlikte uygulanır (VE mantığı); seçili filtreler ekranda görünür ve tek… | — | `ADR-0015` §6 | — | — | — |
@@ -314,3 +314,4 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 2026-10-20 | 2.18 | §7: PG-PERS-08 satırı "T3'te kısmen karşılandı" (#234) | Bilgi İşlem |
 | 2026-10-22 | 2.19 | §5 "Tasarım" sütunu: REQ-KMLK-025, 051, 052, 053'e ADR-0017; REQ-KMLK-011, 036'ya ADR-0007 §1 (tasarım gözden geçirmesi BG-07, #246) | Bilgi İşlem |
 | 2026-10-22 | 2.20 | §7: 45 satırın "Tasarım" sütunu T1 tasarım kararlarıyla (ADR-0019…0022, #245) | Bilgi İşlem |
+| 2026-10-22 | 2.21 | §7: PG-PERS-12 kaynak metni değişiklik talebi #270'e göre | Bilgi İşlem |

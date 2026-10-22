@@ -41,6 +41,7 @@ user_account *───* role *───* permission
 | `report` | Raporlama |
 | `export` | Dışa aktarma (Excel/PDF) |
 | `approve` | Onaylama (onay akışı olan modüllerde) |
+| `view_<alan>` | Alan düzeyinde görme: kaydı görebilen kullanıcının ayrıca korumalı bir alanı görmesi (ör. `view_national_id`, `view_sensitive`; ADR-0019 §2–§4; 22.10.2026 eklendi) |
 
 Örnek: `leave.request.approve`, `personnel.person.export`
 
@@ -206,3 +207,4 @@ eklenmesi istenirse yeni bir kapsam türü olarak eklenir, mevcut davranış boz
 | 2026-09-29 | 0.2 | §1: eylem yetkisinin gerçekleştirme notu (`KR-089`, #100) | Bilgi İşlem |
 | 2026-10-21 | 0.3 | §3: varsayılan yetki politikası oturum ister; anonim uçlar açıkça işaretlenir (`KR-117`, #244) | Bilgi İşlem |
 | 2026-10-22 | 0.4 | §3: kapsam ve alan görünürlüğü T1'de (`KR-121`, ADR-0019) | Bilgi İşlem |
+| 2026-10-22 | 0.5 | §1: alan düzeyinde görme eylemi `view_<alan>` sözlüğe eklendi (ADR-0019, #268, B-16) | Bilgi İşlem |

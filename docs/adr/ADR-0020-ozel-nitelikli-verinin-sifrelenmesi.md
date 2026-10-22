@@ -2,7 +2,7 @@
 
 **Durum:** **Kabul Edildi**
 **Tarih:** 2026-10-22
-**Karar defteri karşılığı:** `KR-122`
+**Karar defteri karşılığı:** `KR-122`, `KR-125`, `KR-126`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **Uyguladığı:** ADR-0009 §5 (özel nitelikli verinin saklanması)
 **İlgili gereksinimler:** PG-PERS-36; `KR-113`, `KR-116` (kan grubu işleme koşulları), `KR-120`
@@ -30,16 +30,23 @@ altyapısı yoktur:
 ### 1. Şifreleme
 
 - Özel nitelikli alanlar (`[SpecialCategoryData]`, `KR-120`) veritabanında **AES-256-GCM**
-  ile şifrelenir. Şifreleme bir EF değer dönüştürücüsüyle yapılır; uygulama kodu düz değeri
-  görür, veritabanı yalnızca şifreli değeri görür.
+  ile şifrelenir.
+- **Şifreleme yeri (revizyon 1.2, B-02):** EF değer dönüştürücüsü kullanılmaz. Dönüştürücü
+  yalnızca kolonun değerini görür, satırın başka bir alanını (kişinin `public_id`'sini)
+  göremez; bu yüzden AAD'yi uygulayamaz. Özel nitelikli değerler ayrı bir tabloda tutulur
+  (`person_sensitive`, ADR-0021 §1). Şifreleme ve çözme bu tablonun **depo katmanında**
+  yapılır: depo değeri yazarken şifreler, okurken çözer. Uygulama kodu düz değeri görür,
+  veritabanı yalnızca şifreli değeri görür.
 - **Ayrı veri anahtarı** kullanılır (`PersonalDataProtection:Keys`). Sır parametre
   anahtarıyla paylaşılmaz: biri ele geçerse diğeri korunmaya devam eder.
 - Şifreli değer **anahtar kimliği** taşır: `k<n>:<nonce>:<şifreli metin>`. Böylece yeni
   anahtara geçilirken eski değerler hâlâ çözülebilir.
 - Her değer için rastgele nonce kullanılır; aynı kan grubu iki kişide farklı şifreli metin
   üretir. Veritabanına erişen biri değerleri gruplayamaz.
-- **İlişkilendirilmiş veri (AAD):** Şifreleme kişinin `public_id`'sine bağlanır. Bir
-  kişinin şifreli değeri başka bir kişinin satırına kopyalanırsa çözülemez.
+- **İlişkilendirilmiş veri (AAD):** Şifreleme **tablo adı + alan adı + kayıt sahibinin
+  `public_id`'si** üçlüsüne bağlanır (revizyon 1.2, B-02). Bir kişinin şifreli değeri başka
+  bir kişinin satırına veya başka bir kolona kopyalanırsa çözülemez. Düzeltme talebinde
+  önerilen kan grubu da aynı kuralla, talebin tablosu ve kimliğiyle şifrelenir.
 
 ### 2. Anahtar zorunludur
 
@@ -51,13 +58,21 @@ altyapısı yoktur:
 
 ### 3. Döndürme ve kurtarma
 
-- **Döndürme:** Yeni anahtar yeni kimlikle eklenir ve yeni yazımlar onunla yapılır. Eski
-  değerler bir sonraki senkronizasyonda yeni anahtarla yeniden yazılır, çünkü kan grubu
-  LOGO'dan gelir. Eski anahtar, onunla şifreli satır kalmayınca çıkarılır. Yordam
-  runbook'a yazılır.
+- **Döndürme (revizyon 1.2, B-03):** Yeni anahtar yeni kimlikle eklenir ve yeni yazımlar
+  onunla yapılır. Eski değerleri **açık bir yeniden şifreleme işi** yeni anahtarla yeniden
+  yazar. Senkronizasyona güvenilmez, çünkü senkronizasyon yalnızca değişen değeri yazar.
+  İş Sistem Yöneticisi tarafından başlatılır. Değer değişmediği için denetim izine "değişti"
+  kaydı üretmez; bunun yerine işin kendisi tek bir güvenlik olayı olarak kaydedilir: kim
+  başlattı, kaç kayıt, hangi anahtardan hangisine. Eski anahtar, onunla şifreli kayıt
+  kalmayınca çıkarılır; iş bunu sayarak doğrular. Yordam runbook'a yazılır.
 - **Anahtar kaybı:** LOGO kaynaktır. Anahtar kaybolursa alan temizlenir ve yeni anahtarla
-  yeniden senkronize edilir. Veri kaybı olmaz. HRMS'te girilen bir alan özel nitelikli
-  olursa bu yol işlemez; o durumda anahtarın yedeklenmesi ayrıca kararlaştırılır.
+  yeniden senkronize edilir; kan grubunda veri kaybı olmaz.
+- **HRMS'te girilen özel nitelikli değer:** Tek örnek, düzeltme talebinde önerilen kan
+  grubudur. Bu değer **talep kapatılınca silinir**; talepte yalnızca hangi alanın
+  bildirildiği ve talebin durumu kalır (KVKK Sorumlusu kararı, 22.10.2026, `KR-126`). Açık
+  talepler yeniden şifreleme işine dahildir. Anahtar kaybında açık taleplerin önerilen değeri
+  kaybolur; personel talebi yeniden gönderir. Bu kabul edilen bir ödündür: değer kısa ömürlüdür
+  ve yalnızca LOGO düzeltmesi için tutulur.
 
 ### 4. Arama ve filtre
 
@@ -67,7 +82,11 @@ altyapısı yoktur:
 - Kan grubu filtresi **uygulama belleğinde** yapılır. Önce kapsam ve diğer filtreler
   veritabanında uygulanır, kalan kayıtların kan grubu çözülür ve süzülür. Veri hacmi küçük
   olduğu için bu yol yeterlidir: 21.10.2026'da 1.371 kişi, 585 aktif kart. Filtreyi
-  yalnızca kan grubunu görebilen kullanıcı kullanabilir (ADR-0019 §2).
+  yalnızca `personnel.person.view_sensitive` izni olan kullanıcı kullanabilir (ADR-0019 §2).
+- **Sıra (revizyon 1.2, B-10):** Kan grubu süzgeci varsa **süzme, sıralama, sayfalama ve
+  toplam sayı bellekte**, bu sırayla yapılır. Veritabanında sayfalayıp sonra süzmek eksik
+  sayfa ve yanlış toplam üretir. Toplamın doğruluğu testle sınanır. Süzgeç yoksa bütün
+  işlemler veritabanında kalır.
 - Sıralama kan grubuna göre yapılmaz.
 
 ### 5. Denetim izi ve erişim kaydı
@@ -88,6 +107,13 @@ altyapısı yoktur:
 
 Yerel ortamda gerçek kan grubunun bulunmasının bir faydası yoktur. Geliştirici şifreleme
 ve görünürlük davranışını CI'daki sentetik veriyle ve UAT'de dener.
+
+**Ayarın niteliği (revizyon 1.2, B-04):** `Logo:SyncSpecialCategoryData` bir **ortam
+yapılandırmasıdır** (sır dosyası veya ortam değişkeni). Sistem Yönetimi parametresi değildir
+ve ekrandan değiştirilemez. Ekrandan açılabilseydi yerel ortamda da açılabilir ve `KR-125`
+çiğnenebilirdi. Ayar kapalıyken senkronizasyon özel nitelikli alanı LOGO'dan **okumaz** ve
+HRMS'teki mevcut değeri **temizler**. Böylece ayar sonradan kapatılan bir ortamda eski kopya
+kalmaz. Temizleme denetim izine "değişti" olarak yazılır.
 
 > **Karar (22.10.2026, `KR-125`):** KVKK Sorumlusu UAT'de gerçek kan grubunun bulunmasını
 > kabul testi için onayladı; yerel geliştirme ortamında bulunmaz. R-25'in kapsamı buna göre
@@ -142,3 +168,4 @@ yeniden senkronizasyonla uygulanabilir.
 |---|---|---|---|
 | 2026-10-22 | 1.0 | İlk sürüm: T1 tasarım kararları (#245 maddeler 3, 4) | Bilgi İşlem |
 | 2026-10-22 | 1.1 | §6: UAT'de gerçek kan grubu KVKK Sorumlusu tarafından onaylandı (`KR-125`, #265) | Bilgi İşlem |
+| 2026-10-22 | 1.2 | Revizyon (#267, #268): şifreleme depo katmanında ve ayrı tabloda, AAD tablo + alan + kimlik (B-02); açık yeniden şifreleme işi, önerilen kan grubu talep kapanınca silinir (B-03); ayar ortam yapılandırması, kapalıyken mevcut değer temizlenir (B-04); bellek içi filtrede sıra (B-10) | Bilgi İşlem |
