@@ -9,6 +9,8 @@
 //   5. Her sistem gereksinimi doğrulanmış: en az bir test dosyası onu anıyor. Doğrulama
 //      yöntemi Analiz, İnceleme veya Gösterim olanlar için TEC.9 doğrulama raporu da kanıttır.
 //      (#122: SYG-KMLK-060/061/062 bu denetim olmadığı için hiçbir kapıya takılmadan kaldı.)
+//      Modül kabul edilmeden (SYG'de baseline yokken) eksik kanıt uyarıdır; SYG koddan önce
+//      yazılır. Kabulde baseline yazılınca hata olur (#272).
 //
 // Neden otomatik? Eşleme üç yerde duruyor (SYG §4, SYG §8, matris). Elle tutulan üç
 // kopya, ilk değişiklikte birbirinden ayrılır ve izlenebilirlik varmış gibi görünür.
@@ -76,7 +78,15 @@ export function checkVerification(module, systemDoc, testTexts, reportTexts) {
     .map((r) => `${r.id}: doğrulama kanıtı yok (yöntem: ${r.method || '—'}; hiçbir test${NON_TEST_METHODS.includes(r.method) ? ' veya TEC.9 raporu' : ''} anmıyor)`);
 }
 
-/** "SYG-KMLK-013, 016" -> ["SYG-KMLK-013", "SYG-KMLK-016"]; "—" -> [] */
+/**
+ * Modul kabul edildi mi? "Onay durumu" satirinda baseline etiketi (v0.2.0) varsa evet
+ * (KR-097, KR-111). Kabulden once eksik dogrulama kaniti uyaridir, sonra hatadir (#272).
+ */
+export function isBaselined(systemDoc) {
+  return /^\*\*Onay durumu:\*\*.*\bv\d+\.\d+\.\d+/m.test(systemDoc);
+}
+
+/** "SYG-KMLK-013, 016" ->["SYG-KMLK-013", "SYG-KMLK-016"]; "—" -> [] */
 function expandIds(cell, prefix) {
   const s = cell.replace(/`/g, '').trim();
   if (s === '—' || s === '') return [];
@@ -152,6 +162,13 @@ if (!modules.length) {
   process.exit(0);
 }
 
+// Baseline tanıma kuralının kendisi: yanlış tanırsa kapı sessizce gevşer veya sertleşir.
+if (!isBaselined('**Onay durumu:** Bilgi İşlem; baseline `v0.2.0` (13.10.2026)')
+  || isBaselined('**Onay durumu:** Bilgi İşlem; baseline modül kabulünde')) {
+  console.error('✗ baseline tanıma kuralı kendi sınamasını geçemedi');
+  process.exit(1);
+}
+
 const matrixDoc = readFileSync(MATRIX_PATH, 'utf8');
 const testTexts = TEST_DIRS.flatMap((d) => walk(d, isTestFile)).map((p) => readFileSync(p, 'utf8'));
 const reportTexts = walk(REPORT_DIR, (p) => p.endsWith('.md')).map((p) => readFileSync(p, 'utf8'));
@@ -190,14 +207,22 @@ for (const module of modules) {
     }
   }
 
+  // Gelistirmesi suren modulde (baseline yok) eksik kanit uyaridir: SYG koddan once
+  // yazilir (TEC.3). Kabulde baseline yazilinca ayni eksik hata olur (#272).
+  const unverified = checkVerification(module, systemDoc, testTexts, reportTexts);
+  const baselined = isBaselined(systemDoc);
   const errors = [
     ...check(module, stakeholderDoc, systemDoc, matrixDoc),
-    ...checkVerification(module, systemDoc, testTexts, reportTexts),
+    ...(baselined ? unverified : []),
   ];
   if (errors.length) {
     console.error(`✗ ${module}: ${errors.length} sorun`);
     for (const e of errors) console.error(`    ${e}`);
     failures++;
+  } else if (unverified.length) {
+    const total = [...systemDoc.matchAll(new RegExp(`^\\| \\*\\*SYG-${module}-\\d{3}\\*\\* \\|`, 'gm'))].length;
+    console.log(`✓ ${module}: her paydaş gereksinimi karşılanıyor; SYG §8 ve izlenebilirlik matrisi SYG §4 ile tutarlı`);
+    console.log(`  ⚠ geliştirme sürüyor (baseline yok): ${total - unverified.length} / ${total} sistem gereksinimi doğrulanmış; kabulde hepsi zorunlu`);
   } else {
     console.log(`✓ ${module}: her paydaş gereksinimi karşılanıyor; SYG §8 ve izlenebilirlik matrisi SYG §4 ile tutarlı; her sistem gereksinimi doğrulanmış`);
   }
