@@ -2670,6 +2670,13 @@
           }
         }
       },
+      "GenderKind": {
+        "enum": [
+          "male",
+          "female",
+          null
+        ]
+      },
       "IFormFile": {
         "type": "string",
         "format": "binary"
@@ -2737,6 +2744,13 @@
           }
         },
         "description": "Baglanti sorgusu."
+      },
+      "MaritalStatusKind": {
+        "enum": [
+          "married",
+          "notMarried",
+          null
+        ]
       },
       "PagedResponseOfAccountSummaryResponse": {
         "required": [
@@ -2984,7 +2998,12 @@
           "email",
           "mobilePhone",
           "isSelf",
-          "employments"
+          "employments",
+          "gender",
+          "previousSurname",
+          "maritalStatus",
+          "educationName",
+          "sensitive"
         ],
         "type": "object",
         "properties": {
@@ -3047,6 +3066,53 @@
               "$ref": "#/components/schemas/EmploymentCardResponse"
             },
             "description": "Istihdamlar; once aktifler, ise giris tarihi yeniden eskiye."
+          },
+          "gender": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Cinsiyet; LOGO'da tanimsizsa bos.",
+                "$ref": "#/components/schemas/GenderKind"
+              }
+            ]
+          },
+          "previousSurname": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Onceki soyadi; yalnizca kadin personelde ve LOGO'da doluysa."
+          },
+          "maritalStatus": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Medeni hal; LOGO'da satiri yoksa bos.",
+                "$ref": "#/components/schemas/MaritalStatusKind"
+              }
+            ]
+          },
+          "educationName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Egitim; kayitli degilse bos."
+          },
+          "sensitive": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Korumali alanlar. Yalnizca gorme hakki olan kullaniciya (`personnel.person.view_sensitive`\r\nveya kisinin kendisi) yazilir; digerlerinin yanitinda alan HIC YOKTUR (SYG-PERS-052).",
+                "$ref": "#/components/schemas/SensitiveResponse"
+              }
+            ]
           }
         },
         "description": "Kisi karti."
@@ -3226,6 +3292,22 @@
           }
         },
         "description": "Kidem suresi (SYG-PERS-039)."
+      },
+      "SensitiveResponse": {
+        "required": [
+          "address"
+        ],
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Adres; kayitli degilse bos (\"Kayitli degil\")."
+          }
+        },
+        "description": "Kartin korumali alanlari (ADR-0019 §2)."
       },
       "SessionResponse": {
         "required": [

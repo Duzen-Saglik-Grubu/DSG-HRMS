@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Dsg.Hrms.Application.Personnel.Cards;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -64,6 +65,14 @@ public sealed class PersonsController : ControllerBase
 /// <param name="MobilePhone">Cep telefonu; kayitli degilse bos.</param>
 /// <param name="IsSelf">Kart kullanicinin kendisine mi ait.</param>
 /// <param name="Employments">Istihdamlar; once aktifler, ise giris tarihi yeniden eskiye.</param>
+/// <param name="Gender">Cinsiyet; LOGO'da tanimsizsa bos.</param>
+/// <param name="PreviousSurname">Onceki soyadi; yalnizca kadin personelde ve LOGO'da doluysa.</param>
+/// <param name="MaritalStatus">Medeni hal; LOGO'da satiri yoksa bos.</param>
+/// <param name="EducationName">Egitim; kayitli degilse bos.</param>
+/// <param name="Sensitive">
+/// Korumali alanlar. Yalnizca gorme hakki olan kullaniciya (<c>personnel.person.view_sensitive</c>
+/// veya kisinin kendisi) yazilir; digerlerinin yanitinda alan HIC YOKTUR (SYG-PERS-052).
+/// </param>
 public sealed record PersonCardResponse(
     Guid PersonId,
     string FirstName,
@@ -75,7 +84,12 @@ public sealed record PersonCardResponse(
     string? Email,
     string? MobilePhone,
     bool IsSelf,
-    IReadOnlyList<EmploymentCardResponse> Employments)
+    IReadOnlyList<EmploymentCardResponse> Employments,
+    GenderKind? Gender,
+    string? PreviousSurname,
+    MaritalStatusKind? MaritalStatus,
+    string? EducationName,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] SensitiveResponse? Sensitive)
 {
     /// <summary>Uygulama katmanindaki karttan yanit kurar.</summary>
     public static PersonCardResponse From(PersonCard card)
@@ -99,8 +113,53 @@ public sealed record PersonCardResponse(
                 e.HireDate,
                 e.TerminationDate,
                 e.IsActive,
-                new SeniorityResponse(e.Seniority.Years, e.Seniority.Months, e.Seniority.Days, e.Seniority.Text)))]);
+                new SeniorityResponse(e.Seniority.Years, e.Seniority.Months, e.Seniority.Days, e.Seniority.Text)))],
+            card.Gender switch
+            {
+                Domain.Personnel.Gender.Male => GenderKind.Male,
+                Domain.Personnel.Gender.Female => GenderKind.Female,
+                _ => null,
+            },
+            card.PreviousSurname,
+            card.MaritalStatus switch
+            {
+                Domain.Personnel.MaritalStatus.Married => MaritalStatusKind.Married,
+                Domain.Personnel.MaritalStatus.NotMarried => MaritalStatusKind.NotMarried,
+                _ => null,
+            },
+            card.EducationName,
+            card.Sensitive is { } sensitive ? new SensitiveResponse(sensitive.Address) : null);
     }
+}
+
+/// <summary>Kartin korumali alanlari (ADR-0019 §2).</summary>
+/// <param name="Address">Adres; kayitli degilse bos ("Kayitli degil").</param>
+public sealed record SensitiveResponse(string? Address);
+
+/// <summary>Cinsiyet.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<GenderKind>))]
+public enum GenderKind
+{
+    /// <summary>Erkek.</summary>
+    [JsonStringEnumMemberName("male")]
+    Male = 1,
+
+    /// <summary>Kadin.</summary>
+    [JsonStringEnumMemberName("female")]
+    Female = 2,
+}
+
+/// <summary>Medeni hal.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<MaritalStatusKind>))]
+public enum MaritalStatusKind
+{
+    /// <summary>Evli.</summary>
+    [JsonStringEnumMemberName("married")]
+    Married = 1,
+
+    /// <summary>Bekar.</summary>
+    [JsonStringEnumMemberName("notMarried")]
+    NotMarried = 2,
 }
 
 /// <summary>Kartta bir istihdam.</summary>

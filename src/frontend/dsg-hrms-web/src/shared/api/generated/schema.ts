@@ -2498,6 +2498,8 @@ export interface components {
             entityTag?: null | components["schemas"]["EntityTagHeaderValue"];
             enableRangeProcessing?: boolean;
         };
+        /** @enum {unknown} */
+        GenderKind: "male" | "female" | null;
         /** Format: binary */
         IFormFile: string;
         /** @description Baglanti bilgisi. */
@@ -2530,6 +2532,8 @@ export interface components {
             /** @description Baglantidaki jeton. */
             token: string;
         };
+        /** @enum {unknown} */
+        MaritalStatusKind: "married" | "notMarried" | null;
         /** @description Sayfalanmis yanit (ADR-0010 §4). */
         PagedResponseOfAccountSummaryResponse: {
             /** @description Bu sayfadaki kayitlar. */
@@ -2665,6 +2669,13 @@ export interface components {
             isSelf: boolean;
             /** @description Istihdamlar; once aktifler, ise giris tarihi yeniden eskiye. */
             employments: components["schemas"]["EmploymentCardResponse"][];
+            gender: null | components["schemas"]["GenderKind"];
+            /** @description Onceki soyadi; yalnizca kadin personelde ve LOGO'da doluysa. */
+            previousSurname: null | string;
+            maritalStatus: null | components["schemas"]["MaritalStatusKind"];
+            /** @description Egitim; kayitli degilse bos. */
+            educationName: null | string;
+            sensitive: null | components["schemas"]["SensitiveResponse"];
         };
         ProblemDetails: {
             type?: null | string;
@@ -2734,6 +2745,11 @@ export interface components {
             days: number | string;
             /** @description Ekran metni: "X Yil Y Ay Z Gun"; sifir olan bas birimler yazilmaz. */
             text: string;
+        };
+        /** @description Kartin korumali alanlari (ADR-0019 §2). */
+        SensitiveResponse: {
+            /** @description Adres; kayitli degilse bos ("Kayitli degil"). */
+            address: null | string;
         };
         /** @description Acik oturum. Yenileme jetonu burada DEGIL, HttpOnly cerezdedir. */
         SessionResponse: {

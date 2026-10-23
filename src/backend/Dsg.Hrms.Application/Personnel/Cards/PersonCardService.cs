@@ -18,6 +18,14 @@ namespace Dsg.Hrms.Application.Personnel.Cards;
 /// <param name="MobilePhone">Cep telefonu; kayitli degilse bos.</param>
 /// <param name="IsSelf">Kart kullanicinin kendisine mi ait.</param>
 /// <param name="Employments">Istihdamlar; once aktifler, ise giris tarihi yeniden eskiye (SYG-PERS-017).</param>
+/// <param name="Gender">Cinsiyet.</param>
+/// <param name="PreviousSurname">Onceki soyadi; yalnizca kadin personelde ve LOGO'da doluysa.</param>
+/// <param name="MaritalStatus">Medeni hal.</param>
+/// <param name="EducationName">Egitim.</param>
+/// <param name="Sensitive">
+/// Korumali alanlar; yalnizca gorme hakki olana (<c>view_sensitive</c> veya kisinin kendisi)
+/// doldurulur, digerlerinde <c>null</c> ve yanitta hic yer almaz (SYG-PERS-052).
+/// </param>
 public sealed record PersonCard(
     Guid PersonId,
     string FirstName,
@@ -29,7 +37,16 @@ public sealed record PersonCard(
     string? Email,
     string? MobilePhone,
     bool IsSelf,
-    IReadOnlyList<EmploymentCard> Employments);
+    IReadOnlyList<EmploymentCard> Employments,
+    Gender? Gender,
+    string? PreviousSurname,
+    MaritalStatus? MaritalStatus,
+    string? EducationName,
+    SensitiveCard? Sensitive);
+
+/// <summary>Kartin korumali alanlari (ADR-0019 §2). Alan bos ise "Kayitli degil".</summary>
+/// <param name="Address">Adres; kayitli degilse <c>null</c>.</param>
+public sealed record SensitiveCard(string? Address);
 
 /// <summary>Kartta bir istihdam.</summary>
 /// <param name="RegistryCode">Sicil numarasi.</param>
@@ -128,6 +145,11 @@ public sealed class PersonCardService
                     e.HireDate,
                     e.TerminationDate,
                     e.IsActive,
-                    Seniority.Calculate(e.HireDate, e.TerminationDate, today)))]);
+                    Seniority.Calculate(e.HireDate, e.TerminationDate, today)))],
+            record.Profile.Gender,
+            record.Profile.PreviousSurname,
+            record.Profile.MaritalStatus,
+            record.Profile.EducationName,
+            PersonFieldVisibility.CanSeeSensitive(viewer, record.Id) ? new SensitiveCard(record.Address) : null);
     }
 }

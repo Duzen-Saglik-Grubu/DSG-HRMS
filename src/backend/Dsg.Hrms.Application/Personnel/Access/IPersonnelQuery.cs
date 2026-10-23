@@ -1,3 +1,5 @@
+using Dsg.Hrms.Domain.Personnel;
+
 namespace Dsg.Hrms.Application.Personnel.Access;
 
 /// <summary>
@@ -34,6 +36,8 @@ public interface IPersonnelQuery
 /// <param name="Email">Kurumsal e-posta; yoksa <c>null</c>.</param>
 /// <param name="MobilePhone">Cep telefonu; yoksa <c>null</c>.</param>
 /// <param name="Employments">Istihdamlar.</param>
+/// <param name="Profile">LOGO'dan gelen genel bilgiler (SYG-PERS-034).</param>
+/// <param name="Address">Adres (korumali alan); kayitli degilse <c>null</c>.</param>
 public sealed record PersonRecord(
     long Id,
     Guid PublicId,
@@ -43,7 +47,9 @@ public sealed record PersonRecord(
     DateOnly BirthDate,
     string? Email,
     string? MobilePhone,
-    IReadOnlyList<EmploymentRecord> Employments);
+    IReadOnlyList<EmploymentRecord> Employments,
+    PersonProfile Profile,
+    string? Address);
 
 /// <summary>Istihdamin okunan hali.</summary>
 /// <param name="RegistryCode">Sicil numarasi.</param>
