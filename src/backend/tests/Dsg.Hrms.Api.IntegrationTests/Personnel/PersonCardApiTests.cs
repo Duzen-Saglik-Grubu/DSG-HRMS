@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Dsg.Hrms.Application.Identity.Authorization;
 using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
@@ -15,7 +16,7 @@ namespace Dsg.Hrms.Api.IntegrationTests.Personnel;
 
 /// <summary>
 /// Kisi karti ve "Profilim" uctan uca: kapsam, alan gorunurlugu, 404 esitligi ve erisim
-/// kaydi (SYG-PERS-044, 050, 051, 052, 053, 057). Veriler SENTETIKTIR.
+/// kaydi (SYG-PERS-034, 037, 044, 050, 051, 052, 053, 057). Veriler SENTETIKTIR.
 /// </summary>
 /// <remarks>
 /// Kisi 1 oturum acan kullanicidir; rolu teste gore verilir. Kisi 3 ve 4 baskalaridir; kisi
@@ -39,6 +40,8 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
     {
         await _fixture.ResetAsync();
         await CreateAccountAsync(1);
+        await SetDetailsAsync(1, new PersonProfile(Gender.Female, "Demir", MaritalStatus.Married, "Lisans"), "Ornek Mah. 1. Sok. No: 2");
+        await SetDetailsAsync(4, new PersonProfile(Gender.Male, null, MaritalStatus.NotMarried, "Lise"), null);
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
@@ -123,7 +126,61 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
         var (_, card) = await GetAsync(client, $"{Persons}/{await PersonIdAsync(4)}", token);
 
         card.EnumerateObject().Select(p => p.Name).ShouldBe(
-            ["personId", "firstName", "lastName", "nationalId", "isNationalIdMasked", "birthDate", "age", "email", "mobilePhone", "isSelf", "employments"]);
+            ["personId", "firstName", "lastName", "nationalId", "isNationalIdMasked", "birthDate", "age", "email", "mobilePhone", "isSelf", "employments",
+             "gender", "previousSurname", "maritalStatus", "educationName", "sensitive"]);
+        card.GetProperty("sensitive").EnumerateObject().Select(p => p.Name).ShouldBe(["address"]);
+    }
+
+    [Fact]
+    public async Task General_information_is_shown_on_the_card()
+    {
+        // SYG-PERS-034: cinsiyet, onceki soyadi (kadin ve doluysa), medeni hal, egitim.
+        using var client = _fixture.CreateClient();
+        var token = await SignInAsync(client);
+
+        var (_, card) = await GetAsync(client, $"{Persons}/me", token);
+
+        card.GetProperty("gender").GetString().ShouldBe("female");
+        card.GetProperty("previousSurname").GetString().ShouldBe("Demir");
+        card.GetProperty("maritalStatus").GetString().ShouldBe("married");
+        card.GetProperty("educationName").GetString().ShouldBe("Lisans");
+    }
+
+    [Fact]
+    public async Task Person_sees_their_own_address_and_hr_sees_everyones()
+    {
+        // SYG-PERS-037, 052 (PG-PERS-20): adresi IK, Sistem Yoneticisi ve kisinin kendisi gorur.
+        using var client = _fixture.CreateClient();
+        var token = await SignInAsync(client);
+        (await GetAsync(client, $"{Persons}/me", token)).Body.GetProperty("sensitive").GetProperty("address").GetString()
+            .ShouldBe("Ornek Mah. 1. Sok. No: 2");
+
+        await GrantRoleAsync(1, Role.HrIdentityOperationsCode);
+        token = await SignInAsync(client);
+        var other = (await GetAsync(client, $"{Persons}/{await PersonIdAsync(4)}", token)).Body;
+
+        // Adresi kayitli olmayan kiside bolum vardir, deger bostur: ekranda "Kayitli degil".
+        other.GetProperty("sensitive").GetProperty("address").ValueKind.ShouldBe(JsonValueKind.Null);
+    }
+
+    [Fact]
+    public async Task Viewer_without_the_sensitive_permission_gets_no_sensitive_section_at_all()
+    {
+        // SYG-PERS-052 (yetki sizintisi testi): tum personeli gorebilen ama view_sensitive izni
+        // olmayan kullanicinin yanitinda korumali alan bolumu HIC YOKTUR; ekranda gizlemek yetmez.
+        await GrantRoleAsync(1, await CreateRoleAsync(Permissions.PersonView));
+        using var client = _fixture.CreateClient();
+        var token = await SignInAsync(client);
+        await SetDetailsAsync(3, new PersonProfile(Gender.Female, null, null, null), "Gizli Mah. 9");
+
+        var (status, card) = await GetAsync(client, $"{Persons}/{await PersonIdAsync(3)}", token);
+
+        status.ShouldBe(HttpStatusCode.OK);
+        card.TryGetProperty("sensitive", out _).ShouldBeFalse();
+        card.GetRawText().ShouldNotContain("Gizli Mah.");
+
+        // Kendi karti tek kayittir: kisinin kendisi kurali gecerlidir.
+        (await GetAsync(client, $"{Persons}/me", token)).Body.TryGetProperty("sensitive", out _).ShouldBeTrue();
     }
 
     [Fact]
@@ -174,6 +231,38 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
         var person = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(index));
         return await context.Set<UserAccount>().Where(a => a.PersonId == person.Id).Select(a => a.Id).SingleAsync();
     }
+
+    private Task<int> SetDetailsAsync(int index, PersonProfile profile, string? address) =>
+        _fixture.WithDbAsync(async context =>
+        {
+            var person = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(index));
+            person.ApplyProfile(profile);
+            var row = await context.Set<PersonSensitive>().SingleOrDefaultAsync(r => r.PersonId == person.Id);
+            if (row is null)
+            {
+                row = PersonSensitive.For(person.Id);
+                context.Add(row);
+            }
+
+            row.ApplyAddress(address);
+            return await context.SaveChangesAsync();
+        });
+
+    /// <summary>Yalnizca verilen izinleri tasiyan bir test rolu olusturur; kodunu doner.</summary>
+    private Task<string> CreateRoleAsync(params string[] permissions) =>
+        _fixture.WithDbAsync(async context =>
+        {
+            var code = $"test-{Guid.NewGuid():N}";
+            await context.Database.ExecuteSqlAsync(
+                $"INSERT INTO identity.role (public_id, code, name, is_system, created_at) VALUES ({Guid.CreateVersion7()}, {code}, {"Test rolu"}, false, now())");
+            foreach (var permission in permissions)
+            {
+                await context.Database.ExecuteSqlAsync(
+                    $"INSERT INTO identity.role_permission (role_id, permission) SELECT id, {permission} FROM identity.role WHERE code = {code}");
+            }
+
+            return code;
+        });
 
     private Task<int> GrantRoleAsync(int index, string roleCode) =>
         _fixture.WithDbAsync(async context =>

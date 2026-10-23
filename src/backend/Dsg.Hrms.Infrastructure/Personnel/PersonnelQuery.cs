@@ -44,7 +44,7 @@ public sealed class PersonnelQuery(HrmsDbContext context) : IPersonnelQuery
         };
     }
 
-    private static async Task<PersonRecord?> FirstAsync(IQueryable<Person> query, CancellationToken cancellationToken) =>
+    private async Task<PersonRecord?> FirstAsync(IQueryable<Person> query, CancellationToken cancellationToken) =>
         await query
             .AsNoTracking()
             .Select(person => new PersonRecord(
@@ -58,7 +58,9 @@ public sealed class PersonnelQuery(HrmsDbContext context) : IPersonnelQuery
                 person.MobilePhone,
                 person.Employments
                     .Select(e => new EmploymentRecord(e.RegistryCode, e.Company.Name, e.HireDate, e.TerminationDate, e.IsActive))
-                    .ToList()))
+                    .ToList(),
+                new PersonProfile(person.Gender, person.PreviousSurname, person.MaritalStatus, person.EducationName),
+                context.Set<PersonSensitive>().Where(s => s.PersonId == person.Id).Select(s => s.Address).FirstOrDefault()))
             .SingleOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
 }
