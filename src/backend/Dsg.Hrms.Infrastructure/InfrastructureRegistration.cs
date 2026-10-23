@@ -8,6 +8,8 @@ using Dsg.Hrms.Application.Identity.Registration;
 using Dsg.Hrms.Application.Identity.Sessions;
 using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Notifications;
+using Dsg.Hrms.Application.Personnel.Access;
+using Dsg.Hrms.Application.Personnel.Cards;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Infrastructure.Audit;
@@ -151,6 +153,11 @@ public static class InfrastructureRegistration
 
         // Uygulama katmani IOptions paketine bagimli degildir; secenek nesnesi dogrudan verilir.
         services.AddSingleton(provider => provider.GetRequiredService<IOptions<PersonnelSyncOptions>>().Value);
+
+        // Kisi okumalari: kapsam ve tek giris noktasi (ADR-0019 §1, SYG-PERS-050).
+        services.AddScoped<ICurrentUserScope, CurrentUserScope>();
+        services.AddScoped<IPersonnelQuery, PersonnelQuery>();
+        services.AddScoped<PersonCardService>();
 
         services.AddScoped<IPersonnelSyncStore, PersonnelSyncStore>();
         services.AddScoped<IPersonnelSyncStatus, PersonnelSyncStatus>();

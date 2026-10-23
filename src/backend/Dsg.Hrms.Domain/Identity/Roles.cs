@@ -20,7 +20,10 @@ public sealed class Role : Entity, IAuditable
     /// <summary>Sistem Yoneticisi: tum izinler.</summary>
     public const string SystemAdministratorCode = "system-administrator";
 
-    /// <summary>IK Kimlik Islemleri: hesap islemleri, davet ve senkronizasyon durumu.</summary>
+    /// <summary>
+    /// Insan Kaynaklari (T3'te "IK Kimlik Islemleri"): hesap islemleri, davet, senkronizasyon ve
+    /// T1 personel izinleri. Kod degismez, yalnizca gorunen ad degisti (ADR-0019 §4).
+    /// </summary>
     public const string HrIdentityOperationsCode = "hr-identity-operations";
 
     private Role()

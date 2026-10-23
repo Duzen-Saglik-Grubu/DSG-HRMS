@@ -22,7 +22,11 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 - **Uygulama veritabanına kısıtlı rolle bağlanır (#258, `KR-118`).** Uygulama denetim, erişim ve güvenlik kayıtlarını yalnızca okuyup ekleyebilir. Bu kayıtları değiştiremez, silemez ve koruma tetikleyicisini kapatamaz.
 - **Erişim kaydında arama metni maskelenir (#259).** Arama kutusuna yazılan TCKN, telefon ve e-posta erişim kaydına düz metin yazılmaz.
 
+### Eklendi
+- **Kişi kartı ve "Profilim" API'si (#276, T1).** Rolü olmayan personel yalnızca kendi kartını görür; İK ve Sistem Yöneticisi tüm personeli görür. Kapsam dışındaki kişi ile var olmayan kişi aynı yanıtı alır. Tam TCKN'yi göremeyen kullanıcı, kendi kartında da `123******01` biçiminde maskeli görür. Kartta yaş ve her istihdamın kıdemi hesaplanır; ayrılan personelde çıkış günü sayılır. Her kart açılışı erişim kaydına yazılır. Ekranlar sonraki sürümlerde gelecek.
+
 ### Değişti
+- **İK rolünün adı "İnsan Kaynakları" oldu ve T1 izinleri eklendi (#276).** İK artık senkronizasyonu elle de başlatabilir (`KR-126`). Senkronizasyon izinlerinin kodu `identity.sync.*` iken `personnel.sync.*` oldu.
 - **Ad ve soyad Türkçe kurala göre sıralanır ve aranır (#244).** Hesap işlemleri ekranında Ç, İ, Ö, Ş ve Ü alfabedeki yerlerinde sıralanır. "ışık" araması IŞIK'ı, "ismail" araması İSMAİL'i bulur. Aramada ASCII `I`, Türkçedeki gibi `ı` sayılır; bu yüzden `ISMAIL` yazmak İSMAİL'i bulmaz.
 
 ---

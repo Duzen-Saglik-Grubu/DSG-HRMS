@@ -30,7 +30,7 @@ public sealed class SyncRunsController : ControllerBase
 
     /// <summary>Son calisma bilgisi.</summary>
     /// <response code="200">Durum. Hic calisma yoksa <c>lastRun</c> bostur.</response>
-    /// <response code="403">Yetki yok (<c>identity.sync.view</c>).</response>
+    /// <response code="403">Yetki yok (<c>personnel.sync.view</c>).</response>
     [HttpGet("latest")]
     [HasPermission(Permissions.SyncView)]
     [ProducesResponseType<SyncStatusResponse>(StatusCodes.Status200OK)]
@@ -53,7 +53,7 @@ public sealed class SyncRunsController : ControllerBase
 
     /// <summary>Senkronizasyonu elle baslatir.</summary>
     /// <response code="202">Calisma sira aldi (veya zaten sirada bekliyordu).</response>
-    /// <response code="403">Yetki yok (<c>identity.sync.create</c>).</response>
+    /// <response code="403">Yetki yok (<c>personnel.sync.create</c>).</response>
     /// <response code="422">Senkronizasyon bu ortamda tanimli degil.</response>
     [HttpPost]
     [HasPermission(Permissions.SyncCreate)]
