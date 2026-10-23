@@ -82,6 +82,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
 
         _source.VerifyReadOnlyAccessAsync(Arg.Any<CancellationToken>()).Returns(new LogoAccessCheckResult(true, []));
         _source.VerifySchemaAsync(Arg.Any<CancellationToken>()).Returns(new LogoSchemaCheckResult(true, []));
+        _source.GetDetailsAsync(Arg.Any<CancellationToken>()).Returns(new LogoPersonnelDetails([], [], []));
     }
 
     public async Task DisposeAsync()
@@ -132,6 +133,59 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         run.PersonsCreated.ShouldBe(2);
         run.EmploymentsCreated.ShouldBe(3);
         run.FinishedAt.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task Details_step_persists_profile_address_and_organization_units_after_the_core_step()
+    {
+        // SYG-PERS-003, 013: T1 adimi ilk adim kaydedildikten sonra ayri islemde calisir. Genel
+        // bilgiler kisinin esas istihdaminin kartindan alinir (KR-126). Veriler SENTETIKTIR.
+        _source.GetDetailsAsync(Arg.Any<CancellationToken>()).Returns(new LogoPersonnelDetails(
+            [
+                new LogoProfileRecord(1, Sex: 2, PreviousSurname: "Demir", MaritalStatus: 1, EducationName: "Lisans", Address: "Ornek Mah. 1. Sok. No: 2"),
+                new LogoProfileRecord(3, Sex: 1, PreviousSurname: "Atilmali", MaritalStatus: 2, EducationName: null, Address: null),
+            ],
+            [new LogoUnitRecord(1, 5, "Merkez Laboratuvar", "Ankara"), new LogoUnitRecord(9, 1, "Firmasi olmayan", null)],
+            [new LogoUnitRecord(1, 7, "Bilgi Islem", null)]));
+
+        var result = await SyncAsync(
+            Card("00001", NationalId(1), logoRef: 1),
+            Card("00003", NationalId(2), logoRef: 3));
+
+        result.Status.ShouldBe(SyncStatus.Succeeded);
+        await using var context = Read();
+        var woman = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(1));
+        woman.Gender.ShouldBe(Gender.Female);
+        woman.PreviousSurname.ShouldBe("Demir");
+        woman.MaritalStatus.ShouldBe(MaritalStatus.Married);
+        woman.EducationName.ShouldBe("Lisans");
+        (await context.Set<PersonSensitive>().SingleAsync()).PersonId.ShouldBe(woman.Id);
+
+        // Onceki soyadi yalnizca kadin personelde tutulur (PG-PERS-19).
+        var man = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(2));
+        man.Gender.ShouldBe(Gender.Male);
+        man.PreviousSurname.ShouldBeNull();
+        man.MaritalStatus.ShouldBe(MaritalStatus.NotMarried);
+
+        (await context.Set<Domain.Organization.Branch>().SingleAsync()).City.ShouldBe("Ankara");
+        (await context.Set<Domain.Organization.Department>().SingleAsync()).Name.ShouldBe("Bilgi Islem");
+    }
+
+    [Fact]
+    public async Task Details_step_failure_keeps_the_core_changes_and_marks_the_run_partial()
+    {
+        // SYG-PERS-013 (AN-07): T1 adimindaki hata kisi ve istihdam degisikliklerini geri almaz.
+        _source.GetDetailsAsync(Arg.Any<CancellationToken>()).ThrowsAsync(new LogoUnavailableException());
+
+        var result = await SyncAsync(Card("00001", NationalId(1), logoRef: 1));
+
+        result.Status.ShouldBe(SyncStatus.PartiallyCompleted);
+        await using var context = Read();
+        (await context.Set<Person>().CountAsync()).ShouldBe(1);
+        var run = await context.Set<PersonnelSyncRun>().SingleAsync();
+        run.Status.ShouldBe(SyncStatus.PartiallyCompleted);
+        run.FailureReason.ShouldBe(SyncFailureReason.SourceUnavailable);
+        run.PersonsCreated.ShouldBe(1);
     }
 
     [Fact]

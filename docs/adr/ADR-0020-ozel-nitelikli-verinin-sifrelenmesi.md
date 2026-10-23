@@ -31,6 +31,8 @@ altyapısı yoktur:
 
 - Özel nitelikli alanlar (`[SpecialCategoryData]`, `KR-120`) veritabanında **AES-256-GCM**
   ile şifrelenir.
+- **Kan grubunda şifrelenen değer LOGO kodudur** (1–8; 23.10.2026, `KR-129`). Ad ekranda referans
+  veriden okunur (ADR-0022 §1). Kod 0 "Belirtilmemiş" değer yok sayılır ve saklanmaz.
 - **Şifreleme yeri (revizyon 1.2, B-02):** EF değer dönüştürücüsü kullanılmaz. Dönüştürücü
   yalnızca kolonun değerini görür, satırın başka bir alanını (kişinin `public_id`'sini)
   göremez; bu yüzden AAD'yi uygulayamaz. Özel nitelikli değerler ayrı bir tabloda tutulur
@@ -169,3 +171,4 @@ yeniden senkronizasyonla uygulanabilir.
 | 2026-10-22 | 1.0 | İlk sürüm: T1 tasarım kararları (#245 maddeler 3, 4) | Bilgi İşlem |
 | 2026-10-22 | 1.1 | §6: UAT'de gerçek kan grubu KVKK Sorumlusu tarafından onaylandı (`KR-125`, #265) | Bilgi İşlem |
 | 2026-10-22 | 1.2 | Revizyon (#267, #268): şifreleme depo katmanında ve ayrı tabloda, AAD tablo + alan + kimlik (B-02); açık yeniden şifreleme işi, önerilen kan grubu talep kapanınca silinir (B-03); ayar ortam yapılandırması, kapalıyken mevcut değer temizlenir (B-04); bellek içi filtrede sıra (B-10) | Bilgi İşlem |
+| 2026-10-23 | 1.3 | §1: şifrelenen değer kan grubu kodudur; ad referans veriden (`KR-129`, #280) | Bilgi İşlem |

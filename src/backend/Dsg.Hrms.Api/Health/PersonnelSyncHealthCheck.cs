@@ -55,6 +55,12 @@ public sealed class PersonnelSyncHealthCheck : IHealthCheck
             return HealthCheckResult.Unhealthy($"Son senkronizasyon basarisiz: {last.FailureReason}.");
         }
 
+        if (last.Status == SyncStatus.PartiallyCompleted)
+        {
+            // Kisi ve istihdam guncel; T1 alanlari (genel bilgiler, adres, tanimlar) bir onceki halde.
+            return HealthCheckResult.Degraded($"Son senkronizasyonun T1 adimi basarisiz: {last.FailureReason}.");
+        }
+
         // Uc periyot: tek bir gecikme veya uzun suren bir calisma alarm uretmesin,
         // ama bir saati asan sessizlik fark edilsin.
         var interval = await _parameters

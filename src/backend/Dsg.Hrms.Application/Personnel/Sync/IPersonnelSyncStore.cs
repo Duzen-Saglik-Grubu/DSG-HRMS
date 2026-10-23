@@ -48,6 +48,19 @@ public interface IPersonnelSyncSession : IAsyncDisposable
     /// <summary>Degisiklikleri kaydeder ve islemi onaylar.</summary>
     /// <exception cref="SyncPersistenceException">Kayit basarisiz olursa.</exception>
     Task CommitAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Ilk adim kaydedildikten sonra ikinci adim icin yeni islem acar ve kilidi yeniden alir
+    /// (SYG-PERS-013). Baska bir calisma kilidi aldiysa <c>false</c>; o calisma ikinci adimi da
+    /// yapar.
+    /// </summary>
+    Task<bool> BeginNextStepAsync(CancellationToken cancellationToken);
+
+    /// <summary>T1 adimi icin mevcut durumu yukler; kisi, istihdam ve firma ayni izlenen nesnelerdir.</summary>
+    Task<PersonnelDetailsSnapshot> LoadDetailsAsync(CancellationToken cancellationToken);
+
+    /// <summary>T1 adiminin yeni kayitlarini ekler.</summary>
+    void AddDetails(DetailsOutcome outcome);
 }
 
 /// <summary>HRMS'teki mevcut durum.</summary>

@@ -36,6 +36,10 @@ Onaylanmamış gereksinime dayanan hiçbir şey yazılmaz (`KR-068`).
   - **Ünvan:** LOGO'daki 1–4 kodlarının karşılıkları. Karşılığı olmayan kod ekranda boş
     görünür (PG-PERS-21).
   - **Görev:** İK'nın tanımladığı görevler (PG-PERS-43).
+  - **Kan grubu** (23.10.2026, `KR-129`): LOGO kodlarının karşılıkları (1 0 Rh+ … 8 AB Rh−; 0
+    "Belirtilmemiş" değer yok sayılır). Bu tür **sistem tanımıdır**: ekrandan adı değiştirilemez ve
+    pasife alınamaz, yalnızca migration ile değişir. Bir adın yanlış düzenlenmesi herkesin sağlık
+    verisini sessizce yanlış gösterirdi.
 - Tanım silinmez, pasife alınır (ADR-0004 §5). Pasif tanım yeni girişte seçilemez, ama
   geçmiş kayıtlarda adıyla görünür.
 - **Basit yönetim ekranı:** liste, ekleme, ad değiştirme, pasife alma. İzinler
@@ -162,3 +166,4 @@ Düşük–orta. Çekirdekler küçüktür ve kendi ad alanlarındadır.
 | 2026-10-22 | 1.1 | Revizyon (#267, #268): önerilen değer talep kapanınca silinir, talebin saklama süresi ve izinleri (B-03, B-14, B-18); e-posta konu satırı (B-18); dışa aktarmada kişi kimlikleri (B-09); özel nitelikli senkronizasyon parametre değil (B-04); görünür kalma süresinin başlangıcı (B-15) | Bilgi İşlem |
 | 2026-10-22 | 1.2 | §3: şema sapması ve başarısız senkronizasyon için ikinci bildirim türü (SYG-PERS AN-06, #274) | Bilgi İşlem |
 | 2026-10-23 | 1.3 | §2: `audit.log.view` İK'da da (`KR-128`, #278) | Bilgi İşlem |
+| 2026-10-23 | 1.4 | §1: üçüncü referans türü kan grubu, değiştirilemez sistem tanımı (`KR-129`, #280) | Bilgi İşlem |

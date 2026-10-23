@@ -31,6 +31,13 @@ public interface ILogoPersonnelSource
     /// <summary>Tum personel kartlarini okur (aktif ve ayrilmis).</summary>
     /// <exception cref="LogoUnavailableException">LOGO'ya erisilemezse.</exception>
     Task<IReadOnlyList<LogoPersonnelRecord>> GetAllAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// T1 adiminin verisini okur: kart basina genel bilgiler ve adres, sube ve birim tanimlari
+    /// (SYG-PERS-003). Din ve saglik alanlari okunmaz (SYG-PERS-004).
+    /// </summary>
+    /// <exception cref="LogoUnavailableException">LOGO'ya erisilemezse.</exception>
+    Task<LogoPersonnelDetails> GetDetailsAsync(CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -62,6 +69,40 @@ public sealed record LogoPersonnelRecord(
     string? FirmName,
     IReadOnlyList<string> Emails,
     IReadOnlyList<string> MobilePhones);
+
+/// <summary>
+/// T1 adiminin LOGO verisi (SYG-PERS-003): kart basina genel bilgiler ve adres, sube ve birim
+/// tanimlari.
+/// </summary>
+/// <param name="Profiles">Kart basina genel bilgiler.</param>
+/// <param name="Branches">Sube tanimlari.</param>
+/// <param name="Departments">Birim tanimlari.</param>
+public sealed record LogoPersonnelDetails(
+    IReadOnlyList<LogoProfileRecord> Profiles,
+    IReadOnlyList<LogoUnitRecord> Branches,
+    IReadOnlyList<LogoUnitRecord> Departments);
+
+/// <summary>Bir kartin T1 genel bilgileri; ham LOGO kodlariyla.</summary>
+/// <param name="LogoRef">Kartin <c>LREF</c>'i.</param>
+/// <param name="Sex">Cinsiyet kodu (1 erkek, 2 kadin).</param>
+/// <param name="PreviousSurname">Onceki soyadi.</param>
+/// <param name="MaritalStatus">Medeni hal kodu (1 evli); aile satiri yoksa <c>null</c>.</param>
+/// <param name="EducationName">Egitim tanim adi.</param>
+/// <param name="Address">Adres (iletisim turu 1; iki satir birlestirilmis).</param>
+public sealed record LogoProfileRecord(
+    int LogoRef,
+    short? Sex,
+    string? PreviousSurname,
+    short? MaritalStatus,
+    string? EducationName,
+    string? Address);
+
+/// <summary>Firmaya bagli bir tanim (sube veya birim).</summary>
+/// <param name="FirmNumber">Firma numarasi.</param>
+/// <param name="Number">Firma icinde numara.</param>
+/// <param name="Name">Ad.</param>
+/// <param name="City">Sehir (yalnizca subede).</param>
+public sealed record LogoUnitRecord(short FirmNumber, short Number, string Name, string? City);
 
 /// <summary>Salt okunur erisim denetiminin sonucu.</summary>
 /// <param name="IsReadOnly">Oturumda hicbir yazma yetkisi yoksa <c>true</c>.</param>

@@ -87,6 +87,24 @@ public sealed class Employment : Entity, IAuditable
     public static bool IsActiveOn(DateOnly? terminationDate, DateOnly today) =>
         terminationDate is null || terminationDate.Value >= today;
 
+    /// <summary>
+    /// Kisinin esas istihdami: aktif istihdamlardan ise giris tarihi en yeni olan; aktif yoksa
+    /// cikis tarihi en yeni olan (ADR-0019 §6, <c>KR-126</c>). Liste karti ve kisinin LOGO'dan
+    /// gelen genel bilgileri bu istihdamin kartindan alinir.
+    /// </summary>
+    /// <returns>Istihdam yoksa <c>null</c>.</returns>
+    public static Employment? Primary(IEnumerable<Employment> employments)
+    {
+        ArgumentNullException.ThrowIfNull(employments);
+
+        return employments
+            .OrderByDescending(e => e.IsActive)
+            .ThenByDescending(e => e.IsActive ? e.HireDate : e.TerminationDate ?? e.HireDate)
+            .ThenByDescending(e => e.HireDate)
+            .ThenBy(e => e.RegistryCode, StringComparer.Ordinal)
+            .FirstOrDefault();
+    }
+
     /// <summary>Yeni istihdam olusturur.</summary>
     public static Employment Create(
         Person person,
