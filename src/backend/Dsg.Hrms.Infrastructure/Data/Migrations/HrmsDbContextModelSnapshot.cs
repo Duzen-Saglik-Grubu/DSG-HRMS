@@ -804,6 +804,16 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         new
                         {
                             RoleId = 2L,
+                            Permission = "system.parameter.view"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "system.parameter.update"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
                             Permission = "personnel.person.view"
                         },
                         new
@@ -855,6 +865,11 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         {
                             RoleId = 2L,
                             Permission = "reference.definition.update"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            Permission = "audit.log.view"
                         });
                 });
 
