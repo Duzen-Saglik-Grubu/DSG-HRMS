@@ -117,6 +117,18 @@ public sealed class PersonnelSyncRun
         FinishedAt = now;
     }
 
+    /// <summary>
+    /// Kisi ve istihdam adimi kaydedildi, T1 adimi (genel bilgiler, adres, kurum tanimlari)
+    /// basarisiz oldu (SYG-PERS-013). Ilk adimin degisiklikleri kalir; T1 adimi bir sonraki
+    /// calismada yeniden denenir.
+    /// </summary>
+    public void CompletePartially(SyncCounts counts, IEnumerable<PersonnelSyncWarning> warnings, SyncFailureReason reason, DateTimeOffset now)
+    {
+        Complete(counts, warnings, now);
+        Status = SyncStatus.PartiallyCompleted;
+        FailureReason = reason;
+    }
+
     /// <summary>Calismayi basarisiz olarak kapatir. Hicbir veri degisikligi uygulanmamistir.</summary>
     public void Fail(SyncFailureReason reason, DateTimeOffset now)
     {
@@ -174,6 +186,12 @@ public enum SyncStatus
 
     /// <summary>Calisma basarisiz; hicbir degisiklik uygulanmadi.</summary>
     Failed = 4,
+
+    /// <summary>
+    /// Kisi ve istihdam adimi kaydedildi, T1 adimi basarisiz (SYG-PERS-013); neden
+    /// <see cref="PersonnelSyncRun.FailureReason"/>'dadir.
+    /// </summary>
+    PartiallyCompleted = 5,
 }
 
 /// <summary>

@@ -59,6 +59,25 @@ public sealed class Person : Entity, IAuditable
     [PersonalData(PersonalDataKind.Phone)]
     public string? MobilePhone { get; private set; }
 
+    /// <summary>Cinsiyet (SYG-PERS-034). LOGO'da tanimsizsa <c>null</c>.</summary>
+    [PersonalData(PersonalDataKind.Unspecified)]
+    public Gender? Gender { get; private set; }
+
+    /// <summary>
+    /// Onceki soyadi. Yalnizca kadin personelde ve LOGO'da doluysa tutulur (PG-PERS-19):
+    /// gosterilmeyecek bir degeri saklamak veri en aza indirme ilkesine aykiridir.
+    /// </summary>
+    [PersonalData(PersonalDataKind.Unspecified)]
+    public string? PreviousSurname { get; private set; }
+
+    /// <summary>Medeni hal (SYG-PERS-034).</summary>
+    [PersonalData(PersonalDataKind.Unspecified)]
+    public MaritalStatus? MaritalStatus { get; private set; }
+
+    /// <summary>Egitim durumu; LOGO tanim adi (SYG-PERS-034).</summary>
+    [AuditVisible("Egitim duzeyi bir tanim adidir (ilkokul, lisans...); kisiyi tek basina tanimlamaz ve IK duzeltmeleri icin degisikligi gorunmelidir")]
+    public string? EducationName { get; private set; }
+
     /// <summary>Kisinin istihdamlari.</summary>
     public IReadOnlyCollection<Employment> Employments => _employments;
 
@@ -121,6 +140,40 @@ public sealed class Person : Entity, IAuditable
         Email = details.Email;
         IsEmailShared = details.IsEmailShared;
         MobilePhone = details.MobilePhone;
+        return true;
+    }
+
+    /// <summary>
+    /// T1 genel bilgilerini gunceller (SYG-PERS-003). Herhangi bir alan degistiyse <c>true</c>.
+    /// </summary>
+    /// <remarks>
+    /// Onceki soyadi kadin olmayan kiside atilir. Degismeyen alanlar yazilmaz; aksi halde her
+    /// senkronizasyon denetim izine gurultu uretirdi.
+    /// </remarks>
+    public bool ApplyProfile(PersonProfile profile)
+    {
+        ArgumentNullException.ThrowIfNull(profile);
+
+        var previousSurname = profile.Gender == Personnel.Gender.Female && !string.IsNullOrWhiteSpace(profile.PreviousSurname)
+            ? profile.PreviousSurname.Trim()
+            : null;
+        var education = string.IsNullOrWhiteSpace(profile.EducationName) ? null : profile.EducationName.Trim();
+
+        var changed =
+            Gender != profile.Gender ||
+            !string.Equals(PreviousSurname, previousSurname, StringComparison.Ordinal) ||
+            MaritalStatus != profile.MaritalStatus ||
+            !string.Equals(EducationName, education, StringComparison.Ordinal);
+
+        if (!changed)
+        {
+            return false;
+        }
+
+        Gender = profile.Gender;
+        PreviousSurname = previousSurname;
+        MaritalStatus = profile.MaritalStatus;
+        EducationName = education;
         return true;
     }
 }

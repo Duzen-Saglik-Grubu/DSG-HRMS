@@ -119,8 +119,10 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
         }
     }
 
-    private sealed class Session(HrmsDbContext context, IDbContextTransaction transaction) : IPersonnelSyncSession
+    private sealed class Session(HrmsDbContext context, IDbContextTransaction firstTransaction) : IPersonnelSyncSession
     {
+        private IDbContextTransaction _transaction = firstTransaction;
+
         public async Task<PersonnelSnapshot> LoadAsync(CancellationToken cancellationToken)
         {
             // Siralama onemlidir: firma ve kisiler once izlemeye alinir, istihdamlar
@@ -145,7 +147,7 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
             try
             {
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+                await _transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (DbUpdateException ex)
             {
@@ -153,10 +155,44 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
             }
         }
 
+        public async Task<bool> BeginNextStepAsync(CancellationToken cancellationToken)
+        {
+            // Ilk adimin islemi onaylandi ve kilit birakildi. Yeni islem acilir ve kilit yeniden
+            // denenir; ara surede baska bir calisma kilidi aldiysa ikinci adim ona birakilir.
+            await _transaction.DisposeAsync().ConfigureAwait(false);
+            _transaction = await context.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+
+            return await context.Database
+                .SqlQuery<bool>($"SELECT pg_try_advisory_xact_lock({LockKey}) AS \"Value\"")
+                .SingleAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        public async Task<PersonnelDetailsSnapshot> LoadDetailsAsync(CancellationToken cancellationToken)
+        {
+            // Kisi, istihdam ve firma ilk adimda izlemeye alinmisti; sorgu ayni nesneleri doner.
+            var companies = await context.Set<Company>().ToListAsync(cancellationToken).ConfigureAwait(false);
+            var persons = await context.Set<Person>().ToListAsync(cancellationToken).ConfigureAwait(false);
+            var employments = await context.Set<Employment>().ToListAsync(cancellationToken).ConfigureAwait(false);
+            var sensitive = await context.Set<PersonSensitive>().ToListAsync(cancellationToken).ConfigureAwait(false);
+            var branches = await context.Set<Branch>().ToListAsync(cancellationToken).ConfigureAwait(false);
+            var departments = await context.Set<Department>().ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            return new PersonnelDetailsSnapshot(companies, persons, employments, sensitive, branches, departments);
+        }
+
+        public void AddDetails(DetailsOutcome outcome)
+        {
+            ArgumentNullException.ThrowIfNull(outcome);
+            context.Set<PersonSensitive>().AddRange(outcome.NewSensitive);
+            context.Set<Branch>().AddRange(outcome.NewBranches);
+            context.Set<Department>().AddRange(outcome.NewDepartments);
+        }
+
         public async ValueTask DisposeAsync()
         {
             // Onaylanmamis islem burada geri alinir; kilit islemle birlikte birakilir.
-            await transaction.DisposeAsync().ConfigureAwait(false);
+            await _transaction.DisposeAsync().ConfigureAwait(false);
             await context.DisposeAsync().ConfigureAwait(false);
         }
     }

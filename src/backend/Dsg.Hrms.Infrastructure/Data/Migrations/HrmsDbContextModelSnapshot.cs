@@ -1266,6 +1266,74 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                     b.ToTable("delivery", "notification");
                 });
 
+            modelBuilder.Entity("Dsg.Hrms.Domain.Organization.Branch", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("City")
+                        .HasColumnType("text")
+                        .HasColumnName("city")
+                        .UseCollation("tr-TR-x-icu");
+
+                    b.Property<long>("CompanyId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("company_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_by");
+
+                    b.Property<short>("LogoNumber")
+                        .HasColumnType("smallint")
+                        .HasColumnName("logo_number");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name")
+                        .UseCollation("tr-TR-x-icu");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_id");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("updated_by");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_branch");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_branch_public_id");
+
+                    b.HasIndex("CompanyId", "LogoNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_branch_company_id_logo_number");
+
+                    b.ToTable("branch", "organization");
+                });
+
             modelBuilder.Entity("Dsg.Hrms.Domain.Organization.Company", b =>
                 {
                     b.Property<long>("Id")
@@ -1322,6 +1390,69 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasDatabaseName("ix_company_public_id");
 
                     b.ToTable("company", "organization");
+                });
+
+            modelBuilder.Entity("Dsg.Hrms.Domain.Organization.Department", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CompanyId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("company_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_by");
+
+                    b.Property<short>("LogoNumber")
+                        .HasColumnType("smallint")
+                        .HasColumnName("logo_number");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name")
+                        .UseCollation("tr-TR-x-icu");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_id");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("updated_by");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_department");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_department_public_id");
+
+                    b.HasIndex("CompanyId", "LogoNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_department_company_id_logo_number");
+
+                    b.ToTable("department", "organization");
                 });
 
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.Employment", b =>
@@ -1432,6 +1563,11 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("created_by");
 
+                    b.Property<string>("EducationName")
+                        .HasColumnType("text")
+                        .HasColumnName("education_name")
+                        .UseCollation("tr-TR-x-icu");
+
                     b.Property<string>("Email")
                         .HasColumnType("text")
                         .HasColumnName("email");
@@ -1441,6 +1577,10 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("first_name")
                         .UseCollation("tr-TR-x-icu");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer")
+                        .HasColumnName("gender");
 
                     b.Property<bool>("IsEmailShared")
                         .HasColumnType("boolean")
@@ -1452,6 +1592,10 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasColumnName("last_name")
                         .UseCollation("tr-TR-x-icu");
 
+                    b.Property<int?>("MaritalStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("marital_status");
+
                     b.Property<string>("MobilePhone")
                         .HasColumnType("text")
                         .HasColumnName("mobile_phone");
@@ -1460,6 +1604,11 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("national_id");
+
+                    b.Property<string>("PreviousSurname")
+                        .HasColumnType("text")
+                        .HasColumnName("previous_surname")
+                        .UseCollation("tr-TR-x-icu");
 
                     b.Property<Guid>("PublicId")
                         .HasColumnType("uuid")
@@ -1497,10 +1646,73 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         {
                             t.HasCheckConstraint("ck_person_email_lowercase", "email IS NULL OR email = lower(email)");
 
+                            t.HasCheckConstraint("ck_person_gender", "gender IS NULL OR gender IN (1, 2)");
+
+                            t.HasCheckConstraint("ck_person_marital_status", "marital_status IS NULL OR marital_status IN (1, 2)");
+
                             t.HasCheckConstraint("ck_person_mobile_phone_format", "mobile_phone IS NULL OR mobile_phone ~ '^5[0-9]{9}$'");
 
                             t.HasCheckConstraint("ck_person_national_id_format", "national_id ~ '^[1-9][0-9]{10}$'");
+
+                            t.HasCheckConstraint("ck_person_previous_surname_female", "previous_surname IS NULL OR gender = 2");
                         });
+                });
+
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.PersonSensitive", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("text")
+                        .HasColumnName("address");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_by");
+
+                    b.Property<long>("PersonId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("person_id");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_id");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("updated_by");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_person_sensitive");
+
+                    b.HasIndex("PersonId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_person_sensitive_person_id");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_person_sensitive_public_id");
+
+                    b.ToTable("person_sensitive", "personnel");
                 });
 
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.Sync.PersonnelSyncRun", b =>
@@ -1994,6 +2206,26 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasConstraintName("fk_verification_code_person_person_id");
                 });
 
+            modelBuilder.Entity("Dsg.Hrms.Domain.Organization.Branch", b =>
+                {
+                    b.HasOne("Dsg.Hrms.Domain.Organization.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_branch_company_company_id");
+                });
+
+            modelBuilder.Entity("Dsg.Hrms.Domain.Organization.Department", b =>
+                {
+                    b.HasOne("Dsg.Hrms.Domain.Organization.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_department_company_company_id");
+                });
+
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.Employment", b =>
                 {
                     b.HasOne("Dsg.Hrms.Domain.Organization.Company", "Company")
@@ -2013,6 +2245,16 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                     b.Navigation("Company");
 
                     b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.PersonSensitive", b =>
+                {
+                    b.HasOne("Dsg.Hrms.Domain.Personnel.Person", null)
+                        .WithOne()
+                        .HasForeignKey("Dsg.Hrms.Domain.Personnel.PersonSensitive", "PersonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_person_sensitive_person_person_id");
                 });
 
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.Sync.PersonnelSyncWarning", b =>

@@ -115,7 +115,20 @@ public sealed partial class PersonnelSyncService
             session.Add(outcome.NewCompanies, outcome.NewPersons, outcome.NewEmployments);
             await session.CommitAsync(cancellationToken).ConfigureAwait(false);
 
-            run.Complete(outcome.Counts, outcome.Warnings, _clock.UtcNow);
+            // T1 adimi ilk adim KAYDEDILDIKTEN sonra calisir (SYG-PERS-013, AN-07): burada
+            // olusan hata kisi, istihdam ve hesap degisikliklerini geri almaz.
+            var (detailsUpdated, detailsFailure) = await RunDetailsStepAsync(session, cancellationToken).ConfigureAwait(false);
+            var counts = outcome.Counts with { PersonsUpdated = outcome.Counts.PersonsUpdated + detailsUpdated };
+
+            if (detailsFailure is { } reason)
+            {
+                run.CompletePartially(counts, outcome.Warnings, reason, _clock.UtcNow);
+            }
+            else
+            {
+                run.Complete(counts, outcome.Warnings, _clock.UtcNow);
+            }
+
             return null;
         }
         catch (LogoUnavailableException ex)
@@ -141,6 +154,57 @@ public sealed partial class PersonnelSyncService
             return SyncFailureReason.Unexpected;
         }
     }
+
+    /// <summary>
+    /// T1 adimi: genel bilgiler, adres, sube ve birim tanimlari (SYG-PERS-003). Hata firlatmaz;
+    /// basarisizligi nedeniyle doner.
+    /// </summary>
+    private async Task<(int Updated, SyncFailureReason? Failure)> RunDetailsStepAsync(
+        IPersonnelSyncSession session,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (!await session.BeginNextStepAsync(cancellationToken).ConfigureAwait(false))
+            {
+                LogDetailsStepYielded(_logger);
+                return (0, null);
+            }
+
+            var details = await _source.GetDetailsAsync(cancellationToken).ConfigureAwait(false);
+            var snapshot = await session.LoadDetailsAsync(cancellationToken).ConfigureAwait(false);
+            var outcome = PersonnelDetailsSynchronizer.Synchronize(details, snapshot);
+
+            session.AddDetails(outcome);
+            await session.CommitAsync(cancellationToken).ConfigureAwait(false);
+            return (outcome.PersonsUpdated, null);
+        }
+        catch (LogoUnavailableException ex)
+        {
+            LogDetailsStepFailed(_logger, ex);
+            return (0, SyncFailureReason.SourceUnavailable);
+        }
+        catch (SyncPersistenceException ex)
+        {
+            LogDetailsStepFailed(_logger, ex);
+            return (0, SyncFailureReason.PersistenceFailed);
+        }
+#pragma warning disable CA1031 // Ilk adim kaydedildi; T1 adimindaki hata calismayi "kismen" kapatir.
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            LogDetailsStepFailed(_logger, ex);
+            return (0, SyncFailureReason.Unexpected);
+        }
+    }
+
+    [LoggerMessage(EventId = 3108, Level = LogLevel.Error,
+        Message = "Senkronizasyonun T1 adimi basarisiz; kisi ve istihdam degisiklikleri kaydedildi, calisma kismen tamamlandi.")]
+    private static partial void LogDetailsStepFailed(ILogger logger, Exception exception);
+
+    [LoggerMessage(EventId = 3109, Level = LogLevel.Information,
+        Message = "Senkronizasyonun T1 adimi atlandi: baska bir calisma kilidi aldi ve adimi o yapacak.")]
+    private static partial void LogDetailsStepYielded(ILogger logger);
 
     [LoggerMessage(EventId = 3100, Level = LogLevel.Information,
         Message = "Personel senkronizasyonu atlandi ({Trigger}): baska bir calisma suruyor.")]

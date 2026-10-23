@@ -218,6 +218,25 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Details_are_read_and_mapped()
+    {
+        // SYG-PERS-003: kart basina genel bilgiler ve adres; sube ve birim tanimlari.
+        // SYG-PERS-004: kan grubu ve din tablosunda olsa da okunmaz (model bunlari esleyemez).
+        var details = await WithSourceAsync(ReaderConnection(), source => source.GetDetailsAsync(CancellationToken.None));
+
+        details.Profiles.Count.ShouldBe(3);
+        details.Profiles.Single(p => p.LogoRef == 1).ShouldBe(
+            new LogoProfileRecord(1, Sex: 2, PreviousSurname: "Demir", MaritalStatus: 1, EducationName: "Lisans", Address: "Ornek Mah. 1. Sok. No: 2 Cankaya"));
+        details.Profiles.Single(p => p.LogoRef == 2).ShouldBe(
+            new LogoProfileRecord(2, Sex: null, PreviousSurname: null, MaritalStatus: null, EducationName: null, Address: "sabit hat"));
+        details.Profiles.Single(p => p.LogoRef == 3).ShouldBe(
+            new LogoProfileRecord(3, Sex: 1, PreviousSurname: null, MaritalStatus: 4, EducationName: null, Address: null));
+
+        details.Branches.ShouldBe([new LogoUnitRecord(1, 0, "Merkez", "Ankara")]);
+        details.Departments.ShouldBe([new LogoUnitRecord(1, 7, "Bilgi Islem", null)]);
+    }
+
+    [Fact]
     public async Task Unreachable_logo_becomes_a_source_unavailable_error()
     {
         var unreachable = new SqlConnectionStringBuilder
@@ -252,7 +271,32 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
                 (10, 1, 6, 'ilk@duzen.com.tr'),
                 (30, 1, 3, '0532 123 45 67'),
                 (40, 2, 1, 'sabit hat'),
-                (50, 2, 6, '   ');
+                (50, 2, 6, '   '),
+                (60, 1, 1, 'Ornek Mah. 1. Sok.'),
+                (61, 1, 1, 'Ikinci adres satiri sonraki LREF');
+            UPDATE LH_001_CONTACT SET EXP2 = 'No: 2 Cankaya' WHERE LREF = 60;
+
+            UPDATE LH_001_PERSON SET SEX = 2, EDUCATION = 3 WHERE LREF = 1;
+            UPDATE LH_001_PERSON SET SEX = 1, EDUCATION = 99 WHERE LREF = 3;
+
+            -- Kartin kendi satiri yakinlik 0; es satiri (1) okunmaz. Kan grubu ve din OKUNMAZ.
+            INSERT INTO LH_001_FAMILY (LREF, PERREF, IDREF, RELATION, STATUS) VALUES
+                (100, 1, 500, 0, 1),
+                (101, 1, 501, 1, 2),
+                (102, 3, NULL, 0, 4);
+            INSERT INTO LH_001_PERIDINF (LREF, EXSURNAME, BLOODGROUP, RELIGION) VALUES
+                (500, 'Demir', 3, 'okunmaz'),
+                (501, 'Es soyadi', 1, NULL);
+
+            INSERT INTO LH_001_TYPEDEF (LREF, TYP, NR, EXP, DESC_) VALUES
+                (1, -5, 3, 'Lisans', NULL),
+                (2, -44, 3, '2511.01', 'Programci');
+
+            INSERT INTO L_CAPIDIV (LOGICALREF, FIRMNR, NR, NAME, CITY) VALUES
+                (1, 1, 0, 'Merkez', 'Ankara'),
+                (2, 2, 1, '   ', NULL);
+            INSERT INTO L_CAPIDEPT (LOGICALREF, FIRMNR, NR, NAME) VALUES
+                (1, 1, 7, 'Bilgi Islem');
             """);
         await ExecuteAsync(AdminConnection(Database), sql);
     }

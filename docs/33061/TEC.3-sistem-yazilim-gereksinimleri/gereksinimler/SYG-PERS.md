@@ -272,7 +272,7 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 
 | Kimlik | Gereksinim | Tür | Kaynak | Doğrulama | Parametre |
 |---|---|---|---|---|---|
-| **SYG-PERS-072** | Referans veri ekranı ünvan ve görev tanımlarını listeler; `reference.definition.update` izniyle yeni tanım eklenir, adı değiştirilir veya pasife alınır. Kod, tür içinde tekildir. Tanım silinmez; pasif tanım yeni girişte seçilemez ama geçmiş kayıtlarda adıyla görünür. Ünvan türünün ilk değerleri: 1 Birim Operatörü, 2 Birim Teknik Sorumlusu, 3 Birim Sorumlusu, 4 Yardımcı Hizmetler. Yeni görev tanımı kod değişikliği olmadan seçilebilir hâle gelir. Değişiklikler denetim izine yazılır. | İşlevsel | PG-PERS-21, PG-PERS-43 | Test | — |
+| **SYG-PERS-072** | Referans veri ekranı ünvan, görev ve kan grubu tanımlarını listeler; `reference.definition.update` izniyle yeni tanım eklenir, adı değiştirilir veya pasife alınır. Kod, tür içinde tekildir. Tanım silinmez; pasif tanım yeni girişte seçilemez ama geçmiş kayıtlarda adıyla görünür. Ünvan türünün ilk değerleri: 1 Birim Operatörü, 2 Birim Teknik Sorumlusu, 3 Birim Sorumlusu, 4 Yardımcı Hizmetler. Yeni görev tanımı kod değişikliği olmadan seçilebilir hâle gelir. **Kan grubu** türünün tanımları LOGO kodlarının karşılıklarıdır (1 0 Rh+, 2 0 Rh−, 3 A Rh+, 4 A Rh−, 5 B Rh+, 6 B Rh−, 7 AB Rh+, 8 AB Rh−; 0 "Belirtilmemiş" değer yok sayılır) ve **ekrandan değiştirilemez**: bir adın yanlış düzenlenmesi herkesin sağlık verisini sessizce yanlış gösterirdi (`KR-129`). Değişiklikler denetim izine yazılır. | İşlevsel | PG-PERS-21, PG-PERS-36, PG-PERS-43 | Test | — |
 
 ### 4.10 Arayüz, API ve parametreler
 
@@ -425,7 +425,7 @@ biri bozulursa PR birleştirilemez:
 | `PG-PERS-33` | SYG-PERS-071 |
 | `PG-PERS-34` | SYG-PERS-056 |
 | `PG-PERS-35` | SYG-PERS-050, 055 |
-| `PG-PERS-36` | SYG-PERS-004, 005, 049, 052, 054, 057, 059, 060, 061, 062, 063, 064, 065, 067 |
+| `PG-PERS-36` | SYG-PERS-004, 005, 049, 052, 054, 057, 059, 060, 061, 062, 063, 064, 065, 067, 072 |
 | `PG-PERS-37` | SYG-PERS-045, 046, 047, 048, 049, 055, 075 |
 | `PG-PERS-38` | SYG-PERS-022, 028, 075 |
 | `PG-PERS-39` | SYG-PERS-076, 077, 079 |
@@ -455,3 +455,4 @@ madde `İptal` notuyla kalır.
 | 2026-10-22 | 0.2 | AN-04 İK teyidiyle kapandı: ayrılan istihdamda kıdem çıkış gününü sayar (SYG-PERS-039); AN-06 onaylandı (`KR-127`, #274) | Bilgi İşlem |
 | 2026-10-22 | 0.3 | SYG-PERS-039: örnek ekran metni "1 Yıl 0 Ay 0 Gün" olarak netleştirildi; yıl varsa üç birim de yazılır (PG-PERS-21; #276) | Bilgi İşlem |
 | 2026-10-23 | 0.4 | SYG-PERS-055: denetim kayıtları ve parametre izinleri İK'da da (`KR-128`, #278) | Bilgi İşlem |
+| 2026-10-23 | 0.5 | SYG-PERS-072: kan grubu tanımları referans veride, değiştirilemez; kaynak PG-PERS-36 (`KR-129`, #280) | Bilgi İşlem |

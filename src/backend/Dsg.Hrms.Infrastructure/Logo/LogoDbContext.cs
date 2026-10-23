@@ -42,6 +42,21 @@ public sealed class LogoDbContext : DbContext
     /// <summary>Firmalar (<c>L_CAPIFIRM</c>).</summary>
     public DbSet<LogoFirm> Firms => Set<LogoFirm>();
 
+    /// <summary>Aile ve resim satirlari (yalnizca medeni hal ve kimlik ek bilgisi baglantisi).</summary>
+    public DbSet<LogoFamily> Families => Set<LogoFamily>();
+
+    /// <summary>Kimlik ek bilgileri.</summary>
+    public DbSet<LogoIdentityInfo> IdentityInfos => Set<LogoIdentityInfo>();
+
+    /// <summary>Tanimlar (egitim).</summary>
+    public DbSet<LogoTypeDefinition> TypeDefinitions => Set<LogoTypeDefinition>();
+
+    /// <summary>Subeler.</summary>
+    public DbSet<LogoDivision> Divisions => Set<LogoDivision>();
+
+    /// <summary>Birimler.</summary>
+    public DbSet<LogoDepartment> Departments => Set<LogoDepartment>();
+
     /// <inheritdoc />
     public override int SaveChanges() => throw new InvalidOperationException(ReadOnlyMessage);
 
@@ -74,6 +89,8 @@ public sealed class LogoDbContext : DbContext
             person.Property(p => p.HireDate).HasColumnName("INDATE");
             person.Property(p => p.TerminationDate).HasColumnName("OUTDATE");
             person.Property(p => p.FirmNumber).HasColumnName("FIRMNR");
+            person.Property(p => p.Sex).HasColumnName("SEX");
+            person.Property(p => p.EducationNumber).HasColumnName("EDUCATION");
         });
 
         modelBuilder.Entity<LogoContact>(contact =>
@@ -84,6 +101,7 @@ public sealed class LogoDbContext : DbContext
             contact.Property(c => c.CardRef).HasColumnName("CARDREF");
             contact.Property(c => c.Type).HasColumnName("TYP");
             contact.Property(c => c.Value).HasColumnName("EXP1");
+            contact.Property(c => c.Value2).HasColumnName("EXP2");
         });
 
         // L_CAPIFIRM.NR kolonu veritabaninda NULL olabilir; birincil anahtar olarak
@@ -94,6 +112,56 @@ public sealed class LogoDbContext : DbContext
             firm.HasNoKey();
             firm.Property(f => f.Number).HasColumnName("NR");
             firm.Property(f => f.Name).HasColumnName("NAME");
+        });
+
+        modelBuilder.Entity<LogoFamily>(family =>
+        {
+            family.ToTable(LogoSchema.FamilyTable);
+            family.HasKey(f => f.LogicalRef);
+            family.Property(f => f.LogicalRef).HasColumnName("LREF");
+            family.Property(f => f.PersonRef).HasColumnName("PERREF");
+            family.Property(f => f.IdentityRef).HasColumnName("IDREF");
+            family.Property(f => f.Relation).HasColumnName("RELATION");
+            family.Property(f => f.MaritalStatus).HasColumnName("STATUS");
+        });
+
+        modelBuilder.Entity<LogoIdentityInfo>(info =>
+        {
+            info.ToTable(LogoSchema.IdentityInfoTable);
+            info.HasKey(i => i.LogicalRef);
+            info.Property(i => i.LogicalRef).HasColumnName("LREF");
+            info.Property(i => i.PreviousSurname).HasColumnName("EXSURNAME");
+        });
+
+        modelBuilder.Entity<LogoTypeDefinition>(definition =>
+        {
+            definition.ToTable(LogoSchema.TypeDefinitionTable);
+            definition.HasKey(d => d.LogicalRef);
+            definition.Property(d => d.LogicalRef).HasColumnName("LREF");
+            definition.Property(d => d.Type).HasColumnName("TYP");
+            definition.Property(d => d.Number).HasColumnName("NR");
+            definition.Property(d => d.Name).HasColumnName("EXP");
+        });
+
+        modelBuilder.Entity<LogoDivision>(division =>
+        {
+            division.ToTable(LogoSchema.DivisionTable);
+            division.HasKey(d => d.LogicalRef);
+            division.Property(d => d.LogicalRef).HasColumnName("LOGICALREF");
+            division.Property(d => d.FirmNumber).HasColumnName("FIRMNR");
+            division.Property(d => d.Number).HasColumnName("NR");
+            division.Property(d => d.Name).HasColumnName("NAME");
+            division.Property(d => d.City).HasColumnName("CITY");
+        });
+
+        modelBuilder.Entity<LogoDepartment>(department =>
+        {
+            department.ToTable(LogoSchema.DepartmentTable);
+            department.HasKey(d => d.LogicalRef);
+            department.Property(d => d.LogicalRef).HasColumnName("LOGICALREF");
+            department.Property(d => d.FirmNumber).HasColumnName("FIRMNR");
+            department.Property(d => d.Number).HasColumnName("NR");
+            department.Property(d => d.Name).HasColumnName("NAME");
         });
     }
 }
@@ -127,6 +195,12 @@ public sealed class LogoPerson
 
     /// <summary><c>FIRMNR</c>.</summary>
     public short? FirmNumber { get; init; }
+
+    /// <summary>Cinsiyet (1 erkek, 2 kadin).</summary>
+    public short? Sex { get; init; }
+
+    /// <summary>Egitim tanim numarasi (<c>LH_001_TYPEDEF</c>, TYP = -5).</summary>
+    public short? EducationNumber { get; init; }
 }
 
 /// <summary>LOGO iletisim kaydi.</summary>
@@ -143,6 +217,9 @@ public sealed class LogoContact
 
     /// <summary><c>EXP1</c> — deger.</summary>
     public string? Value { get; init; }
+
+    /// <summary>Ikinci satir (adreste devam satiri).</summary>
+    public string? Value2 { get; init; }
 }
 
 /// <summary>LOGO firmasi.</summary>
@@ -152,5 +229,85 @@ public sealed class LogoFirm
     public short? Number { get; init; }
 
     /// <summary><c>NAME</c>.</summary>
+    public string? Name { get; init; }
+}
+
+/// <summary>LOGO aile ve resim satiri (<c>LH_001_FAMILY</c>).</summary>
+public sealed class LogoFamily
+{
+    /// <summary>Satir kimligi.</summary>
+    public int LogicalRef { get; init; }
+
+    /// <summary>Kartin <c>LREF</c>'i.</summary>
+    public int? PersonRef { get; init; }
+
+    /// <summary>Kimlik ek bilgisi satiri (<c>LH_001_PERIDINF.LREF</c>).</summary>
+    public int? IdentityRef { get; init; }
+
+    /// <summary>Yakinlik; 0 kisinin kendisi.</summary>
+    public short? Relation { get; init; }
+
+    /// <summary>Medeni hal (1 evli).</summary>
+    public short? MaritalStatus { get; init; }
+}
+
+/// <summary>LOGO kimlik ek bilgisi (<c>LH_001_PERIDINF</c>).</summary>
+public sealed class LogoIdentityInfo
+{
+    /// <summary>Satir kimligi.</summary>
+    public int LogicalRef { get; init; }
+
+    /// <summary>Onceki soyadi.</summary>
+    public string? PreviousSurname { get; init; }
+}
+
+/// <summary>LOGO tanimi (<c>LH_001_TYPEDEF</c>).</summary>
+public sealed class LogoTypeDefinition
+{
+    /// <summary>Satir kimligi.</summary>
+    public int LogicalRef { get; init; }
+
+    /// <summary>Tanim turu.</summary>
+    public short? Type { get; init; }
+
+    /// <summary>Tur icindeki numara.</summary>
+    public short? Number { get; init; }
+
+    /// <summary>Tanim adi.</summary>
+    public string? Name { get; init; }
+}
+
+/// <summary>LOGO subesi (<c>L_CAPIDIV</c>).</summary>
+public sealed class LogoDivision
+{
+    /// <summary>Satir kimligi.</summary>
+    public int LogicalRef { get; init; }
+
+    /// <summary>Firma numarasi.</summary>
+    public short? FirmNumber { get; init; }
+
+    /// <summary>Firma icinde sube numarasi.</summary>
+    public short? Number { get; init; }
+
+    /// <summary>Ad.</summary>
+    public string? Name { get; init; }
+
+    /// <summary>Sehir.</summary>
+    public string? City { get; init; }
+}
+
+/// <summary>LOGO birimi (<c>L_CAPIDEPT</c>).</summary>
+public sealed class LogoDepartment
+{
+    /// <summary>Satir kimligi.</summary>
+    public int LogicalRef { get; init; }
+
+    /// <summary>Firma numarasi.</summary>
+    public short? FirmNumber { get; init; }
+
+    /// <summary>Firma icinde birim numarasi.</summary>
+    public short? Number { get; init; }
+
+    /// <summary>Ad.</summary>
     public string? Name { get; init; }
 }

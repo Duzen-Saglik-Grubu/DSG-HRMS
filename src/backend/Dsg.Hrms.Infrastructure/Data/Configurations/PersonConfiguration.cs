@@ -30,6 +30,14 @@ public sealed class PersonConfiguration : IEntityTypeConfiguration<Person>
             // E-posta normallestirilmis (kucuk harf) saklanir; buyuk harfli bir kayit
             // uyelik eslestirmesinde ayni adresin iki adres sayilmasina yol acardi.
             table.HasCheckConstraint("ck_person_email_lowercase", "email IS NULL OR email = lower(email)");
+
+            // Enum kolonlari tamsayidir ve tanimli degerlerle sinirlidir (ADR-0021 §6).
+            table.HasCheckConstraint("ck_person_gender", "gender IS NULL OR gender IN (1, 2)");
+            table.HasCheckConstraint("ck_person_marital_status", "marital_status IS NULL OR marital_status IN (1, 2)");
+
+            // Onceki soyadi yalnizca kadin personelde tutulur (PG-PERS-19); uygulamadaki bir
+            // hata erkek personelde deger birakamaz.
+            table.HasCheckConstraint("ck_person_previous_surname_female", "previous_surname IS NULL OR gender = 2");
         });
 
         builder.HasKey(person => person.Id);
@@ -40,6 +48,8 @@ public sealed class PersonConfiguration : IEntityTypeConfiguration<Person>
         builder.Property(person => person.FirstName).IsRequired().UseCollation(DatabaseCollations.Turkish);
         builder.Property(person => person.LastName).IsRequired().UseCollation(DatabaseCollations.Turkish);
         builder.Property(person => person.BirthDate).IsRequired();
+        builder.Property(person => person.PreviousSurname).UseCollation(DatabaseCollations.Turkish);
+        builder.Property(person => person.EducationName).UseCollation(DatabaseCollations.Turkish);
 
         builder.HasIndex(person => person.NationalId).IsUnique();
 

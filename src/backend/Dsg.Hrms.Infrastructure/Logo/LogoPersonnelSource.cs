@@ -149,6 +149,81 @@ public sealed partial class LogoPersonnelSource : ILogoPersonnelSource
         return records;
     }
 
+    /// <inheritdoc />
+    /// <remarks>
+    /// <para>
+    /// Kartin kendi aile satiri yakinlik 0 olan satirdir; kimlik ek bilgisi o satirin
+    /// <c>IDREF</c>'iyle baglanir (toplantı kaydı §11.9). Her kartin tek boyle satiri vardir;
+    /// birden fazla gelirse en kucuk <c>LREF</c> alinir ve her calismada ayni sonuc cikar.
+    /// </para>
+    /// <para>
+    /// Fotograf (<c>LDATA</c>) ve kan grubu bu sorguda OKUNMAZ: fotograf yalnizca ozeti
+    /// degistiginde, kan grubu sifrelemeyle birlikte ayri PR'larda gelir.
+    /// </para>
+    /// </remarks>
+    public async Task<LogoPersonnelDetails> GetDetailsAsync(CancellationToken cancellationToken)
+    {
+        return await QueryAsync(async () =>
+        {
+            var persons = await _context.Persons
+                .Select(p => new { p.LogicalRef, p.Sex, p.EducationNumber })
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            var families = await _context.Families
+                .Where(f => f.PersonRef != null && f.Relation == LogoSchema.SelfRelation)
+                .OrderBy(f => f.LogicalRef)
+                .Select(f => new { PersonRef = f.PersonRef!.Value, f.IdentityRef, f.MaritalStatus })
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            var previousSurnames = await _context.IdentityInfos
+                .Where(i => i.PreviousSurname != null && i.PreviousSurname.Trim() != string.Empty)
+                .Select(i => new { i.LogicalRef, i.PreviousSurname })
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            var educations = await _context.TypeDefinitions
+                .Where(d => d.Type == LogoSchema.EducationDefinition && d.Number != null)
+                .Select(d => new { Number = d.Number!.Value, d.Name })
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            var addresses = await _context.Contacts
+                .Where(c => c.CardRef != null && c.Type == LogoSchema.AddressType && c.Value != null && c.Value.Trim() != string.Empty)
+                .OrderBy(c => c.CardRef).ThenBy(c => c.LogicalRef)
+                .Select(c => new { CardRef = c.CardRef!.Value, c.Value, c.Value2 })
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            var divisions = await _context.Divisions
+                .Where(d => d.FirmNumber != null && d.Number != null && d.Name != null && d.Name.Trim() != string.Empty)
+                .Select(d => new LogoUnitRecord(d.FirmNumber!.Value, d.Number!.Value, d.Name!, d.City))
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            var departments = await _context.Departments
+                .Where(d => d.FirmNumber != null && d.Number != null && d.Name != null && d.Name.Trim() != string.Empty)
+                .Select(d => new LogoUnitRecord(d.FirmNumber!.Value, d.Number!.Value, d.Name!, null))
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            var familyByCard = families.GroupBy(f => f.PersonRef).ToDictionary(g => g.Key, g => g.First());
+            var surnameByInfo = previousSurnames.ToDictionary(i => i.LogicalRef, i => i.PreviousSurname);
+            var educationByNumber = educations.GroupBy(e => e.Number).ToDictionary(g => g.Key, g => g.First().Name);
+            var addressByCard = addresses.GroupBy(a => a.CardRef).ToDictionary(
+                g => g.Key,
+                g => string.Join(' ', new[] { g.First().Value, g.First().Value2 }.Where(v => !string.IsNullOrWhiteSpace(v)).Select(v => v!.Trim())));
+
+            var profiles = persons.Select(p =>
+            {
+                var family = familyByCard.GetValueOrDefault(p.LogicalRef);
+                return new LogoProfileRecord(
+                    p.LogicalRef,
+                    p.Sex,
+                    family?.IdentityRef is { } info ? surnameByInfo.GetValueOrDefault(info) : null,
+                    family?.MaritalStatus,
+                    p.EducationNumber is { } education ? educationByNumber.GetValueOrDefault(education) : null,
+                    addressByCard.GetValueOrDefault(p.LogicalRef));
+            }).ToList();
+
+            return new LogoPersonnelDetails(profiles, divisions, departments);
+        }).ConfigureAwait(false);
+    }
+
     private static DateOnly? ToDate(DateTime? value) => value is null ? null : DateOnly.FromDateTime(value.Value);
 
     /// <summary>
