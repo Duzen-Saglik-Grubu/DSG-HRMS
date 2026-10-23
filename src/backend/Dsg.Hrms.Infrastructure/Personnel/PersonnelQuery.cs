@@ -74,7 +74,7 @@ public sealed class PersonnelQuery(HrmsDbContext context) : IPersonnelQuery
             from b in branches.DefaultIfEmpty()
             join d in context.Set<Department>() on a.DepartmentId equals (long?)d.Id into departments
             from d in departments.DefaultIfEmpty()
-            // Sol birlesimde eslesme yoksa EF alanlari SQL NULL olarak dondurur.
+                // Sol birlesimde eslesme yoksa EF alanlari SQL NULL olarak dondurur.
             select new
             {
                 a.EmploymentId,

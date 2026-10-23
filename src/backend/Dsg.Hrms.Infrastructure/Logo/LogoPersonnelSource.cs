@@ -168,8 +168,15 @@ public sealed partial class LogoPersonnelSource : ILogoPersonnelSource
             var persons = await _context.Persons
                 .Select(p => new
                 {
-                    p.LogicalRef, p.Sex, p.EducationNumber, p.FirmNumber,
-                    p.TitleCode, p.StatusCode, p.OccupationRef, p.BranchNumber, p.DepartmentNumber,
+                    p.LogicalRef,
+                    p.Sex,
+                    p.EducationNumber,
+                    p.FirmNumber,
+                    p.TitleCode,
+                    p.StatusCode,
+                    p.OccupationRef,
+                    p.BranchNumber,
+                    p.DepartmentNumber,
                 })
                 .ToListAsync(cancellationToken).ConfigureAwait(false);
 
