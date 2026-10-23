@@ -69,10 +69,7 @@ public sealed class PersonsController : ControllerBase
 /// <param name="PreviousSurname">Onceki soyadi; yalnizca kadin personelde ve LOGO'da doluysa.</param>
 /// <param name="MaritalStatus">Medeni hal; LOGO'da satiri yoksa bos.</param>
 /// <param name="EducationName">Egitim; kayitli degilse bos.</param>
-/// <param name="Sensitive">
-/// Korumali alanlar. Yalnizca gorme hakki olan kullaniciya (<c>personnel.person.view_sensitive</c>
-/// veya kisinin kendisi) yazilir; digerlerinin yanitinda alan HIC YOKTUR (SYG-PERS-052).
-/// </param>
+/// <param name="Sensitive">Korumali alanlar; yalnizca gorme hakki olana (<c>view_sensitive</c> veya kisinin kendisi) yazilir, digerlerinin yanitinda alan HIC YOKTUR (SYG-PERS-052).</param>
 public sealed record PersonCardResponse(
     Guid PersonId,
     string FirstName,

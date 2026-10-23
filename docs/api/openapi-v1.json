@@ -3109,7 +3109,7 @@
                 "type": "null"
               },
               {
-                "description": "Korumali alanlar. Yalnizca gorme hakki olan kullaniciya (`personnel.person.view_sensitive`\r\nveya kisinin kendisi) yazilir; digerlerinin yanitinda alan HIC YOKTUR (SYG-PERS-052).",
+                "description": "Korumali alanlar; yalnizca gorme hakki olana (`view_sensitive` veya kisinin kendisi) yazilir, digerlerinin yanitinda alan HIC YOKTUR (SYG-PERS-052).",
                 "$ref": "#/components/schemas/SensitiveResponse"
               }
             ]
