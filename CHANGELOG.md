@@ -17,7 +17,7 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ### Güvenlik
 - **System.Security.Cryptography.Pkcs 10.0.13'e sabitlendi (#223).** MailKit ve SQL Server sürücüsü üzerinden dolaylı gelen 10.0.0 sürümünde 13.10.2026'da iki hizmet engelleme (DoS) açığı yayımlandı: CVE-2026-84008 (yüksek) ve CVE-2026-70162 (orta). `main` 14.10.2026'da bu yüzden kırmızıya düştü; kayıt otomatik açıldı.
-- **zod 4.6.6 ve vitest 5.0.3 (#288).** 24.10.2026'da yayımlanan açıklar kapatıldı: zod'da büyük koleksiyon doğrulamasında bellek tüketimi (yüksek), vitest'te geliştirme sunucusunda kod enjeksiyonu (orta, yalnızca geliştirme bağımlılığı).
+- **zod 4.6.7 ve vitest 5.0.3 (#288).** 24.10.2026'da yayımlanan açıklar kapatıldı: zod'da büyük koleksiyon doğrulamasında bellek tüketimi (yüksek), vitest'te geliştirme sunucusunda kod enjeksiyonu (orta, yalnızca geliştirme bağımlılığı).
 - **follow-redirects 1.16.1 (#250) ve vite 8.3.4 (#255).** Ön yüzün dolaylı ve geliştirme bağımlılıklarında yayımlanan yüksek önemli açıklar kapatıldı. Açıklar tarayıcıya giden pakette değildi.
 - **Varsayılan yetki politikası oturum ister (#257, `KR-117`).** Yetki işareti taşımayan bir uç nokta artık anonim kalmaz. Oturumsuz erişilebilen uçların listesi mimari testinde sabittir.
 - **Uygulama veritabanına kısıtlı rolle bağlanır (#258, `KR-118`).** Uygulama denetim, erişim ve güvenlik kayıtlarını yalnızca okuyup ekleyebilir. Bu kayıtları değiştiremez, silemez ve koruma tetikleyicisini kapatamaz.
