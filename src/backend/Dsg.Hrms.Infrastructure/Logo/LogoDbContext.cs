@@ -91,6 +91,11 @@ public sealed class LogoDbContext : DbContext
             person.Property(p => p.FirmNumber).HasColumnName("FIRMNR");
             person.Property(p => p.Sex).HasColumnName("SEX");
             person.Property(p => p.EducationNumber).HasColumnName("EDUCATION");
+            person.Property(p => p.TitleCode).HasColumnName("TITLE");
+            person.Property(p => p.StatusCode).HasColumnName("SPECODE");
+            person.Property(p => p.OccupationRef).HasColumnName("JOBREF");
+            person.Property(p => p.BranchNumber).HasColumnName("LOCNR");
+            person.Property(p => p.DepartmentNumber).HasColumnName("DEPTNR");
         });
 
         modelBuilder.Entity<LogoContact>(contact =>
@@ -141,6 +146,7 @@ public sealed class LogoDbContext : DbContext
             definition.Property(d => d.Type).HasColumnName("TYP");
             definition.Property(d => d.Number).HasColumnName("NR");
             definition.Property(d => d.Name).HasColumnName("EXP");
+            definition.Property(d => d.Description).HasColumnName("DESC_");
         });
 
         modelBuilder.Entity<LogoDivision>(division =>
@@ -201,6 +207,21 @@ public sealed class LogoPerson
 
     /// <summary>Egitim tanim numarasi (<c>LH_001_TYPEDEF</c>, TYP = -5).</summary>
     public short? EducationNumber { get; init; }
+
+    /// <summary>Unvan kodu (1–4).</summary>
+    public string? TitleCode { get; init; }
+
+    /// <summary>Statu.</summary>
+    public string? StatusCode { get; init; }
+
+    /// <summary>SGK meslek tanim numarasi (<c>LH_001_TYPEDEF</c>, TYP = -44).</summary>
+    public int? OccupationRef { get; init; }
+
+    /// <summary>Sube numarasi (firma icinde).</summary>
+    public short? BranchNumber { get; init; }
+
+    /// <summary>Birim numarasi (firma icinde).</summary>
+    public short? DepartmentNumber { get; init; }
 }
 
 /// <summary>LOGO iletisim kaydi.</summary>
@@ -273,8 +294,11 @@ public sealed class LogoTypeDefinition
     /// <summary>Tur icindeki numara.</summary>
     public short? Number { get; init; }
 
-    /// <summary>Tanim adi.</summary>
+    /// <summary>Tanim adi (SGK meslekte kod).</summary>
     public string? Name { get; init; }
+
+    /// <summary>Aciklama (SGK meslekte meslek adi).</summary>
+    public string? Description { get; init; }
 }
 
 /// <summary>LOGO subesi (<c>L_CAPIDIV</c>).</summary>

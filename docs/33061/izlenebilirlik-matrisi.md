@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-10-23
+**Son güncelleme:** 2026-10-24
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 
@@ -233,7 +233,7 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 9 | `PG-PERS-09` Aynı TCKN'ye sahip farklı sicil kayıtları TEK kişi olarak gösterilir; her sicil ayrı… | SYG-PERS-015, 022 | `ADR-0005` §1 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
 | 10 | `PG-PERS-10` TCKN'si olmayan LOGO kartı kişi olarak oluşturulmaz; uyarı listesine alınır. | SYG-PERS-016 | `ADR-0003` §5 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
 | 11 | `PG-PERS-11` Kişinin birden fazla sicili varsa kart detayında sekmeli (tab) gösterim kullanılır;… | SYG-PERS-017 | `ADR-0005` §1 | — | — | — |
-| 12 | `PG-PERS-12` Değişen nitelikler (şube, birim, görev) tarih aralıklı tutulur (#270);… | SYG-PERS-018, 019, 020, 021 | `ADR-0021` §2 | — | — | — |
+| 12 | `PG-PERS-12` Değişen nitelikler (firma, şube, birim, görev) tarih aralıklı tutulur (#270, #284);… | SYG-PERS-018, 019, 020, 021 | `ADR-0021` §2 | **Kısmen:** SYG-018, 019, 021 (firma, şube, birim, ünvan, statü, SGK meslek tarih aralıklı; `EXCLUDE` kısıtı; istihdam bitince kapanış; AN-19) · PR #286 — tarihçe ve tarihli sorgu (020), görev sonraki iş | `AssignmentTimelineTests`, `PersonnelSyncStoreTests`, `ApplicationRoleTests` | — |
 | 13 | `PG-PERS-13` Personel listesi, kişi kartlarından oluşan ızgara (grid) düzeninde gösterilir; üstte… | SYG-PERS-022, 023, 031, 074 | `ADR-0015`; `ADR-0021` §5 | — | — | — |
 | 14 | `PG-PERS-14` Kişi kartında gösterilen bilgilerin tamamı için filtre yapılabilir. Seçim listesi… | SYG-PERS-024, 025, 026, 063 | `ADR-0019` §2; `ADR-0021` §7 | — | — | — |
 | 15 | `PG-PERS-15` Filtreler birlikte uygulanır (VE mantığı); seçili filtreler ekranda görünür ve tek… | SYG-PERS-025 | `ADR-0015` §6 | — | — | — |
@@ -242,7 +242,7 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 18 | `PG-PERS-18` Ad, soyad, sicil numarası veya TCKN üzerinden tek kutudan hızlı arama yapılabilir. | SYG-PERS-030 | `ADR-0021` §7 | — | — | — |
 | 19 | `PG-PERS-19` Kart detayında Genel Bilgiler bölümü: fotoğraf, ad, soyad, cinsiyet, doğum tarihi,… | SYG-PERS-003, 034, 036, 052, 066 | `ADR-0021` §1 | **Kısmen:** SYG-003 (senkronizasyon) · PR #281; SYG-034 (kartta cinsiyet, önceki soyadı, medeni hâl, eğitim) · PR #283 (API) — ekran ve evlilik bilgisi sonraki iş | `PersonnelDetailsSynchronizerTests`, `PersonnelSyncStoreTests`, `PersonCardApiTests` | — |
 | 20 | `PG-PERS-20` İletişim Bilgileri bölümü: e-posta, telefon, adres. Adresi yalnızca İK, Sistem… | SYG-PERS-003, 037, 052, 054 | `ADR-0019` §2 | **Kısmen:** SYG-003 (adres korumalı tabloda) · PR #281; SYG-037, 052 (adres yalnızca `view_sensitive` veya kişinin kendisine; diğerlerinin yanıtında bölüm yok), SYG-054 (Kimlik modülü korumalı tiplere bağımlı olamaz) · PR #283 (API) — ekran sonraki iş | `PersonnelDetailsSynchronizerTests`, `PersonCardApiTests`, `ProtectedPersonnelDataTests` | — |
-| 21 | `PG-PERS-21` Çalışma Hayatı bölümü: şehir, firma, şube, birim, ünvanı, görevi (PG-PERS-43),… | SYG-PERS-003, 038, 039, 072 | `ADR-0021` §1, §3; `ADR-0022` §1 | **Kısmen:** SYG-039 (kıdem hesabı, çıkış günü dahil; `KR-127`) · PR #276 — diğer alanlar ve ekran sonraki iş | `SeniorityAndAgeTests`, `PersonCardApiTests` | — |
+| 21 | `PG-PERS-21` Çalışma Hayatı bölümü: şehir, firma, şube, birim, ünvanı, görevi (PG-PERS-43),… | SYG-PERS-003, 038, 039, 072 | `ADR-0021` §1, §3; `ADR-0022` §1 | **Kısmen:** SYG-039 (kıdem) · PR #276; SYG-038 (kartta şehir, şube, birim, ünvan kodu, statü, SGK meslek) · PR #286 — ünvan adı (referans veri) ve görev sonraki iş | `SeniorityAndAgeTests`, `PersonCardApiTests`, `LogoReadOnlyAccessTests` | — |
 | 22 | `PG-PERS-22` Yaş, doğum tarihinden hesaplanarak gösterilir; ayrı bir alan olarak saklanmaz. | SYG-PERS-035 | `ADR-0021` §1 | **Kısmen:** SYG-035 (yaş hesabı, 29 Şubat) · PR #276 (API) — ekran sonraki iş | `SeniorityAndAgeTests` | — |
 | 23 | `PG-PERS-23` Fotoğraf LOGO'daki personel resminden alınır; resmi olmayan kişide ad-soyad baş… | SYG-PERS-014, 040, 041 | `ADR-0021` §5 | — | — | — |
 | 24 | `PG-PERS-24` Bir personel yalnızca kendisine DOĞRUDAN atanmış astlarını görüntüleyebilir; astının… | SYG-PERS-050 | `ADR-0007` §2 (T2) | — | — | — |
@@ -319,3 +319,4 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 2026-10-22 | 2.23 | §7: PG-PERS-05, 21, 22, 25, 26, 27, 28, 31, 35 gerçekleştirme ve doğrulama sütunları (kişi okuma temeli, #276) | Bilgi İşlem |
 | 2026-10-23 | 2.24 | §7: PG-PERS-36 sistem gereksinimine SYG-PERS-072 (`KR-129`); PG-PERS-01, 08, 19, 20, 36, 41 gerçekleştirme ve doğrulama (LOGO kişi alanları, #280) | Bilgi İşlem |
 | 2026-10-23 | 2.25 | §7: PG-PERS-19, 20 gerçekleştirme ve doğrulama (kartta genel bilgiler ve adres görünürlüğü, #282) | Bilgi İşlem |
+| 2026-10-24 | 2.26 | §7: PG-PERS-12 kaynak metni değişiklik talebi #284'e göre; PG-PERS-12, 21 gerçekleştirme ve doğrulama (tarih aralıklı atama, #285) | Bilgi İşlem |

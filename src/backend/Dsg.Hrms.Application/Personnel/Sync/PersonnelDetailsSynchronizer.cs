@@ -106,6 +106,57 @@ public static class PersonnelDetailsSynchronizer
         return new DetailsOutcome(newSensitive, newBranches, newDepartments, personsUpdated, unitsChanged + newBranches.Count + newDepartments.Count);
     }
 
+    /// <summary>
+    /// Tarih aralikli nitelikleri uygular (SYG-PERS-018, 021). Sube ve birim kimlikleri gerektigi
+    /// icin tanimlar kaydedildikten sonra cagrilir.
+    /// </summary>
+    /// <returns>Eklenecek yeni kayitlar ve degisen istihdam sayisi.</returns>
+    public static (IReadOnlyList<EmploymentAssignment> Added, int EmploymentsChanged) SynchronizeAssignments(
+        LogoPersonnelDetails details,
+        PersonnelDetailsSnapshot snapshot,
+        DateOnly today)
+    {
+        ArgumentNullException.ThrowIfNull(details);
+        ArgumentNullException.ThrowIfNull(snapshot);
+
+        var records = details.Assignments.GroupBy(a => a.LogoRef).ToDictionary(g => g.Key, g => g.First());
+        var branches = snapshot.Branches.ToDictionary(b => (b.CompanyId, b.LogoNumber), b => b.Id);
+        var departments = snapshot.Departments.ToDictionary(d => (d.CompanyId, d.LogoNumber), d => d.Id);
+        var existing = snapshot.Assignments.ToLookup(a => a.EmploymentId);
+        var added = new List<EmploymentAssignment>();
+        var changed = 0;
+
+        foreach (var employment in snapshot.Employments)
+        {
+            if (!records.TryGetValue(employment.LogoRef, out var record))
+            {
+                continue;
+            }
+
+            // Firma istihdamin bugunku firmasidir (kisi ve istihdam adimi yazdi); sube ve birim
+            // LOGO'da firmaya bagli numaralardir (ADR-0021 §3).
+            var company = employment.CompanyId;
+            var values = new AssignmentValues(
+                company,
+                record.BranchNumber is { } b && branches.TryGetValue((company, b), out var branchId) ? branchId : null,
+                record.DepartmentNumber is { } d && departments.TryGetValue((company, d), out var departmentId) ? departmentId : null,
+                record.TitleCode,
+                record.StatusCode,
+                record.OccupationCode,
+                record.OccupationName);
+
+            var (newRecord, didChange) = AssignmentTimeline.Apply(employment, [.. existing[employment.Id]], values, today);
+            if (newRecord is not null)
+            {
+                added.Add(newRecord);
+            }
+
+            changed += didChange ? 1 : 0;
+        }
+
+        return (added, changed);
+    }
+
     /// <summary>LOGO kodlarini alan modeline cevirir.</summary>
     /// <remarks>
     /// Cinsiyet: 1 erkek, 2 kadin, diger tanimsiz. Medeni hal: 1 evli, diger her deger bekar;
@@ -145,7 +196,11 @@ public sealed record PersonnelDetailsSnapshot(
     IReadOnlyList<Employment> Employments,
     IReadOnlyList<PersonSensitive> Sensitive,
     IReadOnlyList<Branch> Branches,
-    IReadOnlyList<Department> Departments);
+    IReadOnlyList<Department> Departments)
+{
+    /// <summary>Tarih aralikli kayitlar (izlenen).</summary>
+    public IReadOnlyList<EmploymentAssignment> Assignments { get; init; } = [];
+}
 
 /// <summary>T1 adiminin sonucu.</summary>
 /// <param name="NewSensitive">Eklenecek korumali alan satirlari.</param>

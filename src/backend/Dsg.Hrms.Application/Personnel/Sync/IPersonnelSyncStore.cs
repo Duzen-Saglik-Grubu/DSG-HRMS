@@ -61,6 +61,15 @@ public interface IPersonnelSyncSession : IAsyncDisposable
 
     /// <summary>T1 adiminin yeni kayitlarini ekler.</summary>
     void AddDetails(DetailsOutcome outcome);
+
+    /// <summary>Tarih aralikli yeni kayitlari ekler.</summary>
+    void AddAssignments(IEnumerable<EmploymentAssignment> assignments);
+
+    /// <summary>
+    /// Bekleyen degisiklikleri islemi onaylamadan yazar; yeni sube ve birimler kimlik alir ve
+    /// atamalar onlara baglanabilir. Islem <see cref="CommitAsync"/> ile onaylanir.
+    /// </summary>
+    Task SaveAsync(CancellationToken cancellationToken);
 }
 
 /// <summary>HRMS'teki mevcut durum.</summary>

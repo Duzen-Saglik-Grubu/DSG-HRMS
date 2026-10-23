@@ -52,14 +52,45 @@ public sealed record PersonRecord(
     string? Address);
 
 /// <summary>Istihdamin okunan hali.</summary>
+/// <param name="Id">Ic kimlik (disariya verilmez).</param>
 /// <param name="RegistryCode">Sicil numarasi.</param>
 /// <param name="CompanyName">Firma.</param>
 /// <param name="HireDate">Ise giris tarihi.</param>
 /// <param name="TerminationDate">Isten cikis tarihi; aktifse <c>null</c>.</param>
 /// <param name="IsActive">Istihdam suruyor mu.</param>
 public sealed record EmploymentRecord(
+    long Id,
     string RegistryCode,
     string CompanyName,
     DateOnly HireDate,
     DateOnly? TerminationDate,
-    bool IsActive);
+    bool IsActive)
+{
+    /// <summary>Istihdamin guncel tarih aralikli nitelikleri; T1 oncesi veya hic gorulmediyse <c>null</c>.</summary>
+    public AssignmentRecord? Current { get; init; }
+}
+
+/// <summary>
+/// Bir donemin nitelikleri, adlariyla (SYG-PERS-038). Guncel kayit: acik kayit, yoksa en son kayit.
+/// </summary>
+/// <param name="ValidFrom">Donemin baslangici.</param>
+/// <param name="ValidTo">Donemin bitisi (haric); acikse <c>null</c>.</param>
+/// <param name="CompanyName">Firma.</param>
+/// <param name="BranchName">Sube.</param>
+/// <param name="City">Subenin sehri.</param>
+/// <param name="DepartmentName">Birim.</param>
+/// <param name="TitleCode">Unvan kodu; adi referans veriden gelir.</param>
+/// <param name="StatusCode">Statu.</param>
+/// <param name="OccupationCode">SGK meslek kodu.</param>
+/// <param name="OccupationName">SGK meslek adi.</param>
+public sealed record AssignmentRecord(
+    DateOnly ValidFrom,
+    DateOnly? ValidTo,
+    string CompanyName,
+    string? BranchName,
+    string? City,
+    string? DepartmentName,
+    string? TitleCode,
+    string? StatusCode,
+    string? OccupationCode,
+    string? OccupationName);

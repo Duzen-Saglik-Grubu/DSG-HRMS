@@ -35,6 +35,11 @@ public sealed class LogoFieldScopeTests
         // T1 (SYG-PERS-003)
         "LH_001_PERSON.SEX",        // cinsiyet
         "LH_001_PERSON.EDUCATION",  // egitim tanim numarasi
+        "LH_001_PERSON.TITLE",      // unvan kodu (SYG-PERS-018)
+        "LH_001_PERSON.SPECODE",    // statu
+        "LH_001_PERSON.JOBREF",     // SGK meslek tanim numarasi
+        "LH_001_PERSON.LOCNR",      // sube numarasi
+        "LH_001_PERSON.DEPTNR",     // birim numarasi
         "LH_001_CONTACT.EXP2",      // adresin ikinci satiri
         "LH_001_FAMILY.LREF",       // baglanti
         "LH_001_FAMILY.PERREF",     // baglanti (karta)
@@ -46,7 +51,8 @@ public sealed class LogoFieldScopeTests
         "LH_001_TYPEDEF.LREF",      // baglanti
         "LH_001_TYPEDEF.TYP",       // tanim turu
         "LH_001_TYPEDEF.NR",        // tanim numarasi
-        "LH_001_TYPEDEF.EXP",       // egitim adi
+        "LH_001_TYPEDEF.EXP",       // egitim adi; SGK meslek kodu
+        "LH_001_TYPEDEF.DESC_",     // SGK meslek adi
         "L_CAPIDIV.LOGICALREF",     // baglanti
         "L_CAPIDIV.FIRMNR",         // firma
         "L_CAPIDIV.NR",             // sube numarasi

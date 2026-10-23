@@ -112,6 +112,34 @@ public sealed class ApplicationRoleTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Overlapping_assignment_ranges_are_rejected_for_the_application_role()
+    {
+        // SYG-PERS-019 (ADR-0021 §2, B-19): EXCLUDE kisiti calisma roluyle yapilan eklemede de gecerli;
+        // rol btree_gist'i kurmaz ama kisitli tabloya yazabilir. Veriler SENTETIKTIR.
+        await ExecuteAsOwnerAsync("""
+            INSERT INTO organization.company (id, public_id, logo_firm_number, name, created_at) VALUES (901, gen_random_uuid(), 91, 'Test', now());
+            INSERT INTO personnel.person (id, public_id, national_id, first_name, last_name, birth_date, is_email_shared, created_at)
+                VALUES (901, gen_random_uuid(), '10000000146', 'Test', 'Kisi', '1990-01-01', false, now());
+            INSERT INTO personnel.employment (id, public_id, person_id, registry_code, company_id, hire_date, is_active, logo_ref, created_at)
+                VALUES (901, gen_random_uuid(), 901, 'T901', 901, '2020-01-01', true, 901, now());
+            """);
+
+        const string insert = "INSERT INTO personnel.employment_assignment (public_id, employment_id, company_id, valid_from, valid_to, created_at) VALUES ";
+        await ExecuteAsAppAsync(insert + "(gen_random_uuid(), 901, 901, '2026-01-01', '2026-03-01', now())");
+        await ExecuteAsAppAsync(insert + "(gen_random_uuid(), 901, 901, '2026-03-01', NULL, now())");
+
+        // Bitisik aralik kabul edilir (ust sinir haric); cakisan aralik ve ikinci acik kayit reddedilir.
+        foreach (var range in new[] { "'2026-02-15', '2026-04-01'", "'2026-06-01', NULL" })
+        {
+            var exception = await Should.ThrowAsync<PostgresException>(() => ExecuteAsAppAsync(insert + $"(gen_random_uuid(), 901, 901, {range}, now())"));
+            exception.SqlState.ShouldBe(PostgresErrorCodes.ExclusionViolation, range);
+        }
+
+        var empty = await Should.ThrowAsync<PostgresException>(() => ExecuteAsAppAsync(insert + "(gen_random_uuid(), 901, 901, '2025-01-01', '2025-01-01', now())"));
+        empty.SqlState.ShouldBe(PostgresErrorCodes.CheckViolation);
+    }
+
+    [Fact]
     public async Task Role_can_insert_audit_records_but_cannot_change_them()
     {
         await ExecuteAsAppAsync("""

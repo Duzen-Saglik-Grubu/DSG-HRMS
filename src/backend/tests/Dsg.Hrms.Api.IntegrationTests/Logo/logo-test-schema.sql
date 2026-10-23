@@ -17,6 +17,9 @@ CREATE TABLE LH_001_PERSON (
     FIRMNR     smallint     NULL,
     SEX        smallint     NULL,
     EDUCATION  smallint     NULL,
+    TITLE      varchar(41)  NULL,
+    SPECODE    varchar(25)  NULL,
+    JOBREF     int          NULL,
     LOCNR      smallint     NULL,
     DEPTNR     smallint     NULL
 );

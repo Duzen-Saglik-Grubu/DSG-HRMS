@@ -2582,7 +2582,8 @@
           "hireDate",
           "terminationDate",
           "isActive",
-          "seniority"
+          "seniority",
+          "workLife"
         ],
         "type": "object",
         "properties": {
@@ -2614,6 +2615,17 @@
           "seniority": {
             "description": "Kidem suresi.",
             "$ref": "#/components/schemas/SeniorityResponse"
+          },
+          "workLife": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Calisma hayati: istihdamin guncel nitelikleri (SYG-PERS-038); T1 oncesi veya hic gorulmediyse bos.",
+                "$ref": "#/components/schemas/WorkLifeResponse"
+              }
+            ]
           }
         },
         "description": "Kartta bir istihdam."
@@ -3840,6 +3852,76 @@
           }
         },
         "description": "Kod dogrulama istegi."
+      },
+      "WorkLifeResponse": {
+        "required": [
+          "since",
+          "city",
+          "branchName",
+          "departmentName",
+          "titleCode",
+          "statusCode",
+          "occupationCode",
+          "occupationName"
+        ],
+        "type": "object",
+        "properties": {
+          "since": {
+            "type": "string",
+            "description": "Bu niteliklerin gecerli oldugu donemin baslangici.",
+            "format": "date"
+          },
+          "city": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Sehir (subenin sehri)."
+          },
+          "branchName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Sube."
+          },
+          "departmentName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Birim."
+          },
+          "titleCode": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Unvan kodu (1–4); adi referans veri cekirdegiyle gelecek."
+          },
+          "statusCode": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Statu."
+          },
+          "occupationCode": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "SGK meslek kodu."
+          },
+          "occupationName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "SGK meslek."
+          }
+        },
+        "description": "Calisma hayati bolumu (SYG-PERS-038). Firma istihdamin kendisindedir."
       }
     }
   },

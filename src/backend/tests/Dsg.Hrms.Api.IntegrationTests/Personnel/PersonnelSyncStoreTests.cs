@@ -82,7 +82,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
 
         _source.VerifyReadOnlyAccessAsync(Arg.Any<CancellationToken>()).Returns(new LogoAccessCheckResult(true, []));
         _source.VerifySchemaAsync(Arg.Any<CancellationToken>()).Returns(new LogoSchemaCheckResult(true, []));
-        _source.GetDetailsAsync(Arg.Any<CancellationToken>()).Returns(new LogoPersonnelDetails([], [], []));
+        _source.GetDetailsAsync(Arg.Any<CancellationToken>()).Returns(new LogoPersonnelDetails([], [], [], []));
     }
 
     public async Task DisposeAsync()
@@ -146,7 +146,8 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
                 new LogoProfileRecord(3, Sex: 1, PreviousSurname: "Atilmali", MaritalStatus: 2, EducationName: null, Address: null),
             ],
             [new LogoUnitRecord(1, 5, "Merkez Laboratuvar", "Ankara"), new LogoUnitRecord(9, 1, "Firmasi olmayan", null)],
-            [new LogoUnitRecord(1, 7, "Bilgi Islem", null)]));
+            [new LogoUnitRecord(1, 7, "Bilgi Islem", null)],
+            [new LogoAssignmentRecord(1, 1, 5, 7, "1", "A", "2511.01", "Programci")]));
 
         var result = await SyncAsync(
             Card("00001", NationalId(1), logoRef: 1),
@@ -169,6 +170,41 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
 
         (await context.Set<Domain.Organization.Branch>().SingleAsync()).City.ShouldBe("Ankara");
         (await context.Set<Domain.Organization.Department>().SingleAsync()).Name.ShouldBe("Bilgi Islem");
+    }
+
+    [Fact]
+    public async Task Assignment_history_is_built_day_by_day_and_closed_on_termination()
+    {
+        // SYG-PERS-018, 021 (PG-PERS-12, #284): sube ve firma degisince acik kayit o gun kapanir ve
+        // yenisi acilir; istihdam bitince acik kayit cikisin ertesi gunu kapanir.
+        var day1 = Today;
+        var day2 = Today.AddDays(5);
+        var termination = Today.AddDays(8);
+        LogoAssignmentRecord Record(short branch) => new(1, 1, branch, 7, "1", "A", "2511.01", "Programci");
+        LogoPersonnelDetails Details(short branch) => new(
+            [],
+            [new LogoUnitRecord(1, 5, "Merkez", "Ankara"), new LogoUnitRecord(1, 6, "Cankaya", "Ankara")],
+            [new LogoUnitRecord(1, 7, "Bilgi Islem", null)],
+            [Record(branch)]);
+
+        _source.GetDetailsAsync(Arg.Any<CancellationToken>()).Returns(Details(5));
+        await SyncAsync(Card("00001", NationalId(1), logoRef: 1));
+
+        _clock.Today.Returns(day2);
+        _source.GetDetailsAsync(Arg.Any<CancellationToken>()).Returns(Details(6));
+        await SyncAsync(Card("00001", NationalId(1), logoRef: 1));
+
+        _clock.Today.Returns(termination.AddDays(2));
+        (await SyncAsync(Card("00001", NationalId(1), logoRef: 1, terminationDate: termination))).Status.ShouldBe(SyncStatus.Succeeded);
+
+        await using var context = Read();
+        var branches = await context.Set<Domain.Organization.Branch>().ToDictionaryAsync(b => b.Id, b => b.LogoNumber);
+        var history = await context.Set<EmploymentAssignment>().OrderBy(a => a.ValidFrom).ToListAsync();
+        history.Select(a => (a.ValidFrom, a.ValidTo, branches[a.BranchId!.Value])).ShouldBe([
+            (day1, (DateOnly?)day2, (short)5),
+            (day2, (DateOnly?)termination.AddDays(1), (short)6),
+        ]);
+        history.ShouldAllBe(a => a.TitleCode == "1" && a.OccupationName == "Programci" && a.DepartmentId != null);
     }
 
     [Fact]

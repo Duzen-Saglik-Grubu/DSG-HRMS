@@ -43,7 +43,7 @@ senkronizasyon İK'nın girdiğini ezerdi.
 | `person` (genişler) | LOGO | Cinsiyet, önceki soyadı, medeni hâl, eğitim (tanımın adı) |
 | `person_sensitive` (yeni, kişi başına bir satır) | LOGO | **Korumalı alanlar:** adres, kan grubu (şifreli, ADR-0020) |
 | `person_photo` (yeni) | LOGO | Fotoğrafın küçük hâli ve kaynak özeti (§5) |
-| `employment_assignment` (yeni, tarih aralıklı) | LOGO | Şube, birim, ünvan kodu, statü, SGK meslek kodu ve adı |
+| `employment_assignment` (yeni, tarih aralıklı) | LOGO | Firma (#284), şube, birim, ünvan kodu, statü, SGK meslek kodu ve adı |
 | `employment_duty` (yeni, tarih aralıklı) | HRMS | Görev (referans veri tanımı) |
 | `person_marriage` (yeni) | HRMS | Evlilik tarihi, evlilik yardımı alındı mı |
 | `emergency_contact` (yeni, birden çok) | HRMS | Yakınlığı, ad, soyad, cep telefonu |
@@ -89,7 +89,9 @@ karar T2 tasarımına aittir. T1 `organization_unit` tablosunu kurmaz.
 | Aynı gün ikinci değişiklik | Aynı gün açılmış açık kayıt **güncellenir**, yeni kayıt açılmaz. Böylece sıfır uzunlukta aralık oluşmaz; günün son değeri geçerli olur |
 | Yumuşak silme ve çakışma | `EXCLUDE` kısıtı yalnızca silinmemiş kayıtlara uygulanır (`WHERE deleted_at IS NULL`); silinmiş görev, yerine girilen görevle çakışmaz |
 | Geçmişe dönük görev girişi | İK, başlangıcı geçmişte olan bir görev girebilir. Mevcut kayıtlarla çakışırsa giriş reddedilir; mevcut kaydı kısaltmak için önce o kayıt düzeltilir |
-| İstihdam bitince | Açık görev ve açık atama, istihdamın **çıkış tarihinin ertesi günü** kapanır (dışlayan üst sınır) |
+| İstihdam bitince | Açık görev ve açık atama, istihdamın **çıkış tarihinin ertesi günü** kapanır (dışlayan üst sınır). Çıkış tarihi kaydın başlangıcından önceyse kayıt başladığı günün ertesi kapanır; aralık boş olamaz (SYG-PERS AN-19) |
+| Zaten bitmiş istihdamın ilk kaydı | LOGO kartı çıkıştan sonra donar; karttaki değer çıkış günündeki değer sayılır ve [çıkış günü, ertesi gün) aralıklı tek kayıt açılır. Sonraki LOGO düzeltmesi son kaydı yerinde günceller (SYG-PERS AN-19) |
+| Atamada silme | Atama LOGO kaynaklıdır ve silinmez; `EXCLUDE` kısıtı bütün kayıtlara uygulanır. `WHERE deleted_at IS NULL` yalnızca HRMS'te girilen görevdedir |
 | Çakışma hatası | Veritabanının çakışma hatası (23P01) `409 Conflict` olarak, Problem Details biçiminde döner; `500` dönmez |
 | T1 öncesi bir tarih | Sorgu o tarih için kayıt bulamaz ve "kayıt yok" döner. Değer tahmin edilmez |
 
@@ -240,3 +242,4 @@ yeniden üretilebilir.
 | 2026-10-22 | 1.0 | İlk sürüm: T1 tasarım kararları (#245 maddeler 5, 7, 12, 13) | Bilgi İşlem |
 | 2026-10-22 | 1.1 | §7: ad gösterimi LOGO'daki gibi büyük harf (İK, 22.10.2026, #265) | Bilgi İşlem |
 | 2026-10-22 | 1.2 | Revizyon (#267, #268): korumalı alanlar `person_sensitive` tablosunda (B-11); çalışma şekli kapsam dışı (#270, B-05); `branch`/`department` ile `organization_unit` (B-16); tarih aralığı kuralları (B-06); `btree_gist` yetkisi (B-19); `HASHBYTES` için `CAST` ve LOGO yükü ölçümü (B-13); fotoğraf ucu önbellek ve kayıt (B-18); sınıflandırma kapsamı (B-12); arama anahtarı ve dizin (B-17) | Bilgi İşlem |
+| 2026-10-24 | 1.3 | §1: atamaya firma (değişiklik talebi #284); §2: bitmiş istihdamın ilk kaydı, geriye dönük çıkış, atamada silme yok (SYG-PERS AN-19, #285) | Bilgi İşlem |

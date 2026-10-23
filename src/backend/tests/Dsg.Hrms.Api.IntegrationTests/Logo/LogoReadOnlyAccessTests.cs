@@ -234,6 +234,12 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
 
         details.Branches.ShouldBe([new LogoUnitRecord(1, 0, "Merkez", "Ankara")]);
         details.Departments.ShouldBe([new LogoUnitRecord(1, 7, "Bilgi Islem", null)]);
+
+        // SYG-PERS-018: tarih aralikli nitelikler; SGK meslegi tanim tablosundan (TYP = -44).
+        details.Assignments.Single(a => a.LogoRef == 1).ShouldBe(
+            new LogoAssignmentRecord(1, 1, BranchNumber: 0, DepartmentNumber: 7, TitleCode: "1", StatusCode: "A", OccupationCode: "2511.01", OccupationName: "Programci"));
+        details.Assignments.Single(a => a.LogoRef == 2).ShouldBe(
+            new LogoAssignmentRecord(2, 2, null, null, null, null, null, null));
     }
 
     [Fact]
@@ -276,7 +282,7 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
                 (61, 1, 1, 'Ikinci adres satiri sonraki LREF');
             UPDATE LH_001_CONTACT SET EXP2 = 'No: 2 Cankaya' WHERE LREF = 60;
 
-            UPDATE LH_001_PERSON SET SEX = 2, EDUCATION = 3 WHERE LREF = 1;
+            UPDATE LH_001_PERSON SET SEX = 2, EDUCATION = 3, TITLE = ' 1 ', SPECODE = 'A', JOBREF = 3, LOCNR = 0, DEPTNR = 7 WHERE LREF = 1;
             UPDATE LH_001_PERSON SET SEX = 1, EDUCATION = 99 WHERE LREF = 3;
 
             -- Kartin kendi satiri yakinlik 0; es satiri (1) okunmaz. Kan grubu ve din OKUNMAZ.

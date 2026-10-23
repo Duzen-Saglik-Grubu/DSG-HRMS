@@ -166,7 +166,16 @@ public sealed partial class LogoPersonnelSource : ILogoPersonnelSource
         return await QueryAsync(async () =>
         {
             var persons = await _context.Persons
-                .Select(p => new { p.LogicalRef, p.Sex, p.EducationNumber })
+                .Select(p => new
+                {
+                    p.LogicalRef, p.Sex, p.EducationNumber, p.FirmNumber,
+                    p.TitleCode, p.StatusCode, p.OccupationRef, p.BranchNumber, p.DepartmentNumber,
+                })
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            var occupations = await _context.TypeDefinitions
+                .Where(d => d.Type == LogoSchema.OccupationDefinition && d.Number != null)
+                .Select(d => new { Number = d.Number!.Value, d.Name, d.Description })
                 .ToListAsync(cancellationToken).ConfigureAwait(false);
 
             var families = await _context.Families
@@ -220,9 +229,26 @@ public sealed partial class LogoPersonnelSource : ILogoPersonnelSource
                     addressByCard.GetValueOrDefault(p.LogicalRef));
             }).ToList();
 
-            return new LogoPersonnelDetails(profiles, divisions, departments);
+            var occupationByNumber = occupations.GroupBy(o => (int)o.Number).ToDictionary(g => g.Key, g => g.First());
+            var assignments = persons.Select(p =>
+            {
+                var occupation = p.OccupationRef is { } job ? occupationByNumber.GetValueOrDefault(job) : null;
+                return new LogoAssignmentRecord(
+                    p.LogicalRef,
+                    p.FirmNumber ?? 0,
+                    p.BranchNumber,
+                    p.DepartmentNumber,
+                    Trimmed(p.TitleCode),
+                    Trimmed(p.StatusCode),
+                    Trimmed(occupation?.Name),
+                    Trimmed(occupation?.Description));
+            }).ToList();
+
+            return new LogoPersonnelDetails(profiles, divisions, departments, assignments);
         }).ConfigureAwait(false);
     }
+
+    private static string? Trimmed(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
     private static DateOnly? ToDate(DateTime? value) => value is null ? null : DateOnly.FromDateTime(value.Value);
 

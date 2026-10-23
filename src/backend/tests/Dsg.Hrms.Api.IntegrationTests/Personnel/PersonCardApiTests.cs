@@ -164,6 +164,45 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
     }
 
     [Fact]
+    public async Task Employment_tab_shows_the_latest_work_life_values()
+    {
+        // SYG-PERS-038: sehir, firma, sube, birim, unvan, statu, SGK meslek. Bitmis istihdamda son
+        // bilinen degerler (cikis gunundeki) gorunur; hic kaydi olmayan istihdamda bolum bostur.
+        await GrantRoleAsync(1, Role.HrIdentityOperationsCode);
+        await _fixture.WithDbAsync(async context =>
+        {
+            var employment = await context.Set<Employment>().SingleAsync(e => e.RegistryCode == "00004");
+            if (await context.Set<EmploymentAssignment>().AnyAsync(a => a.EmploymentId == employment.Id))
+            {
+                return 0;
+            }
+
+            var branch = Domain.Organization.Branch.FromLogo(employment.CompanyId, 5, "Merkez Laboratuvar", "Ankara");
+            var department = Domain.Organization.Department.FromLogo(employment.CompanyId, 7, "Bilgi Islem");
+            context.AddRange(branch, department);
+            await context.SaveChangesAsync();
+            var (assignment, _) = AssignmentTimeline.Apply(
+                employment, [], new AssignmentValues(employment.CompanyId, branch.Id, department.Id, "2", "A", "2511.01", "Programci"), Today);
+            context.Add(assignment!);
+            return await context.SaveChangesAsync();
+        });
+        using var client = _fixture.CreateClient();
+        var token = await SignInAsync(client);
+
+        var workLife = (await GetAsync(client, $"{Persons}/{await PersonIdAsync(4)}", token)).Body
+            .GetProperty("employments")[0].GetProperty("workLife");
+        var own = (await GetAsync(client, $"{Persons}/me", token)).Body.GetProperty("employments")[0];
+
+        workLife.GetProperty("city").GetString().ShouldBe("Ankara");
+        workLife.GetProperty("branchName").GetString().ShouldBe("Merkez Laboratuvar");
+        workLife.GetProperty("departmentName").GetString().ShouldBe("Bilgi Islem");
+        workLife.GetProperty("titleCode").GetString().ShouldBe("2");
+        workLife.GetProperty("occupationName").GetString().ShouldBe("Programci");
+        workLife.GetProperty("since").GetString().ShouldBe(Today.AddDays(-1).ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture));
+        own.GetProperty("workLife").ValueKind.ShouldBe(JsonValueKind.Null);
+    }
+
+    [Fact]
     public async Task Viewer_without_the_sensitive_permission_gets_no_sensitive_section_at_all()
     {
         // SYG-PERS-052 (yetki sizintisi testi): tum personeli gorebilen ama view_sensitive izni

@@ -1,6 +1,6 @@
 # Mimari Karar Kayıtları (ADR)
 
-**Son güncelleme:** 2026-10-23
+**Son güncelleme:** 2026-10-24
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama) — *"Design rationale"* çıktısı
 
 ---
@@ -73,7 +73,7 @@ değildir.
 | [ADR-0018](ADR-0018-ortamlarin-verisi.md) | Ortamların Verisi | Kabul Edildi | 2026-10-14 (1.0) | Yerel geliştirme ve UAT gerçek personel verisiyle; CI sentetik (`KR-108`) |
 | [ADR-0019](ADR-0019-personel-verisine-erisim-kapsam-ve-alan-gorunurlugu.md) | Personel Verisine Erişim: Kapsam ve Alan Görünürlüğü | Kabul Edildi | 2026-10-23 (1.3) | `All`/`Self` kapsam, kapsamlı sorgu, tek görünürlük politikası (yanıt, filtre, dışa aktarma); liste erişim kaydında kişi kimlikleri (`KR-121`) |
 | [ADR-0020](ADR-0020-ozel-nitelikli-verinin-sifrelenmesi.md) | Özel Nitelikli Verinin Şifrelenmesi | Kabul Edildi | 2026-10-23 (1.3) | Kan grubu AES-256-GCM, ayrı anahtar, AAD, blind index yok; yerelde senkronize edilmez (`KR-122`) |
-| [ADR-0021](ADR-0021-t1-veri-modeli-genislemesi.md) | T1 Veri Modeli Genişlemesi | Kabul Edildi | 2026-10-22 (1.2) | Kaynağa göre tablo ayrımı, tarih aralıklı atama ve görev, fotoğraf özeti ve küçük hâli, Türkçe karaktersiz arama (`KR-123`) |
+| [ADR-0021](ADR-0021-t1-veri-modeli-genislemesi.md) | T1 Veri Modeli Genişlemesi | Kabul Edildi | 2026-10-24 (1.3) | Kaynağa göre tablo ayrımı, tarih aralıklı atama ve görev, fotoğraf özeti ve küçük hâli, Türkçe karaktersiz arama (`KR-123`) |
 | [ADR-0022](ADR-0022-t1-yatay-cekirdekler.md) | T1'de Kurulan Yatay Çekirdekler | Kabul Edildi | 2026-10-23 (1.4) | Referans veri, denetim kaydı görüntüleme, İK'ya bildir ve uygulama içi bildirim, dışa aktarma, parametreler (`KR-124`) |
 
 ---
@@ -123,3 +123,4 @@ değerlendirilmelidir:
 | 2026-10-22 | 0.11 | ADR-0022 1.2: ikinci bildirim türü (#274) | Bilgi İşlem |
 | 2026-10-23 | 0.12 | ADR-0019 1.3 ve ADR-0022 1.3: İK izinleri (`KR-128`, #278) | Bilgi İşlem |
 | 2026-10-23 | 0.13 | ADR-0020 1.3, ADR-0022 1.4: kan grubu kodları referans veride (`KR-129`, #280) | Bilgi İşlem |
+| 2026-10-24 | 0.14 | ADR-0021 1.3: atamada firma ve tarih aralığı kuralları (#284, #285) | Bilgi İşlem |

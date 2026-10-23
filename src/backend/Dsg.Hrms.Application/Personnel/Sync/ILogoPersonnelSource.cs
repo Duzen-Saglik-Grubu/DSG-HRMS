@@ -77,10 +77,31 @@ public sealed record LogoPersonnelRecord(
 /// <param name="Profiles">Kart basina genel bilgiler.</param>
 /// <param name="Branches">Sube tanimlari.</param>
 /// <param name="Departments">Birim tanimlari.</param>
+/// <param name="Assignments">Kart basina tarih aralikli tutulan nitelikler (SYG-PERS-018).</param>
 public sealed record LogoPersonnelDetails(
     IReadOnlyList<LogoProfileRecord> Profiles,
     IReadOnlyList<LogoUnitRecord> Branches,
-    IReadOnlyList<LogoUnitRecord> Departments);
+    IReadOnlyList<LogoUnitRecord> Departments,
+    IReadOnlyList<LogoAssignmentRecord> Assignments);
+
+/// <summary>Bir kartin bugunku istihdam nitelikleri; ham LOGO degerleriyle.</summary>
+/// <param name="LogoRef">Kartin <c>LREF</c>'i.</param>
+/// <param name="FirmNumber">Firma numarasi.</param>
+/// <param name="BranchNumber">Sube numarasi.</param>
+/// <param name="DepartmentNumber">Birim numarasi.</param>
+/// <param name="TitleCode">Unvan kodu.</param>
+/// <param name="StatusCode">Statu.</param>
+/// <param name="OccupationCode">SGK meslek kodu.</param>
+/// <param name="OccupationName">SGK meslek adi.</param>
+public sealed record LogoAssignmentRecord(
+    int LogoRef,
+    short FirmNumber,
+    short? BranchNumber,
+    short? DepartmentNumber,
+    string? TitleCode,
+    string? StatusCode,
+    string? OccupationCode,
+    string? OccupationName);
 
 /// <summary>Bir kartin T1 genel bilgileri; ham LOGO kodlariyla.</summary>
 /// <param name="LogoRef">Kartin <c>LREF</c>'i.</param>
