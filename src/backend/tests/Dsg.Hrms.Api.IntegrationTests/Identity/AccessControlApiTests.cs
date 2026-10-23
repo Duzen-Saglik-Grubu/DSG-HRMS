@@ -55,10 +55,10 @@ public sealed class AccessControlApiTests : IClassFixture<RegistrationApiFixture
     }
 
     [Fact]
-    public async Task Hr_role_has_every_T1_permission_except_the_audit_log_and_parameters()
+    public async Task Hr_role_has_every_permission_and_is_named_human_resources()
     {
-        // SYG-PERS-055 (KR-126): T1 izinleri IK'da ve Sistem Yoneticisinde; denetim kayitlari ve
-        // parametreler yalnizca Sistem Yoneticisinde. Rolun gorunen adi "Insan Kaynaklari".
+        // SYG-PERS-055 (KR-126, KR-128): T1 izinleri, denetim kayitlari ve parametreler IK'da da
+        // var; bugun IK ve Sistem Yoneticisi ayni izinlere sahip. Rolun gorunen adi "Insan Kaynaklari".
         var (name, grants) = await _fixture.WithDbAsync(async context =>
         {
             var role = await context.Set<Role>().SingleAsync(r => r.Code == Role.HrIdentityOperationsCode);
@@ -66,9 +66,7 @@ public sealed class AccessControlApiTests : IClassFixture<RegistrationApiFixture
         });
 
         name.ShouldBe("İnsan Kaynakları");
-        grants.ShouldBe(
-            Permissions.All.Keys.Except([Permissions.AuditLogView, Permissions.ParameterView, Permissions.ParameterUpdate]),
-            ignoreOrder: true);
+        grants.ShouldBe(Permissions.All.Keys, ignoreOrder: true);
         grants.ShouldNotContain("identity.sync.view");
     }
 

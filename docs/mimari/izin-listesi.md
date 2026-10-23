@@ -1,7 +1,7 @@
 # İzin Listesi
 
 **Belge kimliği:** MIM-IZIN
-**Son güncelleme:** 2026-10-22
+**Son güncelleme:** 2026-10-23
 **Sahibi:** Bilgi İşlem
 **İlgili:** ADR-0007 §1, ADR-0019 §4, `KR-021`, `KR-089`, `KR-126`, SYG-KMLK-074, SYG-PERS-055
 
@@ -48,9 +48,10 @@ Kişi kartı ve "Profilim" (`GET /api/v1/personnel/persons/{id}`, `/me`) izin de
 | Rol | Kod | İzinler |
 |---|---|---|
 | **Sistem Yöneticisi** | `system-administrator` | Tümü |
-| **İnsan Kaynakları** (T3'te "İK Kimlik İşlemleri") | `hr-identity-operations` | `identity.*` (üçü), `personnel.*` (tümü), `reference.*` (ikisi). Denetim kayıtları ve parametreler yok (`KR-126`) |
+| **İnsan Kaynakları** (T3'te "İK Kimlik İşlemleri") | `hr-identity-operations` | `identity.*` (üçü), `personnel.*` (tümü), `reference.*` (ikisi), `system.parameter.*`, `audit.log.view`; bugün Sistem Yöneticisiyle aynı (`KR-126`, `KR-128`) |
 
 - Rol yönetim ekranı **T4 kapsamındadır**. Satır bazlı kapsam T1'de iki değerlidir: `personnel.person.view` izni olan tüm personeli, olmayan yalnızca kendini görür (SYG-PERS-050). Doğrudan ast kapsamı T2'de eklenir.
+- **T4 yönü (`KR-128`):** İzinler istenen rollere, roller istenen kullanıcılara atanabilecek. O zamana kadar rol dağılımı koddadır ve migration ile değişir.
 - İlk sistem yöneticisi, kurulum yapılandırmasındaki `AccessControl__BootstrapAdministrators` listesiyle belirlenir (runbook §11). Listedeki e-postayla giriş yapan hesaba rol bir kez atanır; atama denetim izine yazılır.
 
 ## Değişiklik Geçmişi
@@ -60,3 +61,4 @@ Kişi kartı ve "Profilim" (`GET /api/v1/personnel/persons/{id}`, `/me`) izin de
 | 2026-09-29 | 0.1 | İlk oluşturma: T3 izinleri ve hazır iki rol (#100) | Bilgi İşlem |
 | 2026-10-22 | 0.2 | Biçim: `view_<alan>` eylemi; T1 izinlerine atıf (ADR-0019 §4, #268) | Bilgi İşlem |
 | 2026-10-22 | 0.3 | T1 izinleri eklendi; `identity.sync.*` → `personnel.sync.*`; İK rolünün adı "İnsan Kaynakları", elle senkronizasyon İK'da (`KR-126`, #276) | Bilgi İşlem |
+| 2026-10-23 | 0.4 | İK rolüne `audit.log.view` ve `system.parameter.*`; T4 yönü (`KR-128`, #278) | Bilgi İşlem |

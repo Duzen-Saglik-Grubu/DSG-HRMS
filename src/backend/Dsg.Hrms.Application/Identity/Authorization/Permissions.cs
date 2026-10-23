@@ -68,7 +68,7 @@ public static class Permissions
     /// <summary>Referans tanimlarini ekleme, adini degistirme, pasife alma (SYG-PERS-072).</summary>
     public const string ReferenceUpdate = "reference.definition.update";
 
-    /// <summary>Denetim kayitlarini gorme; yalnizca Sistem Yoneticisi (SYG-PERS-069, KR-119).</summary>
+    /// <summary>Denetim kayitlarini gorme (SYG-PERS-069; KR-119, KR-128).</summary>
     public const string AuditLogView = "audit.log.view";
 
     /// <summary>Sistem parametrelerini gorme (SYG-KMLK-076).</summary>
@@ -106,14 +106,15 @@ public static class Permissions
     {
         [Role.SystemAdministratorCode] = [.. All.Keys],
 
-        // Kapsam T4'e kadar tum personeldir. Parametreler ve denetim kayitlari Sistem
-        // Yoneticisinindir; elle senkronizasyon T1'den itibaren IK'da da vardir (KR-126,
-        // SYG-PERS-055).
+        // Kapsam T4'e kadar tum personeldir. Elle senkronizasyon (KR-126), denetim kayitlari ve
+        // parametreler (KR-128) IK'da da vardir (SYG-PERS-055). Liste bilincli olarak acik
+        // yazilir: yeni bir izin IK'ya kendiliginden gecmez. Rol ve izin atama ekrani T4'tedir.
         [Role.HrIdentityOperationsCode] =
         [
-            AccountView, AccountUpdate, InviteCreate, SyncView, SyncCreate,
+            AccountView, AccountUpdate, InviteCreate, SyncView, SyncCreate, ParameterView, ParameterUpdate,
             PersonView, PersonViewNationalId, PersonViewSensitive, PersonUpdate, PersonExport,
             CorrectionView, CorrectionUpdate, QualityView, QualityExport, ReferenceView, ReferenceUpdate,
+            AuditLogView,
         ],
     };
 }

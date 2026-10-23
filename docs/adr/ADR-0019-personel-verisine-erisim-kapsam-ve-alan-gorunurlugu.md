@@ -111,6 +111,10 @@ düzenlenirken değerlendirilir.
 İzin dağılımı Doğuş Uçanok tarafından 22.10.2026'da onaylandı (`KR-126`; B-14). Senkronizasyonu
 elle başlatma T3'te yalnızca Sistem Yöneticisindeydi; artık İK'da da var.
 
+> **Karar (23.10.2026, `KR-128`):** Denetim kayıtlarını görme (`audit.log.view`) ve sistem
+> parametreleri (`system.parameter.*`) de İK'ya verildi; bugün İK ve Sistem Yöneticisi aynı
+> izinlere sahiptir. T4'te izinler istenen rollere, roller istenen kullanıcılara atanabilecek.
+
 **Eylem adları:** `view_national_id` ve `view_sensitive`, ADR-0007 §1'deki eylem sözlüğüne
 (`view`, `create`, `update`, `delete`, `report`, `export`, `approve`) **alan düzeyi görme**
 eylemleri olarak eklenir. İzin listesi belgesi aynı PR'da güncellenir (B-16).
@@ -205,3 +209,4 @@ ve testlerin bu bileşenlere dayanmasıdır.
 | 2026-10-22 | 1.0 | İlk sürüm: T1 tasarım kararları (#245 maddeler 1, 2, 8, 13) | Bilgi İşlem |
 | 2026-10-22 | 1.1 | §2: evlilik bilgisi yalnızca İK ve Sistem Yöneticisi; §4 ve §5 kararları onaylandı (22.10.2026, #265) | Bilgi İşlem |
 | 2026-10-22 | 1.2 | Revizyon (T1 tasarım gözden geçirmesi #267, #268): korumalı alanlar ayrı tablolarda ve tip düzeyinde test (B-11); sıralama ve küme işlemleri (B-07); TCKN araması (B-17); izin tablosu ve dağılım (B-14, B-16); erişim kaydında süzgeç değeri yazılmaz, dışa aktarmada kişi kimlikleri, küme işleminde `SpecialCategoryView` (B-01, B-08, B-09); §6 çok sicilli kişi (B-15) | Bilgi İşlem |
+| 2026-10-23 | 1.3 | §4: denetim kayıtları ve parametre izinleri İK'da da (`KR-128`, #278) | Bilgi İşlem |

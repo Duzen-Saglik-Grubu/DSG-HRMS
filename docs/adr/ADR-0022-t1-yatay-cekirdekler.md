@@ -47,7 +47,7 @@ Onaylanmamış gereksinime dayanan hiçbir şey yazılmaz (`KR-068`).
 - Salt okunur, sayfalı bir liste. Dört kayıt türünü kapsar: değişiklik, erişim, dışa
   aktarma, güvenlik olayı. Süzgeçler: tarih aralığı, kayıt türü, işlemi yapan, verisi
   görüntülenen kişi.
-- İzin `audit.log.view`; **yalnızca Sistem Yöneticisi**.
+- İzin `audit.log.view`; Sistem Yöneticisi ve İK (**`KR-128`**, 23.10.2026; ilk sürümde yalnızca Sistem Yöneticisiydi, `KR-119`).
 - Ekrana bakmak da erişim kaydına yazılır. Maskeli değerler maskeli kalır; maskeyi açma
   yoktur.
 - Kayıtlara yalnızca okuma yetkisiyle erişilir (`KR-118`). Ekran, kayıtları değiştirecek bir
@@ -161,3 +161,4 @@ Düşük–orta. Çekirdekler küçüktür ve kendi ad alanlarındadır.
 | 2026-10-22 | 1.0 | İlk sürüm: T1 tasarım kararları (#245 maddeler 6, 8, 9, 10, 11) | Bilgi İşlem |
 | 2026-10-22 | 1.1 | Revizyon (#267, #268): önerilen değer talep kapanınca silinir, talebin saklama süresi ve izinleri (B-03, B-14, B-18); e-posta konu satırı (B-18); dışa aktarmada kişi kimlikleri (B-09); özel nitelikli senkronizasyon parametre değil (B-04); görünür kalma süresinin başlangıcı (B-15) | Bilgi İşlem |
 | 2026-10-22 | 1.2 | §3: şema sapması ve başarısız senkronizasyon için ikinci bildirim türü (SYG-PERS AN-06, #274) | Bilgi İşlem |
+| 2026-10-23 | 1.3 | §2: `audit.log.view` İK'da da (`KR-128`, #278) | Bilgi İşlem |

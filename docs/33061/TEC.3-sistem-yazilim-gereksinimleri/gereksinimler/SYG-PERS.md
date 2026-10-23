@@ -5,7 +5,7 @@
 **Modül:** T1 Personel Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-PERS.md` (19.10.2026'da İK onaylı, 45 gereksinim; değişiklik talebi #270)
 **Tasarım:** ADR-0019…ADR-0022 (`KR-121`…`KR-126`); T1 tasarım gözden geçirmesi (`TEC.5-tasarim-tanimlama/raporlar/2026-10-22-t1-tasarim-gozden-gecirme.md`)
-**Son güncelleme:** 2026-10-22
+**Son güncelleme:** 2026-10-23
 **Sahibi:** Bilgi İşlem
 **Onay durumu:** Bilgi İşlem (RACI TEC.3 A); değişiklikler PR onayıyla (`KR-096`). Baseline, T1'in kabul etiketiyle yazılır (`KR-097`, `KR-111`); o zamana kadar geliştirme sürüyor.
 
@@ -240,7 +240,7 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 | **SYG-PERS-052** | Alan görünürlüğü tek politikadadır: tam TCKN `view_national_id`; adres, kan grubu ve acil durum kişileri `view_sensitive` veya kişinin kendisi; evlilik bilgisi yalnızca `view_sensitive`. Göremeyen kullanıcının **API yanıtında alan yer almaz** (maskeli TCKN hariç). Politika dört yerde uygulanır: yanıt, süzgeç, sıralama, dışa aktarma alanları. Her korumalı alan için bu dört yeri sınayan bir yetki sızıntısı testi bulunur. | İşlevsel olmayan | PG-PERS-19, PG-PERS-20, PG-PERS-31, PG-PERS-36, PG-PERS-44 | Test | — |
 | **SYG-PERS-053** | Tam TCKN'yi göremeyen kullanıcı, kişinin kendisi dahil, TCKN'yi maskeli görür: ilk 3 ve son 2 hane açık, aradaki 6 hane `*` (ör. `123******89`). Maskeleme sunucuda yapılır; tam değer yanıtta yoktur. | İşlevsel | PG-PERS-31 | Test | — |
 | **SYG-PERS-054** | Korumalı alanlar kişi tablosunda tutulmaz: adres ve kan grubu `person_sensitive`'de, evlilik bilgisi ve acil durum kişileri kendi tablolarındadır. Kimlik modülünün bu tiplere bağımlılığı mimari testiyle reddedilir; korumalı tiplere bağımlı olabilen sınıflar listelidir. | Kısıt | PG-PERS-20, PG-PERS-36, PG-PERS-44 | Test | — |
-| **SYG-PERS-055** | T1 izinleri: `personnel.person.view`, `.view_national_id`, `.view_sensitive`, `.update`, `.export`; `personnel.correction.view`, `.update`; `personnel.quality.view`, `.export`; `personnel.sync.view`, `.create`; `reference.definition.view`, `.update`. Hepsi İK rolüne ve Sistem Yöneticisine verilir (`KR-126`). `audit.log.view` yalnızca Sistem Yöneticisindedir. İK rolünün görünen adı "İnsan Kaynakları" olur; kodu değişmez. | İşlevsel | PG-PERS-05, PG-PERS-29, PG-PERS-32, PG-PERS-35, PG-PERS-37 | Test | — |
+| **SYG-PERS-055** | T1 izinleri: `personnel.person.view`, `.view_national_id`, `.view_sensitive`, `.update`, `.export`; `personnel.correction.view`, `.update`; `personnel.quality.view`, `.export`; `personnel.sync.view`, `.create`; `reference.definition.view`, `.update`. Hepsi ve ayrıca `audit.log.view` ile `system.parameter.view`, `.update` İK rolüne ve Sistem Yöneticisine verilir (`KR-126`, `KR-128`). İK rolünün görünen adı "İnsan Kaynakları" olur; kodu değişmez. | İşlevsel | PG-PERS-05, PG-PERS-29, PG-PERS-32, PG-PERS-35, PG-PERS-37 | Test | — |
 | **SYG-PERS-056** | T1'de "Yöneticisi" süzgeci arayüzde ve API'de yoktur. Süzgeç T2 Organizasyon Yönetimi ile eklenir (AN-12). | İşlevsel | PG-PERS-34 | Test | — |
 
 ### 4.7 KVKK, şifreleme ve kayıtlar
@@ -454,3 +454,4 @@ madde `İptal` notuyla kalır.
 | 2026-10-22 | 0.1 | İlk oluşturma: PG-PERS'teki 45 onaylı gereksinimden ve T1 tasarım kararlarından (ADR-0019…0022) türetildi; 79 madde, 5 KPÖ, 18 analiz bulgusu (#274) | Bilgi İşlem |
 | 2026-10-22 | 0.2 | AN-04 İK teyidiyle kapandı: ayrılan istihdamda kıdem çıkış gününü sayar (SYG-PERS-039); AN-06 onaylandı (`KR-127`, #274) | Bilgi İşlem |
 | 2026-10-22 | 0.3 | SYG-PERS-039: örnek ekran metni "1 Yıl 0 Ay 0 Gün" olarak netleştirildi; yıl varsa üç birim de yazılır (PG-PERS-21; #276) | Bilgi İşlem |
+| 2026-10-23 | 0.4 | SYG-PERS-055: denetim kayıtları ve parametre izinleri İK'da da (`KR-128`, #278) | Bilgi İşlem |
