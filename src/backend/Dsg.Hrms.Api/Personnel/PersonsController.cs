@@ -112,7 +112,7 @@ public sealed record PersonCardResponse(
                 e.IsActive,
                 new SeniorityResponse(e.Seniority.Years, e.Seniority.Months, e.Seniority.Days, e.Seniority.Text),
                 e.Current is { } c
-                    ? new WorkLifeResponse(c.ValidFrom, c.City, c.BranchName, c.DepartmentName, c.TitleCode, c.StatusCode, c.OccupationCode, c.OccupationName)
+                    ? new WorkLifeResponse(c.ValidFrom, c.City, c.BranchName, c.DepartmentName, c.TitleCode, c.TitleName, c.StatusCode, c.OccupationCode, c.OccupationName)
                     : null))],
             card.Gender switch
             {
@@ -184,7 +184,8 @@ public sealed record EmploymentCardResponse(
 /// <param name="City">Sehir (subenin sehri).</param>
 /// <param name="BranchName">Sube.</param>
 /// <param name="DepartmentName">Birim.</param>
-/// <param name="TitleCode">Unvan kodu (1–4); adi referans veri cekirdegiyle gelecek.</param>
+/// <param name="TitleCode">Unvan kodu (LOGO, 1–4).</param>
+/// <param name="TitleName">Unvan ("Unvani" etiketiyle gosterilir); referans veride karsiligi yoksa bos (PG-PERS-21).</param>
 /// <param name="StatusCode">Statu.</param>
 /// <param name="OccupationCode">SGK meslek kodu.</param>
 /// <param name="OccupationName">SGK meslek.</param>
@@ -194,6 +195,7 @@ public sealed record WorkLifeResponse(
     string? BranchName,
     string? DepartmentName,
     string? TitleCode,
+    string? TitleName,
     string? StatusCode,
     string? OccupationCode,
     string? OccupationName);

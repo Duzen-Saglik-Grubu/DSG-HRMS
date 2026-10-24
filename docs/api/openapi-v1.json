@@ -397,6 +397,307 @@
         }
       }
     },
+    "/api/v1/reference/definitions": {
+      "get": {
+        "tags": [
+          "ReferenceDefinitions"
+        ],
+        "summary": "Turun tanimlari; varsayilan olarak yalnizca aktifler (yeni secim icin).",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ReferenceTypeKind"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tanimlar, siraya gore.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReferenceDefinitionResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`reference.definition.view`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ReferenceDefinitions"
+        ],
+        "summary": "Yeni tanim ekler. Unvan kodu zorunludur (LOGO kodu); gorev kodu verilmezse uretilir.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReferenceDefinitionRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReferenceDefinitionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReferenceDefinitionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Eklenen tanim.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceDefinitionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ad bos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`reference.definition.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Kod kullaniliyor, unvan kodu yok veya tur kan grubu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reference/definitions/{id}/name": {
+      "put": {
+        "tags": [
+          "ReferenceDefinitions"
+        ],
+        "summary": "Tanimin adini degistirir.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameReferenceDefinitionRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameReferenceDefinitionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameReferenceDefinitionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Ad degisti.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Ad bos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`reference.definition.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tanim yok.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sistem tanimi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reference/definitions/{id}/deactivation": {
+      "post": {
+        "tags": [
+          "ReferenceDefinitions"
+        ],
+        "summary": "Tanimi pasife alir; gecmis kayitlarda adiyla gorunmeye devam eder.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Tanim pasif.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`reference.definition.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tanim yok.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sistem tanimi veya zaten pasif.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/me": {
       "get": {
         "tags": [
@@ -2575,6 +2876,32 @@
         },
         "description": "Hesap olusturma istegi."
       },
+      "CreateReferenceDefinitionRequest": {
+        "required": [
+          "type",
+          "code",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "Tur (unvan veya gorev).",
+            "$ref": "#/components/schemas/ReferenceTypeKind"
+          },
+          "code": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Kod; unvanda zorunlu, gorevde istege bagli."
+          },
+          "name": {
+            "type": "string",
+            "description": "Ad."
+          }
+        },
+        "description": "Yeni tanim istegi."
+      },
       "EmploymentCardResponse": {
         "required": [
           "registryCode",
@@ -3208,6 +3535,63 @@
         },
         "description": "Giris ve uyelik ekranlarinin ayarlari."
       },
+      "ReferenceDefinitionResponse": {
+        "required": [
+          "id",
+          "type",
+          "code",
+          "name",
+          "sortOrder",
+          "isActive",
+          "isSystem"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Dis kimlik.",
+            "format": "uuid"
+          },
+          "type": {
+            "description": "Tur.",
+            "$ref": "#/components/schemas/ReferenceTypeKind"
+          },
+          "code": {
+            "type": "string",
+            "description": "Kod."
+          },
+          "name": {
+            "type": "string",
+            "description": "Ad."
+          },
+          "sortOrder": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sira.",
+            "format": "int32"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Yeni secimde listelenir mi."
+          },
+          "isSystem": {
+            "type": "boolean",
+            "description": "Sistem tanimi mi; oyleyse degistirilemez."
+          }
+        },
+        "description": "Referans tanimi."
+      },
+      "ReferenceTypeKind": {
+        "enum": [
+          "title",
+          "duty",
+          "bloodGroup"
+        ],
+        "description": "Referans tanim turu."
+      },
       "RegistrationStartedResponse": {
         "required": [
           "registrationId",
@@ -3235,6 +3619,19 @@
           }
         },
         "description": "Uyelik baslatildi."
+      },
+      "RenameReferenceDefinitionRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Yeni ad."
+          }
+        },
+        "description": "Ad degistirme istegi."
       },
       "RequestCodeRequest": {
         "required": [
@@ -3860,6 +4257,7 @@
           "branchName",
           "departmentName",
           "titleCode",
+          "titleName",
           "statusCode",
           "occupationCode",
           "occupationName"
@@ -3897,7 +4295,14 @@
               "null",
               "string"
             ],
-            "description": "Unvan kodu (1–4); adi referans veri cekirdegiyle gelecek."
+            "description": "Unvan kodu (LOGO, 1–4)."
+          },
+          "titleName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Unvan (\"Unvani\" etiketiyle gosterilir); referans veride karsiligi yoksa bos (PG-PERS-21)."
           },
           "statusCode": {
             "type": [
@@ -3931,6 +4336,9 @@
     },
     {
       "name": "SystemParameters"
+    },
+    {
+      "name": "ReferenceDefinitions"
     },
     {
       "name": "Persons"

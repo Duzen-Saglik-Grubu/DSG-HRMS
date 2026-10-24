@@ -1,6 +1,7 @@
 using Dsg.Hrms.Application.Personnel.Access;
 using Dsg.Hrms.Domain.Organization;
 using Dsg.Hrms.Domain.Personnel;
+using Dsg.Hrms.Domain.Reference;
 using Dsg.Hrms.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -74,13 +75,15 @@ public sealed class PersonnelQuery(HrmsDbContext context) : IPersonnelQuery
             from b in branches.DefaultIfEmpty()
             join d in context.Set<Department>() on a.DepartmentId equals (long?)d.Id into departments
             from d in departments.DefaultIfEmpty()
+            join t in context.Set<ReferenceDefinition>().Where(x => x.Type == ReferenceType.Title) on a.TitleCode equals t.Code into titles
+            from t in titles.DefaultIfEmpty()
                 // Sol birlesimde eslesme yoksa EF alanlari SQL NULL olarak dondurur.
             select new
             {
                 a.EmploymentId,
                 Record = new AssignmentRecord(
                     a.ValidFrom, a.ValidTo, c.Name, b.Name, b.City, d.Name,
-                    a.TitleCode, a.StatusCode, a.OccupationCode, a.OccupationName),
+                    a.TitleCode, t.Name, a.StatusCode, a.OccupationCode, a.OccupationName),
             })
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);

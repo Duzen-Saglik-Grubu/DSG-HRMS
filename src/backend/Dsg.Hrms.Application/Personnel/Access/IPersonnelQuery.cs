@@ -79,7 +79,8 @@ public sealed record EmploymentRecord(
 /// <param name="BranchName">Sube.</param>
 /// <param name="City">Subenin sehri.</param>
 /// <param name="DepartmentName">Birim.</param>
-/// <param name="TitleCode">Unvan kodu; adi referans veriden gelir.</param>
+/// <param name="TitleCode">Unvan kodu (LOGO).</param>
+/// <param name="TitleName">Unvan adi (referans veri); karsiligi yoksa <c>null</c> ve ekranda bos (PG-PERS-21).</param>
 /// <param name="StatusCode">Statu.</param>
 /// <param name="OccupationCode">SGK meslek kodu.</param>
 /// <param name="OccupationName">SGK meslek adi.</param>
@@ -91,6 +92,7 @@ public sealed record AssignmentRecord(
     string? City,
     string? DepartmentName,
     string? TitleCode,
+    string? TitleName,
     string? StatusCode,
     string? OccupationCode,
     string? OccupationName);
