@@ -1,3 +1,5 @@
+using Dsg.Hrms.Application.Common.Paging;
+using Dsg.Hrms.Application.Personnel.Listing;
 using Dsg.Hrms.Domain.Personnel;
 
 namespace Dsg.Hrms.Application.Personnel.Access;
@@ -24,6 +26,12 @@ public interface IPersonnelQuery
 
     /// <summary>Kullanicinin kendi kisi kaydi; kisi kaydi yoksa <c>null</c>.</summary>
     Task<PersonRecord?> FindOwnAsync(PersonnelViewer viewer, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Kapsamdaki kisileri suzer, siralar ve sayfalar (SYG-PERS-022, 027, 028, 030, 031). Gorunur kalma
+    /// suresi dolmus ayrilan kisi listede yoktur.
+    /// </summary>
+    Task<PagedResult<PersonListItem>> ListAsync(PersonnelViewer viewer, PersonListCriteria criteria, CancellationToken cancellationToken);
 }
 
 /// <summary>Kisi kaydinin okunan hali.</summary>

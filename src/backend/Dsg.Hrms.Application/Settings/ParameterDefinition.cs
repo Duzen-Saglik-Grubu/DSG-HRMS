@@ -38,6 +38,7 @@ public enum ParameterType
 /// <param name="Pattern">Metnin veya her liste ogesinin uymasi gereken ifade.</param>
 /// <param name="AllowedItems">Liste ogesi icin izin verilen degerler.</param>
 /// <param name="FormatHint">Bicime uymayan degerde kullaniciya soylenen bicim, orn. "sunucu:port biçiminde olmalıdır (örneğin mail.duzen.com.tr:587)" (SYG-KMLK-064, B-09).</param>
+/// <param name="AllowEmpty">Bos deger gecerli mi; anlami parametreye gore (or. "suresiz").</param>
 public sealed record ParameterDefinition(
     string Key,
     string ConfigurationKey,
@@ -48,7 +49,8 @@ public sealed record ParameterDefinition(
     int? Max = null,
     Regex? Pattern = null,
     IReadOnlyList<string>? AllowedItems = null,
-    string? FormatHint = null)
+    string? FormatHint = null,
+    bool AllowEmpty = false)
 {
     /// <summary>Sir parametre mi.</summary>
     public bool IsSecret => Type == ParameterType.Secret;
@@ -67,7 +69,8 @@ public sealed record ParameterDefinition(
 
         if (value.Length == 0)
         {
-            return ParameterValidation.Invalid("Değer boş olamaz.");
+            // Bazi parametrelerde bos deger anlamlidir (or. "suresiz", PG-PERS-38).
+            return AllowEmpty ? ParameterValidation.Valid(string.Empty) : ParameterValidation.Invalid("Değer boş olamaz.");
         }
 
         return Type switch

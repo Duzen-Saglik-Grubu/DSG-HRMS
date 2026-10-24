@@ -1,5 +1,9 @@
 using System.Text.Json.Serialization;
+using Dsg.Hrms.Api.Identity;
+using Dsg.Hrms.Application.Common.Paging;
 using Dsg.Hrms.Application.Personnel.Cards;
+using Dsg.Hrms.Application.Personnel.Listing;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,11 +29,39 @@ namespace Dsg.Hrms.Api.Personnel;
 public sealed class PersonsController : ControllerBase
 {
     private readonly PersonCardService _cards;
+    private readonly PersonListService _list;
 
     /// <summary>Yeni ornek olusturur.</summary>
-    public PersonsController(PersonCardService cards)
+    public PersonsController(PersonCardService cards, PersonListService list)
     {
         _cards = cards;
+        _list = list;
+    }
+
+    /// <summary>
+    /// Personel listesi: kart izgarasi ve tablo icin (SYG-PERS-022, 023, 027–031). Varsayilan olarak
+    /// yalnizca aktif personel; kapsam disindaki kisiler listede yoktur.
+    /// </summary>
+    /// <response code="200">Sayfalanmis liste.</response>
+    /// <response code="400">Gecersiz sayfa, siralama veya sayfa boyutu parametredeki en buyuk degerden fazla.</response>
+    [HttpGet]
+    [ProducesResponseType<PagedResponse<PersonListItemResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<PagedResponse<PersonListItemResponse>> ListAsync([FromQuery] PersonListRequest request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        var result = await _list.ListAsync(
+            request.Q,
+            (EmploymentStatusFilter)request.Status,
+            request.Sort == PersonSortField.LastName ? PersonSort.LastName : PersonSort.FirstName,
+            request.Order == SortOrder.Desc,
+            request.Page,
+            request.PageSize,
+            cancellationToken);
+
+        return PagedResponse.From(result, PersonListItemResponse.From);
     }
 
     /// <summary>Kullanicinin kendi karti ("Profilim"). Izin gerektirmez.</summary>
@@ -51,6 +83,120 @@ public sealed class PersonsController : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<PersonCardResponse> GetAsync(Guid personId, CancellationToken cancellationToken) =>
         PersonCardResponse.From(await _cards.GetAsync(personId, cancellationToken));
+}
+
+/// <summary>Liste istegi.</summary>
+public sealed class PersonListRequest
+{
+    /// <summary>Hizli arama: ad, soyad, sicil; izinle TCKN. Turkce karakterden bagimsiz.</summary>
+    [FromQuery(Name = "q")]
+    public string? Q { get; init; }
+
+    /// <summary>Calisma durumu (varsayilan aktif).</summary>
+    [FromQuery(Name = "status")]
+    public EmploymentStatusKind Status { get; init; } = EmploymentStatusKind.Active;
+
+    /// <summary>Sayfa (1'den baslar).</summary>
+    [FromQuery(Name = "page")]
+    public int Page { get; init; } = 1;
+
+    /// <summary>Sayfa boyutu; verilmezse parametredeki varsayilan (24).</summary>
+    [FromQuery(Name = "pageSize")]
+    public int? PageSize { get; init; }
+
+    /// <summary>Siralama alani.</summary>
+    [FromQuery(Name = "sort")]
+    public PersonSortField Sort { get; init; } = PersonSortField.FirstName;
+
+    /// <summary>Siralama yonu.</summary>
+    [FromQuery(Name = "order")]
+    public SortOrder Order { get; init; } = SortOrder.Asc;
+
+    /// <inheritdoc />
+    public override string ToString() => nameof(PersonListRequest);
+}
+
+/// <summary>Calisma durumu suzgeci.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<EmploymentStatusKind>))]
+public enum EmploymentStatusKind
+{
+    /// <summary>En az bir aktif sicili olanlar.</summary>
+    [JsonStringEnumMemberName("active")]
+    Active = 1,
+
+    /// <summary>Ayrilanlar (gorunur kalma suresi icindekiler).</summary>
+    [JsonStringEnumMemberName("terminated")]
+    Terminated = 2,
+
+    /// <summary>Tumu.</summary>
+    [JsonStringEnumMemberName("all")]
+    All = 3,
+}
+
+/// <summary>Liste siralama alani.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<PersonSortField>))]
+public enum PersonSortField
+{
+    /// <summary>Ad, sonra soyad.</summary>
+    [JsonStringEnumMemberName("firstName")]
+    FirstName = 1,
+
+    /// <summary>Soyad, sonra ad.</summary>
+    [JsonStringEnumMemberName("lastName")]
+    LastName = 2,
+}
+
+/// <summary>Liste isteginin dogrulamasi.</summary>
+public sealed class PersonListRequestValidator : AbstractValidator<PersonListRequest>
+{
+    /// <summary>Yeni ornek olusturur.</summary>
+    public PersonListRequestValidator()
+    {
+        RuleFor(r => r.Page).GreaterThanOrEqualTo(1).WithMessage("Sayfa numarası 1 veya daha büyük olmalıdır.");
+        RuleFor(r => r.PageSize)
+            .InclusiveBetween(1, PagedResult<object>.MaxPageSize)
+            .When(r => r.PageSize is not null)
+            .WithMessage($"Sayfa boyutu 1 ile {PagedResult<object>.MaxPageSize} arasında olmalıdır.");
+        RuleFor(r => r.Q).MaximumLength(100).WithMessage("Arama metni en fazla 100 karakter olabilir.");
+        RuleFor(r => r.Status).IsInEnum().WithMessage("Geçersiz çalışma durumu.");
+        RuleFor(r => r.Sort).IsInEnum().WithMessage("Geçersiz sıralama alanı.");
+        RuleFor(r => r.Order).IsInEnum().WithMessage("Geçersiz sıralama yönü.");
+    }
+}
+
+/// <summary>Listedeki kisi karti (SYG-PERS-023).</summary>
+/// <param name="PersonId">Dis kimlik.</param>
+/// <param name="FirstName">Ad.</param>
+/// <param name="LastName">Soyad.</param>
+/// <param name="IsActive">En az bir aktif sicili var mi.</param>
+/// <param name="EmploymentCount">Sicil sayisi; 2 ve uzeri kartta "X sicil" isaretidir (KR-126).</param>
+/// <param name="RegistryCode">Esas istihdamin sicili.</param>
+/// <param name="CompanyName">Firma.</param>
+/// <param name="BranchName">Sube.</param>
+/// <param name="DepartmentName">Birim.</param>
+/// <param name="TitleName">Unvan.</param>
+/// <param name="DutyName">Gorev.</param>
+public sealed record PersonListItemResponse(
+    Guid PersonId,
+    string FirstName,
+    string LastName,
+    bool IsActive,
+    int EmploymentCount,
+    string? RegistryCode,
+    string? CompanyName,
+    string? BranchName,
+    string? DepartmentName,
+    string? TitleName,
+    string? DutyName)
+{
+    /// <summary>Uygulama katmanindaki kayittan yanit kurar.</summary>
+    public static PersonListItemResponse From(PersonListItem item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        var p = item.Primary;
+        return new(item.PersonId, item.FirstName, item.LastName, item.IsActive, item.EmploymentCount,
+            p?.RegistryCode, p?.CompanyName, p?.BranchName, p?.DepartmentName, p?.TitleName, p?.DutyName);
+    }
 }
 
 /// <summary>Kisi karti.</summary>

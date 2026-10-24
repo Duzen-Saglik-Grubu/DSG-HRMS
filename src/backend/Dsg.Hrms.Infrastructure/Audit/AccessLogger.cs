@@ -50,6 +50,7 @@ public sealed class AccessLogger(
             EntityId = record.EntityId,
             RecordCount = record.RecordCount,
             Filters = MaskFilters(record.Filters),
+            SubjectIds = record.SubjectIds,
             TraceId = currentUser.TraceId,
             IpAddress = currentUser.IpAddress,
         });

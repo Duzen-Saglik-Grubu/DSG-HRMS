@@ -78,6 +78,13 @@ public sealed class Person : Entity, IAuditable
     [AuditVisible("Egitim duzeyi bir tanim adidir (ilkokul, lisans...); kisiyi tek basina tanimlamaz ve IK duzeltmeleri icin degisikligi gorunmelidir")]
     public string? EducationName { get; private set; }
 
+    /// <summary>
+    /// Turkce karaktersiz arama anahtari (ADR-0021 §7; SYG-PERS-030): ad, soyad ve gosterildigi
+    /// kosulda onceki soyadi. Uygulama yazar; ad veya onceki soyadi degisince yenilenir.
+    /// </summary>
+    [PersonalData(PersonalDataKind.SearchText)]
+    public string SearchKey { get; private set; } = string.Empty;
+
     /// <summary>Kisinin istihdamlari.</summary>
     public IReadOnlyCollection<Employment> Employments => _employments;
 
@@ -140,6 +147,7 @@ public sealed class Person : Entity, IAuditable
         Email = details.Email;
         IsEmailShared = details.IsEmailShared;
         MobilePhone = details.MobilePhone;
+        SearchKey = SearchText.KeyFor(FirstName, LastName, PreviousSurname);
         return true;
     }
 
@@ -174,6 +182,7 @@ public sealed class Person : Entity, IAuditable
         PreviousSurname = previousSurname;
         MaritalStatus = profile.MaritalStatus;
         EducationName = education;
+        SearchKey = SearchText.KeyFor(FirstName, LastName, PreviousSurname);
         return true;
     }
 }

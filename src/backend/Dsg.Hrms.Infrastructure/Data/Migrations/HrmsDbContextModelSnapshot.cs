@@ -65,6 +65,11 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("record_count");
 
+                    b.PrimitiveCollection<Guid[]>("SubjectIds")
+                        .IsRequired()
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("subject_ids");
+
                     b.Property<string>("TraceId")
                         .HasMaxLength(64)
                         .HasColumnType("text")
@@ -76,6 +81,11 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_access_log");
+
+                    b.HasIndex("SubjectIds")
+                        .HasDatabaseName("ix_access_log_subject_ids");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SubjectIds"), "gin");
 
                     b.HasIndex("TraceId")
                         .HasDatabaseName("ix_access_log_trace_id");
@@ -1795,6 +1805,11 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                     b.Property<Guid>("PublicId")
                         .HasColumnType("uuid")
                         .HasColumnName("public_id");
+
+                    b.Property<string>("SearchKey")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("search_key");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamptz")

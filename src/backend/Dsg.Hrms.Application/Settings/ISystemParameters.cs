@@ -39,6 +39,18 @@ public static class SystemParameterExtensions
         return int.Parse(value, NumberStyles.None, CultureInfo.InvariantCulture);
     }
 
+    /// <summary>
+    /// Bos birakilabilen tam sayi parametreyi okur; tanimsiz veya bossa <c>null</c>
+    /// (or. ayrilan personelin gorunur kalma suresi: bos = suresiz, PG-PERS-38).
+    /// </summary>
+    public static async ValueTask<int?> GetOptionalIntegerAsync(
+        this ISystemParameters parameters, ParameterDefinition parameter, CancellationToken cancellationToken)
+    {
+        EnsureType(parameter, ParameterType.Number);
+        var value = await parameters.GetAsync(parameter, cancellationToken).ConfigureAwait(false);
+        return string.IsNullOrWhiteSpace(value) ? null : int.Parse(value, NumberStyles.None, CultureInfo.InvariantCulture);
+    }
+
     /// <summary>Acik/Kapali parametreyi okur.</summary>
     public static async ValueTask<bool> GetBooleanAsync(
         this ISystemParameters parameters, ParameterDefinition parameter, CancellationToken cancellationToken)

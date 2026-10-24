@@ -817,6 +817,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/persons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Personel listesi: kart izgarasi ve tablo icin (SYG-PERS-022, 023, 027–031). Varsayilan olarak
+         *     yalnizca aktif personel; kapsam disindaki kisiler listede yoktur.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    q?: string;
+                    status?: components["schemas"]["EmploymentStatusKind"];
+                    page?: number | string;
+                    pageSize?: number | string;
+                    sort?: components["schemas"]["PersonSortField"];
+                    order?: components["schemas"]["SortOrder"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Sayfalanmis liste. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResponseOfPersonListItemResponse"];
+                    };
+                };
+                /** @description Gecersiz sayfa, siralama veya sayfa boyutu parametredeki en buyuk degerden fazla. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/me": {
         parameters: {
             query?: never;
@@ -2976,6 +3040,11 @@ export interface components {
             workLife: null | components["schemas"]["WorkLifeResponse"];
             duty: null | components["schemas"]["DutyResponse"];
         };
+        /**
+         * @description Calisma durumu suzgeci.
+         * @enum {unknown}
+         */
+        EmploymentStatusKind: "active" | "terminated" | "all";
         EntityTagHeaderValue: {
             tag?: components["schemas"]["StringSegment"];
             isWeak?: boolean;
@@ -3055,6 +3124,31 @@ export interface components {
         PagedResponseOfParameterResponse: {
             /** @description Bu sayfadaki kayitlar. */
             items: components["schemas"]["ParameterResponse"][];
+            /**
+             * Format: int32
+             * @description Sayfa numarasi.
+             */
+            page: number | string;
+            /**
+             * Format: int32
+             * @description Sayfa boyutu.
+             */
+            pageSize: number | string;
+            /**
+             * Format: int32
+             * @description Toplam kayit sayisi.
+             */
+            totalCount: number | string;
+            /**
+             * Format: int32
+             * @description Toplam sayfa sayisi.
+             */
+            totalPages: number | string;
+        };
+        /** @description Sayfalanmis yanit (ADR-0010 §4). */
+        PagedResponseOfPersonListItemResponse: {
+            /** @description Bu sayfadaki kayitlar. */
+            items: components["schemas"]["PersonListItemResponse"][];
             /**
              * Format: int32
              * @description Sayfa numarasi.
@@ -3169,6 +3263,42 @@ export interface components {
             educationName: null | string;
             sensitive: null | components["schemas"]["SensitiveResponse"];
         };
+        /** @description Listedeki kisi karti (SYG-PERS-023). */
+        PersonListItemResponse: {
+            /**
+             * Format: uuid
+             * @description Dis kimlik.
+             */
+            personId: string;
+            /** @description Ad. */
+            firstName: string;
+            /** @description Soyad. */
+            lastName: string;
+            /** @description En az bir aktif sicili var mi. */
+            isActive: boolean;
+            /**
+             * Format: int32
+             * @description Sicil sayisi; 2 ve uzeri kartta "X sicil" isaretidir (KR-126).
+             */
+            employmentCount: number | string;
+            /** @description Esas istihdamin sicili. */
+            registryCode: null | string;
+            /** @description Firma. */
+            companyName: null | string;
+            /** @description Sube. */
+            branchName: null | string;
+            /** @description Birim. */
+            departmentName: null | string;
+            /** @description Unvan. */
+            titleName: null | string;
+            /** @description Gorev. */
+            dutyName: null | string;
+        };
+        /**
+         * @description Liste siralama alani.
+         * @enum {unknown}
+         */
+        PersonSortField: "firstName" | "lastName";
         ProblemDetails: {
             type?: null | string;
             title?: null | string;
