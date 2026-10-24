@@ -177,8 +177,12 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
             var sensitive = await context.Set<PersonSensitive>().ToListAsync(cancellationToken).ConfigureAwait(false);
             var branches = await context.Set<Branch>().ToListAsync(cancellationToken).ConfigureAwait(false);
             var departments = await context.Set<Department>().ToListAsync(cancellationToken).ConfigureAwait(false);
+            var assignments = await context.Set<EmploymentAssignment>().ToListAsync(cancellationToken).ConfigureAwait(false);
 
-            return new PersonnelDetailsSnapshot(companies, persons, employments, sensitive, branches, departments);
+            return new PersonnelDetailsSnapshot(companies, persons, employments, sensitive, branches, departments)
+            {
+                Assignments = assignments,
+            };
         }
 
         public void AddDetails(DetailsOutcome outcome)
@@ -187,6 +191,21 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
             context.Set<PersonSensitive>().AddRange(outcome.NewSensitive);
             context.Set<Branch>().AddRange(outcome.NewBranches);
             context.Set<Department>().AddRange(outcome.NewDepartments);
+        }
+
+        public void AddAssignments(IEnumerable<EmploymentAssignment> assignments) =>
+            context.Set<EmploymentAssignment>().AddRange(assignments);
+
+        public async Task SaveAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new SyncPersistenceException("Senkronizasyon sonucu kaydedilemedi.", ex);
+            }
         }
 
         public async ValueTask DisposeAsync()

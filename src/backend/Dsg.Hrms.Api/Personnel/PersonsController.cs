@@ -110,7 +110,10 @@ public sealed record PersonCardResponse(
                 e.HireDate,
                 e.TerminationDate,
                 e.IsActive,
-                new SeniorityResponse(e.Seniority.Years, e.Seniority.Months, e.Seniority.Days, e.Seniority.Text)))],
+                new SeniorityResponse(e.Seniority.Years, e.Seniority.Months, e.Seniority.Days, e.Seniority.Text),
+                e.Current is { } c
+                    ? new WorkLifeResponse(c.ValidFrom, c.City, c.BranchName, c.DepartmentName, c.TitleCode, c.StatusCode, c.OccupationCode, c.OccupationName)
+                    : null))],
             card.Gender switch
             {
                 Domain.Personnel.Gender.Male => GenderKind.Male,
@@ -166,13 +169,34 @@ public enum MaritalStatusKind
 /// <param name="TerminationDate">Isten cikis tarihi; aktifse bos.</param>
 /// <param name="IsActive">Istihdam suruyor mu.</param>
 /// <param name="Seniority">Kidem suresi.</param>
+/// <param name="WorkLife">Calisma hayati: istihdamin guncel nitelikleri (SYG-PERS-038); T1 oncesi veya hic gorulmediyse bos.</param>
 public sealed record EmploymentCardResponse(
     string RegistryCode,
     string CompanyName,
     DateOnly HireDate,
     DateOnly? TerminationDate,
     bool IsActive,
-    SeniorityResponse Seniority);
+    SeniorityResponse Seniority,
+    WorkLifeResponse? WorkLife);
+
+/// <summary>Calisma hayati bolumu (SYG-PERS-038). Firma istihdamin kendisindedir.</summary>
+/// <param name="Since">Bu niteliklerin gecerli oldugu donemin baslangici.</param>
+/// <param name="City">Sehir (subenin sehri).</param>
+/// <param name="BranchName">Sube.</param>
+/// <param name="DepartmentName">Birim.</param>
+/// <param name="TitleCode">Unvan kodu (1–4); adi referans veri cekirdegiyle gelecek.</param>
+/// <param name="StatusCode">Statu.</param>
+/// <param name="OccupationCode">SGK meslek kodu.</param>
+/// <param name="OccupationName">SGK meslek.</param>
+public sealed record WorkLifeResponse(
+    DateOnly Since,
+    string? City,
+    string? BranchName,
+    string? DepartmentName,
+    string? TitleCode,
+    string? StatusCode,
+    string? OccupationCode,
+    string? OccupationName);
 
 /// <summary>Kidem suresi (SYG-PERS-039).</summary>
 /// <param name="Years">Tam yil.</param>

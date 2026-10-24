@@ -2483,6 +2483,7 @@ export interface components {
             isActive: boolean;
             /** @description Kidem suresi. */
             seniority: components["schemas"]["SeniorityResponse"];
+            workLife: null | components["schemas"]["WorkLifeResponse"];
         };
         EntityTagHeaderValue: {
             tag?: components["schemas"]["StringSegment"];
@@ -2967,6 +2968,28 @@ export interface components {
         VerifyCodeRequest: {
             /** @description Girilen kod. */
             code: string;
+        };
+        /** @description Calisma hayati bolumu (SYG-PERS-038). Firma istihdamin kendisindedir. */
+        WorkLifeResponse: {
+            /**
+             * Format: date
+             * @description Bu niteliklerin gecerli oldugu donemin baslangici.
+             */
+            since: string;
+            /** @description Sehir (subenin sehri). */
+            city: null | string;
+            /** @description Sube. */
+            branchName: null | string;
+            /** @description Birim. */
+            departmentName: null | string;
+            /** @description Unvan kodu (1–4); adi referans veri cekirdegiyle gelecek. */
+            titleCode: null | string;
+            /** @description Statu. */
+            statusCode: null | string;
+            /** @description SGK meslek kodu. */
+            occupationCode: null | string;
+            /** @description SGK meslek. */
+            occupationName: null | string;
         };
     };
     responses: never;

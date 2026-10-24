@@ -28,6 +28,7 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 - **LOGO'dan T1 kişi alanları ve kurum tanımları (#280).** Cinsiyet, önceki soyadı (yalnızca kadın personelde), medeni hâl, eğitim ve adres senkronize edilir; şube (şehir dahil) ve birim tanımları HRMS'e alınır. Din ve sağlık alanları okunmaz. Senkronizasyon önce kişi ve istihdamı kaydeder; T1 adımı başarısız olursa bu değişiklikler kalır ve çalışma "kısmen tamamlandı" olarak kaydedilir. Henüz ekranda gösterilmiyor.
 - **Kişi kartında genel bilgiler ve adres (#282).** Kart API'si cinsiyet, önceki soyadı, medeni hâl ve eğitimi döndürür. Adres yalnızca İK'ya, Sistem Yöneticisine ve kişinin kendisine gider; diğer kullanıcıların yanıtında bu bölüm hiç yer almaz.
+- **Tarih aralıklı istihdam nitelikleri (#285, değişiklik talebi #284).** Firma, şube, birim, ünvan, statü ve SGK meslek bilgisi tarihleriyle tutulur. Değer değişince eski kayıt o gün kapanır; istihdam bitince açık kayıt çıkışın ertesi günü kapanır. Çakışan aralıkları veritabanı reddeder. Kartın her istihdam sekmesi güncel nitelikleri gösterir. Geçmiş, bu sürümün kurulduğu günden başlar.
 
 ### Değişti
 - **İK rolünün adı "İnsan Kaynakları" oldu ve T1 izinleri eklendi (#276).** İK artık senkronizasyonu elle de başlatabilir (`KR-126`); denetim kayıtlarını ve sistem parametrelerini de görür ve parametreleri değiştirebilir (#278, `KR-128`). Senkronizasyon izinlerinin kodu `identity.sync.*` iken `personnel.sync.*` oldu.

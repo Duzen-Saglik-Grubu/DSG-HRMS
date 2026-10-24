@@ -1542,6 +1542,106 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.EmploymentAssignment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("branch_id");
+
+                    b.Property<long>("CompanyId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("company_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_by");
+
+                    b.Property<long?>("DepartmentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("department_id");
+
+                    b.Property<long>("EmploymentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("employment_id");
+
+                    b.Property<string>("OccupationCode")
+                        .HasColumnType("text")
+                        .HasColumnName("occupation_code");
+
+                    b.Property<string>("OccupationName")
+                        .HasColumnType("text")
+                        .HasColumnName("occupation_name");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_id");
+
+                    b.Property<string>("StatusCode")
+                        .HasColumnType("text")
+                        .HasColumnName("status_code");
+
+                    b.Property<string>("TitleCode")
+                        .HasColumnType("text")
+                        .HasColumnName("title_code");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("updated_by");
+
+                    b.Property<DateOnly>("ValidFrom")
+                        .HasColumnType("date")
+                        .HasColumnName("valid_from");
+
+                    b.Property<DateOnly?>("ValidTo")
+                        .HasColumnType("date")
+                        .HasColumnName("valid_to");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_employment_assignment");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("ix_employment_assignment_branch_id");
+
+                    b.HasIndex("CompanyId")
+                        .HasDatabaseName("ix_employment_assignment_company_id");
+
+                    b.HasIndex("DepartmentId")
+                        .HasDatabaseName("ix_employment_assignment_department_id");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_employment_assignment_public_id");
+
+                    b.HasIndex("EmploymentId", "ValidFrom")
+                        .HasDatabaseName("ix_employment_assignment_employment_id_valid_from");
+
+                    b.ToTable("employment_assignment", "personnel", t =>
+                        {
+                            t.HasCheckConstraint("ck_employment_assignment_range", "valid_to IS NULL OR valid_to > valid_from");
+                        });
+                });
+
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.Person", b =>
                 {
                     b.Property<long>("Id")
@@ -2245,6 +2345,35 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                     b.Navigation("Company");
 
                     b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.EmploymentAssignment", b =>
+                {
+                    b.HasOne("Dsg.Hrms.Domain.Organization.Branch", null)
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_employment_assignment_branch_branch_id");
+
+                    b.HasOne("Dsg.Hrms.Domain.Organization.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_employment_assignment_company_company_id");
+
+                    b.HasOne("Dsg.Hrms.Domain.Organization.Department", null)
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_employment_assignment_department_department_id");
+
+                    b.HasOne("Dsg.Hrms.Domain.Personnel.Employment", null)
+                        .WithMany()
+                        .HasForeignKey("EmploymentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_employment_assignment_employment_employment_id");
                 });
 
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.PersonSensitive", b =>

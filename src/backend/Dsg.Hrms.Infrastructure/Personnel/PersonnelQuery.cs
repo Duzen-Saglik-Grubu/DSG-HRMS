@@ -1,4 +1,5 @@
 using Dsg.Hrms.Application.Personnel.Access;
+using Dsg.Hrms.Domain.Organization;
 using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -44,7 +45,54 @@ public sealed class PersonnelQuery(HrmsDbContext context) : IPersonnelQuery
         };
     }
 
-    private async Task<PersonRecord?> FirstAsync(IQueryable<Person> query, CancellationToken cancellationToken) =>
+    private async Task<PersonRecord?> FirstAsync(IQueryable<Person> query, CancellationToken cancellationToken)
+    {
+        var record = await ReadAsync(query, cancellationToken).ConfigureAwait(false);
+        if (record is null || record.Employments.Count == 0)
+        {
+            return record;
+        }
+
+        var current = await CurrentAssignmentsAsync([.. record.Employments.Select(e => e.Id)], cancellationToken).ConfigureAwait(false);
+        return record with
+        {
+            Employments = [.. record.Employments.Select(e => e with { Current = current.GetValueOrDefault(e.Id) })],
+        };
+    }
+
+    /// <summary>
+    /// Her istihdamin guncel donemi: acik kayit, yoksa en son kayit (SYG-PERS-038). Bitmis
+    /// istihdamda kartta son bilinen nitelikler gorunur.
+    /// </summary>
+    private async Task<Dictionary<long, AssignmentRecord>> CurrentAssignmentsAsync(long[] employmentIds, CancellationToken cancellationToken)
+    {
+        var rows = await (
+            from a in context.Set<EmploymentAssignment>().AsNoTracking()
+            where employmentIds.Contains(a.EmploymentId)
+            join c in context.Set<Company>() on a.CompanyId equals c.Id
+            join b in context.Set<Branch>() on a.BranchId equals (long?)b.Id into branches
+            from b in branches.DefaultIfEmpty()
+            join d in context.Set<Department>() on a.DepartmentId equals (long?)d.Id into departments
+            from d in departments.DefaultIfEmpty()
+                // Sol birlesimde eslesme yoksa EF alanlari SQL NULL olarak dondurur.
+            select new
+            {
+                a.EmploymentId,
+                Record = new AssignmentRecord(
+                    a.ValidFrom, a.ValidTo, c.Name, b.Name, b.City, d.Name,
+                    a.TitleCode, a.StatusCode, a.OccupationCode, a.OccupationName),
+            })
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return rows
+            .GroupBy(r => r.EmploymentId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.OrderByDescending(r => r.Record.ValidTo is null).ThenByDescending(r => r.Record.ValidFrom).First().Record);
+    }
+
+    private async Task<PersonRecord?> ReadAsync(IQueryable<Person> query, CancellationToken cancellationToken) =>
         await query
             .AsNoTracking()
             .Select(person => new PersonRecord(
@@ -57,7 +105,7 @@ public sealed class PersonnelQuery(HrmsDbContext context) : IPersonnelQuery
                 person.Email,
                 person.MobilePhone,
                 person.Employments
-                    .Select(e => new EmploymentRecord(e.RegistryCode, e.Company.Name, e.HireDate, e.TerminationDate, e.IsActive))
+                    .Select(e => new EmploymentRecord(e.Id, e.RegistryCode, e.Company.Name, e.HireDate, e.TerminationDate, e.IsActive))
                     .ToList(),
                 new PersonProfile(person.Gender, person.PreviousSurname, person.MaritalStatus, person.EducationName),
                 context.Set<PersonSensitive>().Where(s => s.PersonId == person.Id).Select(s => s.Address).FirstOrDefault()))

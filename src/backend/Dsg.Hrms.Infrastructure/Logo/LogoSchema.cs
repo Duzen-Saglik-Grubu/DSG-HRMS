@@ -57,6 +57,9 @@ public static class LogoSchema
     /// <summary>Tanim turu: egitim.</summary>
     public const short EducationDefinition = -5;
 
+    /// <summary>Tanim turu: SGK meslek (kod <c>EXP</c>, ad <c>DESC_</c>).</summary>
+    public const short OccupationDefinition = -44;
+
     /// <summary>Okunan tablolar; yetki ve sema denetimi bu listeyle yapilir.</summary>
     public static IReadOnlyList<string> Tables { get; } =
         [PersonTable, ContactTable, FirmTable, FamilyTable, IdentityInfoTable, TypeDefinitionTable, DivisionTable, DepartmentTable];
@@ -75,6 +78,11 @@ public static class LogoSchema
         new(PersonTable, "FIRMNR", "smallint"),
         new(PersonTable, "SEX", "smallint"),
         new(PersonTable, "EDUCATION", "smallint"),
+        new(PersonTable, "TITLE", "varchar"),
+        new(PersonTable, "SPECODE", "varchar"),
+        new(PersonTable, "JOBREF", "int"),
+        new(PersonTable, "LOCNR", "smallint"),
+        new(PersonTable, "DEPTNR", "smallint"),
         new(ContactTable, "LREF", "int"),
         new(ContactTable, "CARDREF", "int"),
         new(ContactTable, "TYP", "smallint"),
@@ -93,6 +101,7 @@ public static class LogoSchema
         new(TypeDefinitionTable, "TYP", "smallint"),
         new(TypeDefinitionTable, "NR", "smallint"),
         new(TypeDefinitionTable, "EXP", "varchar"),
+        new(TypeDefinitionTable, "DESC_", "varchar"),
         new(DivisionTable, "LOGICALREF", "int"),
         new(DivisionTable, "FIRMNR", "smallint"),
         new(DivisionTable, "NR", "smallint"),

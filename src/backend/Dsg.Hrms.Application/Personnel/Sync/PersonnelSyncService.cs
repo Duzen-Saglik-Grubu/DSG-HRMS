@@ -117,8 +117,12 @@ public sealed partial class PersonnelSyncService
 
             // T1 adimi ilk adim KAYDEDILDIKTEN sonra calisir (SYG-PERS-013, AN-07): burada
             // olusan hata kisi, istihdam ve hesap degisikliklerini geri almaz.
-            var (detailsUpdated, detailsFailure) = await RunDetailsStepAsync(session, cancellationToken).ConfigureAwait(false);
-            var counts = outcome.Counts with { PersonsUpdated = outcome.Counts.PersonsUpdated + detailsUpdated };
+            var (detailsUpdated, assignmentsChanged, detailsFailure) = await RunDetailsStepAsync(session, cancellationToken).ConfigureAwait(false);
+            var counts = outcome.Counts with
+            {
+                PersonsUpdated = outcome.Counts.PersonsUpdated + detailsUpdated,
+                EmploymentsUpdated = outcome.Counts.EmploymentsUpdated + assignmentsChanged,
+            };
 
             if (detailsFailure is { } reason)
             {
@@ -159,7 +163,7 @@ public sealed partial class PersonnelSyncService
     /// T1 adimi: genel bilgiler, adres, sube ve birim tanimlari (SYG-PERS-003). Hata firlatmaz;
     /// basarisizligi nedeniyle doner.
     /// </summary>
-    private async Task<(int Updated, SyncFailureReason? Failure)> RunDetailsStepAsync(
+    private async Task<(int Updated, int EmploymentsChanged, SyncFailureReason? Failure)> RunDetailsStepAsync(
         IPersonnelSyncSession session,
         CancellationToken cancellationToken)
     {
@@ -168,33 +172,39 @@ public sealed partial class PersonnelSyncService
             if (!await session.BeginNextStepAsync(cancellationToken).ConfigureAwait(false))
             {
                 LogDetailsStepYielded(_logger);
-                return (0, null);
+                return (0, 0, null);
             }
 
             var details = await _source.GetDetailsAsync(cancellationToken).ConfigureAwait(false);
             var snapshot = await session.LoadDetailsAsync(cancellationToken).ConfigureAwait(false);
             var outcome = PersonnelDetailsSynchronizer.Synchronize(details, snapshot);
-
             session.AddDetails(outcome);
+
+            // Yeni sube ve birimler kimlik alsin; atamalar onlara baglanir (SYG-PERS-018).
+            await session.SaveAsync(cancellationToken).ConfigureAwait(false);
+            var withUnits = await session.LoadDetailsAsync(cancellationToken).ConfigureAwait(false);
+            var (assignments, employmentsChanged) = PersonnelDetailsSynchronizer.SynchronizeAssignments(details, withUnits, _clock.Today);
+            session.AddAssignments(assignments);
+
             await session.CommitAsync(cancellationToken).ConfigureAwait(false);
-            return (outcome.PersonsUpdated, null);
+            return (outcome.PersonsUpdated, employmentsChanged, null);
         }
         catch (LogoUnavailableException ex)
         {
             LogDetailsStepFailed(_logger, ex);
-            return (0, SyncFailureReason.SourceUnavailable);
+            return (0, 0, SyncFailureReason.SourceUnavailable);
         }
         catch (SyncPersistenceException ex)
         {
             LogDetailsStepFailed(_logger, ex);
-            return (0, SyncFailureReason.PersistenceFailed);
+            return (0, 0, SyncFailureReason.PersistenceFailed);
         }
 #pragma warning disable CA1031 // Ilk adim kaydedildi; T1 adimindaki hata calismayi "kismen" kapatir.
         catch (Exception ex)
 #pragma warning restore CA1031
         {
             LogDetailsStepFailed(_logger, ex);
-            return (0, SyncFailureReason.Unexpected);
+            return (0, 0, SyncFailureReason.Unexpected);
         }
     }
 

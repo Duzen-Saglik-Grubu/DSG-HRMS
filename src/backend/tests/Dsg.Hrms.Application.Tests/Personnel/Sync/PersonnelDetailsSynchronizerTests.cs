@@ -108,7 +108,8 @@ public sealed class PersonnelDetailsSynchronizerTests
         var details = new LogoPersonnelDetails(
             [],
             [new LogoUnitRecord(1, 5, "Merkez Laboratuvar", "Ankara"), new LogoUnitRecord(1, 6, "Yeni Sube", null), new LogoUnitRecord(9, 1, "Firmasiz", null)],
-            [new LogoUnitRecord(1, 7, "Bilgi Islem", null)]);
+            [new LogoUnitRecord(1, 7, "Bilgi Islem", null)],
+            []);
 
         var outcome = PersonnelDetailsSynchronizer.Synchronize(details, Snapshot([], [], branches: [branch]));
 
@@ -121,7 +122,7 @@ public sealed class PersonnelDetailsSynchronizerTests
     private static LogoProfileRecord Profile(int logoRef, short? sex = 1, string? previousSurname = null, short? marital = 2, string? education = null, string? address = null) =>
         new(logoRef, sex, previousSurname, marital, education, address);
 
-    private static LogoPersonnelDetails Details(params LogoProfileRecord[] profiles) => new(profiles, [], []);
+    private static LogoPersonnelDetails Details(params LogoProfileRecord[] profiles) => new(profiles, [], [], []);
 
     private PersonnelDetailsSnapshot Snapshot(
         IReadOnlyList<Person> persons,
