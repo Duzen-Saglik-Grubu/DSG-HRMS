@@ -949,6 +949,272 @@
             "schema": {
               "$ref": "#/components/schemas/SortOrder"
             }
+          },
+          {
+            "name": "companyId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "branchId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "titleCode",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "dutyId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "statusCode",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "occupationCode",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "education",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "maritalStatus",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/MaritalStatusKind"
+              }
+            }
+          },
+          {
+            "name": "gender",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/GenderKind"
+              }
+            }
+          },
+          {
+            "name": "firstName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lastName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "previousSurname",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registryCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nationalId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "phone",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "address",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "birthDateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "birthDateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "hireDateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "hireDateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "terminationDateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "terminationDateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "ageMin",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "ageMax",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "seniorityMin",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "seniorityMax",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
           }
         ],
         "responses": {
@@ -968,6 +1234,36 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/persons/filter-options": {
+      "get": {
+        "tags": [
+          "Persons"
+        ],
+        "summary": "Suzgec secenekleri ve kullanicinin kullanabilecegi korumali suzgecler (SYG-PERS-024, 026).",
+        "responses": {
+          "200": {
+            "description": "Secenekler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonFilterOptionsResponse"
                 }
               }
             }
@@ -3373,12 +3669,30 @@
           }
         }
       },
+      "FilterOptionResponse": {
+        "required": [
+          "value",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Suzgece gonderilen deger."
+          },
+          "label": {
+            "type": "string",
+            "description": "Ad."
+          }
+        },
+        "description": "Bir secenek."
+      },
       "GenderKind": {
         "enum": [
           "male",
-          "female",
-          null
-        ]
+          "female"
+        ],
+        "description": "Cinsiyet."
       },
       "IFormFile": {
         "type": "string",
@@ -3451,9 +3765,9 @@
       "MaritalStatusKind": {
         "enum": [
           "married",
-          "notMarried",
-          null
-        ]
+          "notMarried"
+        ],
+        "description": "Medeni hal."
       },
       "PagedResponseOfAccountSummaryResponse": {
         "required": [
@@ -3875,6 +4189,96 @@
           }
         },
         "description": "Kisi karti."
+      },
+      "PersonFilterOptionsResponse": {
+        "required": [
+          "companies",
+          "cities",
+          "branches",
+          "departments",
+          "titles",
+          "duties",
+          "statuses",
+          "occupations",
+          "educations",
+          "canFilterByNationalId",
+          "canFilterBySensitive"
+        ],
+        "type": "object",
+        "properties": {
+          "companies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionResponse"
+            },
+            "description": "Firmalar."
+          },
+          "cities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionResponse"
+            },
+            "description": "Sehirler."
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionResponse"
+            },
+            "description": "Subeler."
+          },
+          "departments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionResponse"
+            },
+            "description": "Birimler."
+          },
+          "titles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionResponse"
+            },
+            "description": "Unvanlar."
+          },
+          "duties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionResponse"
+            },
+            "description": "Gorevler."
+          },
+          "statuses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionResponse"
+            },
+            "description": "Statuler."
+          },
+          "occupations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionResponse"
+            },
+            "description": "SGK meslekleri."
+          },
+          "educations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionResponse"
+            },
+            "description": "Egitim durumlari."
+          },
+          "canFilterByNationalId": {
+            "type": "boolean",
+            "description": "TCKN suzgeci sunulur mu."
+          },
+          "canFilterBySensitive": {
+            "type": "boolean",
+            "description": "Adres suzgeci sunulur mu."
+          }
+        },
+        "description": "Suzgec secenekleri (SYG-PERS-024, 026)."
       },
       "PersonListItemResponse": {
         "required": [

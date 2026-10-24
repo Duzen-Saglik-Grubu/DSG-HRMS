@@ -47,6 +47,8 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
             persons = Search(persons, term, PersonFieldVisibility.CanSearchByNationalId(viewer));
         }
 
+        persons = ApplyFilters(persons, criteria.Filters);
+
         var total = await persons.CountAsync(cancellationToken).ConfigureAwait(false);
 
         var ordered = (criteria.Sort, criteria.Descending) switch
@@ -106,6 +108,193 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
 
         return new PagedResult<PersonListItem>(items, Math.Max(1, criteria.Page.Page), criteria.Page.PageSize, total);
     }
+
+    /// <summary>
+    /// Suzgecler (SYG-PERS-024, 025). Her suzgec ayri kosuldur ve birlikte (VE) uygulanir; coklu secimde
+    /// secilenlerden herhangi biri yeter. Istihdam suzgecleri kisinin HERHANGI BIR sicilinin guncel
+    /// doneminde (baslangici en yeni kayit) eslesir (KR-126). Gorunurluk denetimi servistedir; bu metot
+    /// yalnizca izinli istekle cagrilir.
+    /// </summary>
+    private IQueryable<Person> ApplyFilters(IQueryable<Person> persons, PersonListFilters f)
+    {
+        var today = clock.Today;
+        var assignments = context.Set<EmploymentAssignment>();
+        var current = assignments.Where(a => a.ValidFrom == assignments.Where(x => x.EmploymentId == a.EmploymentId).Max(x => x.ValidFrom));
+        var employments = context.Set<Employment>();
+
+        IQueryable<Person> WithAssignment(IQueryable<Person> source, IQueryable<EmploymentAssignment> matching)
+        {
+            var ids = from a in matching join e in employments on a.EmploymentId equals e.Id select e.PersonId;
+            return source.Where(p => ids.Contains(p.Id));
+        }
+
+        if (f.CompanyIds.Count > 0)
+        {
+            var ids = context.Set<Company>().Where(c => f.CompanyIds.Contains(c.PublicId)).Select(c => c.Id);
+            persons = WithAssignment(persons, current.Where(a => ids.Contains(a.CompanyId)));
+        }
+
+        if (f.BranchIds.Count > 0)
+        {
+            var ids = context.Set<Branch>().Where(b => f.BranchIds.Contains(b.PublicId)).Select(b => (long?)b.Id);
+            persons = WithAssignment(persons, current.Where(a => ids.Contains(a.BranchId)));
+        }
+
+        if (f.Cities.Count > 0)
+        {
+            var ids = context.Set<Branch>().Where(b => b.City != null && f.Cities.Contains(b.City)).Select(b => (long?)b.Id);
+            persons = WithAssignment(persons, current.Where(a => ids.Contains(a.BranchId)));
+        }
+
+        if (f.DepartmentIds.Count > 0)
+        {
+            var ids = context.Set<Department>().Where(d => f.DepartmentIds.Contains(d.PublicId)).Select(d => (long?)d.Id);
+            persons = WithAssignment(persons, current.Where(a => ids.Contains(a.DepartmentId)));
+        }
+
+        if (f.TitleCodes.Count > 0)
+        {
+            persons = WithAssignment(persons, current.Where(a => a.TitleCode != null && f.TitleCodes.Contains(a.TitleCode)));
+        }
+
+        if (f.StatusCodes.Count > 0)
+        {
+            persons = WithAssignment(persons, current.Where(a => a.StatusCode != null && f.StatusCodes.Contains(a.StatusCode)));
+        }
+
+        if (f.OccupationCodes.Count > 0)
+        {
+            persons = WithAssignment(persons, current.Where(a => a.OccupationCode != null && f.OccupationCodes.Contains(a.OccupationCode)));
+        }
+
+        if (f.DutyIds.Count > 0)
+        {
+            var duties = context.Set<EmploymentDuty>();
+            var definitionIds = context.Set<ReferenceDefinition>().Where(d => f.DutyIds.Contains(d.PublicId)).Select(d => d.Id);
+            var personIds =
+                from d in duties
+                where d.ValidFrom == duties.Where(x => x.EmploymentId == d.EmploymentId).Max(x => x.ValidFrom)
+                      && definitionIds.Contains(d.DutyDefinitionId)
+                join e in employments on d.EmploymentId equals e.Id
+                select e.PersonId;
+            persons = persons.Where(p => personIds.Contains(p.Id));
+        }
+
+        if (f.Educations.Count > 0)
+        {
+            persons = persons.Where(p => p.EducationName != null && f.Educations.Contains(p.EducationName));
+        }
+
+        if (f.MaritalStatuses.Count > 0)
+        {
+            persons = persons.Where(p => p.MaritalStatus != null && f.MaritalStatuses.Contains(p.MaritalStatus.Value));
+        }
+
+        if (f.Genders.Count > 0)
+        {
+            persons = persons.Where(p => p.Gender != null && f.Genders.Contains(p.Gender.Value));
+        }
+
+        if (Folded(f.FirstName) is { } firstName)
+        {
+            persons = persons.Where(p => HrmsDbFunctions.Fold(p.FirstName).Contains(firstName));
+        }
+
+        if (Folded(f.LastName) is { } lastName)
+        {
+            persons = persons.Where(p => HrmsDbFunctions.Fold(p.LastName).Contains(lastName));
+        }
+
+        if (Folded(f.PreviousSurname) is { } previousSurname)
+        {
+            persons = persons.Where(p => p.PreviousSurname != null && HrmsDbFunctions.Fold(p.PreviousSurname).Contains(previousSurname));
+        }
+
+        if (Trimmed(f.RegistryCode) is { } registryCode)
+        {
+            persons = persons.Where(p => p.Employments.Any(e => e.RegistryCode.Contains(registryCode)));
+        }
+
+        if (Trimmed(f.NationalId) is { } nationalId)
+        {
+            persons = persons.Where(p => p.NationalId.Contains(nationalId));
+        }
+
+        if (Trimmed(f.Email)?.ToLowerInvariant() is { } email)
+        {
+            persons = persons.Where(p => p.Email != null && p.Email.Contains(email));
+        }
+
+        if (Trimmed(f.Phone) is { } phone)
+        {
+            // Numara basinda 0 olmadan tutulur; kullanici "0532..." yazsa da eslesir.
+            var digits = new string([.. phone.Where(char.IsAsciiDigit)]).TrimStart('0');
+            persons = persons.Where(p => p.MobilePhone != null && p.MobilePhone.Contains(digits));
+        }
+
+        if (Folded(f.Address) is { } address)
+        {
+            var ids = context.Set<PersonSensitive>().Where(s => s.Address != null && HrmsDbFunctions.Fold(s.Address).Contains(address)).Select(s => s.PersonId);
+            persons = persons.Where(p => ids.Contains(p.Id));
+        }
+
+        if (f.BirthDate is { } birth)
+        {
+            if (birth.From is { } from)
+            {
+                persons = persons.Where(p => p.BirthDate >= from);
+            }
+
+            if (birth.To is { } to)
+            {
+                persons = persons.Where(p => p.BirthDate <= to);
+            }
+        }
+
+        if (f.HireDate is { } hire)
+        {
+            persons = persons.Where(p => p.Employments.Any(e =>
+                (hire.From == null || e.HireDate >= hire.From) && (hire.To == null || e.HireDate <= hire.To)));
+        }
+
+        if (f.TerminationDate is { } termination)
+        {
+            persons = persons.Where(p => p.Employments.Any(e => e.TerminationDate != null &&
+                (termination.From == null || e.TerminationDate >= termination.From) && (termination.To == null || e.TerminationDate <= termination.To)));
+        }
+
+        if (f.Age is { } age)
+        {
+            // Yas >= min  <=>  dogum <= bugun - min yil; yas <= max  <=>  dogum > bugun - (max + 1) yil.
+            if (age.Min is { } min)
+            {
+                var latest = today.AddYears(-min);
+                persons = persons.Where(p => p.BirthDate <= latest);
+            }
+
+            if (age.Max is { } max)
+            {
+                var earliest = today.AddYears(-(max + 1));
+                persons = persons.Where(p => p.BirthDate > earliest);
+            }
+        }
+
+        if (f.SeniorityYears is { } seniority)
+        {
+            // Kidem bitisi: aktifte bugun, ayrilanda cikis gunu dahil (SYG-PERS-039).
+            var min = seniority.Min;
+            var max = seniority.Max;
+            persons = persons.Where(p => p.Employments.Any(e =>
+                (min == null || e.HireDate.AddYears(min.Value) <= (e.TerminationDate == null ? today : e.TerminationDate.Value.AddDays(1))) &&
+                (max == null || e.HireDate.AddYears(max.Value + 1) > (e.TerminationDate == null ? today : e.TerminationDate.Value.AddDays(1)))));
+        }
+
+        return persons;
+    }
+
+    private static string? Trimmed(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private static string? Folded(string? value) => string.IsNullOrWhiteSpace(value) ? null : SearchText.Fold(value);
 
     /// <summary>
     /// Hizli arama (SYG-PERS-030): ad, soyad ve gosterildigi kosulda onceki soyadi Turkce karaktersiz

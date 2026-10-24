@@ -3,6 +3,7 @@ using Dsg.Hrms.Api.Identity;
 using Dsg.Hrms.Application.Common.Paging;
 using Dsg.Hrms.Application.Personnel.Cards;
 using Dsg.Hrms.Application.Personnel.Listing;
+using Dsg.Hrms.Domain.Personnel;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,10 +60,21 @@ public sealed class PersonsController : ControllerBase
             request.Order == SortOrder.Desc,
             request.Page,
             request.PageSize,
+            request.ToFilters(),
             cancellationToken);
 
         return PagedResponse.From(result, PersonListItemResponse.From);
     }
+
+    /// <summary>
+    /// Suzgec secenekleri ve kullanicinin kullanabilecegi korumali suzgecler (SYG-PERS-024, 026).
+    /// </summary>
+    /// <response code="200">Secenekler.</response>
+    [HttpGet("filter-options")]
+    [ProducesResponseType<PersonFilterOptionsResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<PersonFilterOptionsResponse> FilterOptionsAsync(CancellationToken cancellationToken) =>
+        PersonFilterOptionsResponse.From(await _list.GetFilterOptionsAsync(cancellationToken));
 
     /// <summary>Kullanicinin kendi karti ("Profilim"). Izin gerektirmez.</summary>
     /// <response code="200">Kart.</response>
@@ -112,9 +124,195 @@ public sealed class PersonListRequest
     [FromQuery(Name = "order")]
     public SortOrder Order { get; init; } = SortOrder.Asc;
 
+    /// <summary>Firmalar (coklu; secilenlerden herhangi biri).</summary>
+    [FromQuery(Name = "companyId")]
+    public Guid[] CompanyIds { get; init; } = [];
+
+    /// <summary>Sehirler (coklu).</summary>
+    [FromQuery(Name = "city")]
+    public string[] Cities { get; init; } = [];
+
+    /// <summary>Subeler (coklu).</summary>
+    [FromQuery(Name = "branchId")]
+    public Guid[] BranchIds { get; init; } = [];
+
+    /// <summary>Birimler (coklu).</summary>
+    [FromQuery(Name = "departmentId")]
+    public Guid[] DepartmentIds { get; init; } = [];
+
+    /// <summary>Unvan kodlari (coklu).</summary>
+    [FromQuery(Name = "titleCode")]
+    public string[] TitleCodes { get; init; } = [];
+
+    /// <summary>Gorev tanimlari (coklu).</summary>
+    [FromQuery(Name = "dutyId")]
+    public Guid[] DutyIds { get; init; } = [];
+
+    /// <summary>Statuler (coklu).</summary>
+    [FromQuery(Name = "statusCode")]
+    public string[] StatusCodes { get; init; } = [];
+
+    /// <summary>SGK meslek kodlari (coklu).</summary>
+    [FromQuery(Name = "occupationCode")]
+    public string[] OccupationCodes { get; init; } = [];
+
+    /// <summary>Egitim (coklu).</summary>
+    [FromQuery(Name = "education")]
+    public string[] Educations { get; init; } = [];
+
+    /// <summary>Medeni hal (coklu: married, notMarried).</summary>
+    [FromQuery(Name = "maritalStatus")]
+    public MaritalStatusKind[] MaritalStatuses { get; init; } = [];
+
+    /// <summary>Cinsiyet (coklu: male, female).</summary>
+    [FromQuery(Name = "gender")]
+    public GenderKind[] Genders { get; init; } = [];
+
+    /// <summary>Ad (icinde gecen).</summary>
+    [FromQuery(Name = "firstName")]
+    public string? FirstName { get; init; }
+
+    /// <summary>Soyad (icinde gecen).</summary>
+    [FromQuery(Name = "lastName")]
+    public string? LastName { get; init; }
+
+    /// <summary>Onceki soyadi (icinde gecen).</summary>
+    [FromQuery(Name = "previousSurname")]
+    public string? PreviousSurname { get; init; }
+
+    /// <summary>Sicil (icinde gecen).</summary>
+    [FromQuery(Name = "registryCode")]
+    public string? RegistryCode { get; init; }
+
+    /// <summary>TCKN (icinde gecen); <c>personnel.person.view_national_id</c> izni gerekir.</summary>
+    [FromQuery(Name = "nationalId")]
+    public string? NationalId { get; init; }
+
+    /// <summary>Kurumsal e-posta (icinde gecen).</summary>
+    [FromQuery(Name = "email")]
+    public string? Email { get; init; }
+
+    /// <summary>Cep telefonu (icinde gecen).</summary>
+    [FromQuery(Name = "phone")]
+    public string? Phone { get; init; }
+
+    /// <summary>Adres (icinde gecen); <c>personnel.person.view_sensitive</c> izni gerekir.</summary>
+    [FromQuery(Name = "address")]
+    public string? Address { get; init; }
+
+    /// <summary>Dogum tarihi, baslangic (dahil).</summary>
+    [FromQuery(Name = "birthDateFrom")]
+    public DateOnly? BirthDateFrom { get; init; }
+
+    /// <summary>Dogum tarihi, bitis (dahil).</summary>
+    [FromQuery(Name = "birthDateTo")]
+    public DateOnly? BirthDateTo { get; init; }
+
+    /// <summary>Ise giris tarihi, baslangic (dahil).</summary>
+    [FromQuery(Name = "hireDateFrom")]
+    public DateOnly? HireDateFrom { get; init; }
+
+    /// <summary>Ise giris tarihi, bitis (dahil).</summary>
+    [FromQuery(Name = "hireDateTo")]
+    public DateOnly? HireDateTo { get; init; }
+
+    /// <summary>Isten cikis tarihi, baslangic (dahil).</summary>
+    [FromQuery(Name = "terminationDateFrom")]
+    public DateOnly? TerminationDateFrom { get; init; }
+
+    /// <summary>Isten cikis tarihi, bitis (dahil).</summary>
+    [FromQuery(Name = "terminationDateTo")]
+    public DateOnly? TerminationDateTo { get; init; }
+
+    /// <summary>Yas, en az.</summary>
+    [FromQuery(Name = "ageMin")]
+    public int? AgeMin { get; init; }
+
+    /// <summary>Yas, en cok.</summary>
+    [FromQuery(Name = "ageMax")]
+    public int? AgeMax { get; init; }
+
+    /// <summary>Kidem (tam yil), en az.</summary>
+    [FromQuery(Name = "seniorityMin")]
+    public int? SeniorityMin { get; init; }
+
+    /// <summary>Kidem (tam yil), en cok.</summary>
+    [FromQuery(Name = "seniorityMax")]
+    public int? SeniorityMax { get; init; }
+
+    /// <summary>Istegi uygulama katmaninin suzgec kumesine cevirir.</summary>
+    public PersonListFilters ToFilters() => new()
+    {
+        CompanyIds = CompanyIds,
+        Cities = Cities,
+        BranchIds = BranchIds,
+        DepartmentIds = DepartmentIds,
+        TitleCodes = TitleCodes,
+        DutyIds = DutyIds,
+        StatusCodes = StatusCodes,
+        OccupationCodes = OccupationCodes,
+        Educations = Educations,
+        MaritalStatuses = [.. MaritalStatuses.Select(m => m == MaritalStatusKind.Married ? MaritalStatus.Married : MaritalStatus.NotMarried)],
+        Genders = [.. Genders.Select(g => g == GenderKind.Female ? Gender.Female : Gender.Male)],
+        FirstName = FirstName,
+        LastName = LastName,
+        PreviousSurname = PreviousSurname,
+        RegistryCode = RegistryCode,
+        NationalId = NationalId,
+        Email = Email,
+        Phone = Phone,
+        Address = Address,
+        BirthDate = BirthDateFrom is null && BirthDateTo is null ? null : new DateRange(BirthDateFrom, BirthDateTo),
+        HireDate = HireDateFrom is null && HireDateTo is null ? null : new DateRange(HireDateFrom, HireDateTo),
+        TerminationDate = TerminationDateFrom is null && TerminationDateTo is null ? null : new DateRange(TerminationDateFrom, TerminationDateTo),
+        Age = AgeMin is null && AgeMax is null ? null : new NumberRange(AgeMin, AgeMax),
+        SeniorityYears = SeniorityMin is null && SeniorityMax is null ? null : new NumberRange(SeniorityMin, SeniorityMax),
+    };
+
     /// <inheritdoc />
     public override string ToString() => nameof(PersonListRequest);
 }
+
+/// <summary>Suzgec secenekleri (SYG-PERS-024, 026).</summary>
+/// <param name="Companies">Firmalar.</param>
+/// <param name="Cities">Sehirler.</param>
+/// <param name="Branches">Subeler.</param>
+/// <param name="Departments">Birimler.</param>
+/// <param name="Titles">Unvanlar.</param>
+/// <param name="Duties">Gorevler.</param>
+/// <param name="Statuses">Statuler.</param>
+/// <param name="Occupations">SGK meslekleri.</param>
+/// <param name="Educations">Egitim durumlari.</param>
+/// <param name="CanFilterByNationalId">TCKN suzgeci sunulur mu.</param>
+/// <param name="CanFilterBySensitive">Adres suzgeci sunulur mu.</param>
+public sealed record PersonFilterOptionsResponse(
+    IReadOnlyList<FilterOptionResponse> Companies,
+    IReadOnlyList<FilterOptionResponse> Cities,
+    IReadOnlyList<FilterOptionResponse> Branches,
+    IReadOnlyList<FilterOptionResponse> Departments,
+    IReadOnlyList<FilterOptionResponse> Titles,
+    IReadOnlyList<FilterOptionResponse> Duties,
+    IReadOnlyList<FilterOptionResponse> Statuses,
+    IReadOnlyList<FilterOptionResponse> Occupations,
+    IReadOnlyList<FilterOptionResponse> Educations,
+    bool CanFilterByNationalId,
+    bool CanFilterBySensitive)
+{
+    /// <summary>Uygulama katmanindan yanit kurar.</summary>
+    public static PersonFilterOptionsResponse From(PersonFilterOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        static IReadOnlyList<FilterOptionResponse> Map(IReadOnlyList<FilterOption> items) => [.. items.Select(i => new FilterOptionResponse(i.Value, i.Label))];
+        return new(Map(options.Companies), Map(options.Cities), Map(options.Branches), Map(options.Departments), Map(options.Titles),
+            Map(options.Duties), Map(options.Statuses), Map(options.Occupations), Map(options.Educations),
+            options.CanFilterByNationalId, options.CanFilterBySensitive);
+    }
+}
+
+/// <summary>Bir secenek.</summary>
+/// <param name="Value">Suzgece gonderilen deger.</param>
+/// <param name="Label">Ad.</param>
+public sealed record FilterOptionResponse(string Value, string Label);
 
 /// <summary>Calisma durumu suzgeci.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<EmploymentStatusKind>))]
@@ -161,6 +359,15 @@ public sealed class PersonListRequestValidator : AbstractValidator<PersonListReq
         RuleFor(r => r.Status).IsInEnum().WithMessage("Geçersiz çalışma durumu.");
         RuleFor(r => r.Sort).IsInEnum().WithMessage("Geçersiz sıralama alanı.");
         RuleFor(r => r.Order).IsInEnum().WithMessage("Geçersiz sıralama yönü.");
+        RuleForEach(r => r.MaritalStatuses).IsInEnum().WithMessage("Geçersiz medeni hâl.");
+        RuleForEach(r => r.Genders).IsInEnum().WithMessage("Geçersiz cinsiyet.");
+        RuleFor(r => r.AgeMin).InclusiveBetween(0, 120).When(r => r.AgeMin is not null).WithMessage("Yaş 0 ile 120 arasında olmalıdır.");
+        RuleFor(r => r.AgeMax).InclusiveBetween(0, 120).When(r => r.AgeMax is not null).WithMessage("Yaş 0 ile 120 arasında olmalıdır.");
+        RuleFor(r => r.SeniorityMin).InclusiveBetween(0, 80).When(r => r.SeniorityMin is not null).WithMessage("Kıdem 0 ile 80 yıl arasında olmalıdır.");
+        RuleFor(r => r.SeniorityMax).InclusiveBetween(0, 80).When(r => r.SeniorityMax is not null).WithMessage("Kıdem 0 ile 80 yıl arasında olmalıdır.");
+        RuleForEach(r => new[] { r.FirstName, r.LastName, r.PreviousSurname, r.RegistryCode, r.NationalId, r.Email, r.Phone, r.Address })
+            .MaximumLength(100).WithMessage("Süzgeç metni en fazla 100 karakter olabilir.")
+            .OverridePropertyName("filters");
     }
 }
 
