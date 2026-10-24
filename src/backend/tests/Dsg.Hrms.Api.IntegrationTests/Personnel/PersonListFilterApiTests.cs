@@ -51,11 +51,11 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
     public async Task Multi_select_matches_any_value_and_different_filters_apply_together()
     {
         // SYG-PERS-025 (PG-PERS-14, 15): secilenlerden herhangi biri; farkli suzgecler VE.
-        var (client, token) = await HrAsync();
+        var (client, jwt) = await HrAsync();
         using (client)
         {
-            (await CodesAsync(client, token, $"branchId={_seed.Merkez}&branchId={_seed.Bornova}")).ShouldBe(["00002", "00003", "00005"], ignoreOrder: true);
-            (await CodesAsync(client, token, $"branchId={_seed.Merkez}&departmentId={_seed.Laboratuvar}")).ShouldBe(["00005"]);
+            (await CodesAsync(client, jwt, $"branchId={_seed.Merkez}&branchId={_seed.Bornova}")).ShouldBe(["00002", "00003", "00005"], ignoreOrder: true);
+            (await CodesAsync(client, jwt, $"branchId={_seed.Merkez}&departmentId={_seed.Laboratuvar}")).ShouldBe(["00005"]);
         }
     }
 
@@ -63,31 +63,31 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
     public async Task Each_card_field_has_a_filter()
     {
         // SYG-PERS-024: kartta gosterilen her alan icin suzgec (bugun var olan alanlar).
-        var (client, token) = await HrAsync();
+        var (client, jwt) = await HrAsync();
         using (client)
         {
-            (await CodesAsync(client, token, "city=" + Uri.EscapeDataString("İzmir"))).ShouldBe(["00003"]);
-            (await CodesAsync(client, token, "titleCode=1&titleCode=2")).ShouldBe(["00002", "00003"], ignoreOrder: true);
-            (await CodesAsync(client, token, "statusCode=B")).ShouldBe(["00003"]);
-            (await CodesAsync(client, token, "occupationCode=2222.01")).ShouldBe(["00003"]);
-            (await CodesAsync(client, token, $"dutyId={_seed.Biologist}")).ShouldBe(["00003"]);
-            (await CodesAsync(client, token, $"companyId={_seed.Company}")).ShouldBe(["00002", "00003", "00005"], ignoreOrder: true);
-            (await CodesAsync(client, token, "gender=female")).ShouldBe(["00002"]);
-            (await CodesAsync(client, token, "maritalStatus=notMarried")).ShouldBe(["00003"]);
-            (await CodesAsync(client, token, "education=Lise")).ShouldBe(["00003"]);
-            (await CodesAsync(client, token, "lastName=" + Uri.EscapeDataString("çağ"))).ShouldBe(["00003"]);
-            (await CodesAsync(client, token, "registryCode=0005")).ShouldBe(["00005"]);
-            (await CodesAsync(client, token, "email=ortak@")).ShouldBe(["00003"]);
-            (await CodesAsync(client, token, "phone=0532%20123%2045%2068")).ShouldBe(["00003"]);
-            (await CodesAsync(client, token, "address=kizilay")).ShouldBe(["00002"]);
-            (await CodesAsync(client, token, $"nationalId={NationalId(5)[..6]}")).ShouldContain("00005");
-            (await CodesAsync(client, token, "hireDateFrom=2020-01-01&hireDateTo=2020-01-01")).Count.ShouldBe(4);
-            (await CodesAsync(client, token, "status=terminated&terminationDateFrom=2000-01-01")).ShouldBe(["00004"]);
-            (await CodesAsync(client, token, "birthDateFrom=1985-04-12&birthDateTo=1985-04-12")).Count.ShouldBe(4);
-            (await CodesAsync(client, token, "ageMin=41&ageMax=41")).Count.ShouldBe(4);
-            (await CodesAsync(client, token, "ageMin=42")).ShouldBeEmpty();
-            (await CodesAsync(client, token, "seniorityMin=6&seniorityMax=6")).Count.ShouldBe(4);
-            (await CodesAsync(client, token, "seniorityMin=7")).ShouldBeEmpty();
+            (await CodesAsync(client, jwt, "city=" + Uri.EscapeDataString("İzmir"))).ShouldBe(["00003"]);
+            (await CodesAsync(client, jwt, "titleCode=1&titleCode=2")).ShouldBe(["00002", "00003"], ignoreOrder: true);
+            (await CodesAsync(client, jwt, "statusCode=B")).ShouldBe(["00003"]);
+            (await CodesAsync(client, jwt, "occupationCode=2222.01")).ShouldBe(["00003"]);
+            (await CodesAsync(client, jwt, $"dutyId={_seed.Biologist}")).ShouldBe(["00003"]);
+            (await CodesAsync(client, jwt, $"companyId={_seed.Company}")).ShouldBe(["00002", "00003", "00005"], ignoreOrder: true);
+            (await CodesAsync(client, jwt, "gender=female")).ShouldBe(["00002"]);
+            (await CodesAsync(client, jwt, "maritalStatus=notMarried")).ShouldBe(["00003"]);
+            (await CodesAsync(client, jwt, "education=Lise")).ShouldBe(["00003"]);
+            (await CodesAsync(client, jwt, "lastName=" + Uri.EscapeDataString("çağ"))).ShouldBe(["00003"]);
+            (await CodesAsync(client, jwt, "registryCode=0005")).ShouldBe(["00005"]);
+            (await CodesAsync(client, jwt, "email=ortak@")).ShouldBe(["00003"]);
+            (await CodesAsync(client, jwt, "phone=0532%20123%2045%2068")).ShouldBe(["00003"]);
+            (await CodesAsync(client, jwt, "address=kizilay")).ShouldBe(["00002"]);
+            (await CodesAsync(client, jwt, $"nationalId={NationalId(5)[..6]}")).ShouldContain("00005");
+            (await CodesAsync(client, jwt, "hireDateFrom=2020-01-01&hireDateTo=2020-01-01")).Count.ShouldBe(4);
+            (await CodesAsync(client, jwt, "status=terminated&terminationDateFrom=2000-01-01")).ShouldBe(["00004"]);
+            (await CodesAsync(client, jwt, "birthDateFrom=1985-04-12&birthDateTo=1985-04-12")).Count.ShouldBe(4);
+            (await CodesAsync(client, jwt, "ageMin=41&ageMax=41")).Count.ShouldBe(4);
+            (await CodesAsync(client, jwt, "ageMin=42")).ShouldBeEmpty();
+            (await CodesAsync(client, jwt, "seniorityMin=6&seniorityMax=6")).Count.ShouldBe(4);
+            (await CodesAsync(client, jwt, "seniorityMin=7")).ShouldBeEmpty();
         }
     }
 
@@ -97,12 +97,12 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
         // SYG-PERS-026 (KR-116 madde 3): goremedigi alana gore suzen kullanici gizli degeri cikarirdi.
         await GrantRoleAsync(await CreateRoleAsync(Permissions.PersonView));
         using var client = _fixture.CreateClient();
-        var token = await SignInAsync(client);
+        var jwt = await SignInAsync(client);
 
-        (await SendAsync(client, $"{Persons}?address=kizilay", token)).Status.ShouldBe(HttpStatusCode.BadRequest);
-        (await SendAsync(client, $"{Persons}?nationalId=123", token)).Status.ShouldBe(HttpStatusCode.BadRequest);
+        (await SendAsync(client, $"{Persons}?address=kizilay", jwt)).Status.ShouldBe(HttpStatusCode.BadRequest);
+        (await SendAsync(client, $"{Persons}?nationalId=123", jwt)).Status.ShouldBe(HttpStatusCode.BadRequest);
 
-        var options = (await SendAsync(client, $"{Persons}/filter-options", token)).Body;
+        var options = (await SendAsync(client, $"{Persons}/filter-options", jwt)).Body;
         options.GetProperty("canFilterBySensitive").GetBoolean().ShouldBeFalse();
         options.GetProperty("canFilterByNationalId").GetBoolean().ShouldBeFalse();
         options.GetProperty("branches").EnumerateArray().Select(b => b.GetProperty("label").GetString()).ShouldBe(["Bornova", "Merkez"], ignoreOrder: true);
@@ -111,10 +111,10 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
     [Fact]
     public async Task Hr_is_offered_the_protected_filters()
     {
-        var (client, token) = await HrAsync();
+        var (client, jwt) = await HrAsync();
         using (client)
         {
-            var options = (await SendAsync(client, $"{Persons}/filter-options", token)).Body;
+            var options = (await SendAsync(client, $"{Persons}/filter-options", jwt)).Body;
 
             options.GetProperty("canFilterBySensitive").GetBoolean().ShouldBeTrue();
             options.GetProperty("canFilterByNationalId").GetBoolean().ShouldBeTrue();
@@ -127,12 +127,12 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
     public async Task Protected_filter_value_is_not_written_to_the_access_log()
     {
         // SYG-PERS-059 (B-01): korumali suzgecin degeri yazilmaz, yalnizca kullanildigi.
-        var (client, token) = await HrAsync();
+        var (client, jwt) = await HrAsync();
         using (client)
         {
             var before = await _fixture.WithDbAsync(context => context.AccessLog.MaxAsync(e => (long?)e.Id)) ?? 0;
 
-            await CodesAsync(client, token, "address=kizilay&statusCode=A");
+            await CodesAsync(client, jwt, "address=kizilay&statusCode=A");
 
             var entry = await _fixture.WithDbAsync(context => context.AccessLog.Where(e => e.Id > before).SingleAsync());
             entry.Filters.ShouldNotContain("kizilay");
@@ -207,14 +207,14 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
         context.Add(row);
     }
 
-    private static async Task<List<string?>> CodesAsync(HttpClient client, string token, string query)
+    private static async Task<List<string?>> CodesAsync(HttpClient client, string jwt, string query)
     {
-        var (status, body) = await SendAsync(client, $"{Persons}?{query}", token);
+        var (status, body) = await SendAsync(client, $"{Persons}?{query}", jwt);
         status.ShouldBe(HttpStatusCode.OK, query);
         return [.. body.GetProperty("items").EnumerateArray().Select(i => i.GetProperty("registryCode").GetString())];
     }
 
-    private async Task<(HttpClient Client, string Token)> HrAsync()
+    private async Task<(HttpClient Client, string Jwt)> HrAsync()
     {
         await GrantRoleAsync(Role.HrIdentityOperationsCode);
         var client = _fixture.CreateClient();
@@ -268,10 +268,10 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
         return body.GetProperty("session").GetProperty("accessToken").GetString()!;
     }
 
-    private static async Task<(HttpStatusCode Status, JsonElement Body)> SendAsync(HttpClient client, string path, string token)
+    private static async Task<(HttpStatusCode Status, JsonElement Body)> SendAsync(HttpClient client, string path, string jwt)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, new Uri(path, UriKind.Relative));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
         using var response = await client.SendAsync(request);
         var text = await response.Content.ReadAsStringAsync();
         return (response.StatusCode, string.IsNullOrEmpty(text) ? default : JsonDocument.Parse(text).RootElement.Clone());
