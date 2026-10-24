@@ -105,7 +105,13 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
 
         foreach (var body in new[] { started, code })
         {
-            var text = body.GetRawText();
+            // Rastgele deger tasiyan alanlar cikarilir: GUID veya zaman damgasi rastlantiyla
+            // "567" icerebilir ve test sebepsiz duserdi (#295). Hedef bu alanlarda tasinmaz.
+            var text = string.Join(
+                ',',
+                body.EnumerateObject()
+                    .Where(p => p.Name is not ("registrationId" or "expiresAt"))
+                    .Select(p => $"{p.Name}:{p.Value.GetRawText()}"));
             text.ShouldNotContain("ahmet");
             text.ShouldNotContain("5321234567");
             text.ShouldNotContain("567");
