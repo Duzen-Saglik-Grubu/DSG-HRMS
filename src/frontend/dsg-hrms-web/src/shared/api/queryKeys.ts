@@ -11,6 +11,11 @@ export const queryKeys = {
   system: {
     parameters: ['system', 'parameters'] as const,
   },
+  personnel: {
+    persons: ['personnel', 'persons'] as const,
+    list: (query: string) => ['personnel', 'persons', query] as const,
+    filterOptions: ['personnel', 'filter-options'] as const,
+  },
   identity: {
     publicSettings: ['identity', 'public-settings'] as const,
     twoFactor: ['identity', 'two-factor'] as const,

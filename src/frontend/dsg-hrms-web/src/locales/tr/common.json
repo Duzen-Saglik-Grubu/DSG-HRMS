@@ -6,7 +6,8 @@
   },
   "nav": {
     "home": "Ana Sayfa",
-    "openMenu": "Menüyü aç"
+    "openMenu": "Menüyü aç",
+    "personnel": "Personel"
   },
   "status": {
     "loading": "Yükleniyor…",
@@ -374,6 +375,113 @@
       "reset": "Varsayılana dön",
       "uploaded": "Logo yüklendi.",
       "removed": "Varsayılan logoya dönüldü."
+    }
+  },
+  "personnel": {
+    "list": {
+      "title": "Personel",
+      "subtitle": "Personeli arayın, süzün ve kart ya da tablo görünümünde inceleyin.",
+      "search": "Ad, soyad veya sicil",
+      "searchWithNationalId": "Ad, soyad, sicil veya TCKN",
+      "status": {
+        "label": "Çalışma durumu",
+        "active": "Aktif",
+        "terminated": "Ayrılan",
+        "all": "Tümü"
+      },
+      "view": {
+        "label": "Görünüm",
+        "grid": "Kart görünümü",
+        "table": "Tablo görünümü"
+      },
+      "sort": {
+        "label": "Sıralama",
+        "firstNameAsc": "Ad (A–Z)",
+        "firstNameDesc": "Ad (Z–A)",
+        "lastNameAsc": "Soyad (A–Z)",
+        "lastNameDesc": "Soyad (Z–A)"
+      },
+      "filters": "Süzgeçler",
+      "filtersWithCount": "Süzgeçler ({{count}})",
+      "clear": "Temizle",
+      "activeFilters": "Seçili süzgeçler",
+      "removeFilter": "{{label}} süzgecini kaldır",
+      "employmentCount": "{{count}} sicil",
+      "terminated": "Ayrıldı",
+      "photo": "{{name}} fotoğrafı",
+      "columns": {
+        "name": "Ad soyad",
+        "firstName": "Ad",
+        "lastName": "Soyad",
+        "registryCode": "Sicil",
+        "company": "Firma",
+        "unit": "Şube / Birim",
+        "role": "Ünvan / Görev",
+        "state": "Durum"
+      },
+      "pageSize": "Sayfa başına kişi:",
+      "emptyTitle": "Bu ölçütlere uyan personel yok",
+      "emptyText": "Aramayı veya süzgeçleri değiştirin; ayrılan personel için çalışma durumunu \"Ayrılan\" ya da \"Tümü\" yapın.",
+      "panel": {
+        "title": "Süzgeçler",
+        "apply": "Uygula",
+        "close": "Kapat",
+        "groups": {
+          "organization": "Kurum",
+          "personal": "Kişisel bilgiler",
+          "text": "Metinle ara",
+          "dates": "Tarihler",
+          "ranges": "Yaş ve kıdem"
+        },
+        "noOptions": "Seçenek yok",
+        "min": "En az",
+        "max": "En çok",
+        "years": "yıl",
+        "rangeError": "En az değeri en çok değerinden büyük olamaz."
+      },
+      "fields": {
+        "companyId": "Firma",
+        "city": "Şehir",
+        "branchId": "Şube",
+        "departmentId": "Birim",
+        "titleCode": "Ünvan",
+        "dutyId": "Görev",
+        "statusCode": "Statü",
+        "occupationCode": "SGK meslek",
+        "education": "Eğitim",
+        "gender": "Cinsiyet",
+        "maritalStatus": "Medeni hâl",
+        "firstName": "Ad",
+        "lastName": "Soyad",
+        "previousSurname": "Önceki soyadı",
+        "registryCode": "Sicil",
+        "nationalId": "TCKN",
+        "email": "E-posta",
+        "phone": "Telefon",
+        "address": "Adres",
+        "birthDate": "Doğum tarihi",
+        "hireDate": "İşe giriş tarihi",
+        "terminationDate": "Çıkış tarihi",
+        "age": "Yaş",
+        "seniority": "Kıdem"
+      },
+      "values": {
+        "gender": {
+          "female": "Kadın",
+          "male": "Erkek"
+        },
+        "maritalStatus": {
+          "married": "Evli",
+          "notMarried": "Bekâr"
+        }
+      },
+      "range": {
+        "between": "{{from}} – {{to}}",
+        "from": "{{from}} ve sonrası",
+        "to": "{{to}} ve öncesi",
+        "min": "en az {{min}}",
+        "max": "en çok {{max}}"
+      }
     }
   }
 }
