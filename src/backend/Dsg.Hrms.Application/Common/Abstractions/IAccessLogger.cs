@@ -58,6 +58,12 @@ public sealed record AccessRecord(
     int RecordCount,
     IReadOnlyDictionary<string, string?>? Filters)
 {
+    /// <summary>
+    /// Listeleme ve disa aktarmada verisi gosterilen kisilerin dis kimlikleri (ADR-0019 §5;
+    /// SYG-PERS-058).
+    /// </summary>
+    public IReadOnlyList<Guid> SubjectIds { get; init; } = [];
+
     /// <summary>Tek bir kaydin goruntulenmesi.</summary>
     public static AccessRecord View(string entityName, Guid entityId) =>
         new(AccessType.View, entityName, entityId, 1, null);

@@ -891,6 +891,100 @@
         }
       }
     },
+    "/api/v1/personnel/persons": {
+      "get": {
+        "tags": [
+          "Persons"
+        ],
+        "summary": "Personel listesi: kart izgarasi ve tablo icin (SYG-PERS-022, 023, 027–031). Varsayilan olarak\nyalnizca aktif personel; kapsam disindaki kisiler listede yoktur.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/EmploymentStatusKind"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PersonSortField"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sayfalanmis liste.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResponseOfPersonListItemResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz sayfa, siralama veya sayfa boyutu parametredeki en buyuk degerden fazla.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/me": {
       "get": {
         "tags": [
@@ -3219,6 +3313,14 @@
         },
         "description": "Kartta bir istihdam."
       },
+      "EmploymentStatusKind": {
+        "enum": [
+          "active",
+          "terminated",
+          "all"
+        ],
+        "description": "Calisma durumu suzgeci."
+      },
       "EntityTagHeaderValue": {
         "type": "object",
         "properties": {
@@ -3423,6 +3525,62 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ParameterResponse"
+            },
+            "description": "Bu sayfadaki kayitlar."
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa numarasi.",
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa boyutu.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam kayit sayisi.",
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam sayfa sayisi.",
+            "format": "int32"
+          }
+        },
+        "description": "Sayfalanmis yanit (ADR-0010 §4)."
+      },
+      "PagedResponseOfPersonListItemResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonListItemResponse"
             },
             "description": "Bu sayfadaki kayitlar."
           },
@@ -3717,6 +3875,100 @@
           }
         },
         "description": "Kisi karti."
+      },
+      "PersonListItemResponse": {
+        "required": [
+          "personId",
+          "firstName",
+          "lastName",
+          "isActive",
+          "employmentCount",
+          "registryCode",
+          "companyName",
+          "branchName",
+          "departmentName",
+          "titleName",
+          "dutyName"
+        ],
+        "type": "object",
+        "properties": {
+          "personId": {
+            "type": "string",
+            "description": "Dis kimlik.",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Ad."
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Soyad."
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "En az bir aktif sicili var mi."
+          },
+          "employmentCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sicil sayisi; 2 ve uzeri kartta \"X sicil\" isaretidir (KR-126).",
+            "format": "int32"
+          },
+          "registryCode": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Esas istihdamin sicili."
+          },
+          "companyName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Firma."
+          },
+          "branchName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Sube."
+          },
+          "departmentName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Birim."
+          },
+          "titleName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Unvan."
+          },
+          "dutyName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Gorev."
+          }
+        },
+        "description": "Listedeki kisi karti (SYG-PERS-023)."
+      },
+      "PersonSortField": {
+        "enum": [
+          "firstName",
+          "lastName"
+        ],
+        "description": "Liste siralama alani."
       },
       "ProblemDetails": {
         "type": "object",

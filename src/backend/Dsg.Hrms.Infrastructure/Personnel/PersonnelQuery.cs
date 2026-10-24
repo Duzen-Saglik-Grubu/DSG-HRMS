@@ -1,4 +1,8 @@
+using Dsg.Hrms.Application.Common.Abstractions;
+using Dsg.Hrms.Application.Common.Paging;
 using Dsg.Hrms.Application.Personnel.Access;
+using Dsg.Hrms.Application.Personnel.Listing;
+using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Organization;
 using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Domain.Reference;
@@ -11,14 +15,127 @@ namespace Dsg.Hrms.Infrastructure.Personnel;
 /// Kisi okumalarinin tek giris noktasi (ADR-0019 §1, SYG-PERS-050). Kapsam suzgeci her
 /// sorguya burada eklenir.
 /// </summary>
-public sealed class PersonnelQuery(HrmsDbContext context) : IPersonnelQuery
+public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters parameters, IDateTimeProvider clock) : IPersonnelQuery
 {
     /// <inheritdoc />
-    public Task<PersonRecord?> FindAsync(Guid personId, PersonnelViewer viewer, CancellationToken cancellationToken)
+    public async Task<PersonRecord?> FindAsync(Guid personId, PersonnelViewer viewer, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(viewer);
 
-        return FirstAsync(InScope(viewer).Where(person => person.PublicId == personId), cancellationToken);
+        // Gorunur kalma suresi dolan ayrilan kisinin karti herkes icin 404'tur (SYG-PERS-028).
+        var persons = await VisibleAsync(InScope(viewer), cancellationToken).ConfigureAwait(false);
+        return await FirstAsync(persons.Where(person => person.PublicId == personId), cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedResult<PersonListItem>> ListAsync(PersonnelViewer viewer, PersonListCriteria criteria, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(viewer);
+        ArgumentNullException.ThrowIfNull(criteria);
+
+        var persons = await VisibleAsync(InScope(viewer), cancellationToken).ConfigureAwait(false);
+
+        persons = criteria.Status switch
+        {
+            EmploymentStatusFilter.Active => persons.Where(p => p.Employments.Any(e => e.IsActive)),
+            EmploymentStatusFilter.Terminated => persons.Where(p => !p.Employments.Any(e => e.IsActive)),
+            _ => persons,
+        };
+
+        if (criteria.Search is { } term)
+        {
+            persons = Search(persons, term, PersonFieldVisibility.CanSearchByNationalId(viewer));
+        }
+
+        var total = await persons.CountAsync(cancellationToken).ConfigureAwait(false);
+
+        var ordered = (criteria.Sort, criteria.Descending) switch
+        {
+            (PersonSort.LastName, false) => persons.OrderBy(p => p.LastName).ThenBy(p => p.FirstName),
+            (PersonSort.LastName, true) => persons.OrderByDescending(p => p.LastName).ThenByDescending(p => p.FirstName),
+            (_, true) => persons.OrderByDescending(p => p.FirstName).ThenByDescending(p => p.LastName),
+            _ => persons.OrderBy(p => p.FirstName).ThenBy(p => p.LastName),
+        };
+
+        var page = await ordered
+            .ThenBy(p => p.Id)
+            .Skip(criteria.Page.Skip)
+            .Take(criteria.Page.PageSize)
+            .Select(p => new { p.Id, p.PublicId, p.FirstName, p.LastName })
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        long[] personIds = [.. page.Select(p => p.Id)];
+        var employments = await context.Set<Employment>()
+            .AsNoTracking()
+            .Include(e => e.Company)
+            .Where(e => personIds.Contains(e.PersonId))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        var byPerson = employments.ToLookup(e => e.PersonId);
+
+        // Kartta gosterilen esas istihdam (KR-126); nitelikleri yalnizca bu sayfa icin okunur.
+        var primaries = page
+            .Select(p => (p.Id, Primary: Employment.Primary(byPerson[p.Id])))
+            .Where(x => x.Primary is not null)
+            .ToDictionary(x => x.Id, x => x.Primary!);
+        long[] primaryIds = [.. primaries.Values.Select(e => e.Id)];
+        var assignments = await CurrentAssignmentsAsync(primaryIds, cancellationToken).ConfigureAwait(false);
+        var duties = await CurrentDutiesAsync(primaryIds, cancellationToken).ConfigureAwait(false);
+
+        var items = page.Select(p =>
+        {
+            var primary = primaries.GetValueOrDefault(p.Id);
+            var current = primary is null ? null : assignments.GetValueOrDefault(primary.Id);
+            return new PersonListItem(
+                p.PublicId,
+                p.FirstName,
+                p.LastName,
+                byPerson[p.Id].Any(e => e.IsActive),
+                byPerson[p.Id].Count(),
+                primary is null
+                    ? null
+                    : new PrimaryEmployment(
+                        primary.RegistryCode,
+                        current?.CompanyName ?? primary.Company.Name,
+                        current?.BranchName,
+                        current?.DepartmentName,
+                        current?.TitleName,
+                        primary is null ? null : duties.GetValueOrDefault(primary.Id)?.Name));
+        }).ToList();
+
+        return new PagedResult<PersonListItem>(items, Math.Max(1, criteria.Page.Page), criteria.Page.PageSize, total);
+    }
+
+    /// <summary>
+    /// Hizli arama (SYG-PERS-030): ad, soyad ve gosterildigi kosulda onceki soyadi Turkce karaktersiz
+    /// arama anahtarinda; sicil numarasinda; izin varsa TCKN'de. Hepsi "icinde gecen" aramadir.
+    /// </summary>
+    private static IQueryable<Person> Search(IQueryable<Person> persons, string term, bool nationalId)
+    {
+        var folded = SearchText.Fold(term);
+        var digits = term.All(char.IsAsciiDigit);
+
+        return nationalId && digits
+            ? persons.Where(p => p.SearchKey.Contains(folded) || p.Employments.Any(e => e.RegistryCode.Contains(term)) || p.NationalId.Contains(term))
+            : persons.Where(p => p.SearchKey.Contains(folded) || p.Employments.Any(e => e.RegistryCode.Contains(term)));
+    }
+
+    /// <summary>
+    /// Ayrilan kisinin gorunur kalma suresi (PG-PERS-38, KR-114, KR-126): en az bir aktif sicili olan
+    /// kisi her zaman gorunur; olmayan, son cikis tarihinden itibaren parametredeki sure boyunca. Bos
+    /// parametre suresizdir.
+    /// </summary>
+    private async Task<IQueryable<Person>> VisibleAsync(IQueryable<Person> persons, CancellationToken cancellationToken)
+    {
+        var years = await parameters.GetOptionalIntegerAsync(ParameterCatalog.TerminatedVisibilityYears, cancellationToken).ConfigureAwait(false);
+        if (years is null)
+        {
+            return persons;
+        }
+
+        var cutoff = clock.Today.AddYears(-years.Value);
+        return persons.Where(p => p.Employments.Any(e => e.IsActive) || p.Employments.Max(e => e.TerminationDate) >= cutoff);
     }
 
     /// <inheritdoc />

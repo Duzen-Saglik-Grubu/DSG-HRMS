@@ -33,6 +33,12 @@ public sealed class AccessLogEntryConfiguration : IEntityTypeConfiguration<Acces
             .HasColumnType("jsonb")
             .IsRequired();
 
+        // Listede gosterilen kisiler (ADR-0019 §5). Kisi bazli "kim gordu" sorgusu dizinle yapilir.
+        builder.Property(entry => entry.SubjectIds)
+            .HasColumnType("uuid[]")
+            .IsRequired();
+        builder.HasIndex(entry => entry.SubjectIds).HasMethod("gin");
+
         // "Bu kullanici bugun kimin verisine baktı?"
         builder.HasIndex(entry => new { entry.UserAccountId, entry.OccurredAt });
 

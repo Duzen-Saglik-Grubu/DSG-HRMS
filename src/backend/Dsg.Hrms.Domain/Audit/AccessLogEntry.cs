@@ -55,6 +55,13 @@ public sealed class AccessLogEntry
     /// </remarks>
     public required string Filters { get; init; }
 
+    /// <summary>
+    /// Listeleme ve disa aktarmada verisi gosterilen kisilerin dis kimlikleri (ADR-0019 §5;
+    /// SYG-PERS-033, 058). "Verilerimi kim gordu" sorusu listeler icin de cevaplanir. Tek kayit
+    /// erisiminde bos; kimlik <see cref="EntityId"/>'dedir.
+    /// </summary>
+    public IReadOnlyList<Guid> SubjectIds { get; init; } = [];
+
     /// <summary>Uygulama logu ile iliskilendirme kimligi.</summary>
     public string? TraceId { get; init; }
 

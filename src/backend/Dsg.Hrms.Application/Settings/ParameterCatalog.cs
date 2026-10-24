@@ -176,6 +176,26 @@ public static partial class ParameterCatalog
         "PRM-GRN-04", $"{Section}:SupportContact", ParameterType.Text, "Destek iletisim bilgisi (uyelik ve giris ekranlari)",
         "Bilgi İşlem");
 
+    /// <summary>Kart izgarasinin ve listelerin varsayilan sayfa boyutu (PG-PERS-17, S-07; SYG-PERS-029).</summary>
+    public static readonly ParameterDefinition DefaultPageSize = Integer(
+        "PRM-GRN-02", "DefaultPageSize", "Listelerin varsayilan sayfa boyutu (kart izgarasi)", 24, 6, PagedResultLimit);
+
+    /// <summary>
+    /// En buyuk sayfa boyutu (PG-PERS-17; SYG-PERS-029). Koddaki 100 tavanini asamaz: tavan, tek
+    /// istekte butun listeyi cekmeyi onleyen guvenlik sinirdir (ADR-0010 §4).
+    /// </summary>
+    public static readonly ParameterDefinition MaxPageSize = Integer(
+        "PRM-GRN-03", "MaxPageSize", "Listelerin en buyuk sayfa boyutu", PagedResultLimit, 24, PagedResultLimit);
+
+    /// <summary>
+    /// Ayrilan personelin gorunur kalma suresi, yil (PG-PERS-38, KR-114; SYG-PERS-028). Bos = suresiz;
+    /// sure son cikis tarihinden baslar (KR-126).
+    /// </summary>
+    public static readonly ParameterDefinition TerminatedVisibilityYears = new(
+        "PRM-PRS-01", $"{Section}:TerminatedVisibilityYears", ParameterType.Number,
+        "Ayrilan personelin listede ve kartta gorunur kalma suresi (yil; bos = suresiz)",
+        DefaultValue: null, Min: 1, Max: 50, AllowEmpty: true);
+
     /// <summary>Bildirim istisnasinin islemsel iletileri kapsamamasi.</summary>
     public static readonly ParameterDefinition TransactionalMessagesBypassExemption = Boolean(
         "PRM-BLD-03", "TransactionalMessagesBypassExemption", "Bildirim istisnasinin islemsel iletileri kapsamamasi", true);
@@ -193,12 +213,16 @@ public static partial class ParameterCatalog
             RegistrationLimitPerNationalId, RegistrationLimitPerIp, RequirePasswordChangeOnFirstLogin, PasswordMaxAgeDays,
             HrInviteEnabled, AutoDeactivateOnEmploymentEnd, InviteLinkLifetimeHours,
             SupportContact, TransactionalMessagesBypassExemption,
+            DefaultPageSize, MaxPageSize, TerminatedVisibilityYears,
         }.OrderBy(p => p.Key, StringComparer.Ordinal),
     ];
 
     /// <summary>Kimlige gore tanimi bulur; katalogda yoksa <c>null</c>.</summary>
     public static ParameterDefinition? Find(string key) =>
         All.FirstOrDefault(p => string.Equals(p.Key, key, StringComparison.Ordinal));
+
+    /// <summary>Koddaki sayfa boyutu tavani (ADR-0010 §4).</summary>
+    private const int PagedResultLimit = Common.Paging.PagedResult<object>.MaxPageSize;
 
     private static ParameterDefinition Integer(string key, string name, string description, int @default, int min, int max) =>
         new(key, $"{Section}:{name}", ParameterType.Number, description,
