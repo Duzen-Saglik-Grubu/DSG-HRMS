@@ -123,11 +123,15 @@ public static class PersonnelDetailsSynchronizer
         var branches = snapshot.Branches.ToDictionary(b => (b.CompanyId, b.LogoNumber), b => b.Id);
         var departments = snapshot.Departments.ToDictionary(d => (d.CompanyId, d.LogoNumber), d => d.Id);
         var existing = snapshot.Assignments.ToLookup(a => a.EmploymentId);
+        var duties = snapshot.Duties.ToLookup(d => d.EmploymentId);
         var added = new List<EmploymentAssignment>();
         var changed = 0;
 
         foreach (var employment in snapshot.Employments)
         {
+            // Istihdam bitince HRMS'te girilen acik gorev de cikisin ertesi gunu kapanir (SYG-PERS-021).
+            changed += DutyTimeline.CloseOnTermination(employment, [.. duties[employment.Id]]) ? 1 : 0;
+
             if (!records.TryGetValue(employment.LogoRef, out var record))
             {
                 continue;
@@ -200,6 +204,9 @@ public sealed record PersonnelDetailsSnapshot(
 {
     /// <summary>Tarih aralikli kayitlar (izlenen).</summary>
     public IReadOnlyList<EmploymentAssignment> Assignments { get; init; } = [];
+
+    /// <summary>Silinmemis gorev kayitlari (izlenen).</summary>
+    public IReadOnlyList<EmploymentDuty> Duties { get; init; } = [];
 }
 
 /// <summary>T1 adiminin sonucu.</summary>

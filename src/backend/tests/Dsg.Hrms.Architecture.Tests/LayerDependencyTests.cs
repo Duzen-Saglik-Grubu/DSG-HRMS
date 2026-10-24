@@ -256,6 +256,7 @@ public sealed class LayerDependencyTests
         // Referans veri cekirdegi (ADR-0022 §1, KR-115).
         ["Infrastructure: Personnel -> Reference"] = "kartta unvan adi referans veriden (SYG-PERS-038)",
         ["Api: Reference -> Identity"] = "referans veri uclarinda yetki ozniteligi ve izin kodlari (SYG-PERS-072)",
+        ["Api: Personnel -> Identity"] = "gorev girisi ucunda yetki ozniteligi ve izin kodlari (SYG-PERS-042)",
     };
 
     [Fact]

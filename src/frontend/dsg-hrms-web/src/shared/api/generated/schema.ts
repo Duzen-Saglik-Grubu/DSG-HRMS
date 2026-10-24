@@ -651,6 +651,172 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Istihdama gorev atar; onceki acik gorev yeni baslangicla kapanir. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                    registryCode: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AssignDutyRequest"];
+                    "text/json": components["schemas"]["AssignDutyRequest"];
+                    "application/*+json": components["schemas"]["AssignDutyRequest"];
+                };
+            };
+            responses: {
+                /** @description Gecerli gorev kaydi. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DutyResponse"];
+                    };
+                };
+                /** @description Gorev tanimi secilmedi. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.person.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi veya istihdam yok ya da kapsam disi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Baska bir gorev donemiyle cakisiyor veya acik gorevden once basliyor. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Tarih istihdam araligi disinda ya da tanim pasif. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties/{dutyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Gorev kaydini siler (yanlis girisi duzeltmek icin; kayit yumusak silinir). */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                    registryCode: string;
+                    dutyId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Silindi. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.person.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi, istihdam veya gorev kaydi yok ya da kapsam disi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/me": {
         parameters: {
             query?: never;
@@ -2725,6 +2891,19 @@ export interface components {
             /** @description Kisinin iki adimli dogrulama tercihi acik mi; hesap yoksa `false` (SYG-KMLK-081). */
             twoFactorEnabled: boolean;
         };
+        /** @description Gorev atama istegi. */
+        AssignDutyRequest: {
+            /**
+             * Format: uuid
+             * @description Gorev taniminin dis kimligi (referans veri, tur gorev).
+             */
+            definitionId: string;
+            /**
+             * Format: date
+             * @description Baslangic; verilmezse bugun.
+             */
+            validFrom: null | string;
+        };
         /** @description Oturum icinde parola degisikligi istegi (SYG-KMLK-048). */
         ChangePasswordRequest: {
             /** @description Mevcut parola. */
@@ -2754,6 +2933,26 @@ export interface components {
             /** @description Ad. */
             name: string;
         };
+        /** @description Gorev kaydi. */
+        DutyResponse: {
+            /**
+             * Format: uuid
+             * @description Dis kimlik.
+             */
+            id: string;
+            /** @description Gorev. */
+            name: string;
+            /**
+             * Format: date
+             * @description Baslangic.
+             */
+            validFrom: string;
+            /**
+             * Format: date
+             * @description Bitis (haric); acikse bos.
+             */
+            validTo: null | string;
+        };
         /** @description Kartta bir istihdam. */
         EmploymentCardResponse: {
             /** @description Sicil numarasi. */
@@ -2775,6 +2974,7 @@ export interface components {
             /** @description Kidem suresi. */
             seniority: components["schemas"]["SeniorityResponse"];
             workLife: null | components["schemas"]["WorkLifeResponse"];
+            duty: null | components["schemas"]["DutyResponse"];
         };
         EntityTagHeaderValue: {
             tag?: components["schemas"]["StringSegment"];

@@ -178,10 +178,12 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
             var branches = await context.Set<Branch>().ToListAsync(cancellationToken).ConfigureAwait(false);
             var departments = await context.Set<Department>().ToListAsync(cancellationToken).ConfigureAwait(false);
             var assignments = await context.Set<EmploymentAssignment>().ToListAsync(cancellationToken).ConfigureAwait(false);
+            var duties = await context.Set<EmploymentDuty>().ToListAsync(cancellationToken).ConfigureAwait(false);
 
             return new PersonnelDetailsSnapshot(companies, persons, employments, sensitive, branches, departments)
             {
                 Assignments = assignments,
+                Duties = duties,
             };
         }
 

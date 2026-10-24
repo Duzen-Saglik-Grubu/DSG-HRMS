@@ -68,7 +68,17 @@ public sealed record EmploymentRecord(
 {
     /// <summary>Istihdamin guncel tarih aralikli nitelikleri; T1 oncesi veya hic gorulmediyse <c>null</c>.</summary>
     public AssignmentRecord? Current { get; init; }
+
+    /// <summary>Istihdamin guncel gorevi (acik kayit, yoksa en son kayit); girilmediyse <c>null</c>.</summary>
+    public DutyRecord? CurrentDuty { get; init; }
 }
+
+/// <summary>Bir gorev donemi (SYG-PERS-042).</summary>
+/// <param name="Id">Gorev kaydinin dis kimligi.</param>
+/// <param name="Name">Gorev.</param>
+/// <param name="ValidFrom">Baslangic.</param>
+/// <param name="ValidTo">Bitis (haric); acikse <c>null</c>.</param>
+public sealed record DutyRecord(Guid Id, string Name, DateOnly ValidFrom, DateOnly? ValidTo);
 
 /// <summary>
 /// Bir donemin nitelikleri, adlariyla (SYG-PERS-038). Guncel kayit: acik kayit, yoksa en son kayit.

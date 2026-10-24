@@ -113,7 +113,8 @@ public sealed record PersonCardResponse(
                 new SeniorityResponse(e.Seniority.Years, e.Seniority.Months, e.Seniority.Days, e.Seniority.Text),
                 e.Current is { } c
                     ? new WorkLifeResponse(c.ValidFrom, c.City, c.BranchName, c.DepartmentName, c.TitleCode, c.TitleName, c.StatusCode, c.OccupationCode, c.OccupationName)
-                    : null))],
+                    : null,
+                e.Duty is { } d ? new DutyResponse(d.Id, d.Name, d.ValidFrom, d.ValidTo) : null))],
             card.Gender switch
             {
                 Domain.Personnel.Gender.Male => GenderKind.Male,
@@ -170,6 +171,7 @@ public enum MaritalStatusKind
 /// <param name="IsActive">Istihdam suruyor mu.</param>
 /// <param name="Seniority">Kidem suresi.</param>
 /// <param name="WorkLife">Calisma hayati: istihdamin guncel nitelikleri (SYG-PERS-038); T1 oncesi veya hic gorulmediyse bos.</param>
+/// <param name="Duty">Guncel gorev (SYG-PERS-042); girilmediyse bos.</param>
 public sealed record EmploymentCardResponse(
     string RegistryCode,
     string CompanyName,
@@ -177,7 +179,8 @@ public sealed record EmploymentCardResponse(
     DateOnly? TerminationDate,
     bool IsActive,
     SeniorityResponse Seniority,
-    WorkLifeResponse? WorkLife);
+    WorkLifeResponse? WorkLife,
+    DutyResponse? Duty);
 
 /// <summary>Calisma hayati bolumu (SYG-PERS-038). Firma istihdamin kendisindedir.</summary>
 /// <param name="Since">Bu niteliklerin gecerli oldugu donemin baslangici.</param>
