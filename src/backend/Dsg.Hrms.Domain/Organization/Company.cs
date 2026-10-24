@@ -26,6 +26,7 @@ public sealed class Company : Entity, IAuditable
     public short LogoFirmNumber { get; private set; }
 
     /// <summary>Firma adi.</summary>
+    [AuditVisible("Firma adi kurum tanimidir, kisisel veri degildir; LOGO'daki ad degisikligi izlenebilmelidir")]
     public string Name { get; private set; } = string.Empty;
 
     /// <inheritdoc />

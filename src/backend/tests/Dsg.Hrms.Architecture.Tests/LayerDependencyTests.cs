@@ -209,7 +209,7 @@ public sealed class LayerDependencyTests
     // ------------------------------------------------------------------
 
     /// <summary>Is modulleri: her katmanin dogrudan altindaki ad alanlari.</summary>
-    private static readonly string[] Modules = ["Identity", "Personnel", "Organization", "Notifications", "Settings", "Audit"];
+    private static readonly string[] Modules = ["Identity", "Personnel", "Organization", "Notifications", "Settings", "Audit", "Reference"];
 
     /// <summary>
     /// Modul olmayan ortak veya teknik ad alanlari. Yeni bir ust ad alani ya modul ya da
@@ -252,6 +252,10 @@ public sealed class LayerDependencyTests
         ["Api: Identity -> Personnel"] = "uyelik isteginde TCKN bicim dogrulamasi (Domain.Personnel.NationalId)",
         ["Api: Identity -> Settings"] = "giris ekraninin herkese acik ayarlari (SYG-KMLK-070)",
         ["Api: Settings -> Identity"] = "parametre ve logo uclarinda yetki ozniteligi ve izin kodlari (SYG-KMLK-074)",
+
+        // Referans veri cekirdegi (ADR-0022 §1, KR-115).
+        ["Infrastructure: Personnel -> Reference"] = "kartta unvan adi referans veriden (SYG-PERS-038)",
+        ["Api: Reference -> Identity"] = "referans veri uclarinda yetki ozniteligi ve izin kodlari (SYG-PERS-072)",
     };
 
     [Fact]

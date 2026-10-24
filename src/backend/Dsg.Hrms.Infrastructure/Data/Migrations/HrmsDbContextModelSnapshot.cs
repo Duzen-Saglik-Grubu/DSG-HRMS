@@ -1949,6 +1949,234 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                     b.ToTable("sync_warning", "personnel");
                 });
 
+            modelBuilder.Entity("Dsg.Hrms.Domain.Reference.ReferenceDefinition", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<long>("Id"), 1000L, null, null, null, null, null);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("text")
+                        .HasColumnName("code");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_by");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsSystem")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_system");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("text")
+                        .HasColumnName("name")
+                        .UseCollation("tr-TR-x-icu");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_id");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("updated_by");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_definition");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_definition_public_id");
+
+                    b.HasIndex("Type", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("ix_definition_type_code");
+
+                    b.ToTable("definition", "reference", t =>
+                        {
+                            t.HasCheckConstraint("ck_definition_type", "type IN (1, 2, 3)");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Code = "1",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = false,
+                            Name = "Birim Operatörü",
+                            PublicId = new Guid("0192a3b4-1001-7000-8000-000000000001"),
+                            SortOrder = 1,
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Code = "2",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = false,
+                            Name = "Birim Teknik Sorumlusu",
+                            PublicId = new Guid("0192a3b4-1001-7000-8000-000000000002"),
+                            SortOrder = 2,
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Code = "3",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = false,
+                            Name = "Birim Sorumlusu",
+                            PublicId = new Guid("0192a3b4-1001-7000-8000-000000000003"),
+                            SortOrder = 3,
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Code = "4",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = false,
+                            Name = "Yardımcı Hizmetler",
+                            PublicId = new Guid("0192a3b4-1001-7000-8000-000000000004"),
+                            SortOrder = 4,
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 11L,
+                            Code = "1",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "0 Rh+",
+                            PublicId = new Guid("0192a3b4-1003-7000-8000-000000000001"),
+                            SortOrder = 1,
+                            Type = 3
+                        },
+                        new
+                        {
+                            Id = 12L,
+                            Code = "2",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "0 Rh-",
+                            PublicId = new Guid("0192a3b4-1003-7000-8000-000000000002"),
+                            SortOrder = 2,
+                            Type = 3
+                        },
+                        new
+                        {
+                            Id = 13L,
+                            Code = "3",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "A Rh+",
+                            PublicId = new Guid("0192a3b4-1003-7000-8000-000000000003"),
+                            SortOrder = 3,
+                            Type = 3
+                        },
+                        new
+                        {
+                            Id = 14L,
+                            Code = "4",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "A Rh-",
+                            PublicId = new Guid("0192a3b4-1003-7000-8000-000000000004"),
+                            SortOrder = 4,
+                            Type = 3
+                        },
+                        new
+                        {
+                            Id = 15L,
+                            Code = "5",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "B Rh+",
+                            PublicId = new Guid("0192a3b4-1003-7000-8000-000000000005"),
+                            SortOrder = 5,
+                            Type = 3
+                        },
+                        new
+                        {
+                            Id = 16L,
+                            Code = "6",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "B Rh-",
+                            PublicId = new Guid("0192a3b4-1003-7000-8000-000000000006"),
+                            SortOrder = 6,
+                            Type = 3
+                        },
+                        new
+                        {
+                            Id = 17L,
+                            Code = "7",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "AB Rh+",
+                            PublicId = new Guid("0192a3b4-1003-7000-8000-000000000007"),
+                            SortOrder = 7,
+                            Type = 3
+                        },
+                        new
+                        {
+                            Id = 18L,
+                            Code = "8",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "AB Rh-",
+                            PublicId = new Guid("0192a3b4-1003-7000-8000-000000000008"),
+                            SortOrder = 8,
+                            Type = 3
+                        });
+                });
+
             modelBuilder.Entity("Dsg.Hrms.Domain.Settings.BrandLogo", b =>
                 {
                     b.Property<long>("Id")
