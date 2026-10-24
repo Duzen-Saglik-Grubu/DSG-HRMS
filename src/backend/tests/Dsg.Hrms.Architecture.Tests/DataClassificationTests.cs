@@ -88,14 +88,25 @@ public sealed class DataClassificationTests
         names.ShouldContain("Employment.HireDate");
     }
 
+    /// <summary>
+    /// Taranan ad alanlari: personel, T1'de eklenen referans veri ve kurum tanimlari (SYG-PERS-067,
+    /// ADR-0021 §6 / B-12).
+    /// </summary>
+    private static readonly string[] Namespaces =
+    [
+        typeof(Person).Namespace!,
+        typeof(Dsg.Hrms.Domain.Reference.ReferenceDefinition).Namespace!,
+        typeof(Dsg.Hrms.Domain.Organization.Company).Namespace!,
+    ];
+
+    private static bool InScope(string? ns) =>
+        ns is not null && Namespaces.Any(n => ns == n || ns.StartsWith(n + ".", StringComparison.Ordinal));
+
     private static List<PropertyInfo> Fields() =>
         typeof(Person).Assembly.GetTypes()
-            .Where(t => t is { IsClass: true, IsAbstract: false }
-                        && t.Namespace is { } ns
-                        && (ns == typeof(Person).Namespace || ns.StartsWith(typeof(Person).Namespace + ".", StringComparison.Ordinal))
-                        && t.GetProperty("Id") is not null)
+            .Where(t => t is { IsClass: true, IsAbstract: false } && InScope(t.Namespace) && t.GetProperty("Id") is not null)
             .SelectMany(t => t.GetProperties(BindingFlags.Instance | BindingFlags.Public))
-            .Where(p => p.DeclaringType!.Namespace!.StartsWith(typeof(Person).Namespace!, StringComparison.Ordinal))
+            .Where(p => InScope(p.DeclaringType!.Namespace))
             .Where(p => IsTextOrDate(p.PropertyType))
             .ToList();
 

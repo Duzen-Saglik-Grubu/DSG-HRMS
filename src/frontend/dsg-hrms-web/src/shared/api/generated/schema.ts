@@ -369,6 +369,288 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reference/definitions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Turun tanimlari; varsayilan olarak yalnizca aktifler (yeni secim icin). */
+        get: {
+            parameters: {
+                query?: {
+                    type?: components["schemas"]["ReferenceTypeKind"];
+                    includeInactive?: boolean;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Tanimlar, siraya gore. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReferenceDefinitionResponse"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`reference.definition.view`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Yeni tanim ekler. Unvan kodu zorunludur (LOGO kodu); gorev kodu verilmezse uretilir. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateReferenceDefinitionRequest"];
+                    "text/json": components["schemas"]["CreateReferenceDefinitionRequest"];
+                    "application/*+json": components["schemas"]["CreateReferenceDefinitionRequest"];
+                };
+            };
+            responses: {
+                /** @description Eklenen tanim. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReferenceDefinitionResponse"];
+                    };
+                };
+                /** @description Ad bos. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`reference.definition.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kod kullaniliyor, unvan kodu yok veya tur kan grubu. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reference/definitions/{id}/name": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Tanimin adini degistirir. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RenameReferenceDefinitionRequest"];
+                    "text/json": components["schemas"]["RenameReferenceDefinitionRequest"];
+                    "application/*+json": components["schemas"]["RenameReferenceDefinitionRequest"];
+                };
+            };
+            responses: {
+                /** @description Ad degisti. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Ad bos. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`reference.definition.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Tanim yok. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Sistem tanimi. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reference/definitions/{id}/deactivation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tanimi pasife alir; gecmis kayitlarda adiyla gorunmeye devam eder. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Tanim pasif. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`reference.definition.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Tanim yok. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Sistem tanimi veya zaten pasif. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/me": {
         parameters: {
             query?: never;
@@ -2463,6 +2745,15 @@ export interface components {
             /** @description Parola. */
             password: string;
         };
+        /** @description Yeni tanim istegi. */
+        CreateReferenceDefinitionRequest: {
+            /** @description Tur (unvan veya gorev). */
+            type: components["schemas"]["ReferenceTypeKind"];
+            /** @description Kod; unvanda zorunlu, gorevde istege bagli. */
+            code: null | string;
+            /** @description Ad. */
+            name: string;
+        };
         /** @description Kartta bir istihdam. */
         EmploymentCardResponse: {
             /** @description Sicil numarasi. */
@@ -2702,6 +2993,34 @@ export interface components {
             /** @description Iki adimli dogrulama sistemde kullaniliyor mu (PRM-KML-08); kullanici menusundeki hesap guvenligi sayfasi buna gore gosterilir (SYG-KMLK-080). */
             twoFactorAvailable: boolean;
         };
+        /** @description Referans tanimi. */
+        ReferenceDefinitionResponse: {
+            /**
+             * Format: uuid
+             * @description Dis kimlik.
+             */
+            id: string;
+            /** @description Tur. */
+            type: components["schemas"]["ReferenceTypeKind"];
+            /** @description Kod. */
+            code: string;
+            /** @description Ad. */
+            name: string;
+            /**
+             * Format: int32
+             * @description Sira.
+             */
+            sortOrder: number | string;
+            /** @description Yeni secimde listelenir mi. */
+            isActive: boolean;
+            /** @description Sistem tanimi mi; oyleyse degistirilemez. */
+            isSystem: boolean;
+        };
+        /**
+         * @description Referans tanim turu.
+         * @enum {unknown}
+         */
+        ReferenceTypeKind: "title" | "duty" | "bloodGroup";
         /** @description Uyelik baslatildi. */
         RegistrationStartedResponse: {
             /**
@@ -2716,6 +3035,11 @@ export interface components {
              * @description Uyelik isleminin gecerlilik sonu.
              */
             expiresAt: string;
+        };
+        /** @description Ad degistirme istegi. */
+        RenameReferenceDefinitionRequest: {
+            /** @description Yeni ad. */
+            name: string;
         };
         /** @description Kod istegi (SYG-KMLK-019). */
         RequestCodeRequest: {
@@ -2982,8 +3306,10 @@ export interface components {
             branchName: null | string;
             /** @description Birim. */
             departmentName: null | string;
-            /** @description Unvan kodu (1–4); adi referans veri cekirdegiyle gelecek. */
+            /** @description Unvan kodu (LOGO, 1–4). */
             titleCode: null | string;
+            /** @description Unvan ("Unvani" etiketiyle gosterilir); referans veride karsiligi yoksa bos (PG-PERS-21). */
+            titleName: null | string;
             /** @description Statu. */
             statusCode: null | string;
             /** @description SGK meslek kodu. */

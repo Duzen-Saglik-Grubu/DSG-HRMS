@@ -11,6 +11,7 @@ using Dsg.Hrms.Application.Notifications;
 using Dsg.Hrms.Application.Personnel.Access;
 using Dsg.Hrms.Application.Personnel.Cards;
 using Dsg.Hrms.Application.Personnel.Sync;
+using Dsg.Hrms.Application.Reference;
 using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Infrastructure.Audit;
 using Dsg.Hrms.Infrastructure.Configuration;
@@ -21,6 +22,7 @@ using Dsg.Hrms.Infrastructure.Identity.Passwords;
 using Dsg.Hrms.Infrastructure.Logo;
 using Dsg.Hrms.Infrastructure.Notifications;
 using Dsg.Hrms.Infrastructure.Personnel;
+using Dsg.Hrms.Infrastructure.Reference;
 using Dsg.Hrms.Infrastructure.Settings;
 using Dsg.Hrms.Infrastructure.Time;
 using Microsoft.EntityFrameworkCore;
@@ -153,6 +155,10 @@ public static class InfrastructureRegistration
 
         // Uygulama katmani IOptions paketine bagimli degildir; secenek nesnesi dogrudan verilir.
         services.AddSingleton(provider => provider.GetRequiredService<IOptions<PersonnelSyncOptions>>().Value);
+
+        // Referans veri cekirdegi (ADR-0022 §1, SYG-PERS-072).
+        services.AddScoped<IReferenceDefinitionStore, ReferenceDefinitionStore>();
+        services.AddScoped<ReferenceDefinitionService>();
 
         // Kisi okumalari: kapsam ve tek giris noktasi (ADR-0019 §1, SYG-PERS-050).
         services.AddScoped<ICurrentUserScope, CurrentUserScope>();
