@@ -50,6 +50,9 @@ jobs:
       - name: PR disiplini kurallarini sina
         run: node .github/scripts/pr-discipline-test.mjs
 
+      - name: Saglik taramasi kayit secimini sina
+        run: node .github/scripts/health-sweep-issues-test.mjs
+
       # Gereksinim zinciri: paydas gereksinimi -> sistem gereksinimi -> matris.
       # Ayni esleme uc yerde duruyor (SYG §4, SYG §8, izlenebilirlik matrisi); elle
       # tutulan kopyalar ilk degisiklikte ayrilir. Betik once kendini sinar.
