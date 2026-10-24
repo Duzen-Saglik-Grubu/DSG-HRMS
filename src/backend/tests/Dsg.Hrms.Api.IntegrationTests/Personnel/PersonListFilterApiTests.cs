@@ -117,6 +117,8 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
             var options = (await SendAsync(client, $"{Persons}/filter-options", jwt)).Body;
 
             options.GetProperty("canFilterBySensitive").GetBoolean().ShouldBeTrue();
+            options.GetProperty("defaultPageSize").GetInt32().ShouldBe(24);
+            options.GetProperty("maxPageSize").GetInt32().ShouldBe(100);
             options.GetProperty("canFilterByNationalId").GetBoolean().ShouldBeTrue();
             options.GetProperty("cities").EnumerateArray().Select(c => c.GetProperty("value").GetString()).ShouldBe(["Ankara", "İzmir"], ignoreOrder: true);
             options.GetProperty("duties").EnumerateArray().ShouldContain(d => d.GetProperty("label").GetString() == "Biyolog");

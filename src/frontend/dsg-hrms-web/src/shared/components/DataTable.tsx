@@ -40,6 +40,10 @@ interface DataTableProps<TRow> {
   /** Liste bos oldugunda gosterilecek icerik (EmptyState onerilir). */
   empty?: ReactNode;
   caption?: string;
+  /** Sayfa boyutu secenekleri; verilmezse genel secenekler (ornegin parametreye bagli listeler icin). */
+  pageSizeOptions?: readonly number[];
+  /** Sayfa boyutu etiketi; verilmezse "Sayfa basina kayit". */
+  labelRowsPerPage?: string;
 }
 
 /**
@@ -62,6 +66,8 @@ export function DataTable<TRow>({
   loading = false,
   empty,
   caption,
+  pageSizeOptions = PAGE_SIZE_OPTIONS,
+  labelRowsPerPage,
 }: DataTableProps<TRow>) {
   const { t } = useTranslation();
 
@@ -149,12 +155,12 @@ export function DataTable<TRow>({
         // MUI sayfa numarasini 0'dan sayar; sozlesme 1'den (ADR-0010 §4).
         page={Math.max(0, request.page - 1)}
         rowsPerPage={request.pageSize}
-        rowsPerPageOptions={[...PAGE_SIZE_OPTIONS]}
+        rowsPerPageOptions={[...pageSizeOptions]}
         onPageChange={(_, yeniSayfa) => onRequestChange({ ...request, page: yeniSayfa + 1 })}
         onRowsPerPageChange={(event) =>
           onRequestChange({ ...request, pageSize: Number(event.target.value), page: 1 })
         }
-        labelRowsPerPage={t('table.rowsPerPage')}
+        labelRowsPerPage={labelRowsPerPage ?? t('table.rowsPerPage')}
         labelDisplayedRows={({ from, to, count }) => t('table.rowRange', { from, to, count })}
       />
     </Paper>

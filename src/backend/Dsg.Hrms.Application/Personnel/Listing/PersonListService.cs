@@ -71,7 +71,17 @@ public sealed record PersonFilterOptions(
     IReadOnlyList<FilterOption> Occupations,
     IReadOnlyList<FilterOption> Educations,
     bool CanFilterByNationalId,
-    bool CanFilterBySensitive);
+    bool CanFilterBySensitive)
+{
+    /// <summary>Varsayilan sayfa boyutu (`PRM-GRN-02`).</summary>
+    public int DefaultPageSize { get; init; }
+
+    /// <summary>
+    /// En buyuk sayfa boyutu (`PRM-GRN-03`): ekran sayfa boyutu seceneklerini bunu asmayacak
+    /// sekilde sunar (SYG-PERS-029).
+    /// </summary>
+    public int MaxPageSize { get; init; }
+}
 
 /// <summary>Suzgec seceneklerinin veritabani tarafi.</summary>
 public interface IPersonFilterOptionsQuery
@@ -155,11 +165,22 @@ public sealed class PersonListService
     {
         var viewer = await _scope.GetAsync(cancellationToken).ConfigureAwait(false);
         var options = await _options.GetAsync(cancellationToken).ConfigureAwait(false);
+        var (defaultPageSize, maxPageSize) = await PageSizesAsync(cancellationToken).ConfigureAwait(false);
         return options with
         {
             CanFilterByNationalId = PersonListFilters.CanUse(viewer, FilterProtection.NationalId),
             CanFilterBySensitive = PersonListFilters.CanUse(viewer, FilterProtection.Sensitive),
+            DefaultPageSize = defaultPageSize,
+            MaxPageSize = maxPageSize,
         };
+    }
+
+    /// <summary>Varsayilan ve en buyuk sayfa boyutu; varsayilan en buyugu asmaz.</summary>
+    private async Task<(int Default, int Max)> PageSizesAsync(CancellationToken cancellationToken)
+    {
+        var max = await _parameters.GetIntegerAsync(ParameterCatalog.MaxPageSize, cancellationToken).ConfigureAwait(false);
+        var preferred = await _parameters.GetIntegerAsync(ParameterCatalog.DefaultPageSize, cancellationToken).ConfigureAwait(false);
+        return (Math.Min(preferred, max), max);
     }
 
     /// <summary>Listeyi doner ve erisimi kaydeder.</summary>
@@ -190,10 +211,8 @@ public sealed class PersonListService
     {
         ArgumentNullException.ThrowIfNull(filters);
 
-        var maxPageSize = await _parameters.GetIntegerAsync(ParameterCatalog.MaxPageSize, cancellationToken).ConfigureAwait(false);
-        var size = pageSize ?? Math.Min(
-            await _parameters.GetIntegerAsync(ParameterCatalog.DefaultPageSize, cancellationToken).ConfigureAwait(false),
-            maxPageSize);
+        var (defaultPageSize, maxPageSize) = await PageSizesAsync(cancellationToken).ConfigureAwait(false);
+        var size = pageSize ?? defaultPageSize;
         if (size > maxPageSize)
         {
             throw new InvalidRequestException($"Sayfa boyutu en fazla {maxPageSize} olabilir.");

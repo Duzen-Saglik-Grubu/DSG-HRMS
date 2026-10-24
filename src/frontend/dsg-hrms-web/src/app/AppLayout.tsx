@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
+import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import LockResetRounded from '@mui/icons-material/LockResetRounded';
 import ManageAccountsOutlined from '@mui/icons-material/ManageAccountsOutlined';
 import SecurityOutlined from '@mui/icons-material/SecurityOutlined';
@@ -18,7 +19,7 @@ import TuneRounded from '@mui/icons-material/TuneRounded';
 import LogoutRounded from '@mui/icons-material/LogoutRounded';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useNavigate } from 'react-router';
+import { NavLink, Outlet, useNavigate } from 'react-router';
 import { fetchPublicSettings } from '@/shared/api/publicSettings';
 import { queryKeys } from '@/shared/api/queryKeys';
 import { session, useSession } from '@/shared/auth/session';
@@ -35,6 +36,7 @@ import { routes } from '@/shared/routes';
  */
 export function AppLayout() {
   const { t } = useTranslation();
+  const canViewPersonnel = usePermission(permissions.personView);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -46,6 +48,18 @@ export function AppLayout() {
           <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
             {t('app.organization')}
           </Typography>
+          {canViewPersonnel ? (
+            // Rolu olmayan personel listede yalnizca kendini gorur; baglanti ona sunulmaz.
+            <Button
+              color="inherit"
+              component={NavLink}
+              to={routes.personnel}
+              startIcon={<BadgeOutlined />}
+              sx={{ textTransform: 'none' }}
+            >
+              {t('nav.personnel')}
+            </Button>
+          ) : null}
           <UserMenu />
         </Toolbar>
       </AppBar>

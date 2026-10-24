@@ -25,6 +25,14 @@ VALUES
   ('20000000596', 'Zeynep', 'Izinsiz', '1988-03-21', 'e2e.izinsiz@duzen.com.tr', false, null, now(), gen_random_uuid())
 ON CONFLICT (national_id) DO NOTHING;
 
+-- Arama anahtari: kisiler senkronizasyonla geldiginde uygulama yazar (ADR-0021 §7). Burada kisiler
+-- SQL ile eklendigi icin T1PersonListSearchAndAccessSubjects migration'indaki kuralla doldurulur.
+UPDATE personnel.person
+   SET search_key = lower(translate(
+       concat_ws(' ', NULLIF(btrim(first_name), ''), NULLIF(btrim(last_name), ''), NULLIF(btrim(previous_surname), '')),
+       'ÇĞIİÖŞÜçğıöşü', 'CGIIOSUcgiosu'))
+ WHERE national_id LIKE '2000000%';
+
 INSERT INTO personnel.employment (person_id, registry_code, company_id, hire_date, is_active, logo_ref, created_at, public_id)
 SELECT p.id, 'E2E' || right(p.national_id, 3), c.id, '2020-01-01', true, 900000 + row_number() OVER (ORDER BY p.national_id), now(), gen_random_uuid()
 FROM personnel.person p
