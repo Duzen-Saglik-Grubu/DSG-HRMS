@@ -208,6 +208,27 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Termination_closes_the_open_duty_entered_in_hrms()
+    {
+        // SYG-PERS-021: HRMS'te girilen acik gorev de istihdam bitince cikisin ertesi gunu kapanir.
+        await SyncAsync(Card("00001", NationalId(1), logoRef: 1));
+        await using (var context = Read())
+        {
+            var employment = await context.Set<Employment>().SingleAsync();
+            var definition = await context.Set<Domain.Reference.ReferenceDefinition>().Where(d => d.Type == Domain.Reference.ReferenceType.Title).Select(d => d.Id).FirstAsync();
+            var (duty, _) = DutyTimeline.Assign(employment, [], definition, employment.HireDate);
+            context.Add(duty!);
+            await context.SaveChangesAsync();
+        }
+
+        var termination = Today.AddDays(-2);
+        await SyncAsync(Card("00001", NationalId(1), logoRef: 1, terminationDate: termination));
+
+        await using var verify = Read();
+        (await verify.Set<EmploymentDuty>().SingleAsync()).ValidTo.ShouldBe(termination.AddDays(1));
+    }
+
+    [Fact]
     public async Task Details_step_failure_keeps_the_core_changes_and_marks_the_run_partial()
     {
         // SYG-PERS-013 (AN-07): T1 adimindaki hata kisi ve istihdam degisikliklerini geri almaz.

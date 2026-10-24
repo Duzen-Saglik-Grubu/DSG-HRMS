@@ -56,6 +56,7 @@ public sealed record SensitiveCard(string? Address);
 /// <param name="IsActive">Istihdam suruyor mu.</param>
 /// <param name="Seniority">Kidem suresi (SYG-PERS-039).</param>
 /// <param name="Current">Guncel tarih aralikli nitelikler (SYG-PERS-038); yoksa <c>null</c>.</param>
+/// <param name="Duty">Guncel gorev (SYG-PERS-042); girilmediyse <c>null</c>.</param>
 public sealed record EmploymentCard(
     string RegistryCode,
     string CompanyName,
@@ -63,7 +64,8 @@ public sealed record EmploymentCard(
     DateOnly? TerminationDate,
     bool IsActive,
     Seniority Seniority,
-    AssignmentRecord? Current);
+    AssignmentRecord? Current,
+    DutyRecord? Duty);
 
 /// <summary>
 /// Kisi kartini ve "Profilim"i sunar (ADR-0019; SYG-PERS-044, 051, 052, 053, 057).
@@ -148,7 +150,8 @@ public sealed class PersonCardService
                     e.TerminationDate,
                     e.IsActive,
                     Seniority.Calculate(e.HireDate, e.TerminationDate, today),
-                    e.Current))],
+                    e.Current,
+                    e.CurrentDuty))],
             record.Profile.Gender,
             record.Profile.PreviousSurname,
             record.Profile.MaritalStatus,

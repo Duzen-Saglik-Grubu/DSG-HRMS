@@ -10,6 +10,7 @@ using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Notifications;
 using Dsg.Hrms.Application.Personnel.Access;
 using Dsg.Hrms.Application.Personnel.Cards;
+using Dsg.Hrms.Application.Personnel.Duties;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Application.Reference;
 using Dsg.Hrms.Application.Settings;
@@ -164,6 +165,10 @@ public static class InfrastructureRegistration
         services.AddScoped<ICurrentUserScope, CurrentUserScope>();
         services.AddScoped<IPersonnelQuery, PersonnelQuery>();
         services.AddScoped<PersonCardService>();
+
+        // Gorev girisi (SYG-PERS-042).
+        services.AddScoped<IDutyStore, DutyStore>();
+        services.AddScoped<DutyService>();
 
         services.AddScoped<IPersonnelSyncStore, PersonnelSyncStore>();
         services.AddScoped<IPersonnelSyncStatus, PersonnelSyncStatus>();

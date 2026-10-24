@@ -1642,6 +1642,88 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.EmploymentDuty", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<long?>("DeletedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<long>("DutyDefinitionId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("duty_definition_id");
+
+                    b.Property<long>("EmploymentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("employment_id");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_id");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("updated_by");
+
+                    b.Property<DateOnly>("ValidFrom")
+                        .HasColumnType("date")
+                        .HasColumnName("valid_from");
+
+                    b.Property<DateOnly?>("ValidTo")
+                        .HasColumnType("date")
+                        .HasColumnName("valid_to");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_employment_duty");
+
+                    b.HasIndex("DeletedAt")
+                        .HasDatabaseName("ix_employment_duty_deleted_at")
+                        .HasFilter("deleted_at IS NULL");
+
+                    b.HasIndex("DutyDefinitionId")
+                        .HasDatabaseName("ix_employment_duty_duty_definition_id");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_employment_duty_public_id");
+
+                    b.HasIndex("EmploymentId", "ValidFrom")
+                        .HasDatabaseName("ix_employment_duty_employment_id_valid_from");
+
+                    b.ToTable("employment_duty", "personnel", t =>
+                        {
+                            t.HasCheckConstraint("ck_employment_duty_range", "valid_to IS NULL OR valid_to > valid_from");
+                        });
+                });
+
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.Person", b =>
                 {
                     b.Property<long>("Id")
@@ -2602,6 +2684,23 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_employment_assignment_employment_employment_id");
+                });
+
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.EmploymentDuty", b =>
+                {
+                    b.HasOne("Dsg.Hrms.Domain.Reference.ReferenceDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("DutyDefinitionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_employment_duty_reference_definition_duty_definition_id");
+
+                    b.HasOne("Dsg.Hrms.Domain.Personnel.Employment", null)
+                        .WithMany()
+                        .HasForeignKey("EmploymentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_employment_duty_employment_employment_id");
                 });
 
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.PersonSensitive", b =>

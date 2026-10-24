@@ -698,6 +698,199 @@
         }
       }
     },
+    "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties": {
+      "post": {
+        "tags": [
+          "EmploymentDuties"
+        ],
+        "summary": "Istihdama gorev atar; onceki acik gorev yeni baslangicla kapanir.",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "registryCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignDutyRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignDutyRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignDutyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Gecerli gorev kaydi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DutyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gorev tanimi secilmedi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.person.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi veya istihdam yok ya da kapsam disi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Baska bir gorev donemiyle cakisiyor veya acik gorevden once basliyor.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Tarih istihdam araligi disinda ya da tanim pasif.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties/{dutyId}": {
+      "delete": {
+        "tags": [
+          "EmploymentDuties"
+        ],
+        "summary": "Gorev kaydini siler (yanlis girisi duzeltmek icin; kayit yumusak silinir).",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "registryCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dutyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Silindi.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.person.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi, istihdam veya gorev kaydi yok ya da kapsam disi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/me": {
       "get": {
         "tags": [
@@ -2831,6 +3024,29 @@
         },
         "description": "Listedeki kisi. Yalnizca ad, soyad, sicil ve firma (SYG-KMLK-073)."
       },
+      "AssignDutyRequest": {
+        "required": [
+          "definitionId",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "definitionId": {
+            "type": "string",
+            "description": "Gorev taniminin dis kimligi (referans veri, tur gorev).",
+            "format": "uuid"
+          },
+          "validFrom": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Baslangic; verilmezse bugun.",
+            "format": "date"
+          }
+        },
+        "description": "Gorev atama istegi."
+      },
       "ChangePasswordRequest": {
         "required": [
           "currentPassword",
@@ -2902,6 +3118,40 @@
         },
         "description": "Yeni tanim istegi."
       },
+      "DutyResponse": {
+        "required": [
+          "id",
+          "name",
+          "validFrom",
+          "validTo"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Dis kimlik.",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Gorev."
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "Baslangic.",
+            "format": "date"
+          },
+          "validTo": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Bitis (haric); acikse bos.",
+            "format": "date"
+          }
+        },
+        "description": "Gorev kaydi."
+      },
       "EmploymentCardResponse": {
         "required": [
           "registryCode",
@@ -2910,7 +3160,8 @@
           "terminationDate",
           "isActive",
           "seniority",
-          "workLife"
+          "workLife",
+          "duty"
         ],
         "type": "object",
         "properties": {
@@ -2951,6 +3202,17 @@
               {
                 "description": "Calisma hayati: istihdamin guncel nitelikleri (SYG-PERS-038); T1 oncesi veya hic gorulmediyse bos.",
                 "$ref": "#/components/schemas/WorkLifeResponse"
+              }
+            ]
+          },
+          "duty": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Guncel gorev (SYG-PERS-042); girilmediyse bos.",
+                "$ref": "#/components/schemas/DutyResponse"
               }
             ]
           }
@@ -4339,6 +4601,9 @@
     },
     {
       "name": "ReferenceDefinitions"
+    },
+    {
+      "name": "EmploymentDuties"
     },
     {
       "name": "Persons"

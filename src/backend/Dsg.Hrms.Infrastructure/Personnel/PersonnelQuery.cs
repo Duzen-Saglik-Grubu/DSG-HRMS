@@ -54,10 +54,12 @@ public sealed class PersonnelQuery(HrmsDbContext context) : IPersonnelQuery
             return record;
         }
 
-        var current = await CurrentAssignmentsAsync([.. record.Employments.Select(e => e.Id)], cancellationToken).ConfigureAwait(false);
+        long[] ids = [.. record.Employments.Select(e => e.Id)];
+        var current = await CurrentAssignmentsAsync(ids, cancellationToken).ConfigureAwait(false);
+        var duties = await CurrentDutiesAsync(ids, cancellationToken).ConfigureAwait(false);
         return record with
         {
-            Employments = [.. record.Employments.Select(e => e with { Current = current.GetValueOrDefault(e.Id) })],
+            Employments = [.. record.Employments.Select(e => e with { Current = current.GetValueOrDefault(e.Id), CurrentDuty = duties.GetValueOrDefault(e.Id) })],
         };
     }
 
@@ -85,6 +87,24 @@ public sealed class PersonnelQuery(HrmsDbContext context) : IPersonnelQuery
                     a.ValidFrom, a.ValidTo, c.Name, b.Name, b.City, d.Name,
                     a.TitleCode, t.Name, a.StatusCode, a.OccupationCode, a.OccupationName),
             })
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return rows
+            .GroupBy(r => r.EmploymentId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.OrderByDescending(r => r.Record.ValidTo is null).ThenByDescending(r => r.Record.ValidFrom).First().Record);
+    }
+
+    /// <summary>Her istihdamin guncel gorevi: acik kayit, yoksa en son kayit; silinmisler haric.</summary>
+    private async Task<Dictionary<long, DutyRecord>> CurrentDutiesAsync(long[] employmentIds, CancellationToken cancellationToken)
+    {
+        var rows = await (
+            from d in context.Set<EmploymentDuty>().AsNoTracking()
+            where employmentIds.Contains(d.EmploymentId)
+            join r in context.Set<ReferenceDefinition>() on d.DutyDefinitionId equals r.Id
+            select new { d.EmploymentId, Record = new DutyRecord(d.PublicId, r.Name, d.ValidFrom, d.ValidTo) })
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
