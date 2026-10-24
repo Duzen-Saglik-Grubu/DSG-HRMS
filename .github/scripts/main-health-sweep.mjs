@@ -11,7 +11,8 @@
 //   2. "main kirmizi denetimi"nin son calismalarindan biri basarisiz veya
 //      tamamlanamamis mi? Denetimin kendisinin calismamasi da bir olaydir.
 // Bulunan her sorun icin [HATA] issue'su acilir; ayni baslikta acik issue varsa
-// yorum eklenir. Ayni sorun (anahtar) ikinci kez yazilmaz.
+// yorum eklenir. Ayni sorun (anahtar) ikinci kez yazilmaz. "Dogrulanmadi" sorununda ayni
+// is akisinin acik "main kirmizi" kaydi once aranir; varsa ona yazilir (#291).
 //
 // Kullanim (depo kokunde, gh CLI oturumu acik):
 //   node .github/scripts/main-health-sweep.mjs [--dry-run]
@@ -21,6 +22,7 @@
 //   --until=<ISO>   kayit denetiminin penceresi bu anda biter (simdi yerine)
 
 import { execFileSync } from 'node:child_process';
+import { findOpenIssue, unverifiedTitle } from './health-sweep-issues.mjs';
 
 const arg = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split('=').slice(1).join('=');
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -49,7 +51,7 @@ const BAD = new Set(['failure', 'cancelled', 'timed_out', 'startup_failure']);
 
 const api = (path) => JSON.parse(execFileSync('gh', ['api', path], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }));
 
-/** @type {{ title: string, key: string, detail: string }[]} */
+/** @type {{ title: string, key: string, detail: string, workflowName?: string }[]} */
 const problems = [];
 
 // 1. main'in son commit'i dogrulandi mi?
@@ -62,7 +64,8 @@ if (ageMinutes >= GRACE_MINUTES) {
     if (runs.some((r) => r.conclusion === 'success')) continue;
     const seen = runs.map((r) => `${r.status}/${r.conclusion ?? '-'} ${r.html_url}`).join('; ') || 'hiç çalışma yok';
     problems.push({
-      title: `[HATA] main doğrulanmadı: ${wf.name}`,
+      title: unverifiedTitle(wf.name),
+      workflowName: wf.name,
       key: `${wf.file}@${sha}`,
       detail: `Son \`main\` commit'i \`${sha.substring(0, 7)}\` (${Math.round(ageMinutes / 60)} saat önce) **${wf.name}** iş akışında başarıyla doğrulanmadı. Çalışmalar: ${seen}`,
     });
@@ -94,7 +97,7 @@ const openIssues = api(`repos/${REPO}/issues?state=open&labels=tur:hata&per_page
 
 for (const p of problems) {
   const body = `${p.detail}\n\n${marker(p.key)}`;
-  const existing = openIssues.find((i) => i.title === p.title);
+  const existing = findOpenIssue(p, openIssues);
   if (existing) {
     const comments = api(`repos/${REPO}/issues/${existing.number}/comments?per_page=100`);
     const already = [existing.body ?? '', ...comments.map((c) => c.body ?? '')].some((b) => b.includes(marker(p.key)));
