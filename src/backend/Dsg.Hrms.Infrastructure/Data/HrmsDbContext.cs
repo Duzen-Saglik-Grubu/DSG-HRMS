@@ -63,6 +63,7 @@ public class HrmsDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(HrmsDbContext).Assembly);
+        HrmsDbFunctions.Register(modelBuilder);
 
         ApplyCommonConventions(modelBuilder);
     }

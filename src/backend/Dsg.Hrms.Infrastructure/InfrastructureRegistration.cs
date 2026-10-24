@@ -167,6 +167,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IPersonnelQuery, PersonnelQuery>();
         services.AddScoped<PersonCardService>();
         services.AddScoped<PersonListService>();
+        services.AddScoped<IPersonFilterOptionsQuery, PersonFilterOptionsQuery>();
 
         // Gorev girisi (SYG-PERS-042).
         services.AddScoped<IDutyStore, DutyStore>();

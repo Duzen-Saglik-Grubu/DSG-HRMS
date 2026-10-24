@@ -837,6 +837,35 @@ export interface paths {
                     pageSize?: number | string;
                     sort?: components["schemas"]["PersonSortField"];
                     order?: components["schemas"]["SortOrder"];
+                    companyId?: string[];
+                    city?: string[];
+                    branchId?: string[];
+                    departmentId?: string[];
+                    titleCode?: string[];
+                    dutyId?: string[];
+                    statusCode?: string[];
+                    occupationCode?: string[];
+                    education?: string[];
+                    maritalStatus?: components["schemas"]["MaritalStatusKind"][];
+                    gender?: components["schemas"]["GenderKind"][];
+                    firstName?: string;
+                    lastName?: string;
+                    previousSurname?: string;
+                    registryCode?: string;
+                    nationalId?: string;
+                    email?: string;
+                    phone?: string;
+                    address?: string;
+                    birthDateFrom?: string;
+                    birthDateTo?: string;
+                    hireDateFrom?: string;
+                    hireDateTo?: string;
+                    terminationDateFrom?: string;
+                    terminationDateTo?: string;
+                    ageMin?: number | string;
+                    ageMax?: number | string;
+                    seniorityMin?: number | string;
+                    seniorityMax?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -860,6 +889,51 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/persons/filter-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Suzgec secenekleri ve kullanicinin kullanabilecegi korumali suzgecler (SYG-PERS-024, 026). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Secenekler. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PersonFilterOptionsResponse"];
                     };
                 };
                 /** @description Unauthorized */
@@ -3059,8 +3133,18 @@ export interface components {
             entityTag?: null | components["schemas"]["EntityTagHeaderValue"];
             enableRangeProcessing?: boolean;
         };
-        /** @enum {unknown} */
-        GenderKind: "male" | "female" | null;
+        /** @description Bir secenek. */
+        FilterOptionResponse: {
+            /** @description Suzgece gonderilen deger. */
+            value: string;
+            /** @description Ad. */
+            label: string;
+        };
+        /**
+         * @description Cinsiyet.
+         * @enum {unknown}
+         */
+        GenderKind: "male" | "female";
         /** Format: binary */
         IFormFile: string;
         /** @description Baglanti bilgisi. */
@@ -3093,8 +3177,11 @@ export interface components {
             /** @description Baglantidaki jeton. */
             token: string;
         };
-        /** @enum {unknown} */
-        MaritalStatusKind: "married" | "notMarried" | null;
+        /**
+         * @description Medeni hal.
+         * @enum {unknown}
+         */
+        MaritalStatusKind: "married" | "notMarried";
         /** @description Sayfalanmis yanit (ADR-0010 §4). */
         PagedResponseOfAccountSummaryResponse: {
             /** @description Bu sayfadaki kayitlar. */
@@ -3262,6 +3349,31 @@ export interface components {
             /** @description Egitim; kayitli degilse bos. */
             educationName: null | string;
             sensitive: null | components["schemas"]["SensitiveResponse"];
+        };
+        /** @description Suzgec secenekleri (SYG-PERS-024, 026). */
+        PersonFilterOptionsResponse: {
+            /** @description Firmalar. */
+            companies: components["schemas"]["FilterOptionResponse"][];
+            /** @description Sehirler. */
+            cities: components["schemas"]["FilterOptionResponse"][];
+            /** @description Subeler. */
+            branches: components["schemas"]["FilterOptionResponse"][];
+            /** @description Birimler. */
+            departments: components["schemas"]["FilterOptionResponse"][];
+            /** @description Unvanlar. */
+            titles: components["schemas"]["FilterOptionResponse"][];
+            /** @description Gorevler. */
+            duties: components["schemas"]["FilterOptionResponse"][];
+            /** @description Statuler. */
+            statuses: components["schemas"]["FilterOptionResponse"][];
+            /** @description SGK meslekleri. */
+            occupations: components["schemas"]["FilterOptionResponse"][];
+            /** @description Egitim durumlari. */
+            educations: components["schemas"]["FilterOptionResponse"][];
+            /** @description TCKN suzgeci sunulur mu. */
+            canFilterByNationalId: boolean;
+            /** @description Adres suzgeci sunulur mu. */
+            canFilterBySensitive: boolean;
         };
         /** @description Listedeki kisi karti (SYG-PERS-023). */
         PersonListItemResponse: {

@@ -27,6 +27,12 @@ regexes = [
   # entropili bir degerle degistirildi. Istisna, PR gecmisindeki o commit'in taramadan
   # gecebilmesi icindir ve YALNIZCA bu harfi harfine degeri kapsar.
   '''abcDEF123_-xyz''',
+
+  # Liste suzgeci testindeki sorgu dizesi (#301, commit 6831ae4): "token" adli degiskenden
+  # sonra gelen "education=Lise" generic-api-key kuralina takildi. Sir degil, egitim
+  # suzgecinin degeridir; degisken sonraki commit'te yeniden adlandirildi. Istisna, PR
+  # gecmisindeki o commit'in taramadan gecebilmesi icindir ve YALNIZCA bu degeri kapsar.
+  '''^education=Lise$''',
 ]
 
 paths = [
