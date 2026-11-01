@@ -105,7 +105,12 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
         var options = (await SendAsync(client, $"{Persons}/filter-options", jwt)).Body;
         options.GetProperty("canFilterBySensitive").GetBoolean().ShouldBeFalse();
         options.GetProperty("canFilterByNationalId").GetBoolean().ShouldBeFalse();
-        options.GetProperty("branches").EnumerateArray().Select(b => b.GetProperty("label").GetString()).ShouldBe(["Bornova", "Merkez"], ignoreOrder: true);
+        // Ayni adli sube farkli firmalarda olabilir: ad firmayla birlikte (#306).
+        var company = await _fixture.WithDbAsync(context => context.Set<Company>().Select(c => c.Name).FirstAsync());
+        options.GetProperty("branches").EnumerateArray().Select(b => b.GetProperty("label").GetString())
+            .ShouldBe([$"Bornova ({company})", $"Merkez ({company})"], ignoreOrder: true);
+        options.GetProperty("departments").EnumerateArray().Select(b => b.GetProperty("label").GetString())
+            .ShouldContain($"Laboratuvar ({company})");
     }
 
     [Fact]
@@ -123,6 +128,29 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
             options.GetProperty("cities").EnumerateArray().Select(c => c.GetProperty("value").GetString()).ShouldBe(["Ankara", "İzmir"], ignoreOrder: true);
             options.GetProperty("duties").EnumerateArray().ShouldContain(d => d.GetProperty("label").GetString() == "Biyolog");
         }
+    }
+
+    [Fact]
+    public async Task Turkish_dotted_and_dotless_i_match_in_name_filters_and_search()
+    {
+        // #306: ad sutunlari Turkce siralamali (tr-TR-x-icu); SQL lower('I') orada "ı" verir. Suzgecin
+        // veritabani tarafi ve arama terimi ayni sonucu uretmezse "ismail" İSMAİL'i bulamaz.
+        var (client, jwt) = await HrAsync();
+        using (client)
+        {
+            (await CodesAsync(client, jwt, "firstName=ismail")).ShouldBe(["00005"]);
+            (await CodesAsync(client, jwt, "firstName=" + Uri.EscapeDataString("İSMAİL"))).ShouldBe(["00005"]);
+            (await CodesAsync(client, jwt, "lastName=" + Uri.EscapeDataString("ışık"))).ShouldBe(["00005"]);
+            (await CodesAsync(client, jwt, "lastName=isik")).ShouldBe(["00005"]);
+            (await CodesAsync(client, jwt, "q=" + Uri.EscapeDataString("İsmail"))).ShouldBe(["00005"]);
+        }
+
+        // Veritabanindaki katlama (suzgec ve migration'daki anahtar doldurma) uygulamayla ayni.
+        var folded = await _fixture.WithDbAsync(context => context.Set<Person>()
+            .Where(p => p.NationalId == NationalId(5))
+            .Select(p => HrmsDbFunctions.Fold(p.FirstName + " " + p.LastName))
+            .SingleAsync());
+        folded.ShouldBe(SearchText.KeyFor("İSMAİL", "IŞIK", null));
     }
 
     [Fact]
@@ -180,6 +208,8 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
             await Profile(context, 3, new PersonProfile(Gender.Male, null, MaritalStatus.NotMarried, "Lise"), "Bornova Cad. 2");
             var person3 = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(3));
             person3.Apply(new PersonDetails("Ahmet", "ÇAĞLAR", person3.BirthDate, person3.Email, person3.IsEmailShared, person3.MobilePhone));
+            var person5 = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(5));
+            person5.Apply(new PersonDetails("İSMAİL", "IŞIK", person5.BirthDate, person5.Email, person5.IsEmailShared, person5.MobilePhone));
             await context.SaveChangesAsync();
         }
 

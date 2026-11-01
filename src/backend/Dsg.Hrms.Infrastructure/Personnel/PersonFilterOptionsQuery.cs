@@ -18,12 +18,22 @@ public sealed class PersonFilterOptionsQuery(HrmsDbContext context) : IPersonFil
     {
         var companies = await context.Set<Company>().AsNoTracking().OrderBy(c => c.Name)
             .Select(c => new FilterOption(c.PublicId.ToString(), c.Name)).ToListAsync(cancellationToken).ConfigureAwait(false);
-        var branches = await context.Set<Branch>().AsNoTracking().OrderBy(b => b.Name)
-            .Select(b => new FilterOption(b.PublicId.ToString(), b.Name)).ToListAsync(cancellationToken).ConfigureAwait(false);
+        // Ayni adli sube ve birim farkli firmalarda var (ornegin uc "ANLASMALI KURUMLAR"); ad, firmayla
+        // birlikte gosterilir ki kullanici hangisini sectigini bilsin (#306).
+        var branches = await (
+                from branch in context.Set<Branch>().AsNoTracking()
+                join company in context.Set<Company>() on branch.CompanyId equals company.Id
+                orderby branch.Name, company.Name
+                select new FilterOption(branch.PublicId.ToString(), branch.Name + " (" + company.Name + ")"))
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
         var cities = await context.Set<Branch>().AsNoTracking().Where(b => b.City != null).Select(b => b.City!).Distinct().OrderBy(c => c)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
-        var departments = await context.Set<Department>().AsNoTracking().OrderBy(d => d.Name)
-            .Select(d => new FilterOption(d.PublicId.ToString(), d.Name)).ToListAsync(cancellationToken).ConfigureAwait(false);
+        var departments = await (
+                from department in context.Set<Department>().AsNoTracking()
+                join company in context.Set<Company>() on department.CompanyId equals company.Id
+                orderby department.Name, company.Name
+                select new FilterOption(department.PublicId.ToString(), department.Name + " (" + company.Name + ")"))
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
         var titles = await context.Set<ReferenceDefinition>().AsNoTracking().Where(d => d.Type == ReferenceType.Title).OrderBy(d => d.SortOrder)
             .Select(d => new FilterOption(d.Code, d.Name)).ToListAsync(cancellationToken).ConfigureAwait(false);
         var duties = await context.Set<ReferenceDefinition>().AsNoTracking().Where(d => d.Type == ReferenceType.Duty).OrderBy(d => d.Name)

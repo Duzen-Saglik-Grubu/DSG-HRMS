@@ -53,6 +53,8 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 `v0.2.0-rc.4`'ün yerine İK kabulüne sunulan sürüm. Bilgi İşlem'in kabul senaryoları provasında çıkan düzeltmeyi içerir; kabul planındaki düzeltmeler (#196) yalnızca belgede yapıldı.
 
 ### Düzeltildi
+- **Personel aramasında "i" ve "İ" (#306).** "İSMAİL" ya da "ismail" yazınca kişi bulunmuyordu. Ad sütunları Türkçe sıralamalı olduğu için veritabanı "I" harfini noktasız "ı" yapıyor, uygulama ise "i" yapıyordu. Mevcut kişilerin yaklaşık üçte ikisinin arama anahtarı bu yüzden hatalıydı; anahtarlar migration ile yeniden üretildi. Ad ve soyad süzgeçleri de düzeldi.
+- **Personel listesi incelemesi (#306).** Kartta fotoğraf üstte, bilgiler ortalı. Süzgeçteki çoklu seçimde her seçenekte onay kutusu var ve seçim yapınca liste kapanmıyor. Şube ve birim seçeneklerinde firma adı parantez içinde görünüyor; aynı adlı şube ve birimler ayırt edilebiliyor.
 - **Parametre ekranında T5'e ait bir parametre görünüyordu (#198).** "İK'nın kilitli hesabı açabilmesi" (PRM-HSP-03) hiçbir işleve bağlı olmadan listeleniyordu. Kilit açma T5 Kullanıcı Yönetimi kapsamında; parametre o modülle birlikte gelecek (SYG-KMLK-076).
 
 ---

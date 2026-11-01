@@ -7,17 +7,22 @@ namespace Dsg.Hrms.Domain.Personnel;
 /// "ışık" yazmak da ayni sonucu verir.
 /// </summary>
 /// <remarks>
-/// Kural acik bir normallestirmedir (ADR-0004 §10): Turkce harfler ASCII karsiliklarina cevrilir,
-/// sonra kultur bagimsiz kucuk harfe indirilir. Veritabanindaki arama anahtari ve arama terimi ayni
-/// kuralla uretilir; migration'daki SQL karsiligi (<c>translate</c> + <c>lower</c>) bununla esdir.
+/// Kural acik bir normallestirmedir (ADR-0004 §10): Turkce harfler KUCUK ASCII karsiliklarina
+/// cevrilir, sonra kultur bagimsiz kucuk harfe indirilir. Veritabanindaki arama anahtari ve arama
+/// terimi ayni kuralla uretilir; SQL karsiligi (<c>translate</c> + <c>lower</c>) bununla esdir.
+/// <para>
+/// Karsiliklar KUCUK harftir, cunku ad sutunlari Turkce siralamayla (<c>tr-TR-x-icu</c>) tanimlidir
+/// ve bu siralamada SQL <c>lower('I')</c> noktasiz <c>ı</c> uretir. "I" once "i"ye cevrilmezse
+/// veritabanindaki anahtar "ısmaıl", aranan terim "ismail" olur ve hic eslesmez (#306).
+/// </para>
 /// </remarks>
 public static class SearchText
 {
     /// <summary>Cevrilen Turkce harfler (buyuk ve kucuk).</summary>
     public const string TurkishLetters = "ÇĞIİÖŞÜçğıöşü";
 
-    /// <summary>Karsiliklari, ayni sirayla.</summary>
-    public const string AsciiLetters = "CGIIOSUcgiosu";
+    /// <summary>Kucuk ASCII karsiliklari, ayni sirayla.</summary>
+    public const string AsciiLetters = "cgiiosucgiosu";
 
     /// <summary>Metni arama bicimine indirir; bos metin bos doner.</summary>
     public static string Fold(string? value)
