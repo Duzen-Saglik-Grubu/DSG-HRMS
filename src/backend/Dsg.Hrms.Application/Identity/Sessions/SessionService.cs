@@ -523,6 +523,7 @@ public sealed partial class SessionService
             idle,
             candidate.Person.FirstName,
             candidate.Person.LastName,
+            candidate.Person.Email,
             [.. permissions.Order(StringComparer.Ordinal)],
             session.PasswordChangeRequired);
     }

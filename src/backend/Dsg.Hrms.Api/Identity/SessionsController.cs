@@ -176,7 +176,7 @@ public sealed class SessionsController : ControllerBase
             tokens.AccessTokenExpiresAt,
             tokens.SessionExpiresAt,
             (int)tokens.IdleTimeout.TotalMinutes,
-            new SessionUserResponse(tokens.FirstName, tokens.LastName, tokens.Permissions),
+            new SessionUserResponse(tokens.FirstName, tokens.LastName, tokens.Email, tokens.Permissions),
             tokens.PasswordChangeRequired switch
             {
                 PasswordChangeReason.FirstSignIn => PasswordChangeReasonKind.FirstSignIn,
@@ -268,8 +268,9 @@ public enum PasswordChangeReasonKind
 /// <summary>Oturumdaki kullanici.</summary>
 /// <param name="FirstName">Ad.</param>
 /// <param name="LastName">Soyad.</param>
+/// <param name="Email">Giris e-postasi; kullanici kartinda adin altinda gosterilir. Tanimli degilse <c>null</c>.</param>
 /// <param name="Permissions">Izinler. Istemci yalnizca GOSTERIM icin kullanir; denetim her istekte sunucudadir (ADR-0007 §3).</param>
-public sealed record SessionUserResponse(string FirstName, string LastName, IReadOnlyList<string> Permissions);
+public sealed record SessionUserResponse(string FirstName, string LastName, string? Email, IReadOnlyList<string> Permissions);
 
 /// <summary>Bekleyen iki adimli giris.</summary>
 /// <param name="ChallengeId">Kimlik.</param>

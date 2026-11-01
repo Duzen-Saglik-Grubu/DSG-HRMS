@@ -22,7 +22,7 @@ export function fakeSession(
     accessTokenExpiresAt: new Date(now + 15 * 60_000).toISOString(),
     sessionExpiresAt: new Date(now + 8 * 60 * 60_000).toISOString(),
     idleTimeoutMinutes: 30,
-    user: { firstName, lastName, permissions },
+    user: { firstName, lastName, email: 'ahmet.yilmaz@duzen.com.tr', permissions },
     passwordChangeRequired,
   };
 }

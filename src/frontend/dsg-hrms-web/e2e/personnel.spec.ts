@@ -63,4 +63,12 @@ test('2. rolu olmayan personel listeyi gormez; adresi yazsa da profiline gider (
   await page.getByRole('link', { name: 'Profilim' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Zeynep Izinsiz' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Genel Bilgiler' })).toContainText('*');
+
+  // Kullanici kartinda adin altinda e-posta; Profilim kullanici menusunden de acilir.
+  await page.getByRole('link', { name: 'Ana Sayfa' }).click();
+  const userCard = page.getByRole('button', { name: people.unprivileged.fullName });
+  await expect(userCard).toContainText(people.unprivileged.email);
+  await userCard.click();
+  await page.getByRole('menuitem', { name: 'Profilim' }).click();
+  await expect(page).toHaveURL(/\/profile$/);
 });

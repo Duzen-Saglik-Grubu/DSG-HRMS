@@ -40,6 +40,7 @@ function renderLayout() {
           { index: true, element: <p>Ana içerik</p> },
           { path: routes.accountSecurity, element: <p>Güvenlik sayfası</p> },
           { path: routes.personnel, element: <PersonnelProbe /> },
+          { path: routes.profile, element: <p>Profil sayfası</p> },
         ],
       },
     ],
@@ -86,6 +87,20 @@ describe('kullanici menusu', () => {
     expect(screen.getByRole('menuitem', { name: 'Parolamı değiştir' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Hesap güvenliği' })).not.toBeInTheDocument();
     expect(fetchPublicSettings).toHaveBeenCalled();
+  });
+
+  it('kullanici kartinda adin altinda e-posta yazar; menuden Profilim acilir (#311)', async () => {
+    vi.mocked(fetchPublicSettings).mockResolvedValue(settings(false));
+    const user = userEvent.setup();
+    renderLayout();
+
+    const card = await screen.findByRole('button', { name: 'Ahmet Yılmaz' });
+    expect(card).toHaveTextContent('ahmet.yilmaz@duzen.com.tr');
+
+    await openMenu(user);
+    await user.click(screen.getByRole('menuitem', { name: 'Profilim' }));
+
+    expect(await screen.findByText('Profil sayfası')).toBeInTheDocument();
   });
 });
 

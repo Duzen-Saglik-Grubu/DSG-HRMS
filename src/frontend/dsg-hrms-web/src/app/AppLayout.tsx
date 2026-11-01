@@ -4,6 +4,7 @@ import {
   Box,
   Breadcrumbs,
   Button,
+  Divider,
   Drawer,
   IconButton,
   InputAdornment,
@@ -16,6 +17,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
 import ChevronRightRounded from '@mui/icons-material/ChevronRightRounded';
 import KeyboardDoubleArrowLeftRounded from '@mui/icons-material/KeyboardDoubleArrowLeftRounded';
 import KeyboardDoubleArrowRightRounded from '@mui/icons-material/KeyboardDoubleArrowRightRounded';
@@ -380,8 +382,9 @@ function UserPanel({ mini }: { mini: boolean }) {
               <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
                 {name}
               </Typography>
+              {/* Tasarimdaki gibi adin hemen altinda giris e-postasi (#311). */}
               <Typography variant="caption" color="text.secondary" noWrap component="p">
-                {t('nav.myAccount')}
+                {state.user.email ?? t('nav.myAccount')}
               </Typography>
             </Box>
             <ChevronRightRounded fontSize="small" color="action" />
@@ -396,6 +399,14 @@ function UserPanel({ mini }: { mini: boolean }) {
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
+        {/* Sol menudeki "Profilim" kullanici menusunden de acilir (#311). */}
+        <MenuItem onClick={() => go(routes.profile)}>
+          <ListItemIcon>
+            <AccountCircleOutlined fontSize="small" />
+          </ListItemIcon>
+          {t('nav.profile')}
+        </MenuItem>
+        <Divider />
         <MenuItem onClick={() => go(routes.changePassword)}>
           <ListItemIcon>
             <LockResetRounded fontSize="small" />

@@ -3557,6 +3557,8 @@ export interface components {
             firstName: string;
             /** @description Soyad. */
             lastName: string;
+            /** @description Giris e-postasi; kullanici kartinda adin altinda gosterilir. Tanimli degilse `null`. */
+            email: null | string;
             /** @description Izinler. Istemci yalnizca GOSTERIM icin kullanir; denetim her istekte sunucudadir (ADR-0007 §3). */
             permissions: string[];
         };

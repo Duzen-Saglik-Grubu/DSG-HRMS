@@ -70,6 +70,7 @@ public interface IAccessTokenIssuer
 /// <param name="IdleTimeout">Hareketsizlik suresi.</param>
 /// <param name="FirstName">Kullanicinin adi.</param>
 /// <param name="LastName">Kullanicinin soyadi.</param>
+/// <param name="Email">Kullanicinin giris e-postasi (kurumsal e-posta); tanimli degilse <c>null</c>.</param>
 /// <param name="Permissions">Kullanicinin izinleri; istemci yalnizca GOSTERIM icin kullanir (ADR-0007 §3).</param>
 /// <param name="PasswordChangeRequired">Oturum parola degisimi bekliyorsa nedeni (SYG-KMLK-046, 050).</param>
 public sealed record SessionTokens(
@@ -80,6 +81,7 @@ public sealed record SessionTokens(
     TimeSpan IdleTimeout,
     string FirstName,
     string LastName,
+    string? Email,
     IReadOnlyList<string> Permissions,
     PasswordChangeReason? PasswordChangeRequired = null)
 {
