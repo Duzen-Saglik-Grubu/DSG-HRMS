@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Security.Cryptography;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Infrastructure.Logo;
 using Microsoft.Data.SqlClient;
@@ -240,6 +241,32 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
             new LogoAssignmentRecord(1, 1, BranchNumber: 0, DepartmentNumber: 7, TitleCode: "1", StatusCode: "A", OccupationCode: "2511.01", OccupationName: "Programci"));
         details.Assignments.Single(a => a.LogoRef == 2).ShouldBe(
             new LogoAssignmentRecord(2, 2, null, null, null, null, null, null));
+    }
+
+    [Fact]
+    public async Task Photo_digests_are_computed_in_logo_and_images_are_read_only_on_request()
+    {
+        // SYG-PERS-014, ADR-0021 §5: ozet sunucuda hesaplanir; goruntu yalnizca istenen kartlar
+        // icin okunur. Es satiri (yakinlik 1) ve bos goruntu (0 bayt) fotograf degildir.
+        byte[] own = [0xFF, 0xD8, 0xFF, 0xE0, 0x01, 0x02, 0x03];
+        byte[] spouse = [0x89, 0x50, 0x4E, 0x47, 0x09];
+        await ExecuteAsync(AdminConnection(Database), $"""
+            UPDATE LH_001_FAMILY SET LDATA = 0x{Convert.ToHexString(own)} WHERE LREF = 100;
+            UPDATE LH_001_FAMILY SET LDATA = 0x{Convert.ToHexString(spouse)} WHERE LREF = 101;
+            UPDATE LH_001_FAMILY SET LDATA = 0x WHERE LREF = 102;
+            """);
+        var hash = Convert.ToHexString(SHA256.HashData(own));
+
+        var digests = await WithSourceAsync(ReaderConnection(), source => source.GetPhotoDigestsAsync(CancellationToken.None));
+        digests.ShouldBe([new LogoPhotoDigest(1, hash)]);
+
+        var photos = await WithSourceAsync(ReaderConnection(), source => source.GetPhotosAsync([1, 3], CancellationToken.None));
+        var photo = photos.ShouldHaveSingleItem();
+        photo.LogoRef.ShouldBe(1);
+        photo.Hash.ShouldBe(hash);
+        photo.Data.ShouldBe(own);
+
+        (await WithSourceAsync(ReaderConnection(), source => source.GetPhotosAsync([], CancellationToken.None))).ShouldBeEmpty();
     }
 
     [Fact]

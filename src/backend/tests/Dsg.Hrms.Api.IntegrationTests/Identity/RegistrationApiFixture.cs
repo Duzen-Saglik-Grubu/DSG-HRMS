@@ -100,7 +100,7 @@ public class RegistrationApiFixture : IAsyncLifetime
         return await action(scope.ServiceProvider.GetRequiredService<HrmsDbContext>());
     }
 
-    /// <summary>Denemeler, kod istekleri ve hesaplar silinir; kisiler kalir. Saat ilerletilir.</summary>
+    /// <summary>Denemeler, kod istekleri, hesaplar ve fotograflar silinir; kisiler kalir. Saat ilerletilir.</summary>
     public async Task ResetAsync()
     {
         Messages.Clear();
@@ -110,7 +110,7 @@ public class RegistrationApiFixture : IAsyncLifetime
             await context.Database.ExecuteSqlRawAsync(
                 "DELETE FROM identity.refresh_token; DELETE FROM identity.user_session; DELETE FROM identity.login_challenge; DELETE FROM identity.login_throttle; " +
                 "DELETE FROM identity.registration_code_request; DELETE FROM identity.registration_attempt; DELETE FROM identity.verification_code; DELETE FROM identity.user_role; DELETE FROM identity.user_account; DELETE FROM identity.account_invitation; " +
-                "DELETE FROM settings.system_parameter; DELETE FROM settings.brand_logo;");
+                "DELETE FROM settings.system_parameter; DELETE FROM settings.brand_logo; DELETE FROM personnel.person_photo;");
             return 0;
         });
 

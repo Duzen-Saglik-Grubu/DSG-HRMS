@@ -146,6 +146,28 @@ gerçekleştirme notu düşülür.
   Fotoğraf ayrıca erişim kaydı üretmez: fotoğraf, erişim kaydı yazılan kart veya liste
   görüntülemesinin parçasıdır (revizyon 1.2, B-18).
 
+> **Gerçekleştirme notu (#313, 02.11.2026):**
+>
+> - **Hangi kartın fotoğrafı:** Kişinin fotoğrafı, genel bilgileri gibi **esas istihdamının**
+>   kartından alınır (`KR-126`). Esas kartta fotoğraf yoksa kişinin fotoğrafı yoktur; başka
+>   sicilin fotoğrafına düşülmez. Liste kartında görünen sicil ile fotoğrafın kaynağı hep aynıdır.
+> - **Özet:** LOGO'da `CONVERT(char(64), HASHBYTES('SHA2_256', CAST(LDATA AS varbinary(max))), 2)`
+>   ile alınır. Görüntü okunduğunda özet okunan baytlardan yeniden hesaplanır ve o saklanır;
+>   iki sorgu arasında LOGO'da fotoğraf değişirse saklanan özet saklanan görüntüyle yine aynıdır.
+>   Boş görüntü (0 bayt) fotoğraf sayılmaz.
+> - **Parçalı okuma:** Görüntüler 50'şerli gruplarla okunur ve her grup hemen veritabanına
+>   yazılır (yaklaşık 14 MB bellek); işlem adımın sonunda onaylanır.
+> - **EXIF yönü:** `SKImage.FromEncodedData` yönü çözümleme sırasında uygular; ayrıca
+>   döndürülmez. Kütüphane davranışı değişirse `SkiaPhotoThumbnailerTests` düşer.
+> - **Önbellek:** Yanıt `Cache-Control: private, no-cache` taşır: tarayıcı her gösterimde özeti
+>   sorar (`If-None-Match`) ve değişmeyen fotoğraf için `304` alır.
+> - **İlk ölçüm (yerel ortam, gerçek LOGO, salt okunur; 01–02.11.2026):** 990 fotoğrafın özeti
+>   yaklaşık 1,6 sn. İlk aktarım (bütün fotoğraflar) 34 sn sürdü ve 867 fotoğraf saklandı;
+>   ortalama 14 KB, toplam 12 MB (tahmin ≈30 KB ve ≈15 MB idi). Fotoğrafı değişmeyen ikinci
+>   çalışma 2 sn sürdü; görüntü okunmadı ve denetim izine kayıt düşmedi. LOGO sunucusundaki
+>   okuma yükü (okunan sayfa sayısı) UAT'de ayrıca ölçülür (B-13); şimdilik §5'teki iki
+>   iyileştirmeye gerek görülmedi.
+
 ### 6. Veritabanı kuralları (#246'dan)
 
 - **Enum kolonları** iş tablolarında tamsayı ve `CHECK` kısıtlıdır. T1'in yeni enum
@@ -243,3 +265,4 @@ yeniden üretilebilir.
 | 2026-10-22 | 1.1 | §7: ad gösterimi LOGO'daki gibi büyük harf (İK, 22.10.2026, #265) | Bilgi İşlem |
 | 2026-10-22 | 1.2 | Revizyon (#267, #268): korumalı alanlar `person_sensitive` tablosunda (B-11); çalışma şekli kapsam dışı (#270, B-05); `branch`/`department` ile `organization_unit` (B-16); tarih aralığı kuralları (B-06); `btree_gist` yetkisi (B-19); `HASHBYTES` için `CAST` ve LOGO yükü ölçümü (B-13); fotoğraf ucu önbellek ve kayıt (B-18); sınıflandırma kapsamı (B-12); arama anahtarı ve dizin (B-17) | Bilgi İşlem |
 | 2026-10-24 | 1.3 | §1: atamaya firma (değişiklik talebi #284); §2: bitmiş istihdamın ilk kaydı, geriye dönük çıkış, atamada silme yok (SYG-PERS AN-19, #285) | Bilgi İşlem |
+| 2026-11-02 | 1.4 | §5 gerçekleştirme notu: fotoğrafın kaynağı esas istihdam, parçalı okuma, EXIF, önbellek ve ilk yerel ölçüm (#313) | Bilgi İşlem |

@@ -32,7 +32,23 @@ public interface IPersonnelQuery
     /// suresi dolmus ayrilan kisi listede yoktur.
     /// </summary>
     Task<PagedResult<PersonListItem>> ListAsync(PersonnelViewer viewer, PersonListCriteria criteria, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Kisinin fotografi (SYG-PERS-041); kart ile ayni kapsam ve gorunur kalma kurali. Kapsam
+    /// disindaysa, kisi yoksa veya fotografi yoksa <c>null</c>.
+    /// </summary>
+    Task<PhotoRecord?> FindPhotoAsync(Guid personId, PersonnelViewer viewer, CancellationToken cancellationToken);
+
+    /// <summary>Kullanicinin kendi fotografi; yoksa <c>null</c>.</summary>
+    Task<PhotoRecord?> FindOwnPhotoAsync(PersonnelViewer viewer, CancellationToken cancellationToken);
 }
+
+/// <summary>Saklanan fotograf.</summary>
+/// <param name="Content">Kucultulmus JPEG.</param>
+/// <param name="SourceHash">LOGO'daki orijinalin SHA-256 ozeti; ETag olarak kullanilir.</param>
+#pragma warning disable CA1819 // Goruntu baytlari kopyalanmadan yanita yazilir.
+public sealed record PhotoRecord(byte[] Content, string SourceHash);
+#pragma warning restore CA1819
 
 /// <summary>Kisi kaydinin okunan hali.</summary>
 /// <param name="Id">Ic kimlik (gorunurluk karari icin; disariya verilmez).</param>
@@ -57,7 +73,11 @@ public sealed record PersonRecord(
     string? MobilePhone,
     IReadOnlyList<EmploymentRecord> Employments,
     PersonProfile Profile,
-    string? Address);
+    string? Address)
+{
+    /// <summary>Kisinin saklanan fotografi var mi (SYG-PERS-040).</summary>
+    public bool HasPhoto { get; init; }
+}
 
 /// <summary>Istihdamin okunan hali.</summary>
 /// <param name="Id">Ic kimlik (disariya verilmez).</param>

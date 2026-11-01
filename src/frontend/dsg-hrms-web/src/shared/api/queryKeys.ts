@@ -17,6 +17,7 @@ export const queryKeys = {
     filterOptions: ['personnel', 'filter-options'] as const,
     card: (personId: string) => ['personnel', 'card', personId] as const,
     me: ['personnel', 'card', 'me'] as const,
+    photo: (personId: string) => ['personnel', 'photo', personId] as const,
   },
   identity: {
     publicSettings: ['identity', 'public-settings'] as const,

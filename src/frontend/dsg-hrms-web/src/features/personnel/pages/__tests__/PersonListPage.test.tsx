@@ -20,6 +20,7 @@ const AYSE: PersonListItem = {
   departmentName: 'Bilgi İşlem',
   titleName: 'Uzman',
   dutyName: 'Biyolog',
+  hasPhoto: false,
 };
 
 const MEHMET: PersonListItem = {
@@ -34,6 +35,7 @@ const MEHMET: PersonListItem = {
   departmentName: null,
   titleName: null,
   dutyName: null,
+  hasPhoto: false,
 };
 
 function options(overrides: Partial<PersonFilterOptions> = {}): PersonFilterOptions {
@@ -93,6 +95,36 @@ describe('PersonListPage', () => {
     // Durum gonderilmez: sunucunun varsayilani Aktif (SYG-PERS-027).
     expect(lastQuery().has('status')).toBe(false);
     expect(screen.getByRole('button', { name: 'Aktif' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('fotografi olan kiside fotograf, olmayanda bas harfler gorunur (SYG-PERS-040)', async () => {
+    vi.spyOn(personsApi, 'list').mockResolvedValue({
+      items: [{ ...AYSE, hasPhoto: true }, MEHMET],
+      page: 1,
+      pageSize: 24,
+      totalCount: 2,
+      totalPages: 1,
+    });
+    const photo = vi.spyOn(personsApi, 'photo').mockResolvedValue(new Blob(['jpeg']));
+    // jsdom nesne adresi uretmez; yalnizca bu iki islev tanimlanir.
+    URL.createObjectURL = () => 'blob:ayse';
+    URL.revokeObjectURL = vi.fn();
+    renderWithProviders(<PersonListPage />);
+
+    const ayse = await screen.findByRole('article', { name: 'AYŞE DEMİR' });
+    await waitFor(() =>
+      expect(within(ayse).getByRole('img', { name: 'AYŞE DEMİR fotoğrafı' })).toHaveAttribute(
+        'src',
+        'blob:ayse',
+      ),
+    );
+    const mehmet = screen.getByRole('article', { name: 'MEHMET KAYA' });
+    expect(within(mehmet).getByRole('img', { name: 'MEHMET KAYA fotoğrafı' })).toHaveTextContent(
+      'MK',
+    );
+    // Fotografi olmayan kisi icin istek yapilmaz.
+    expect(photo).toHaveBeenCalledTimes(1);
+    expect(photo).toHaveBeenCalledWith('p-1');
   });
 
   it('gorunum degistirici ayni suzgec ve sayfayla tabloya gecer ve geri doner', async () => {

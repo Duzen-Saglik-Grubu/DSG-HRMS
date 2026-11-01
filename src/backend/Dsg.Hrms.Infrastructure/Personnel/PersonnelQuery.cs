@@ -75,6 +75,11 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
         var byPerson = employments.ToLookup(e => e.PersonId);
+        var withPhoto = (await context.Set<PersonPhoto>()
+            .Where(photo => personIds.Contains(photo.PersonId))
+            .Select(photo => photo.PersonId)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false)).ToHashSet();
 
         // Kartta gosterilen esas istihdam (KR-126); nitelikleri yalnizca bu sayfa icin okunur.
         var primaries = page
@@ -103,7 +108,10 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
                         current?.BranchName,
                         current?.DepartmentName,
                         current?.TitleName,
-                        primary is null ? null : duties.GetValueOrDefault(primary.Id)?.Name));
+                        primary is null ? null : duties.GetValueOrDefault(primary.Id)?.Name))
+            {
+                HasPhoto = withPhoto.Contains(p.Id),
+            };
         }).ToList();
 
         return new PagedResult<PersonListItem>(items, Math.Max(1, criteria.Page.Page), criteria.Page.PageSize, total);
@@ -328,6 +336,38 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
     }
 
     /// <inheritdoc />
+    public async Task<PhotoRecord?> FindPhotoAsync(Guid personId, PersonnelViewer viewer, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(viewer);
+
+        // Kart ile ayni kapsam ve gorunur kalma kurali (SYG-PERS-041, 028).
+        var persons = await VisibleAsync(InScope(viewer), cancellationToken).ConfigureAwait(false);
+        return await persons
+            .Where(person => person.PublicId == personId)
+            .Join(context.Set<PersonPhoto>(), person => person.Id, photo => photo.PersonId, (_, photo) => new PhotoRecord(photo.Content, photo.SourceHash))
+            .SingleOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async Task<PhotoRecord?> FindOwnPhotoAsync(PersonnelViewer viewer, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(viewer);
+
+        if (viewer.PersonId is not { } own)
+        {
+            return null;
+        }
+
+        return await context.Set<PersonPhoto>()
+            .AsNoTracking()
+            .Where(photo => photo.PersonId == own)
+            .Select(photo => new PhotoRecord(photo.Content, photo.SourceHash))
+            .SingleOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public Task<PersonRecord?> FindOwnAsync(PersonnelViewer viewer, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(viewer);
@@ -437,7 +477,10 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
                     .Select(e => new EmploymentRecord(e.Id, e.RegistryCode, e.Company.Name, e.HireDate, e.TerminationDate, e.IsActive))
                     .ToList(),
                 new PersonProfile(person.Gender, person.PreviousSurname, person.MaritalStatus, person.EducationName),
-                context.Set<PersonSensitive>().Where(s => s.PersonId == person.Id).Select(s => s.Address).FirstOrDefault()))
+                context.Set<PersonSensitive>().Where(s => s.PersonId == person.Id).Select(s => s.Address).FirstOrDefault())
+            {
+                HasPhoto = context.Set<PersonPhoto>().Any(photo => photo.PersonId == person.Id),
+            })
             .SingleOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
 }

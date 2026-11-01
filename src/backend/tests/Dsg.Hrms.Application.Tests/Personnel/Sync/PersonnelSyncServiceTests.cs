@@ -38,7 +38,7 @@ public sealed class PersonnelSyncServiceTests
     }
 
     private PersonnelSyncService CreateService() =>
-        new(_source, _store, _clock, _parameters, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance);
+        new(_source, _store, _clock, _parameters, new PersonnelSyncOptions(), Substitute.For<IPhotoThumbnailer>(), NullLogger<PersonnelSyncService>.Instance);
 
     [Fact]
     public async Task Successful_run_applies_changes_and_records_the_run()

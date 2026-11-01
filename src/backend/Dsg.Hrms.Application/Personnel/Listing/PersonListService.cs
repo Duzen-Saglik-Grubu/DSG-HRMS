@@ -103,7 +103,11 @@ public sealed record PersonListItem(
     string LastName,
     bool IsActive,
     int EmploymentCount,
-    PrimaryEmployment? Primary);
+    PrimaryEmployment? Primary)
+{
+    /// <summary>Kisinin fotografi var mi; yoksa kartta bas harfler gosterilir (SYG-PERS-040).</summary>
+    public bool HasPhoto { get; init; }
+}
 
 /// <summary>Kartta gosterilen esas istihdam.</summary>
 /// <param name="RegistryCode">Sicil.</param>

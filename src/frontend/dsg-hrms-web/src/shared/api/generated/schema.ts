@@ -817,6 +817,130 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/persons/me/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kullanicinin kendi fotografi. Izin gerektirmez. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Fotograf (JPEG, uzun kenar en fazla 400 piksel). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "image/jpeg": components["schemas"]["FileContentResult"];
+                    };
+                };
+                /** @description Tarayicidaki surum guncel. */
+                304: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Fotograf yok. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/persons/{personId}/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kisinin fotografi. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Fotograf (JPEG, uzun kenar en fazla 400 piksel). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "image/jpeg": components["schemas"]["FileContentResult"];
+                    };
+                };
+                /** @description Tarayicidaki surum guncel. */
+                304: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi yok, kapsam disinda veya fotografi yok (ayirt edilemez). */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons": {
         parameters: {
             query?: never;
@@ -3349,6 +3473,8 @@ export interface components {
             /** @description Egitim; kayitli degilse bos. */
             educationName: null | string;
             sensitive: null | components["schemas"]["SensitiveResponse"];
+            /** @description Fotografi var mi; varsa `/persons/{personId}/photo` (kendi kartinda `/persons/me/photo`) ucundan alinir. */
+            hasPhoto: boolean;
         };
         /** @description Suzgec secenekleri (SYG-PERS-024, 026). */
         PersonFilterOptionsResponse: {
@@ -3415,6 +3541,8 @@ export interface components {
             titleName: null | string;
             /** @description Gorev. */
             dutyName: null | string;
+            /** @description Fotografi var mi; varsa `/persons/{personId}/photo` ucundan alinir. */
+            hasPhoto: boolean;
         };
         /**
          * @description Liste siralama alani.

@@ -240,7 +240,7 @@ public sealed class AccountLifecycleTests
         clock.Today.Returns(Today);
         var parameters = new FakeSystemParameters().With(ParameterCatalog.AutoDeactivateOnEmploymentEnd, parameterValue);
 
-        var result = await new PersonnelSyncService(source, store, clock, parameters, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance)
+        var result = await new PersonnelSyncService(source, store, clock, parameters, new PersonnelSyncOptions(), Substitute.For<IPhotoThumbnailer>(), NullLogger<PersonnelSyncService>.Instance)
             .RunAsync(SyncTrigger.Scheduled, CancellationToken.None);
 
         result.Status.ShouldBe(SyncStatus.Succeeded);

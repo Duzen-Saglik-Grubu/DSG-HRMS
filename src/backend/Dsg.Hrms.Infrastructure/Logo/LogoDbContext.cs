@@ -128,6 +128,7 @@ public sealed class LogoDbContext : DbContext
             family.Property(f => f.IdentityRef).HasColumnName("IDREF");
             family.Property(f => f.Relation).HasColumnName("RELATION");
             family.Property(f => f.MaritalStatus).HasColumnName("STATUS");
+            family.Property(f => f.Photo).HasColumnName("LDATA").HasColumnType("image");
         });
 
         modelBuilder.Entity<LogoIdentityInfo>(info =>
@@ -270,6 +271,13 @@ public sealed class LogoFamily
 
     /// <summary>Medeni hal (1 evli).</summary>
     public short? MaritalStatus { get; init; }
+
+    /// <summary>
+    /// Fotograf (<c>LDATA</c>, eski <c>image</c> turu; JPEG veya PNG). Ortalama 280 KB oldugu icin
+    /// sorgular bu alani yalnizca ozeti degisen kartlar icin secer (ADR-0021 §5); varligin tamami
+    /// hicbir yerde yuklenmez.
+    /// </summary>
+    public byte[]? Photo { get; init; }
 }
 
 /// <summary>LOGO kimlik ek bilgisi (<c>LH_001_PERIDINF</c>).</summary>

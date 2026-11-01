@@ -1855,6 +1855,73 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.PersonPhoto", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<byte[]>("Content")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("content");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_by");
+
+                    b.Property<long>("PersonId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("person_id");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_id");
+
+                    b.Property<string>("SourceHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("text")
+                        .HasColumnName("source_hash");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("updated_by");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_person_photo");
+
+                    b.HasIndex("PersonId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_person_photo_person_id");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_person_photo_public_id");
+
+                    b.ToTable("person_photo", "personnel", t =>
+                        {
+                            t.HasCheckConstraint("ck_person_photo_source_hash", "char_length(source_hash) = 64");
+                        });
+                });
+
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.PersonSensitive", b =>
                 {
                     b.Property<long>("Id")
@@ -2716,6 +2783,16 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_employment_duty_employment_employment_id");
+                });
+
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.PersonPhoto", b =>
+                {
+                    b.HasOne("Dsg.Hrms.Domain.Personnel.Person", null)
+                        .WithOne()
+                        .HasForeignKey("Dsg.Hrms.Domain.Personnel.PersonPhoto", "PersonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_person_photo_person_person_id");
                 });
 
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.PersonSensitive", b =>
