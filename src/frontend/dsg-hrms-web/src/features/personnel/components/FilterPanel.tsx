@@ -3,6 +3,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  Checkbox,
   Divider,
   Drawer,
   IconButton,
@@ -207,17 +208,26 @@ function MultiSelect({
     .getAll(name)
     .map((value) => choices.find((choice) => choice.value === value) ?? { value, label: value });
 
+  // Secim yapinca liste kapanmaz; her secenekte onay kutusu vardir (#306). Boylece birden fazla
+  // deger, listeyi yeniden acmadan secilir.
   return (
     <Autocomplete
       multiple
       size="small"
       options={choices}
       value={selected}
+      disableCloseOnSelect
+      limitTags={3}
       getOptionLabel={(option) => option.label}
       isOptionEqualToValue={(option, value) => option.value === value.value}
-      filterSelectedOptions
       noOptionsText={t('personnel.list.panel.noOptions')}
       onChange={(_, values) => onChange({ [name]: values.map((value) => value.value) })}
+      renderOption={({ key: _key, ...props }, option, { selected: checked }) => (
+        <li key={option.value} {...props}>
+          <Checkbox size="small" checked={checked} sx={{ mr: 1, p: 0.5 }} tabIndex={-1} />
+          {option.label}
+        </li>
+      )}
       renderInput={(input) => <TextField {...input} label={t(`personnel.list.fields.${name}`)} />}
     />
   );
