@@ -15,7 +15,7 @@ test('1. yonetici: liste kart izgarasiyla acilir, arar ve tabloya gecer (SYG-PER
   page,
 }) => {
   await signIn(page, people.admin.email, passwords.first);
-  await page.getByRole('link', { name: 'Personel' }).click();
+  await page.getByRole('link', { name: 'Personel listesi', exact: true }).click();
 
   await expect(page.getByRole('article', { name: 'Deniz Davetli' })).toBeVisible();
   await expect(page.getByRole('article', { name: 'Yusuf Yonetici' })).toBeVisible();
@@ -44,7 +44,7 @@ test('2. rolu olmayan personel baglantiyi gormez, listede yalnizca kendini gorur
 }) => {
   await signIn(page, people.unprivileged.email, passwords.first);
   await expect(page.getByRole('button', { name: people.unprivileged.fullName })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Personel' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Personel listesi', exact: true })).toHaveCount(0);
 
   await page.goto('/personnel');
   await expect(page.getByRole('article', { name: 'Zeynep Izinsiz' })).toBeVisible();

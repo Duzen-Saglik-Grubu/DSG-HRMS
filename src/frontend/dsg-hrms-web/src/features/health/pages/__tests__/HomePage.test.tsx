@@ -1,9 +1,12 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router';
 import { AppProviders } from '@/app/AppProviders';
 import { HomePage } from '../HomePage';
 import * as healthApi from '@/shared/api/health';
+import { permissions } from '@/shared/auth/permissions';
+import { setSession } from '@/test/session';
 
 /**
  * Ana sayfanin uc durumu da dogrulanir: yukleniyor, basarili, hatali.
@@ -19,7 +22,9 @@ function renderHomePage() {
 
   return render(
     <AppProviders queryClient={queryClient}>
-      <HomePage />
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>
     </AppProviders>,
   );
 }
@@ -67,5 +72,24 @@ describe('HomePage', () => {
     });
 
     expect(screen.getByText(/DESTEK-2026-0042/)).toBeInTheDocument();
+  });
+});
+
+describe('HomePage hizli erisim', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.spyOn(healthApi, 'fetchHealth').mockReturnValue(new Promise(() => undefined));
+  });
+
+  it('kartlar izne gore gorunur (#309)', async () => {
+    await setSession({ status: 'authenticated', permissions: [permissions.personView] });
+
+    renderHomePage();
+
+    expect(screen.getByRole('heading', { level: 1, name: /Ahmet/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Personel/ })).toHaveAttribute('href', '/personnel');
+    expect(screen.getByRole('link', { name: /Parolamı değiştir/ })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Hesap işlemleri/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Sistem parametreleri/ })).not.toBeInTheDocument();
   });
 });

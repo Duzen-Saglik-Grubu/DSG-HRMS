@@ -1,89 +1,335 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import {
-  AppBar,
+  Avatar,
   Box,
+  Breadcrumbs,
   Button,
-  Container,
+  Drawer,
+  IconButton,
+  InputAdornment,
   ListItemIcon,
   Menu,
   MenuItem,
-  Toolbar,
+  TextField,
+  Tooltip,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
-import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
-import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
+import { alpha, useTheme } from '@mui/material/styles';
+import ChevronRightRounded from '@mui/icons-material/ChevronRightRounded';
+import KeyboardDoubleArrowLeftRounded from '@mui/icons-material/KeyboardDoubleArrowLeftRounded';
+import KeyboardDoubleArrowRightRounded from '@mui/icons-material/KeyboardDoubleArrowRightRounded';
 import LockResetRounded from '@mui/icons-material/LockResetRounded';
-import ManageAccountsOutlined from '@mui/icons-material/ManageAccountsOutlined';
-import SecurityOutlined from '@mui/icons-material/SecurityOutlined';
-import TuneRounded from '@mui/icons-material/TuneRounded';
 import LogoutRounded from '@mui/icons-material/LogoutRounded';
+import MenuRounded from '@mui/icons-material/MenuRounded';
+import SearchRounded from '@mui/icons-material/SearchRounded';
+import SecurityOutlined from '@mui/icons-material/SecurityOutlined';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { NavLink, Outlet, useNavigate } from 'react-router';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { fetchPublicSettings } from '@/shared/api/publicSettings';
 import { queryKeys } from '@/shared/api/queryKeys';
+import { permissions } from '@/shared/auth/permissions';
 import { session, useSession } from '@/shared/auth/session';
 import { SessionActivity } from '@/shared/auth/SessionActivity';
-import { permissions } from '@/shared/auth/permissions';
 import { usePermission } from '@/shared/auth/usePermission';
+import { DEFAULT_LOGO_URL, uploadedLogoUrl } from '@/shared/branding';
 import { routes } from '@/shared/routes';
+import { findNavItem, navigation } from './navigation';
+
+/** Acik ve daraltilmis sol menu genisligi. */
+const SIDEBAR_WIDTH = 264;
+const SIDEBAR_MINI_WIDTH = 76;
+
+/** Daraltma tercihinin tarayicida tutuldugu anahtar (yalnizca gorunum tercihi). */
+const COLLAPSED_KEY = 'dsg-hrms.sidebar-collapsed';
+
+function readCollapsed(): boolean {
+  try {
+    return localStorage.getItem(COLLAPSED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeCollapsed(value: boolean): void {
+  try {
+    localStorage.setItem(COLLAPSED_KEY, value ? '1' : '0');
+  } catch {
+    // Tarayici depolamaya izin vermiyorsa tercih yalnizca bu oturumda gecerlidir.
+  }
+}
 
 /**
- * Uygulama kabugu: ust cubuk ve icerik alani.
+ * Uygulama kabugu (ornek tasarim MainScreen.jpeg, #309): bolum basliklari olan sol menu, konum
+ * yolu ve hizli arama bulunan ust cubuk, icerik alani.
  *
- * Gezinme menusu, yetkilendirme altyapisi kurulduktan sonra eklenecektir;
- * menu ogeleri kullanicinin yetkisine gore belirlenir (ADR-0007).
+ * Genis ekranda menu sabittir ve daraltilabilir; telefonda ust cubuktaki dugmeyle acilan cekmece
+ * olur. Menu ogeleri izne gore gorunur (ADR-0007); asil denetim sunucudadir.
  */
 export function AppLayout() {
-  const { t } = useTranslation();
-  const canViewPersonnel = usePermission(permissions.personView);
+  const theme = useTheme();
+  // Ilk cizimde dogru duzen secilir (titreme olmaz); matchMedia olmayan ortamda genis duzen.
+  const desktop = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true, defaultMatches: true });
+  const [collapsed, setCollapsed] = useState(readCollapsed);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const mini = desktop && collapsed;
+  const width = mini ? SIDEBAR_MINI_WIDTH : SIDEBAR_WIDTH;
+
+  const toggle = () => {
+    setCollapsed((current) => {
+      writeCollapsed(!current);
+      return !current;
+    });
+  };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static" color="primary">
-        <Toolbar sx={{ gap: 2 }}>
-          <Typography variant="h6" component="h1" sx={{ flexGrow: 1 }}>
-            {t('app.name')}
-          </Typography>
-          <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
-            {t('app.organization')}
-          </Typography>
-          {canViewPersonnel ? (
-            // Rolu olmayan personel listede yalnizca kendini gorur; baglanti ona sunulmaz.
-            <Button
-              color="inherit"
-              component={NavLink}
-              to={routes.personnel}
-              startIcon={<BadgeOutlined />}
-              sx={{ textTransform: 'none' }}
-            >
-              {t('nav.personnel')}
-            </Button>
-          ) : null}
-          <UserMenu />
-        </Toolbar>
-      </AppBar>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+      {desktop ? (
+        <Box
+          component="nav"
+          sx={{
+            width,
+            flexShrink: 0,
+            transition: theme.transitions.create('width'),
+          }}
+        >
+          <Box
+            sx={{
+              position: 'fixed',
+              insetBlock: 0,
+              left: 0,
+              width,
+              transition: theme.transitions.create('width'),
+              borderRight: 1,
+              borderColor: 'divider',
+              bgcolor: 'background.paper',
+              zIndex: theme.zIndex.appBar,
+            }}
+          >
+            <Sidebar mini={mini} onToggle={toggle} />
+          </Box>
+        </Box>
+      ) : (
+        <Drawer
+          open={mobileOpen}
+          onClose={() => setMobileOpen(false)}
+          slotProps={{ paper: { sx: { width: SIDEBAR_WIDTH } } }}
+        >
+          <Box component="nav" sx={{ height: '100%' }}>
+            <Sidebar mini={false} onNavigate={() => setMobileOpen(false)} />
+          </Box>
+        </Drawer>
+      )}
 
-      <Container component="main" maxWidth="lg" sx={{ py: 3, flexGrow: 1 }}>
-        <Outlet />
-      </Container>
+      <Box sx={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+        <TopBar onOpenMenu={desktop ? undefined : () => setMobileOpen(true)} />
+        <Box
+          component="main"
+          sx={{ flexGrow: 1, px: { xs: 2, sm: 3, lg: 4 }, py: 3, maxWidth: 1600, width: '100%' }}
+        >
+          <Outlet />
+        </Box>
+      </Box>
 
       <SessionActivity />
     </Box>
   );
 }
 
+interface SidebarProps {
+  mini: boolean;
+  onToggle?: () => void;
+  onNavigate?: () => void;
+}
+
+/** Logo, bolumlu gezinme ve altta kullanici karti ile cikis. */
+function Sidebar({ mini, onToggle, onNavigate }: SidebarProps) {
+  const { t } = useTranslation();
+  const state = useSession();
+  const granted = state.status === 'authenticated' ? state.user.permissions : [];
+  const sections = navigation
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => !item.permission || granted.includes(item.permission)),
+    }))
+    .filter((section) => section.items.length > 0);
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Brand mini={mini} onToggle={onToggle} />
+
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden', px: mini ? 1.5 : 2, py: 1 }}>
+        {sections.map((section) => (
+          <Box key={section.key} component="section" aria-label={t(section.label)} sx={{ mb: 2 }}>
+            {mini ? (
+              <Box sx={{ height: 12 }} />
+            ) : (
+              <Typography
+                variant="overline"
+                component="h2"
+                sx={{
+                  display: 'block',
+                  px: 1.5,
+                  color: 'text.secondary',
+                  fontWeight: 600,
+                  letterSpacing: '0.08em',
+                }}
+              >
+                {t(section.label)}
+              </Typography>
+            )}
+            <Box component="ul" sx={{ listStyle: 'none', m: 0, p: 0 }}>
+              {section.items.map((item) => (
+                <Box component="li" key={item.to} sx={{ mb: 0.5 }}>
+                  <NavEntry item={item} mini={mini} onNavigate={onNavigate} />
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        ))}
+      </Box>
+
+      <UserPanel mini={mini} />
+    </Box>
+  );
+}
+
+function Brand({ mini, onToggle }: { mini: boolean; onToggle: (() => void) | undefined }) {
+  const { t } = useTranslation();
+  const [logoFailed, setLogoFailed] = useState(false);
+  const settings = useQuery({
+    queryKey: queryKeys.identity.publicSettings,
+    queryFn: fetchPublicSettings,
+    staleTime: 5 * 60_000,
+  });
+  // Yuklu logo varsa o, yoksa veya yuklenemezse depodaki varsayilan logo (SYG-KMLK-069).
+  const version = settings.data?.logoVersion;
+  const logoUrl = version && !logoFailed ? uploadedLogoUrl(version) : DEFAULT_LOGO_URL;
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        px: mini ? 1.5 : 2.5,
+        height: 72,
+        borderBottom: 1,
+        borderColor: 'divider',
+        justifyContent: mini ? 'center' : 'flex-start',
+      }}
+    >
+      {mini ? null : (
+        <>
+          <Box
+            component="img"
+            src={logoUrl}
+            alt={t('app.organization')}
+            onError={() => setLogoFailed(true)}
+            sx={{ height: 36, maxWidth: 48, objectFit: 'contain' }}
+          />
+          <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+            <Typography
+              variant="subtitle1"
+              component="p"
+              sx={{ fontWeight: 800, color: 'primary.main', lineHeight: 1.2 }}
+            >
+              {t('app.name')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" noWrap component="p">
+              {t('app.organization')}
+            </Typography>
+          </Box>
+        </>
+      )}
+      {onToggle ? (
+        <Tooltip title={mini ? t('nav.expand') : t('nav.collapse')} placement="right">
+          <IconButton
+            size="small"
+            onClick={onToggle}
+            aria-label={mini ? t('nav.expand') : t('nav.collapse')}
+            sx={{ border: 1, borderColor: 'divider', borderRadius: 1.5 }}
+          >
+            {mini ? (
+              <KeyboardDoubleArrowRightRounded fontSize="small" />
+            ) : (
+              <KeyboardDoubleArrowLeftRounded fontSize="small" />
+            )}
+          </IconButton>
+        </Tooltip>
+      ) : null}
+    </Box>
+  );
+}
+
+function NavEntry({
+  item,
+  mini,
+  onNavigate,
+}: {
+  item: (typeof navigation)[number]['items'][number];
+  mini: boolean;
+  onNavigate: (() => void) | undefined;
+}) {
+  const { t } = useTranslation();
+  const Icon = item.icon;
+  const label = t(item.label);
+
+  const link = (
+    <Box
+      component={NavLink}
+      to={item.to}
+      end={item.to === routes.home}
+      onClick={onNavigate}
+      aria-label={mini ? label : undefined}
+      sx={(theme) => ({
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        px: 1.5,
+        py: 1,
+        justifyContent: mini ? 'center' : 'flex-start',
+        borderRadius: 2,
+        border: 1,
+        borderColor: 'transparent',
+        color: 'text.secondary',
+        textDecoration: 'none',
+        fontWeight: 500,
+        transition: theme.transitions.create(['background-color', 'color']),
+        '&:hover': { bgcolor: 'action.hover', color: 'text.primary' },
+        '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
+        '&.active': {
+          bgcolor: alpha(theme.palette.primary.main, 0.08),
+          borderColor: alpha(theme.palette.primary.main, 0.25),
+          color: 'primary.main',
+          fontWeight: 600,
+        },
+      })}
+    >
+      <Icon fontSize="small" />
+      {mini ? null : <Box component="span">{label}</Box>}
+    </Box>
+  );
+
+  return mini ? (
+    <Tooltip title={label} placement="right">
+      {link}
+    </Tooltip>
+  ) : (
+    link
+  );
+}
+
 /**
- * Oturumdaki kullanicinin adi, parola degisikligi, hesap guvenligi ve cikis
- * (SYG-KMLK-043, 048, 080). Hesap guvenligi yalnizca iki adimli dogrulama sistemde
- * kullaniliyorsa gorunur; sayfa yine de adresiyle acilabilir.
+ * Oturumdaki kullanici, parola degisikligi, hesap guvenligi ve cikis (SYG-KMLK-043, 048, 080).
+ * Hesap guvenligi yalnizca iki adimli dogrulama sistemde kullaniliyorsa gorunur; sayfa yine de
+ * adresiyle acilabilir.
  */
-function UserMenu() {
+function UserPanel({ mini }: { mini: boolean }) {
   const { t } = useTranslation();
   const state = useSession();
   const navigate = useNavigate();
-  const canManageAccounts = usePermission(permissions.accountView);
-  const canViewParameters = usePermission(permissions.parameterView);
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const settings = useQuery({
     queryKey: queryKeys.identity.publicSettings,
@@ -98,75 +344,66 @@ function UserMenu() {
   }
 
   const name = `${state.user.firstName} ${state.user.lastName}`;
+  const initials = `${state.user.firstName.charAt(0)}${state.user.lastName.charAt(0)}`;
+  const go = (to: string) => {
+    setAnchor(null);
+    void navigate(to);
+  };
 
   return (
-    <>
+    <Box sx={{ p: mini ? 1.5 : 2, borderTop: 1, borderColor: 'divider' }}>
       <Button
         color="inherit"
-        startIcon={<AccountCircleOutlined />}
+        fullWidth
+        aria-label={name}
         aria-haspopup="menu"
         aria-expanded={anchor ? 'true' : undefined}
         aria-controls={anchor ? 'user-menu' : undefined}
         onClick={(event) => setAnchor(event.currentTarget)}
-        sx={{ textTransform: 'none', minWidth: 0 }}
+        sx={{
+          justifyContent: mini ? 'center' : 'flex-start',
+          gap: 1.5,
+          p: 1,
+          minWidth: 0,
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: 2,
+          textAlign: 'left',
+        }}
       >
-        <Box
-          component="span"
-          sx={{
-            maxWidth: { xs: 120, sm: 240 },
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {name}
-        </Box>
+        <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.main', fontSize: '0.9rem' }}>
+          {initials}
+        </Avatar>
+        {mini ? null : (
+          <>
+            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                {name}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" noWrap component="p">
+                {t('nav.myAccount')}
+              </Typography>
+            </Box>
+            <ChevronRightRounded fontSize="small" color="action" />
+          </>
+        )}
       </Button>
-      <Menu id="user-menu" anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
-        {canManageAccounts ? (
-          <MenuItem
-            onClick={() => {
-              setAnchor(null);
-              void navigate(routes.accounts);
-            }}
-          >
-            <ListItemIcon>
-              <ManageAccountsOutlined fontSize="small" />
-            </ListItemIcon>
-            {t('identity.accounts.title')}
-          </MenuItem>
-        ) : null}
-        {canViewParameters ? (
-          <MenuItem
-            onClick={() => {
-              setAnchor(null);
-              void navigate(routes.parameters);
-            }}
-          >
-            <ListItemIcon>
-              <TuneRounded fontSize="small" />
-            </ListItemIcon>
-            {t('system.parameters.title')}
-          </MenuItem>
-        ) : null}
-        <MenuItem
-          onClick={() => {
-            setAnchor(null);
-            void navigate(routes.changePassword);
-          }}
-        >
+      <Menu
+        id="user-menu"
+        anchorEl={anchor}
+        open={Boolean(anchor)}
+        onClose={() => setAnchor(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <MenuItem onClick={() => go(routes.changePassword)}>
           <ListItemIcon>
             <LockResetRounded fontSize="small" />
           </ListItemIcon>
           {t('session.changePassword')}
         </MenuItem>
         {twoFactorAvailable ? (
-          <MenuItem
-            onClick={() => {
-              setAnchor(null);
-              void navigate(routes.accountSecurity);
-            }}
-          >
+          <MenuItem onClick={() => go(routes.accountSecurity)}>
             <ListItemIcon>
               <SecurityOutlined fontSize="small" />
             </ListItemIcon>
@@ -185,6 +422,109 @@ function UserMenu() {
           {t('session.signOut')}
         </MenuItem>
       </Menu>
-    </>
+      {mini ? null : (
+        <Button
+          fullWidth
+          variant="outlined"
+          color="inherit"
+          endIcon={<LogoutRounded fontSize="small" />}
+          onClick={() => void session.signOut()}
+          sx={{ mt: 1.5, borderColor: 'divider', bgcolor: 'action.hover' }}
+        >
+          {t('session.signOut')}
+        </Button>
+      )}
+    </Box>
+  );
+}
+
+/**
+ * Ust cubuk: konum yolu ve hizli personel aramasi. Arama, personeli gorebilen kullaniciya sunulur
+ * ve personel listesini o terimle acar (SYG-PERS-030).
+ */
+function TopBar({ onOpenMenu }: { onOpenMenu: (() => void) | undefined }) {
+  const { t } = useTranslation();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const canSearch = usePermission(permissions.personView);
+  const [term, setTerm] = useState('');
+  const found = findNavItem(pathname);
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    const value = term.trim();
+    if (value) {
+      void navigate(`${routes.personnel}?q=${encodeURIComponent(value)}`);
+      setTerm('');
+    }
+  };
+
+  return (
+    <Box
+      component="header"
+      sx={{
+        position: 'sticky',
+        top: 0,
+        zIndex: (theme) => theme.zIndex.appBar - 1,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2,
+        px: { xs: 2, sm: 3, lg: 4 },
+        height: 72,
+        bgcolor: 'background.paper',
+        borderBottom: 1,
+        borderColor: 'divider',
+      }}
+    >
+      {onOpenMenu ? (
+        <IconButton onClick={onOpenMenu} aria-label={t('nav.openMenu')} edge="start">
+          <MenuRounded />
+        </IconButton>
+      ) : null}
+
+      <Breadcrumbs aria-label={t('nav.breadcrumb')} sx={{ flexShrink: 0 }}>
+        {found && 'section' in found ? (
+          <Typography color="text.secondary">{t(found.section.label)}</Typography>
+        ) : null}
+        {found && 'account' in found ? (
+          <Typography color="text.secondary">{t('nav.myAccount')}</Typography>
+        ) : null}
+        <Typography color="text.primary" sx={{ fontWeight: 600 }}>
+          {found && 'section' in found
+            ? t(found.item.label)
+            : found
+              ? t(found.account)
+              : t('app.name')}
+        </Typography>
+      </Breadcrumbs>
+
+      <Box sx={{ flexGrow: 1 }} />
+
+      {canSearch ? (
+        <Box
+          component="form"
+          role="search"
+          onSubmit={submit}
+          sx={{ width: { xs: 0, sm: 280, lg: 380 }, display: { xs: 'none', sm: 'block' } }}
+        >
+          <TextField
+            value={term}
+            onChange={(event) => setTerm(event.target.value)}
+            placeholder={t('nav.searchPersonnel')}
+            slotProps={{
+              htmlInput: { 'aria-label': t('nav.searchPersonnel'), maxLength: 100 },
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchRounded fontSize="small" />
+                  </InputAdornment>
+                ),
+                sx: { bgcolor: 'background.default' },
+              },
+            }}
+          />
+        </Box>
+      ) : null}
+    </Box>
   );
 }

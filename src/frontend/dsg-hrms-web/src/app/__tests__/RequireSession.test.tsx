@@ -119,16 +119,17 @@ describe('RequireSession', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Ahmet Yılmaz' }));
     expect(await screen.findByRole('menuitem', { name: 'Parolamı değiştir' })).toBeInTheDocument();
-    expect(screen.queryByRole('menuitem', { name: 'Hesap işlemleri' })).not.toBeInTheDocument();
+    // Hesap islemleri sol menudedir (#309); izni olmayana gorunmez, bolum basligi da gorunmez.
+    expect(screen.queryByRole('link', { name: 'Hesap işlemleri' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Sistem' })).not.toBeInTheDocument();
   });
 
-  it('izni olan kullanici menuden hesap islemlerine gider', async () => {
+  it('izni olan kullanici sol menuden hesap islemlerine gider', async () => {
     const user = userEvent.setup();
     await setSession({ status: 'authenticated', permissions: ['identity.account.view'] });
     renderAt('/leave');
 
-    await user.click(await screen.findByRole('button', { name: 'Ahmet Yılmaz' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Hesap işlemleri' }));
+    await user.click(await screen.findByRole('link', { name: 'Hesap işlemleri' }));
 
     expect(await screen.findByText('Hesaplar sayfası')).toBeInTheDocument();
   });
@@ -138,8 +139,7 @@ describe('RequireSession', () => {
     await setSession({ status: 'authenticated', permissions: ['system.parameter.view'] });
     renderAt('/leave');
 
-    await user.click(await screen.findByRole('button', { name: 'Ahmet Yılmaz' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Sistem parametreleri' }));
+    await user.click(await screen.findByRole('link', { name: 'Sistem parametreleri' }));
 
     expect(await screen.findByText('Parametreler sayfası')).toBeInTheDocument();
   });

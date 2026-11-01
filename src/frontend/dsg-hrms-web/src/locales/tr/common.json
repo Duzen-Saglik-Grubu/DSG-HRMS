@@ -7,7 +7,19 @@
   "nav": {
     "home": "Ana Sayfa",
     "openMenu": "Menüyü aç",
-    "personnel": "Personel"
+    "personnel": "Personel listesi",
+    "sections": {
+      "overview": "Genel Bakış",
+      "people": "Personel",
+      "system": "Sistem"
+    },
+    "accounts": "Hesap işlemleri",
+    "parameters": "Sistem parametreleri",
+    "collapse": "Menüyü daralt",
+    "expand": "Menüyü genişlet",
+    "myAccount": "Hesabım",
+    "breadcrumb": "Konum",
+    "searchPersonnel": "Personel ara (ad, soyad, sicil)"
   },
   "status": {
     "loading": "Yükleniyor…",
@@ -483,5 +495,33 @@
         "max": "en çok {{max}}"
       }
     }
+  },
+  "home": {
+    "greeting": {
+      "morning": "Günaydın, {{name}}",
+      "day": "İyi günler, {{name}}",
+      "evening": "İyi akşamlar, {{name}}"
+    },
+    "subtitle": "İnsan Kaynakları Yönetim Sistemi",
+    "quickAccess": "Hızlı erişim",
+    "cards": {
+      "personnel": {
+        "title": "Personel",
+        "text": "Personeli arayın, süzün; kart ya da tablo görünümünde inceleyin."
+      },
+      "accounts": {
+        "title": "Hesap işlemleri",
+        "text": "Kullanıcı hesaplarını görün, davet gönderin, hesabı pasife alın."
+      },
+      "parameters": {
+        "title": "Sistem parametreleri",
+        "text": "Sistemin çalışma kurallarını ve kurumsal logoyu yönetin."
+      },
+      "password": {
+        "title": "Parolamı değiştir",
+        "text": "Hesabınızın parolasını yenileyin."
+      }
+    },
+    "open": "Aç"
   }
 }

@@ -38,7 +38,7 @@ describe('uygulama kabugu', () => {
     renderAt('/');
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { level: 1, name: 'DSG-HRMS' })).toBeInTheDocument();
+      expect(screen.getByText('DSG-HRMS')).toBeInTheDocument();
     });
 
     expect(screen.getByText('Düzen Sağlık Grubu')).toBeInTheDocument();
