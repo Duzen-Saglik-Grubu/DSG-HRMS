@@ -81,7 +81,7 @@ describe('PersonListPage', () => {
     renderWithProviders(<PersonListPage />);
 
     const card = await screen.findByRole('article', { name: 'AYŞE DEMİR' });
-    expect(within(card).getByText('00012')).toBeInTheDocument();
+    expect(within(card).getByText('(00012)')).toBeInTheDocument();
     expect(within(card).getByText('Merkez / Bilgi İşlem')).toBeInTheDocument();
     expect(within(card).getByText('Uzman / Biyolog')).toBeInTheDocument();
     expect(within(card).getByText('2 sicil')).toBeInTheDocument();
@@ -135,8 +135,12 @@ describe('PersonListPage', () => {
     const panel = await screen.findByRole('dialog', { name: 'Süzgeçler' });
     await user.click(within(panel).getByLabelText('Şube'));
     await user.click(await screen.findByRole('option', { name: 'Merkez' }));
-    await user.click(within(panel).getByLabelText('Şube'));
-    await user.click(await screen.findByRole('option', { name: 'Bornova' }));
+    // Liste secimden sonra acik kalir; ikinci deger yeniden acmadan secilir (#306).
+    await user.click(screen.getByRole('option', { name: 'Bornova' }));
+    expect(
+      within(screen.getByRole('option', { name: 'Merkez' })).getByRole('checkbox'),
+    ).toBeChecked();
+    await user.keyboard('{Escape}');
     await user.click(within(panel).getByRole('button', { name: 'Uygula' }));
 
     await waitFor(() => expect(lastQuery().getAll('branchId')).toEqual(['b-1', 'b-2']));

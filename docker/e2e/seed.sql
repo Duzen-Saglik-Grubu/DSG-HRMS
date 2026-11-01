@@ -26,11 +26,11 @@ VALUES
 ON CONFLICT (national_id) DO NOTHING;
 
 -- Arama anahtari: kisiler senkronizasyonla geldiginde uygulama yazar (ADR-0021 §7). Burada kisiler
--- SQL ile eklendigi icin T1PersonListSearchAndAccessSubjects migration'indaki kuralla doldurulur.
+-- SQL ile eklendigi icin T1SearchKeyTurkishLowercase migration'indaki kuralla doldurulur.
 UPDATE personnel.person
    SET search_key = lower(translate(
        concat_ws(' ', NULLIF(btrim(first_name), ''), NULLIF(btrim(last_name), ''), NULLIF(btrim(previous_surname), '')),
-       'ÇĞIİÖŞÜçğıöşü', 'CGIIOSUcgiosu'))
+       'ÇĞIİÖŞÜçğıöşü', 'cgiiosucgiosu'))
  WHERE national_id LIKE '2000000%';
 
 INSERT INTO personnel.employment (person_id, registry_code, company_id, hire_date, is_active, logo_ref, created_at, public_id)
