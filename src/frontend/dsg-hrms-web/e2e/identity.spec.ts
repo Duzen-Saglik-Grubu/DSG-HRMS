@@ -93,8 +93,7 @@ test('6. IK davet baglantisi: yonetici gonderir, kisi parolasini belirler (SYG-K
 }) => {
   await registerViaApi(request, people.admin, passwords.first);
   await signIn(page, people.admin.email, passwords.first);
-  await page.getByRole('button', { name: people.admin.fullName }).click();
-  await page.getByRole('menuitem', { name: 'Hesap işlemleri' }).click();
+  await page.getByRole('link', { name: 'Hesap işlemleri', exact: true }).click();
 
   await page.getByLabel('Sicil numarası, ad veya soyad').fill('Davetli');
   const row = page.getByRole('row', { name: new RegExp(people.invitee.fullName) });
@@ -129,7 +128,7 @@ test('7. yetki: izni olmayan kullanici hesap islemlerini goremez (SYG-KMLK-072)'
 
   await page.getByRole('button', { name: people.unprivileged.fullName }).click();
   await expect(page.getByRole('menuitem', { name: 'Parolamı değiştir' })).toBeVisible();
-  await expect(page.getByRole('menuitem', { name: 'Hesap işlemleri' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Hesap işlemleri', exact: true })).toHaveCount(0);
   await page.keyboard.press('Escape');
 
   // Adres elle yazilsa da sunucu reddeder ve ekran bunu soyler.
