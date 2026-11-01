@@ -36,10 +36,18 @@ test('1. yonetici: liste kart izgarasiyla acilir, arar ve tabloya gecer (SYG-PER
   await page.getByRole('button', { name: 'Temizle' }).click();
   await expect(page.getByRole('row', { name: /Deniz/ })).toBeVisible();
 
+  // Kisi karti: tablodan acilir, geri donuste liste ayni arama ve gorunumle gelir (#311).
+  await page.getByRole('row', { name: /Deniz/ }).getByRole('link', { name: 'Deniz' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Deniz Davetli' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Genel Bilgiler' })).toBeVisible();
+  await page.getByRole('link', { name: 'Listeye dön' }).click();
+  await expect(page).toHaveURL(/view=table/);
+  await expect(page).toHaveURL(/q=davetl/);
+
   await signOut(page, people.admin.fullName);
 });
 
-test('2. rolu olmayan personel baglantiyi gormez, listede yalnizca kendini gorur (ADR-0019 §1)', async ({
+test('2. rolu olmayan personel listeyi gormez; adresi yazsa da profiline gider (#311)', async ({
   page,
 }) => {
   await signIn(page, people.unprivileged.email, passwords.first);
@@ -47,6 +55,12 @@ test('2. rolu olmayan personel baglantiyi gormez, listede yalnizca kendini gorur
   await expect(page.getByRole('link', { name: 'Personel listesi', exact: true })).toHaveCount(0);
 
   await page.goto('/personnel');
-  await expect(page.getByRole('article', { name: 'Zeynep Izinsiz' })).toBeVisible();
-  await expect(page.getByRole('article')).toHaveCount(1);
+  await expect(page).toHaveURL(/\/profile$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Zeynep Izinsiz' })).toBeVisible();
+
+  // Profilim herkese acik (SYG-PERS-044); TCKN kisinin kendisine de maskeli.
+  await page.getByRole('link', { name: 'Ana Sayfa' }).click();
+  await page.getByRole('link', { name: 'Profilim' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Zeynep Izinsiz' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Genel Bilgiler' })).toContainText('*');
 });

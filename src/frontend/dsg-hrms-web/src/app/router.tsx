@@ -4,6 +4,7 @@ import { routes } from '@/shared/routes';
 import { AppLayout } from './AppLayout';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { RouteFallback } from './pages/RouteFallback';
+import { PersonnelListRoute } from './PersonnelListRoute';
 import { RequireSession } from './RequireSession';
 
 // Rota bazli kod bolme (ADR-0015 §11): ilk yukleme kucuk kalir, her modul
@@ -61,6 +62,18 @@ const PersonListPage = lazy(async () => {
   const page = await import('@/features/personnel/pages/PersonListPage');
 
   return { default: page.PersonListPage };
+});
+
+const PersonCardPage = lazy(async () => {
+  const page = await import('@/features/personnel/pages/PersonCardPage');
+
+  return { default: page.PersonCardPage };
+});
+
+const ProfilePage = lazy(async () => {
+  const page = await import('@/features/personnel/pages/ProfilePage');
+
+  return { default: page.ProfilePage };
 });
 
 const RegistrationPage = lazy(async () => {
@@ -155,8 +168,26 @@ export const router = createBrowserRouter([
       {
         path: routes.personnel,
         element: (
+          <PersonnelListRoute>
+            <Suspense fallback={<RouteFallback />}>
+              <PersonListPage />
+            </Suspense>
+          </PersonnelListRoute>
+        ),
+      },
+      {
+        path: `${routes.personnel}/:personId`,
+        element: (
           <Suspense fallback={<RouteFallback />}>
-            <PersonListPage />
+            <PersonCardPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: routes.profile,
+        element: (
+          <Suspense fallback={<RouteFallback />}>
+            <ProfilePage />
           </Suspense>
         ),
       },

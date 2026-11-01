@@ -5,6 +5,8 @@ import type { ApiSchemas } from '@/shared/api/schemas';
 export type PersonListItem = ApiSchemas['PersonListItemResponse'];
 export type PersonFilterOptions = ApiSchemas['PersonFilterOptionsResponse'];
 export type FilterOption = ApiSchemas['FilterOptionResponse'];
+export type PersonCard = ApiSchemas['PersonCardResponse'];
+export type EmploymentCard = ApiSchemas['EmploymentCardResponse'];
 
 const BASE = '/personnel/persons';
 
@@ -31,6 +33,21 @@ export const personsApi = {
       totalCount: Number(data.totalCount),
       totalPages: Number(data.totalPages),
     };
+  },
+
+  /**
+   * Kisi karti (SYG-PERS-034–039). Kapsam disindaki ve var olmayan kisi ayni yaniti (`404`) alir;
+   * gorulemeyen bolumler yanitta hic yer almaz (ADR-0019).
+   */
+  card: async (personId: string): Promise<PersonCard> => {
+    const response = await apiClient.get<PersonCard>(`${BASE}/${encodeURIComponent(personId)}`);
+    return response.data;
+  },
+
+  /** Kullanicinin kendi karti, "Profilim" (SYG-PERS-044). Izin gerektirmez. */
+  me: async (): Promise<PersonCard> => {
+    const response = await apiClient.get<PersonCard>(`${BASE}/me`);
+    return response.data;
   },
 
   /** Secim listelerinin degerleri, kullanilabilen korumali suzgecler ve sayfa boyutlari. */
