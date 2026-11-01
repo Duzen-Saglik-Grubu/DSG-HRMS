@@ -16,6 +16,7 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 ## [Yayımlanmamış]
 
 ### Güvenlik
+- **follow-redirects 1.16.2 (#305).** 01.11.2026'da yayımlanan yüksek önemli açık (GHSA-mrwp-f3q8-3g9p) kapatıldı: özel kimlik bilgisi başlıkları başka bir alana yönlendirmede silinmeyebiliyordu. Paket ön yüzde `axios` üzerinden dolaylı gelir; `main` bu yüzden kırmızıya düştü ve kayıt otomatik açıldı. Aynı denetimde geliştirme araçları da güncellendi (typescript-eslint 8.72.1).
 - **System.Security.Cryptography.Pkcs 10.0.13'e sabitlendi (#223).** MailKit ve SQL Server sürücüsü üzerinden dolaylı gelen 10.0.0 sürümünde 13.10.2026'da iki hizmet engelleme (DoS) açığı yayımlandı: CVE-2026-84008 (yüksek) ve CVE-2026-70162 (orta). `main` 14.10.2026'da bu yüzden kırmızıya düştü; kayıt otomatik açıldı.
 - **zod 4.6.7, vitest 5.0.3 ve undici 8.12.3 (#288).** 24.10.2026'da yayımlanan açıklar kapatıldı: zod'da büyük koleksiyon doğrulamasında bellek tüketimi (yüksek), vitest'te geliştirme sunucusunda kod enjeksiyonu (orta, yalnızca geliştirme bağımlılığı). Aynı gün `undici`'de (test ortamındaki `jsdom` üzerinden) üç yüksek önemli açık da kapatıldı.
 - **follow-redirects 1.16.1 (#250) ve vite 8.3.4 (#255).** Ön yüzün dolaylı ve geliştirme bağımlılıklarında yayımlanan yüksek önemli açıklar kapatıldı. Açıklar tarayıcıya giden pakette değildi.
