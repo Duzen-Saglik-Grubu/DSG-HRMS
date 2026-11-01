@@ -4712,6 +4712,7 @@
         "required": [
           "firstName",
           "lastName",
+          "email",
           "permissions"
         ],
         "type": "object",
@@ -4723,6 +4724,13 @@
           "lastName": {
             "type": "string",
             "description": "Soyad."
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Giris e-postasi; kullanici kartinda adin altinda gosterilir. Tanimli degilse `null`."
           },
           "permissions": {
             "type": "array",

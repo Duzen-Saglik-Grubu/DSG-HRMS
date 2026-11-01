@@ -3,8 +3,10 @@ import {
   Badge,
   Box,
   Button,
+  CardActionArea,
   Grid,
   InputAdornment,
+  Link,
   MenuItem,
   Paper,
   Skeleton,
@@ -20,7 +22,7 @@ import SearchRounded from '@mui/icons-material/SearchRounded';
 import TableRowsRounded from '@mui/icons-material/TableRowsRounded';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
+import { Link as RouterLink, useLocation, useSearchParams } from 'react-router';
 import type { PageRequest, SortOrder } from '@/shared/api/paging';
 import { ApiError } from '@/shared/api/problemDetails';
 import { queryKeys } from '@/shared/api/queryKeys';
@@ -28,6 +30,7 @@ import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { PageHeader } from '@/shared/components/PageHeader';
+import { personCardPath } from '@/shared/routes';
 import { personsApi, type PersonListItem } from '../api/personsApi';
 import { FilterChips } from '../components/FilterChips';
 import { FilterPanel } from '../components/FilterPanel';
@@ -66,6 +69,8 @@ const SORTS = ['firstName-asc', 'firstName-desc', 'lastName-asc', 'lastName-desc
 export function PersonListPage() {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
+  // Karttan geri donuldugunde liste ayni suzgec, sayfa ve gorunumle acilir.
+  const cardState = { listSearch: useLocation().search };
   const [panelOpen, setPanelOpen] = useState(false);
   const [term, setTerm] = useState(() => params.get('q') ?? '');
 
@@ -118,7 +123,22 @@ export function PersonListPage() {
     });
 
   const columns: DataTableColumn<PersonListItem>[] = [
-    { field: 'firstName', header: t('personnel.list.columns.firstName'), sortable: true },
+    {
+      field: 'firstName',
+      header: t('personnel.list.columns.firstName'),
+      sortable: true,
+      render: (row) => (
+        <Link
+          component={RouterLink}
+          to={personCardPath(row.personId)}
+          state={cardState}
+          underline="hover"
+          sx={{ fontWeight: 600 }}
+        >
+          {row.firstName}
+        </Link>
+      ),
+    },
     { field: 'lastName', header: t('personnel.list.columns.lastName'), sortable: true },
     { field: 'registryCode', header: t('personnel.list.columns.registryCode') },
     { field: 'companyName', header: t('personnel.list.columns.company') },
@@ -299,6 +319,7 @@ export function PersonListPage() {
           request={request}
           sizes={sizes}
           empty={empty}
+          cardState={cardState}
           onRequestChange={changeRequest}
         />
       )}
@@ -324,6 +345,7 @@ interface CardGridProps {
   request: PageRequest;
   sizes: number[];
   empty: React.ReactNode;
+  cardState: { listSearch: string };
   onRequestChange: (request: PageRequest) => void;
 }
 
@@ -335,6 +357,7 @@ function CardGrid({
   request,
   sizes,
   empty,
+  cardState,
   onRequestChange,
 }: CardGridProps) {
   const { t } = useTranslation();
@@ -354,7 +377,14 @@ function CardGrid({
             ))
           : rows.map((person) => (
               <Grid key={person.personId} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                <PersonCard person={person} />
+                <CardActionArea
+                  component={RouterLink}
+                  to={personCardPath(person.personId)}
+                  state={cardState}
+                  sx={{ height: '100%', borderRadius: 1 }}
+                >
+                  <PersonCard person={person} />
+                </CardActionArea>
               </Grid>
             ))}
       </Grid>

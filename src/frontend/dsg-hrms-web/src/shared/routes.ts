@@ -16,7 +16,12 @@ export const routes = {
   invite: '/invite',
   parameters: '/system/parameters',
   personnel: '/personnel',
+  profile: '/profile',
 } as const;
+
+/** Bir kisinin karti (SYG-PERS-034). */
+export const personCardPath = (personId: string) =>
+  `${routes.personnel}/${encodeURIComponent(personId)}`;
 
 /** Giristen sonra donulecek adresin tasindigi sorgu parametresi. */
 export const RETURN_TO_PARAM = 'returnTo';

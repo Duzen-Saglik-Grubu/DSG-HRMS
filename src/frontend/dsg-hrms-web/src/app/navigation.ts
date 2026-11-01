@@ -1,4 +1,5 @@
 import type { SvgIconComponent } from '@mui/icons-material';
+import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
 import ManageAccountsOutlined from '@mui/icons-material/ManageAccountsOutlined';
@@ -38,6 +39,8 @@ export const navigation: NavSection[] = [
     key: 'people',
     label: 'nav.sections.people',
     items: [
+      // Herkes kendi kartini acar (SYG-PERS-044).
+      { to: routes.profile, label: 'nav.profile', icon: AccountCircleOutlined },
       {
         to: routes.personnel,
         label: 'nav.personnel',

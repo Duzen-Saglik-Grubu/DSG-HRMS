@@ -32,7 +32,12 @@ function sessionAt(serverNow: number, id = 'a', idleMinutes = 30): SessionRespon
     accessTokenExpiresAt: new Date(serverNow + 15 * MINUTE).toISOString(),
     sessionExpiresAt: new Date(serverNow + 8 * 60 * MINUTE).toISOString(),
     idleTimeoutMinutes: idleMinutes,
-    user: { firstName: 'Ahmet', lastName: 'Yılmaz', permissions: [] },
+    user: {
+      firstName: 'Ahmet',
+      lastName: 'Yılmaz',
+      email: 'ahmet.yilmaz@duzen.com.tr',
+      permissions: [],
+    },
     passwordChangeRequired: null,
   };
 }
@@ -79,6 +84,7 @@ describe('SessionManager — jeton', () => {
       user: {
         firstName: 'Ahmet',
         lastName: 'Yılmaz',
+        email: 'ahmet.yilmaz@duzen.com.tr',
         permissions: [],
         passwordChangeRequired: null,
       },

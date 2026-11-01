@@ -14,6 +14,8 @@ export type PasswordChangeReason = 'firstSignIn' | 'expired';
 export interface SessionUser {
   firstName: string;
   lastName: string;
+  /** Giris e-postasi; kullanici kartinda adin altinda gosterilir. Tanimli degilse `null`. */
+  email: string | null;
   /**
    * Izinler (ADR-0007). Yalnizca GOSTERIM icindir: menude ve dugmelerde neyin gorunecegini
    * belirler. Gercek denetim her istekte sunucudadir.
@@ -365,6 +367,7 @@ export class SessionManager {
     const user: SessionUser = {
       firstName: session.user.firstName,
       lastName: session.user.lastName,
+      email: session.user.email,
       permissions: [...session.user.permissions].sort(),
       passwordChangeRequired: session.passwordChangeRequired ?? null,
     };
@@ -373,6 +376,7 @@ export class SessionManager {
       current.status !== 'authenticated' ||
       current.user.firstName !== user.firstName ||
       current.user.lastName !== user.lastName ||
+      current.user.email !== user.email ||
       current.user.permissions.join() !== user.permissions.join() ||
       current.user.passwordChangeRequired !== user.passwordChangeRequired
     ) {

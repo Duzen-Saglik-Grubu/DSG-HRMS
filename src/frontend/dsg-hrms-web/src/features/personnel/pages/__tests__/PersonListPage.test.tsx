@@ -85,6 +85,8 @@ describe('PersonListPage', () => {
     expect(within(card).getByText('Merkez / Bilgi İşlem')).toBeInTheDocument();
     expect(within(card).getByText('Uzman / Biyolog')).toBeInTheDocument();
     expect(within(card).getByText('2 sicil')).toBeInTheDocument();
+    // Kart, kisinin kartina goturur (#311).
+    expect(card.closest('a')).toHaveAttribute('href', '/personnel/p-1');
     expect(
       within(screen.getByRole('article', { name: 'MEHMET KAYA' })).getByText('Ayrıldı'),
     ).toBeInTheDocument();
