@@ -15,6 +15,7 @@ export const routes = {
   accounts: '/accounts',
   invite: '/invite',
   parameters: '/system/parameters',
+  personnel: '/personnel',
 } as const;
 
 /** Giristen sonra donulecek adresin tasindigi sorgu parametresi. */

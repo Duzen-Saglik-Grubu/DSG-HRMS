@@ -3374,6 +3374,16 @@ export interface components {
             canFilterByNationalId: boolean;
             /** @description Adres suzgeci sunulur mu. */
             canFilterBySensitive: boolean;
+            /**
+             * Format: int32
+             * @description Varsayilan sayfa boyutu (PRM-GRN-02).
+             */
+            defaultPageSize: number | string;
+            /**
+             * Format: int32
+             * @description En buyuk sayfa boyutu (PRM-GRN-03); sayfa boyutu secenekleri bunu asmaz (SYG-PERS-029).
+             */
+            maxPageSize: number | string;
         };
         /** @description Listedeki kisi karti (SYG-PERS-023). */
         PersonListItemResponse: {

@@ -285,6 +285,8 @@ public sealed class PersonListRequest
 /// <param name="Educations">Egitim durumlari.</param>
 /// <param name="CanFilterByNationalId">TCKN suzgeci sunulur mu.</param>
 /// <param name="CanFilterBySensitive">Adres suzgeci sunulur mu.</param>
+/// <param name="DefaultPageSize">Varsayilan sayfa boyutu (PRM-GRN-02).</param>
+/// <param name="MaxPageSize">En buyuk sayfa boyutu (PRM-GRN-03); sayfa boyutu secenekleri bunu asmaz (SYG-PERS-029).</param>
 public sealed record PersonFilterOptionsResponse(
     IReadOnlyList<FilterOptionResponse> Companies,
     IReadOnlyList<FilterOptionResponse> Cities,
@@ -296,7 +298,9 @@ public sealed record PersonFilterOptionsResponse(
     IReadOnlyList<FilterOptionResponse> Occupations,
     IReadOnlyList<FilterOptionResponse> Educations,
     bool CanFilterByNationalId,
-    bool CanFilterBySensitive)
+    bool CanFilterBySensitive,
+    int DefaultPageSize,
+    int MaxPageSize)
 {
     /// <summary>Uygulama katmanindan yanit kurar.</summary>
     public static PersonFilterOptionsResponse From(PersonFilterOptions options)
@@ -305,7 +309,7 @@ public sealed record PersonFilterOptionsResponse(
         static IReadOnlyList<FilterOptionResponse> Map(IReadOnlyList<FilterOption> items) => [.. items.Select(i => new FilterOptionResponse(i.Value, i.Label))];
         return new(Map(options.Companies), Map(options.Cities), Map(options.Branches), Map(options.Departments), Map(options.Titles),
             Map(options.Duties), Map(options.Statuses), Map(options.Occupations), Map(options.Educations),
-            options.CanFilterByNationalId, options.CanFilterBySensitive);
+            options.CanFilterByNationalId, options.CanFilterBySensitive, options.DefaultPageSize, options.MaxPageSize);
     }
 }
 

@@ -4202,7 +4202,9 @@
           "occupations",
           "educations",
           "canFilterByNationalId",
-          "canFilterBySensitive"
+          "canFilterBySensitive",
+          "defaultPageSize",
+          "maxPageSize"
         ],
         "type": "object",
         "properties": {
@@ -4276,6 +4278,24 @@
           "canFilterBySensitive": {
             "type": "boolean",
             "description": "Adres suzgeci sunulur mu."
+          },
+          "defaultPageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Varsayilan sayfa boyutu (PRM-GRN-02).",
+            "format": "int32"
+          },
+          "maxPageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "En buyuk sayfa boyutu (PRM-GRN-03); sayfa boyutu secenekleri bunu asmaz (SYG-PERS-029).",
+            "format": "int32"
           }
         },
         "description": "Suzgec secenekleri (SYG-PERS-024, 026)."
