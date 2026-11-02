@@ -5,7 +5,7 @@
 **Modül:** T1 Personel Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-PERS.md` (19.10.2026'da İK onaylı, 45 gereksinim; değişiklik talebi #270)
 **Tasarım:** ADR-0019…ADR-0022 (`KR-121`…`KR-126`); T1 tasarım gözden geçirmesi (`TEC.5-tasarim-tanimlama/raporlar/2026-10-22-t1-tasarim-gozden-gecirme.md`)
-**Son güncelleme:** 2026-10-24
+**Son güncelleme:** 2026-11-03
 **Sahibi:** Bilgi İşlem
 **Onay durumu:** Bilgi İşlem (RACI TEC.3 A); değişiklikler PR onayıyla (`KR-096`). Baseline, T1'in kabul etiketiyle yazılır (`KR-097`, `KR-111`); o zamana kadar geliştirme sürüyor.
 
@@ -458,3 +458,4 @@ madde `İptal` notuyla kalır.
 | 2026-10-23 | 0.4 | SYG-PERS-055: denetim kayıtları ve parametre izinleri İK'da da (`KR-128`, #278) | Bilgi İşlem |
 | 2026-10-23 | 0.5 | SYG-PERS-072: kan grubu tanımları referans veride, değiştirilemez; kaynak PG-PERS-36 (`KR-129`, #280) | Bilgi İşlem |
 | 2026-10-24 | 0.6 | Değişiklik talebi #284: SYG-PERS-018 ve 020'ye firma; SYG-PERS-019 kısıt kapsamı (atama bütün kayıtlar, görev silinmemiş); AN-19 türetilmiş davranış: bitmiş istihdamın ilk kaydı ve geriye dönük çıkış (SYG-PERS-018, 021; #285) | Bilgi İşlem |
+| 2026-11-03 | 0.7 | §7 ortam hazırlığı: özel nitelikli veri anahtarı yerelde eklendi, UAT'de sürümden önce; yeri BK-12, BK-16, BK-29 (#317). Gereksinim metni değişmedi | Bilgi İşlem |
