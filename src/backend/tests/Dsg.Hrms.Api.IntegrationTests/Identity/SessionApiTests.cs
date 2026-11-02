@@ -57,6 +57,7 @@ public sealed class SessionApiTests : IClassFixture<RegistrationApiFixture>, IAs
         session.GetProperty("user").GetProperty("firstName").GetString().ShouldBe("Ahmet");
         // Kullanici kartinda adin altinda gosterilir; normallestirilmis giris e-postasidir (#311).
         session.GetProperty("user").GetProperty("email").GetString().ShouldBe("ahmet.yilmaz@duzen.com.tr");
+        session.GetProperty("user").GetProperty("hasPhoto").GetBoolean().ShouldBeFalse();
         response.Body.GetRawText().ShouldNotContain(response.Cookie!);
 
         // SYG-KMLK-037: HttpOnly, Secure, SameSite=Strict; yalnizca oturum uclarina gider.

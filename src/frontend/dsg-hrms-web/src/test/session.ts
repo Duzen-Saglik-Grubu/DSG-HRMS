@@ -14,6 +14,7 @@ export function fakeSession(
   lastName = 'Yılmaz',
   permissions: string[] = [],
   passwordChangeRequired: PasswordChangeReason | null = null,
+  hasPhoto = false,
 ): SessionResponse {
   const now = Date.now();
 
@@ -22,7 +23,7 @@ export function fakeSession(
     accessTokenExpiresAt: new Date(now + 15 * 60_000).toISOString(),
     sessionExpiresAt: new Date(now + 8 * 60 * 60_000).toISOString(),
     idleTimeoutMinutes: 30,
-    user: { firstName, lastName, email: 'ahmet.yilmaz@duzen.com.tr', permissions },
+    user: { firstName, lastName, email: 'ahmet.yilmaz@duzen.com.tr', hasPhoto, permissions },
     passwordChangeRequired,
   };
 }
@@ -48,6 +49,7 @@ export async function setSession(
         status: 'authenticated';
         permissions?: string[];
         passwordChangeRequired?: PasswordChangeReason;
+        hasPhoto?: boolean;
       },
 ): Promise<void> {
   vi.spyOn(sessionApi, 'signOut').mockResolvedValue(undefined);
@@ -58,7 +60,13 @@ export async function setSession(
 
   if (target.status === 'authenticated') {
     session.start(
-      fakeSession('Ahmet', 'Yılmaz', target.permissions, target.passwordChangeRequired ?? null),
+      fakeSession(
+        'Ahmet',
+        'Yılmaz',
+        target.permissions,
+        target.passwordChangeRequired ?? null,
+        target.hasPhoto,
+      ),
     );
     return;
   }

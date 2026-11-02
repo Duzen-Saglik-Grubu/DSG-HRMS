@@ -16,6 +16,8 @@ export interface SessionUser {
   lastName: string;
   /** Giris e-postasi; kullanici kartinda adin altinda gosterilir. Tanimli degilse `null`. */
   email: string | null;
+  /** Fotografi var mi; kullanici kartinda fotograf yalnizca varsa istenir (#315). */
+  hasPhoto: boolean;
   /**
    * Izinler (ADR-0007). Yalnizca GOSTERIM icindir: menude ve dugmelerde neyin gorunecegini
    * belirler. Gercek denetim her istekte sunucudadir.
@@ -368,6 +370,7 @@ export class SessionManager {
       firstName: session.user.firstName,
       lastName: session.user.lastName,
       email: session.user.email,
+      hasPhoto: session.user.hasPhoto,
       permissions: [...session.user.permissions].sort(),
       passwordChangeRequired: session.passwordChangeRequired ?? null,
     };
@@ -377,6 +380,7 @@ export class SessionManager {
       current.user.firstName !== user.firstName ||
       current.user.lastName !== user.lastName ||
       current.user.email !== user.email ||
+      current.user.hasPhoto !== user.hasPhoto ||
       current.user.permissions.join() !== user.permissions.join() ||
       current.user.passwordChangeRequired !== user.passwordChangeRequired
     ) {

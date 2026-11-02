@@ -50,24 +50,6 @@ export const personsApi = {
     return response.data;
   },
 
-  /**
-   * Kisinin fotografi (SYG-PERS-041): kucultulmus JPEG. Oturum jetonu bellekte tutuldugu icin
-   * goruntu `<img src>` ile degil yetkili istekle alinir. Sunucu `private, no-cache` ve ETag
-   * gonderir; tarayici degismeyen fotografi yeniden indirmez.
-   */
-  photo: async (personId: string): Promise<Blob> => {
-    const response = await apiClient.get<Blob>(`${BASE}/${encodeURIComponent(personId)}/photo`, {
-      responseType: 'blob',
-    });
-    return response.data;
-  },
-
-  /** Kullanicinin kendi fotografi. */
-  myPhoto: async (): Promise<Blob> => {
-    const response = await apiClient.get<Blob>(`${BASE}/me/photo`, { responseType: 'blob' });
-    return response.data;
-  },
-
   /** Secim listelerinin degerleri, kullanilabilen korumali suzgecler ve sayfa boyutlari. */
   filterOptions: async (): Promise<PersonFilterOptions> => {
     const response = await apiClient.get<PersonFilterOptions>(`${BASE}/filter-options`);

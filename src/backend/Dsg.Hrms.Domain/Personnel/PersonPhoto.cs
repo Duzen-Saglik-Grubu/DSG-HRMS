@@ -37,6 +37,12 @@ public sealed class PersonPhoto : Entity, IAuditable
     [AuditVisible("Goruntunun ozetidir; goruntuyu geri vermez ve hangi kaynak surumunun aktarildigini gosterir.")]
     public string SourceHash { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Goruntuyu ureten kucultme kuralinin surumu. Kural degisince fotograf, LOGO'da degismese de
+    /// yeniden kucultulur (#315).
+    /// </summary>
+    public int ThumbnailVersion { get; private set; }
+
     /// <inheritdoc />
     public DateTimeOffset CreatedAt { get; set; }
 
@@ -50,24 +56,26 @@ public sealed class PersonPhoto : Entity, IAuditable
     public long? UpdatedBy { get; set; }
 
     /// <summary>Kisinin fotografini olusturur.</summary>
-    public static PersonPhoto For(long personId, string sourceHash, byte[] content)
+    public static PersonPhoto For(long personId, string sourceHash, byte[] content, int thumbnailVersion)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(personId);
 
         var photo = new PersonPhoto { PersonId = personId };
-        photo.Replace(sourceHash, content);
+        photo.Replace(sourceHash, content, thumbnailVersion);
         return photo;
     }
 
-    /// <summary>Goruntuyu kaynagin yeni surumuyle degistirir.</summary>
-    public void Replace(string sourceHash, byte[] content)
+    /// <summary>Goruntuyu kaynagin yeni surumuyle ya da yeni kucultme kuraliyla degistirir.</summary>
+    public void Replace(string sourceHash, byte[] content, int thumbnailVersion)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceHash);
         ArgumentNullException.ThrowIfNull(content);
         ArgumentOutOfRangeException.ThrowIfNotEqual(sourceHash.Length, SourceHashLength, nameof(sourceHash));
         ArgumentOutOfRangeException.ThrowIfZero(content.Length, nameof(content));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(thumbnailVersion);
 
         SourceHash = sourceHash.ToUpperInvariant();
         Content = content;
+        ThumbnailVersion = thumbnailVersion;
     }
 }

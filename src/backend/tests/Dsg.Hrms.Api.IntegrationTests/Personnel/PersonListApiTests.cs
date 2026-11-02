@@ -81,7 +81,7 @@ public sealed class PersonListApiTests : IClassFixture<Identity.RegistrationApiF
         await _fixture.WithDbAsync(async context =>
         {
             var person = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(2));
-            context.Add(PersonPhoto.For(person.Id, new string('A', PersonPhoto.SourceHashLength), [0xFF, 0xD8]));
+            context.Add(PersonPhoto.For(person.Id, new string('A', PersonPhoto.SourceHashLength), [0xFF, 0xD8], thumbnailVersion: 2));
             return await context.SaveChangesAsync();
         });
         var withPhoto = await PersonIdAsync(2);

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator } from '@playwright/test';
 import { signIn, signOut } from './support/flows';
 import { passwords, people } from './support/people';
 
@@ -24,9 +24,7 @@ test('1. yonetici: liste kart izgarasiyla acilir, arar ve tabloya gecer (SYG-PER
   const photo = page
     .getByRole('article', { name: 'Deniz Davetli' })
     .getByRole('img', { name: 'Deniz Davetli fotoğrafı' });
-  await expect(photo).toHaveAttribute('src', /^blob:/);
-  await expect(photo).toHaveJSProperty('complete', true);
-  expect(await photo.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(160);
+  await expectPhotoLoaded(photo);
   await expect(
     page
       .getByRole('article', { name: 'Yusuf Yonetici' })
@@ -53,13 +51,18 @@ test('1. yonetici: liste kart izgarasiyla acilir, arar ve tabloya gecer (SYG-PER
   await page.getByRole('row', { name: /Deniz/ }).getByRole('link', { name: 'Deniz' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Deniz Davetli' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Genel Bilgiler' })).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Deniz Davetli fotoğrafı' })).toHaveAttribute(
-    'src',
-    /^blob:/,
-  );
+  await expectPhotoLoaded(page.getByRole('img', { name: 'Deniz Davetli fotoğrafı' }));
   await page.getByRole('link', { name: 'Listeye dön' }).click();
   await expect(page).toHaveURL(/view=table/);
   await expect(page).toHaveURL(/q=davetl/);
+
+  // Karta gidip donunce fotograf kaybolmaz (#315).
+  await page.getByRole('button', { name: 'Kart görünümü' }).click();
+  await expectPhotoLoaded(
+    page
+      .getByRole('article', { name: 'Deniz Davetli' })
+      .getByRole('img', { name: 'Deniz Davetli fotoğrafı' }),
+  );
 
   await signOut(page, people.admin.fullName);
 });
@@ -89,3 +92,10 @@ test('2. rolu olmayan personel listeyi gormez; adresi yazsa da profiline gider (
   await page.getByRole('menuitem', { name: 'Profilim' }).click();
   await expect(page).toHaveURL(/\/profile$/);
 });
+
+/** Fotograf goruntusu gercekten yuklendi: bas harflere dusmedi. */
+async function expectPhotoLoaded(photo: Locator) {
+  await expect(photo).toHaveAttribute('src', /^data:image\/jpeg;base64,/);
+  await expect(photo).toHaveJSProperty('complete', true);
+  expect(await photo.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(160);
+}

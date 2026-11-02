@@ -249,6 +249,19 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
     // ------------------------------------------------------------------ fotograf (SYG-PERS-040, 041)
 
     [Fact]
+    public async Task Session_user_tells_whether_the_user_has_a_photo()
+    {
+        // #315: kullanici karti kendi fotografini yalnizca oturum "var" derse ister.
+        await SetPhotoAsync(1);
+        using var client = _fixture.CreateClient();
+
+        using var response = await client.PostAsJsonAsync(new Uri("/api/v1/identity/sessions", UriKind.Relative), new { email = UserEmail, password = Password });
+
+        var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+        body.GetProperty("session").GetProperty("user").GetProperty("hasPhoto").GetBoolean().ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task Photo_is_served_with_its_digest_as_etag_and_a_private_cache_policy()
     {
         var hash = await SetPhotoAsync(1);
@@ -329,7 +342,7 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
         {
             var person = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(index));
             var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(PhotoBytes));
-            context.Add(PersonPhoto.For(person.Id, hash, PhotoBytes));
+            context.Add(PersonPhoto.For(person.Id, hash, PhotoBytes, thumbnailVersion: 2));
             await context.SaveChangesAsync();
             return hash;
         });

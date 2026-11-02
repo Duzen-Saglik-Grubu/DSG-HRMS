@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react';
 import {
-  Avatar,
   Box,
   Breadcrumbs,
   Button,
@@ -34,6 +33,7 @@ import { queryKeys } from '@/shared/api/queryKeys';
 import { permissions } from '@/shared/auth/permissions';
 import { session, useSession } from '@/shared/auth/session';
 import { SessionActivity } from '@/shared/auth/SessionActivity';
+import { PersonAvatar } from '@/shared/components/PersonAvatar';
 import { usePermission } from '@/shared/auth/usePermission';
 import { DEFAULT_LOGO_URL, uploadedLogoUrl } from '@/shared/branding';
 import { routes } from '@/shared/routes';
@@ -346,7 +346,6 @@ function UserPanel({ mini }: { mini: boolean }) {
   }
 
   const name = `${state.user.firstName} ${state.user.lastName}`;
-  const initials = `${state.user.firstName.charAt(0)}${state.user.lastName.charAt(0)}`;
   const go = (to: string) => {
     setAnchor(null);
     void navigate(to);
@@ -373,9 +372,13 @@ function UserPanel({ mini }: { mini: boolean }) {
           textAlign: 'left',
         }}
       >
-        <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.main', fontSize: '0.9rem' }}>
-          {initials}
-        </Avatar>
+        <PersonAvatar
+          source="me"
+          hasPhoto={state.user.hasPhoto}
+          firstName={state.user.firstName}
+          lastName={state.user.lastName}
+          size={36}
+        />
         {mini ? null : (
           <>
             <Box sx={{ flexGrow: 1, minWidth: 0 }}>
