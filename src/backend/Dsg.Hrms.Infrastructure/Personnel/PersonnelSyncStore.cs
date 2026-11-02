@@ -195,6 +195,20 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
             context.Set<Department>().AddRange(outcome.NewDepartments);
         }
 
+        public async Task<PersonnelPhotoSnapshot> LoadPhotosAsync(CancellationToken cancellationToken)
+        {
+            // Istihdamlar onceki adimlarda izlemeye alinmisti; fotograflar degistirilecegi icin izlenir.
+            var personIds = await context.Set<Person>().Select(p => p.Id).ToListAsync(cancellationToken).ConfigureAwait(false);
+            var employments = await context.Set<Employment>().ToListAsync(cancellationToken).ConfigureAwait(false);
+            var photos = await context.Set<PersonPhoto>().ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            return new PersonnelPhotoSnapshot(personIds, employments, photos);
+        }
+
+        public void AddPhotos(IEnumerable<PersonPhoto> photos) => context.Set<PersonPhoto>().AddRange(photos);
+
+        public void RemovePhotos(IEnumerable<PersonPhoto> photos) => context.Set<PersonPhoto>().RemoveRange(photos);
+
         public void AddAssignments(IEnumerable<EmploymentAssignment> assignments) =>
             context.Set<EmploymentAssignment>().AddRange(assignments);
 

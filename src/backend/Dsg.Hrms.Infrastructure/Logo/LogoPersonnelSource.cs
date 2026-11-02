@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Security.Cryptography;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -158,7 +159,7 @@ public sealed partial class LogoPersonnelSource : ILogoPersonnelSource
     /// </para>
     /// <para>
     /// Fotograf (<c>LDATA</c>) ve kan grubu bu sorguda OKUNMAZ: fotograf yalnizca ozeti
-    /// degistiginde, kan grubu sifrelemeyle birlikte ayri PR'larda gelir.
+    /// degistiginde (<see cref="GetPhotosAsync"/>), kan grubu sifrelemeyle birlikte ayri PR'da gelir.
     /// </para>
     /// </remarks>
     public async Task<LogoPersonnelDetails> GetDetailsAsync(CancellationToken cancellationToken)
@@ -255,6 +256,60 @@ public sealed partial class LogoPersonnelSource : ILogoPersonnelSource
         }).ConfigureAwait(false);
     }
 
+    /// <inheritdoc />
+    /// <remarks>
+    /// <para>
+    /// Ozet sunucuda hesaplanir; goruntu agdan tasinmaz. <c>LDATA</c> eski <c>image</c> turunde
+    /// oldugu icin <c>CAST</c> gerekir (ADR-0021 §5). 01.11.2026'da 990 fotografin ozeti yaklasik
+    /// 1,6 saniyede alindi; UAT olcumu ADR'ye yazilir.
+    /// </para>
+    /// <para>
+    /// Sorgu metni sabittir; disaridan girdi almaz. Bos goruntu (0 bayt) fotograf sayilmaz.
+    /// </para>
+    /// </remarks>
+    public async Task<IReadOnlyList<LogoPhotoDigest>> GetPhotoDigestsAsync(CancellationToken cancellationToken)
+    {
+        const string sql =
+            "SELECT PERREF AS LogoRef, CONVERT(char(64), HASHBYTES('SHA2_256', CAST(LDATA AS varbinary(max))), 2) AS Hash " +
+            $"FROM {LogoSchema.FamilyTable} " +
+            "WHERE RELATION = 0 AND PERREF IS NOT NULL AND LDATA IS NOT NULL AND DATALENGTH(LDATA) > 0 " +
+            "ORDER BY PERREF, LREF";
+
+        var rows = await QueryAsync(() => _context.Database.SqlQueryRaw<DigestRow>(sql).ToListAsync(cancellationToken))
+            .ConfigureAwait(false);
+
+        // Her kartin tek "kendisi" satiri vardir (toplantı kaydı §11.9); birden fazla gelirse en
+        // kucuk LREF alinir ve her calismada ayni sonuc cikar.
+        return [.. rows.GroupBy(r => r.LogoRef).Select(g => new LogoPhotoDigest(g.Key, g.First().Hash))];
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// Ozet, okunan baytlardan yeniden hesaplanir: ozet sorgusuyla bu sorgu arasinda LOGO'da
+    /// fotograf degistiyse saklanan ozet saklanan goruntuyle yine ayni kalir.
+    /// </remarks>
+    public async Task<IReadOnlyList<LogoPhoto>> GetPhotosAsync(IReadOnlyCollection<int> logoRefs, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(logoRefs);
+        if (logoRefs.Count == 0)
+        {
+            return [];
+        }
+
+        int[] refs = [.. logoRefs];
+        var rows = await QueryAsync(() => _context.Families
+                .Where(f => f.Relation == LogoSchema.SelfRelation && f.PersonRef != null && refs.Contains(f.PersonRef.Value) && f.Photo != null)
+                .OrderBy(f => f.LogicalRef)
+                .Select(f => new { PersonRef = f.PersonRef!.Value, f.Photo })
+                .ToListAsync(cancellationToken))
+            .ConfigureAwait(false);
+
+        return [.. rows
+            .Where(r => r.Photo is { Length: > 0 })
+            .GroupBy(r => r.PersonRef)
+            .Select(g => new LogoPhoto(g.Key, Convert.ToHexString(SHA256.HashData(g.First().Photo!)), g.First().Photo!))];
+    }
+
     private static string? Trimmed(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
     private static DateOnly? ToDate(DateTime? value) => value is null ? null : DateOnly.FromDateTime(value.Value);
@@ -292,6 +347,14 @@ public sealed partial class LogoPersonnelSource : ILogoPersonnelSource
         public string Permission { get; init; } = string.Empty;
 
         public int? Granted { get; init; }
+    }
+
+    /// <summary>Fotograf ozeti sorgusunun satiri.</summary>
+    private sealed class DigestRow
+    {
+        public int LogoRef { get; init; }
+
+        public string Hash { get; init; } = string.Empty;
     }
 
     /// <summary>Sema sorgusunun satiri.</summary>

@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from 'react';
-import { Avatar, Box, Chip, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Chip, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import type { EmploymentCard, PersonCard } from '../api/personsApi';
 import { displayDate, joinParts, orderEmployments } from '../display';
+import { PersonAvatar } from './PersonAvatar';
 
 /**
  * Kisi karti gorunumu: "Profilim" ve listeden acilan kart ayni gorunumu kullanir (SYG-PERS-034,
@@ -75,12 +76,14 @@ function ProfileHeader({
             borderColor: active ? 'primary.light' : 'warning.light',
           }}
         >
-          <Avatar
-            aria-label={t('personnel.card.photo', { name })}
-            sx={{ width: 96, height: 96, bgcolor: 'primary.main', fontSize: '2rem' }}
-          >
-            {`${person.firstName.charAt(0)}${person.lastName.charAt(0)}`}
-          </Avatar>
+          {/* Kendi karti "me" ucundan: gorunur kalma suresi kisinin kendisine uygulanmaz. */}
+          <PersonAvatar
+            source={person.isSelf ? 'me' : { personId: person.personId }}
+            hasPhoto={person.hasPhoto}
+            firstName={person.firstName}
+            lastName={person.lastName}
+            size={96}
+          />
         </Box>
         <Box sx={{ minWidth: 0 }}>
           <Typography variant="h5" component="h1" sx={{ fontWeight: 700 }}>

@@ -422,7 +422,6 @@
       "removeFilter": "{{label}} süzgecini kaldır",
       "employmentCount": "{{count}} sicil",
       "terminated": "Ayrıldı",
-      "photo": "{{name}} fotoğrafı",
       "columns": {
         "name": "Ad soyad",
         "firstName": "Ad",
@@ -504,7 +503,6 @@
       "notFound": "Kişi bulunamadı",
       "notFoundText": "Aradığınız kişi yok ya da bu kişinin kartını görme yetkiniz bulunmuyor.",
       "profileMissing": "Hesabınıza bağlı bir personel kaydı bulunamadı. İnsan Kaynakları birimine başvurun.",
-      "photo": "{{name}} fotoğrafı",
       "active": "Aktif",
       "terminated": "Ayrıldı",
       "notRegistered": "Kayıtlı değil",
@@ -545,7 +543,8 @@
         "seniority": "Kıdem süresi"
       },
       "ageValue": "{{age}} yaş"
-    }
+    },
+    "photo": "{{name}} fotoğrafı"
   },
   "home": {
     "greeting": {

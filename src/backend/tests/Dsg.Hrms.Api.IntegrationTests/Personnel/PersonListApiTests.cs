@@ -75,6 +75,27 @@ public sealed class PersonListApiTests : IClassFixture<Identity.RegistrationApiF
     }
 
     [Fact]
+    public async Task List_items_tell_whether_a_photo_exists()
+    {
+        // SYG-PERS-023, 040: fotografi olmayan kartta bas harfler gosterilir.
+        await _fixture.WithDbAsync(async context =>
+        {
+            var person = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(2));
+            context.Add(PersonPhoto.For(person.Id, new string('A', PersonPhoto.SourceHashLength), [0xFF, 0xD8]));
+            return await context.SaveChangesAsync();
+        });
+        var withPhoto = await PersonIdAsync(2);
+
+        var (client, token) = await HrAsync();
+        using (client)
+        {
+            var items = (await ListAsync(client, token, "")).GetProperty("items").EnumerateArray().ToList();
+            items.Single(i => i.GetProperty("personId").GetGuid() == withPhoto).GetProperty("hasPhoto").GetBoolean().ShouldBeTrue();
+            items.Where(i => i.GetProperty("personId").GetGuid() != withPhoto).ShouldAllBe(i => !i.GetProperty("hasPhoto").GetBoolean());
+        }
+    }
+
+    [Fact]
     public async Task Quick_search_ignores_turkish_letters_and_covers_registry_codes()
     {
         // SYG-PERS-030 (ADR-0021 §7): "isik" IŞIK'i, "ışık" da ayni kisiyi bulur.

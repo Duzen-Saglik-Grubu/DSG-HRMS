@@ -27,6 +27,7 @@ public sealed class PersonnelSyncWorkerTests
         services.AddSingleton(_store);
         services.AddSingleton(Substitute.For<IDateTimeProvider>());
         services.AddSingleton(new PersonnelSyncOptions());
+        services.AddSingleton(Substitute.For<IPhotoThumbnailer>());
         services.AddSingleton<ISystemParameters>(new FakeSystemParameters());
         services.AddSingleton(typeof(ILogger<>), typeof(NullLogger<>));
         services.AddScoped<PersonnelSyncService>();

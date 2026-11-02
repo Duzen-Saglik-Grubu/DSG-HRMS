@@ -62,6 +62,15 @@ public interface IPersonnelSyncSession : IAsyncDisposable
     /// <summary>T1 adiminin yeni kayitlarini ekler.</summary>
     void AddDetails(DetailsOutcome outcome);
 
+    /// <summary>Fotograf adimi icin kisileri, istihdamlari ve mevcut fotograflari yukler (SYG-PERS-014).</summary>
+    Task<PersonnelPhotoSnapshot> LoadPhotosAsync(CancellationToken cancellationToken);
+
+    /// <summary>Yeni fotograflari ekler.</summary>
+    void AddPhotos(IEnumerable<PersonPhoto> photos);
+
+    /// <summary>LOGO'da artik olmayan fotograflari siler.</summary>
+    void RemovePhotos(IEnumerable<PersonPhoto> photos);
+
     /// <summary>Tarih aralikli yeni kayitlari ekler.</summary>
     void AddAssignments(IEnumerable<EmploymentAssignment> assignments);
 

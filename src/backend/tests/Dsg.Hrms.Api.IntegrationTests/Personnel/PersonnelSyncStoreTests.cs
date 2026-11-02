@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Security.Cryptography;
 using Dsg.Hrms.Api.IntegrationTests.Settings;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Personnel.Sync;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Npgsql;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using SkiaSharp;
 using Testcontainers.PostgreSql;
 
 namespace Dsg.Hrms.Api.IntegrationTests.Personnel;
@@ -83,6 +85,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         _source.VerifyReadOnlyAccessAsync(Arg.Any<CancellationToken>()).Returns(new LogoAccessCheckResult(true, []));
         _source.VerifySchemaAsync(Arg.Any<CancellationToken>()).Returns(new LogoSchemaCheckResult(true, []));
         _source.GetDetailsAsync(Arg.Any<CancellationToken>()).Returns(new LogoPersonnelDetails([], [], [], []));
+        _source.GetPhotoDigestsAsync(Arg.Any<CancellationToken>()).Returns([]);
     }
 
     public async Task DisposeAsync()
@@ -100,7 +103,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
 
         await using var store = CreateStore();
         var service = new PersonnelSyncService(
-            _source, store, _clock, _parameters, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance);
+            _source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), NullLogger<PersonnelSyncService>.Instance);
 
         return await service.RunAsync(SyncTrigger.Scheduled, CancellationToken.None);
     }
@@ -245,6 +248,88 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         run.PersonsCreated.ShouldBe(1);
     }
 
+    // ------------------------------------------------------------------ fotograf (SYG-PERS-014)
+
+    [Fact]
+    public async Task Photo_is_stored_small_and_is_not_read_again_while_its_digest_is_unchanged()
+    {
+        var original = TestImages.Jpeg(1200, 900);
+        var hash = Convert.ToHexString(SHA256.HashData(original));
+        LogoHasPhoto(1, original);
+
+        (await SyncAsync(Card("00001", NationalId(1), logoRef: 1))).Status.ShouldBe(SyncStatus.Succeeded);
+
+        await using (var context = Read())
+        {
+            var photo = await context.Set<PersonPhoto>().SingleAsync();
+            photo.SourceHash.ShouldBe(hash);
+            photo.Content.Length.ShouldBeLessThan(original.Length);
+            using var bitmap = SKBitmap.Decode(photo.Content);
+            (bitmap.Width, bitmap.Height).ShouldBe((400, 300));
+
+            // Goruntu denetim izine yazilmaz; yalnizca degistigi ve ozeti gorunur (KR-059).
+            var entry = await context.ChangeLog.SingleAsync(e => e.EntityName == nameof(PersonPhoto));
+            var changes = entry.Changes.ToString();
+            changes.ShouldContain(hash);
+            changes.Length.ShouldBeLessThan(1_000);
+        }
+
+        _source.ClearReceivedCalls();
+        var second = await SyncAsync(Card("00001", NationalId(1), logoRef: 1));
+
+        second.Status.ShouldBe(SyncStatus.Succeeded);
+        await _source.DidNotReceive().GetPhotosAsync(Arg.Any<IReadOnlyCollection<int>>(), Arg.Any<CancellationToken>());
+        await using var verify = Read();
+        (await verify.Set<PersonnelSyncRun>().OrderByDescending(r => r.Id).FirstAsync()).PersonsUpdated.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task Changed_photo_is_replaced_and_deleted_photo_is_removed()
+    {
+        LogoHasPhoto(1, TestImages.Jpeg(300, 300, SKColors.Red));
+        await SyncAsync(Card("00001", NationalId(1), logoRef: 1));
+
+        var changed = TestImages.Jpeg(300, 300, SKColors.Green);
+        LogoHasPhoto(1, changed);
+        await SyncAsync(Card("00001", NationalId(1), logoRef: 1));
+
+        await using (var context = Read())
+        {
+            (await context.Set<PersonPhoto>().SingleAsync()).SourceHash.ShouldBe(Convert.ToHexString(SHA256.HashData(changed)));
+        }
+
+        _source.GetPhotoDigestsAsync(Arg.Any<CancellationToken>()).Returns([]);
+        var removed = await SyncAsync(Card("00001", NationalId(1), logoRef: 1));
+
+        removed.Status.ShouldBe(SyncStatus.Succeeded);
+        await using var verify = Read();
+        (await verify.Set<PersonPhoto>().CountAsync()).ShouldBe(0);
+        (await verify.ChangeLog.CountAsync(e => e.EntityName == nameof(PersonPhoto) && e.Operation == AuditOperation.Delete)).ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Photo_step_failure_keeps_the_earlier_steps_and_marks_the_run_partial()
+    {
+        // SYG-PERS-013: fotograflar en son islenir; hatalari kisi ve istihdam degisikliklerini geri almaz.
+        _source.GetPhotoDigestsAsync(Arg.Any<CancellationToken>()).ThrowsAsync(new LogoUnavailableException());
+
+        var result = await SyncAsync(Card("00001", NationalId(1), logoRef: 1));
+
+        result.Status.ShouldBe(SyncStatus.PartiallyCompleted);
+        await using var context = Read();
+        (await context.Set<Person>().CountAsync()).ShouldBe(1);
+        (await context.Set<PersonnelSyncRun>().SingleAsync()).FailureReason.ShouldBe(SyncFailureReason.SourceUnavailable);
+    }
+
+    /// <summary>LOGO'da kartin fotografi var: ozet ve goruntu ayni baytlardan uretilir.</summary>
+    private void LogoHasPhoto(int logoRef, byte[] image)
+    {
+        var hash = Convert.ToHexString(SHA256.HashData(image));
+        _source.GetPhotoDigestsAsync(Arg.Any<CancellationToken>()).Returns([new LogoPhotoDigest(logoRef, hash)]);
+        _source.GetPhotosAsync(Arg.Any<IReadOnlyCollection<int>>(), Arg.Any<CancellationToken>())
+            .Returns([new LogoPhoto(logoRef, hash, image)]);
+    }
+
     [Fact]
     public async Task Second_identical_sync_adds_nothing_to_the_audit_trail()
     {
@@ -326,7 +411,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         _source.GetAllAsync(Arg.Any<CancellationToken>()).ThrowsAsync(new LogoUnavailableException());
         await using (var store = CreateStore())
         {
-            await new PersonnelSyncService(_source, store, _clock, _parameters, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance)
+            await new PersonnelSyncService(_source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), NullLogger<PersonnelSyncService>.Instance)
                 .RunAsync(SyncTrigger.Scheduled, CancellationToken.None);
         }
 
@@ -399,7 +484,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         await using (var store = CreateStore())
         {
             var service = new PersonnelSyncService(
-                _source, store, _clock, _parameters, new PersonnelSyncOptions(), NullLogger<PersonnelSyncService>.Instance);
+                _source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), NullLogger<PersonnelSyncService>.Instance);
             (await service.RunAsync(SyncTrigger.Scheduled, CancellationToken.None)).Status.ShouldBe(SyncStatus.Failed);
         }
 

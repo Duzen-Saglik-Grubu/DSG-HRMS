@@ -891,6 +891,103 @@
         }
       }
     },
+    "/api/v1/personnel/persons/me/photo": {
+      "get": {
+        "tags": [
+          "PersonPhotos"
+        ],
+        "summary": "Kullanicinin kendi fotografi. Izin gerektirmez.",
+        "responses": {
+          "200": {
+            "description": "Fotograf (JPEG, uzun kenar en fazla 400 piksel).",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileContentResult"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Tarayicidaki surum guncel."
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Fotograf yok.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/persons/{personId}/photo": {
+      "get": {
+        "tags": [
+          "PersonPhotos"
+        ],
+        "summary": "Kisinin fotografi.",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fotograf (JPEG, uzun kenar en fazla 400 piksel).",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileContentResult"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Tarayicidaki surum guncel."
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi yok, kapsam disinda veya fotografi yok (ayirt edilemez).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons": {
       "get": {
         "tags": [
@@ -4076,7 +4173,8 @@
           "previousSurname",
           "maritalStatus",
           "educationName",
-          "sensitive"
+          "sensitive",
+          "hasPhoto"
         ],
         "type": "object",
         "properties": {
@@ -4186,6 +4284,10 @@
                 "$ref": "#/components/schemas/SensitiveResponse"
               }
             ]
+          },
+          "hasPhoto": {
+            "type": "boolean",
+            "description": "Fotografi var mi; varsa `/persons/{personId}/photo` (kendi kartinda `/persons/me/photo`) ucundan alinir."
           }
         },
         "description": "Kisi karti."
@@ -4312,7 +4414,8 @@
           "branchName",
           "departmentName",
           "titleName",
-          "dutyName"
+          "dutyName",
+          "hasPhoto"
         ],
         "type": "object",
         "properties": {
@@ -4383,6 +4486,10 @@
               "string"
             ],
             "description": "Gorev."
+          },
+          "hasPhoto": {
+            "type": "boolean",
+            "description": "Fotografi var mi; varsa `/persons/{personId}/photo` ucundan alinir."
           }
         },
         "description": "Listedeki kisi karti (SYG-PERS-023)."
@@ -5288,6 +5395,9 @@
     },
     {
       "name": "EmploymentDuties"
+    },
+    {
+      "name": "PersonPhotos"
     },
     {
       "name": "Persons"

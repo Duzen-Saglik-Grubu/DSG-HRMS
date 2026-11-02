@@ -1,7 +1,7 @@
 # Paket Envanteri
 
 **Belge kimliği:** MIM-003
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-11-02
 **İlgili süreç:** TEC.5 (Tasarım), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-001`, `KR-005`, `KR-006`, `KR-025`, `KR-026`, `KR-057`
 
@@ -40,6 +40,7 @@ Bu tablo, **neden kullanılmadıklarını** kayıt altına alır. Amacı, ilerid
 | **QuestPDF** | PdfSharp / MigraDoc | Community lisansı ciro eşiğine bağlı | `KR-025` |
 | **FluentAssertions** | Shouldly | **8.x sürümü koşullu ticari lisansa geçti** | `KR-057` |
 | **EPPlus** | ClosedXML | 5.x'ten itibaren ticari lisans | `KR-026` |
+| **SixLabors.ImageSharp** | SkiaSharp | Ticari kullanımda lisans ciro eşiğine bağlı | `KR-025` ilkesi; ADR-0021 §5 |
 | **EF Core In-Memory** | Testcontainers | Gerçek veritabanı davranışını taklit etmiyor | ADR-0011 §3 |
 | **MUI X `DateRangePicker`** | İki adet `DatePicker` | Yalnızca ücretli (Pro) pakette; iki ücretsiz `DatePicker` ile aynı işlev elde edildi | `KR-025` |
 | **MUI X `DataGrid`** | MUI `Table` üzerine kendi `DataTable` | Sunucu tarafı özelliklerin bir kısmı Pro pakette; lisans belirsizliği yerine tam denetim tercih edildi | `KR-025` |
@@ -129,6 +130,16 @@ sabitlenirler. Üst paketler yamalı sürümü kendisi getirdiğinde satır kald
 | ClosedXML | 0.105.0 | MIT | Excel üretimi (ADR-0014) |
 | PdfSharp | 6.2.1 | MIT | PDF üretimi |
 | PdfSharp.MigraDoc | 6.2.1 | MIT | PDF belge düzeni |
+
+### 3.7.1 Görüntü
+
+| Paket | Sürüm | Lisans | Amaç |
+|---|---|---|---|
+| SkiaSharp | 4.152.3 | MIT | Personel fotoğrafını 400 piksele küçültme ve JPEG'e çevirme (ADR-0021 §5) |
+| SkiaSharp.NativeAssets.Linux.NoDependencies | 4.152.3 | MIT | Linux konteynerinde sistem kütüphanesi gerektirmeyen yerel Skia kütüphanesi |
+
+Yerel kütüphane konteyner taramasında (trivy) izlenir. Sürüm, yayımlanmasının üzerinden bir ay
+geçmiş olduğu için seçildi (4.153.x ve 4.154.0 28.10.2026'da yayımlandı).
 
 ### 3.8 Test
 
@@ -271,3 +282,4 @@ Reddedilen bir paket varsa §2 tablosuna gerekçesiyle yazılır.
 | 2026-09-11 | 0.7 | Tarih seçimi paketleri eklendi; MUI X Pro bileşenleri reddedilenler tablosuna işlendi | Bilgi İşlem |
 | 2026-09-12 | 0.8 | §4.3 TypeScript 6 hazırlığı notu eklendi (baseUrl kaldırıldı) | Bilgi İşlem |
 | 2026-10-14 | 0.9 | §3.6: MailKit eklendi; §3.6.1 güvenlik için sabitlenen dolaylı paketler: System.Security.Cryptography.Pkcs 10.0.13 (#223) | Bilgi İşlem |
+| 2026-11-02 | 0.10 | §3.7.1 görüntü: SkiaSharp ve Linux yerel paketi eklendi; ImageSharp reddedilenlere işlendi (#313) | Bilgi İşlem |

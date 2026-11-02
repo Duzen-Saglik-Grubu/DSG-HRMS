@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient } from '@tanstack/react-query';
 import { createMemoryRouter, RouterProvider } from 'react-router';
@@ -65,6 +65,7 @@ function person(overrides: Partial<PersonCard> = {}): PersonCard {
     maritalStatus: 'married',
     educationName: 'Lisans',
     sensitive: { address: 'Kızılay Mah. 1' },
+    hasPhoto: false,
     ...overrides,
   };
 }
@@ -187,6 +188,25 @@ describe('Profilim', () => {
       await screen.findByRole('heading', { level: 1, name: 'AYŞE DEMİR' }),
     ).toBeInTheDocument();
     expect(personsApi.me).toHaveBeenCalled();
+  });
+
+  it('kendi fotografi "me" ucundan gelir (SYG-PERS-041)', async () => {
+    await setSession({ status: 'authenticated' });
+    vi.spyOn(personsApi, 'me').mockResolvedValue(person({ isSelf: true, hasPhoto: true }));
+    const myPhoto = vi.spyOn(personsApi, 'myPhoto').mockResolvedValue(new Blob(['jpeg']));
+    const photo = vi.spyOn(personsApi, 'photo');
+    URL.createObjectURL = () => 'blob:ben';
+    URL.revokeObjectURL = vi.fn();
+    renderAt(routes.profile);
+
+    await waitFor(() =>
+      expect(screen.getByRole('img', { name: 'AYŞE DEMİR fotoğrafı' })).toHaveAttribute(
+        'src',
+        'blob:ben',
+      ),
+    );
+    expect(myPhoto).toHaveBeenCalled();
+    expect(photo).not.toHaveBeenCalled();
   });
 
   it('personeli goremeyen kullanici liste adresini yazsa da profiline gider (#311)', async () => {

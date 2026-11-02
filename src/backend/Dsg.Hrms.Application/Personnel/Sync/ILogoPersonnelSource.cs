@@ -38,6 +38,20 @@ public interface ILogoPersonnelSource
     /// </summary>
     /// <exception cref="LogoUnavailableException">LOGO'ya erisilemezse.</exception>
     Task<LogoPersonnelDetails> GetDetailsAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Fotografi olan kartlarin goruntu ozetleri (SHA-256); goruntunun kendisi okunmaz
+    /// (SYG-PERS-014, ADR-0021 §5). Ozet LOGO sunucusunda hesaplanir.
+    /// </summary>
+    /// <exception cref="LogoUnavailableException">LOGO'ya erisilemezse.</exception>
+    Task<IReadOnlyList<LogoPhotoDigest>> GetPhotoDigestsAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Verilen kartlarin fotograflarini okur. Yalnizca ozeti degisen kartlar icin cagrilir; cagiran
+    /// buyuk listeyi parcalara boler.
+    /// </summary>
+    /// <exception cref="LogoUnavailableException">LOGO'ya erisilemezse.</exception>
+    Task<IReadOnlyList<LogoPhoto>> GetPhotosAsync(IReadOnlyCollection<int> logoRefs, CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -117,6 +131,19 @@ public sealed record LogoProfileRecord(
     short? MaritalStatus,
     string? EducationName,
     string? Address);
+
+/// <summary>Bir kartin fotograf ozeti.</summary>
+/// <param name="LogoRef">Kartin <c>LREF</c>'i.</param>
+/// <param name="Hash">Goruntunun SHA-256 ozeti (64 onaltilik karakter, buyuk harf).</param>
+public sealed record LogoPhotoDigest(int LogoRef, string Hash);
+
+/// <summary>Bir kartin fotografi.</summary>
+/// <param name="LogoRef">Kartin <c>LREF</c>'i.</param>
+/// <param name="Hash">Okunan goruntunun SHA-256 ozeti; ozet sorgusundan sonra degistiyse yeni ozet.</param>
+/// <param name="Data">Orijinal goruntu (JPEG veya PNG).</param>
+#pragma warning disable CA1819 // Goruntu baytlari kopyalanmadan kucultmeye aktarilir.
+public sealed record LogoPhoto(int LogoRef, string Hash, byte[] Data);
+#pragma warning restore CA1819
 
 /// <summary>Firmaya bagli bir tanim (sube veya birim).</summary>
 /// <param name="FirmNumber">Firma numarasi.</param>

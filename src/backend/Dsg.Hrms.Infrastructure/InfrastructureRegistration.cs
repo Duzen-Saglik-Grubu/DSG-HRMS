@@ -176,6 +176,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IPersonnelSyncStore, PersonnelSyncStore>();
         services.AddScoped<IPersonnelSyncStatus, PersonnelSyncStatus>();
         services.AddScoped<PersonnelSyncService>();
+        services.AddSingleton<IPhotoThumbnailer, SkiaPhotoThumbnailer>();
 
         AddLogo(services, configuration);
 

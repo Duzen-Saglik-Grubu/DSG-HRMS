@@ -42,7 +42,11 @@ public sealed record PersonCard(
     string? PreviousSurname,
     MaritalStatus? MaritalStatus,
     string? EducationName,
-    SensitiveCard? Sensitive);
+    SensitiveCard? Sensitive)
+{
+    /// <summary>Kisinin fotografi var mi; yoksa bas harfler gosterilir (SYG-PERS-040).</summary>
+    public bool HasPhoto { get; init; }
+}
 
 /// <summary>Kartin korumali alanlari (ADR-0019 §2). Alan bos ise "Kayitli degil".</summary>
 /// <param name="Address">Adres; kayitli degilse <c>null</c>.</param>
@@ -122,6 +126,26 @@ public sealed class PersonCardService
         return await PresentAsync(record, viewer, cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Kisinin fotografi (SYG-PERS-041). Kapsam disi, bulunmayan ve fotografi olmayan kisi ayni
+    /// <see cref="NotFoundException"/>'i uretir. Ayri erisim kaydi yazilmaz: fotograf, kaydi
+    /// yazilan kart veya liste goruntulemesinin parcasidir.
+    /// </summary>
+    public async Task<PhotoRecord> GetPhotoAsync(Guid personId, CancellationToken cancellationToken)
+    {
+        var viewer = await _scope.GetAsync(cancellationToken).ConfigureAwait(false);
+        return await _query.FindPhotoAsync(personId, viewer, cancellationToken).ConfigureAwait(false)
+            ?? throw new NotFoundException(NotFoundMessage);
+    }
+
+    /// <summary>Kullanicinin kendi fotografi; yoksa <see cref="NotFoundException"/>.</summary>
+    public async Task<PhotoRecord> GetOwnPhotoAsync(CancellationToken cancellationToken)
+    {
+        var viewer = await _scope.GetAsync(cancellationToken).ConfigureAwait(false);
+        return await _query.FindOwnPhotoAsync(viewer, cancellationToken).ConfigureAwait(false)
+            ?? throw new NotFoundException(NotFoundMessage);
+    }
+
     private async Task<PersonCard> PresentAsync(PersonRecord record, PersonnelViewer viewer, CancellationToken cancellationToken)
     {
         await _accessLogger.LogAsync(AccessRecord.View(EntityName, record.PublicId), cancellationToken).ConfigureAwait(false);
@@ -156,6 +180,9 @@ public sealed class PersonCardService
             record.Profile.PreviousSurname,
             record.Profile.MaritalStatus,
             record.Profile.EducationName,
-            PersonFieldVisibility.CanSeeSensitive(viewer, record.Id) ? new SensitiveCard(record.Address) : null);
+            PersonFieldVisibility.CanSeeSensitive(viewer, record.Id) ? new SensitiveCard(record.Address) : null)
+        {
+            HasPhoto = record.HasPhoto,
+        };
     }
 }

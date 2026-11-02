@@ -46,6 +46,7 @@ public sealed class LogoFieldScopeTests
         "LH_001_FAMILY.IDREF",      // baglanti (kimlik ek bilgisine)
         "LH_001_FAMILY.RELATION",   // yakinlik (0 = kisinin kendisi)
         "LH_001_FAMILY.STATUS",     // medeni hal
+        "LH_001_FAMILY.LDATA",      // fotograf (SYG-PERS-014)
         "LH_001_PERIDINF.LREF",     // baglanti
         "LH_001_PERIDINF.EXSURNAME", // onceki soyadi
         "LH_001_TYPEDEF.LREF",      // baglanti

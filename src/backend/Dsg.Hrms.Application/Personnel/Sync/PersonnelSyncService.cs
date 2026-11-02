@@ -29,6 +29,7 @@ public sealed partial class PersonnelSyncService
     private readonly IDateTimeProvider _clock;
     private readonly ISystemParameters _parameters;
     private readonly PersonnelSyncOptions _options;
+    private readonly IPhotoThumbnailer _thumbnailer;
     private readonly ILogger<PersonnelSyncService> _logger;
 
     /// <summary>Yeni ornek olusturur.</summary>
@@ -38,6 +39,7 @@ public sealed partial class PersonnelSyncService
         IDateTimeProvider clock,
         ISystemParameters parameters,
         PersonnelSyncOptions options,
+        IPhotoThumbnailer thumbnailer,
         ILogger<PersonnelSyncService> logger)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -47,6 +49,7 @@ public sealed partial class PersonnelSyncService
         _clock = clock;
         _parameters = parameters;
         _options = options;
+        _thumbnailer = thumbnailer;
         _logger = logger;
     }
 
@@ -118,13 +121,16 @@ public sealed partial class PersonnelSyncService
             // T1 adimi ilk adim KAYDEDILDIKTEN sonra calisir (SYG-PERS-013, AN-07): burada
             // olusan hata kisi, istihdam ve hesap degisikliklerini geri almaz.
             var (detailsUpdated, assignmentsChanged, detailsFailure) = await RunDetailsStepAsync(session, cancellationToken).ConfigureAwait(false);
+
+            // Fotograflar en son islenir (SYG-PERS-013); hatasi onceki adimlari geri almaz.
+            var (photosChanged, photoFailure) = await RunPhotoStepAsync(session, cancellationToken).ConfigureAwait(false);
             var counts = outcome.Counts with
             {
-                PersonsUpdated = outcome.Counts.PersonsUpdated + detailsUpdated,
+                PersonsUpdated = outcome.Counts.PersonsUpdated + detailsUpdated + photosChanged,
                 EmploymentsUpdated = outcome.Counts.EmploymentsUpdated + assignmentsChanged,
             };
 
-            if (detailsFailure is { } reason)
+            if ((detailsFailure ?? photoFailure) is { } reason)
             {
                 run.CompletePartially(counts, outcome.Warnings, reason, _clock.UtcNow);
             }
@@ -207,6 +213,87 @@ public sealed partial class PersonnelSyncService
             return (0, 0, SyncFailureReason.Unexpected);
         }
     }
+
+    /// <summary>
+    /// Fotograf adimi (SYG-PERS-014, ADR-0021 §5): ozetler okunur, yalnizca degisen goruntuler
+    /// LOGO'dan alinir, kucultulur ve saklanir. Hata firlatmaz; basarisizligi nedeniyle doner.
+    /// </summary>
+    /// <returns>Eklenen, degisen veya kaldirilan fotograf sayisi.</returns>
+    private async Task<(int Changed, SyncFailureReason? Failure)> RunPhotoStepAsync(
+        IPersonnelSyncSession session,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (!await session.BeginNextStepAsync(cancellationToken).ConfigureAwait(false))
+            {
+                LogPhotoStepYielded(_logger);
+                return (0, null);
+            }
+
+            var digests = await _source.GetPhotoDigestsAsync(cancellationToken).ConfigureAwait(false);
+            var snapshot = await session.LoadPhotosAsync(cancellationToken).ConfigureAwait(false);
+            var plan = PersonnelPhotoSynchronizer.Plan(digests, snapshot);
+            session.RemovePhotos(plan.ToRemove);
+
+            var changed = plan.ToRemove.Count;
+            var undecodable = 0;
+
+            // Ilk aktarimda yaklasik 1.000 goruntu (ort. 280 KB) okunur; bellek ve LOGO sorgusu
+            // sinirli kalsin diye parca parca alinir ve her parca hemen veritabanina yazilir.
+            foreach (var batch in plan.ToFetch.Keys.Chunk(PhotoBatchSize))
+            {
+                var photos = await _source.GetPhotosAsync(batch, cancellationToken).ConfigureAwait(false);
+                var outcome = PersonnelPhotoSynchronizer.Apply(photos, plan, snapshot, _thumbnailer);
+                session.AddPhotos(outcome.Added);
+                await session.SaveAsync(cancellationToken).ConfigureAwait(false);
+
+                changed += outcome.Changed;
+                undecodable += outcome.Undecodable;
+            }
+
+            await session.CommitAsync(cancellationToken).ConfigureAwait(false);
+
+            if (undecodable > 0)
+            {
+                LogUndecodablePhotos(_logger, undecodable);
+            }
+
+            return (changed, null);
+        }
+        catch (LogoUnavailableException ex)
+        {
+            LogPhotoStepFailed(_logger, ex);
+            return (0, SyncFailureReason.SourceUnavailable);
+        }
+        catch (SyncPersistenceException ex)
+        {
+            LogPhotoStepFailed(_logger, ex);
+            return (0, SyncFailureReason.PersistenceFailed);
+        }
+#pragma warning disable CA1031 // Onceki adimlar kaydedildi; fotograf adimindaki hata calismayi "kismen" kapatir.
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            LogPhotoStepFailed(_logger, ex);
+            return (0, SyncFailureReason.Unexpected);
+        }
+    }
+
+    /// <summary>Bir LOGO sorgusunda okunan en fazla goruntu sayisi (yaklasik 14 MB).</summary>
+    internal const int PhotoBatchSize = 50;
+
+    [LoggerMessage(EventId = 3110, Level = LogLevel.Error,
+        Message = "Senkronizasyonun fotograf adimi basarisiz; onceki adimlar kaydedildi, calisma kismen tamamlandi.")]
+    private static partial void LogPhotoStepFailed(ILogger logger, Exception exception);
+
+    [LoggerMessage(EventId = 3111, Level = LogLevel.Information,
+        Message = "Senkronizasyonun fotograf adimi atlandi: baska bir calisma kilidi aldi ve adimi o yapacak.")]
+    private static partial void LogPhotoStepYielded(ILogger logger);
+
+    [LoggerMessage(EventId = 3112, Level = LogLevel.Warning,
+        Message = "LOGO'daki {Count} fotograf cozulemedi ve aktarilmadi; sonraki calismada yeniden denenecek.")]
+    private static partial void LogUndecodablePhotos(ILogger logger, int count);
 
     [LoggerMessage(EventId = 3108, Level = LogLevel.Error,
         Message = "Senkronizasyonun T1 adimi basarisiz; kisi ve istihdam degisiklikleri kaydedildi, calisma kismen tamamlandi.")]

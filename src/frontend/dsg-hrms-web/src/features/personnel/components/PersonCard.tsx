@@ -1,12 +1,8 @@
-import { Avatar, Box, Card, CardContent, Chip, Stack, Typography } from '@mui/material';
+import { Box, Card, CardContent, Chip, Stack, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import type { PersonListItem } from '../api/personsApi';
 import { joinParts } from '../display';
-
-/** Fotograf gelene kadar ad ve soyadin bas harfleri (SYG-PERS-040 sonraki is). */
-function initials(person: PersonListItem): string {
-  return `${person.firstName.charAt(0)}${person.lastName.charAt(0)}`;
-}
+import { PersonAvatar } from './PersonAvatar';
 
 /**
  * Liste karti (SYG-PERS-023): fotograf, ad soyad, sicil, sube / birim ve unvan / gorev. Fotograf
@@ -42,12 +38,13 @@ export function PersonCard({ person }: { person: PersonListItem }) {
               borderColor: person.isActive ? 'primary.light' : 'warning.light',
             }}
           >
-            <Avatar
-              aria-label={t('personnel.list.photo', { name })}
-              sx={{ width: 72, height: 72, bgcolor: 'primary.main', fontSize: '1.4rem' }}
-            >
-              {initials(person)}
-            </Avatar>
+            <PersonAvatar
+              source={{ personId: person.personId }}
+              hasPhoto={person.hasPhoto}
+              firstName={person.firstName}
+              lastName={person.lastName}
+              size={72}
+            />
           </Box>
           <Box sx={{ width: '100%', minWidth: 0 }}>
             <Typography

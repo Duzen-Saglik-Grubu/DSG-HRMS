@@ -387,6 +387,7 @@ public sealed class PersonListRequestValidator : AbstractValidator<PersonListReq
 /// <param name="DepartmentName">Birim.</param>
 /// <param name="TitleName">Unvan.</param>
 /// <param name="DutyName">Gorev.</param>
+/// <remarks><see cref="HasPhoto"/> yanlissa kartta bas harfler gosterilir (SYG-PERS-040).</remarks>
 public sealed record PersonListItemResponse(
     Guid PersonId,
     string FirstName,
@@ -400,13 +401,19 @@ public sealed record PersonListItemResponse(
     string? TitleName,
     string? DutyName)
 {
+    /// <summary>Fotografi var mi; varsa <c>/persons/{personId}/photo</c> ucundan alinir.</summary>
+    public required bool HasPhoto { get; init; }
+
     /// <summary>Uygulama katmanindaki kayittan yanit kurar.</summary>
     public static PersonListItemResponse From(PersonListItem item)
     {
         ArgumentNullException.ThrowIfNull(item);
         var p = item.Primary;
         return new(item.PersonId, item.FirstName, item.LastName, item.IsActive, item.EmploymentCount,
-            p?.RegistryCode, p?.CompanyName, p?.BranchName, p?.DepartmentName, p?.TitleName, p?.DutyName);
+            p?.RegistryCode, p?.CompanyName, p?.BranchName, p?.DepartmentName, p?.TitleName, p?.DutyName)
+        {
+            HasPhoto = item.HasPhoto,
+        };
     }
 }
 
@@ -445,6 +452,9 @@ public sealed record PersonCardResponse(
     string? EducationName,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] SensitiveResponse? Sensitive)
 {
+    /// <summary>Fotografi var mi; varsa <c>/persons/{personId}/photo</c> (kendi kartinda <c>/persons/me/photo</c>) ucundan alinir.</summary>
+    public required bool HasPhoto { get; init; }
+
     /// <summary>Uygulama katmanindaki karttan yanit kurar.</summary>
     public static PersonCardResponse From(PersonCard card)
     {
@@ -486,7 +496,10 @@ public sealed record PersonCardResponse(
                 _ => null,
             },
             card.EducationName,
-            card.Sensitive is { } sensitive ? new SensitiveResponse(sensitive.Address) : null);
+            card.Sensitive is { } sensitive ? new SensitiveResponse(sensitive.Address) : null)
+        {
+            HasPhoto = card.HasPhoto,
+        };
     }
 }
 

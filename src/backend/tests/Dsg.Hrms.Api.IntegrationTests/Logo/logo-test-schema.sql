@@ -38,8 +38,9 @@ CREATE TABLE L_CAPIFIRM (
     TITLE varchar(201) NULL
 );
 
--- T1 tablolari (23.10.2026, INFORMATION_SCHEMA). LDATA ve BLOODGROUP gibi kolonlar,
--- senkronizasyonun bunlari OKUMADIGINI gostermek icin vardir.
+-- T1 tablolari (23.10.2026, INFORMATION_SCHEMA). NAME, BLOODGROUP ve RELIGION gibi kolonlar,
+-- senkronizasyonun bunlari OKUMADIGINI gostermek icin vardir. LDATA (fotograf) yalnizca ozeti
+-- degistiginde okunur (SYG-PERS-014).
 CREATE TABLE LH_001_FAMILY (
     LREF      int          NOT NULL PRIMARY KEY,
     PERREF    int          NULL,

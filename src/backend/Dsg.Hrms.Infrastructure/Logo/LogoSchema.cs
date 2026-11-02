@@ -95,6 +95,7 @@ public static class LogoSchema
         new(FamilyTable, "IDREF", "int"),
         new(FamilyTable, "RELATION", "smallint"),
         new(FamilyTable, "STATUS", "smallint"),
+        new(FamilyTable, "LDATA", "image"),
         new(IdentityInfoTable, "LREF", "int"),
         new(IdentityInfoTable, "EXSURNAME", "varchar"),
         new(TypeDefinitionTable, "LREF", "int"),

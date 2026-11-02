@@ -127,7 +127,7 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
 
         card.EnumerateObject().Select(p => p.Name).ShouldBe(
             ["personId", "firstName", "lastName", "nationalId", "isNationalIdMasked", "birthDate", "age", "email", "mobilePhone", "isSelf", "employments",
-             "gender", "previousSurname", "maritalStatus", "educationName", "sensitive"]);
+             "gender", "previousSurname", "maritalStatus", "educationName", "sensitive", "hasPhoto"]);
         card.GetProperty("sensitive").EnumerateObject().Select(p => p.Name).ShouldBe(["address"]);
     }
 
@@ -246,6 +246,70 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
             ]);
     }
 
+    // ------------------------------------------------------------------ fotograf (SYG-PERS-040, 041)
+
+    [Fact]
+    public async Task Photo_is_served_with_its_digest_as_etag_and_a_private_cache_policy()
+    {
+        var hash = await SetPhotoAsync(1);
+        using var client = _fixture.CreateClient();
+        var token = await SignInAsync(client);
+
+        (await GetAsync(client, $"{Persons}/me", token)).Body.GetProperty("hasPhoto").GetBoolean().ShouldBeTrue();
+
+        using (var response = await SendAsync(client, $"{Persons}/me/photo", token))
+        {
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            response.Content.Headers.ContentType!.MediaType.ShouldBe("image/jpeg");
+            response.Headers.ETag!.Tag.ShouldBe($"\"{hash}\"");
+            response.Headers.CacheControl!.Private.ShouldBeTrue();
+            response.Headers.CacheControl.NoCache.ShouldBeTrue();
+            (await response.Content.ReadAsByteArrayAsync()).ShouldBe(PhotoBytes);
+        }
+
+        // Tarayicidaki surum guncelse goruntu yeniden gonderilmez.
+        using var revalidated = await SendAsync(client, $"{Persons}/{await PersonIdAsync(1)}/photo", token, ifNoneMatch: hash);
+        revalidated.StatusCode.ShouldBe(HttpStatusCode.NotModified);
+    }
+
+    [Fact]
+    public async Task Photo_follows_the_card_scope_and_hides_whether_a_photo_exists()
+    {
+        // SYG-PERS-041, 051: kapsam disi, bulunmayan ve fotografi olmayan kisi ayni 404'u alir.
+        await SetPhotoAsync(3);
+        using var client = _fixture.CreateClient();
+        var token = await SignInAsync(client);
+
+        var outOfScope = await PhotoStatusAsync(client, $"{Persons}/{await PersonIdAsync(3)}/photo", token);
+        var missing = await PhotoStatusAsync(client, $"{Persons}/{Guid.CreateVersion7()}/photo", token);
+        var noPhoto = await PhotoStatusAsync(client, $"{Persons}/me/photo", token);
+
+        outOfScope.Status.ShouldBe(HttpStatusCode.NotFound);
+        missing.Status.ShouldBe(HttpStatusCode.NotFound);
+        noPhoto.Status.ShouldBe(HttpStatusCode.NotFound);
+        Comparable(outOfScope.Body).ShouldBe(Comparable(missing.Body));
+        Comparable(noPhoto.Body).ShouldBe(Comparable(missing.Body));
+        (await GetAsync(client, $"{Persons}/me", token)).Body.GetProperty("hasPhoto").GetBoolean().ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task Photo_request_writes_no_access_log_entry()
+    {
+        // SYG-PERS-041: fotograf, kaydi yazilan kart veya liste goruntulemesinin parcasidir.
+        await SetPhotoAsync(3);
+        await GrantRoleAsync(1, Role.HrIdentityOperationsCode);
+        using var client = _fixture.CreateClient();
+        var token = await SignInAsync(client);
+        var before = await _fixture.WithDbAsync(context => context.AccessLog.MaxAsync(e => (long?)e.Id)) ?? 0;
+
+        using (var response = await SendAsync(client, $"{Persons}/{await PersonIdAsync(3)}/photo", token))
+        {
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        }
+
+        (await _fixture.WithDbAsync(context => context.AccessLog.CountAsync(e => e.Id > before))).ShouldBe(0);
+    }
+
     [Fact]
     public async Task Card_requires_a_session()
     {
@@ -253,7 +317,37 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
 
         (await GetAsync(client, $"{Persons}/me", null)).Status.ShouldBe(HttpStatusCode.Unauthorized);
         (await GetAsync(client, $"{Persons}/{await PersonIdAsync(1)}", null)).Status.ShouldBe(HttpStatusCode.Unauthorized);
+        (await GetAsync(client, $"{Persons}/me/photo", null)).Status.ShouldBe(HttpStatusCode.Unauthorized);
+        (await GetAsync(client, $"{Persons}/{await PersonIdAsync(1)}/photo", null)).Status.ShouldBe(HttpStatusCode.Unauthorized);
     }
+
+    /// <summary>Sentetik fotograf: gecerli bir JPEG olmasi gerekmez; uc baytlari oldugu gibi verir.</summary>
+    private static readonly byte[] PhotoBytes = [0xFF, 0xD8, 0xFF, 0xE0, 0x10, 0x20, 0xFF, 0xD9];
+
+    private Task<string> SetPhotoAsync(int index) =>
+        _fixture.WithDbAsync(async context =>
+        {
+            var person = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(index));
+            var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(PhotoBytes));
+            context.Add(PersonPhoto.For(person.Id, hash, PhotoBytes));
+            await context.SaveChangesAsync();
+            return hash;
+        });
+
+    private static async Task<HttpResponseMessage> SendAsync(HttpClient client, string path, string token, string? ifNoneMatch = null)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri(path, UriKind.Relative));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        if (ifNoneMatch is not null)
+        {
+            request.Headers.IfNoneMatch.Add(new EntityTagHeaderValue($"\"{ifNoneMatch}\""));
+        }
+
+        return await client.SendAsync(request);
+    }
+
+    private static Task<(HttpStatusCode Status, JsonElement Body)> PhotoStatusAsync(HttpClient client, string path, string token) =>
+        GetAsync(client, path, token);
 
     /// <summary>Problem Details govdesinin istege ozgu olmayan kismi.</summary>
     private static string Comparable(JsonElement body) =>

@@ -20,6 +20,19 @@ test('1. yonetici: liste kart izgarasiyla acilir, arar ve tabloya gecer (SYG-PER
   await expect(page.getByRole('article', { name: 'Deniz Davetli' })).toBeVisible();
   await expect(page.getByRole('article', { name: 'Yusuf Yonetici' })).toBeVisible();
 
+  // Fotograf (SYG-PERS-040): tohumda yalnizca Deniz'in sentetik fotografi var; digerlerinde bas harfler.
+  const photo = page
+    .getByRole('article', { name: 'Deniz Davetli' })
+    .getByRole('img', { name: 'Deniz Davetli fotoğrafı' });
+  await expect(photo).toHaveAttribute('src', /^blob:/);
+  await expect(photo).toHaveJSProperty('complete', true);
+  expect(await photo.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(160);
+  await expect(
+    page
+      .getByRole('article', { name: 'Yusuf Yonetici' })
+      .getByRole('img', { name: 'Yusuf Yonetici fotoğrafı' }),
+  ).toHaveText('YY');
+
   // Turkce karakterden bagimsiz, yazma durunca aranir.
   await page.getByLabel(/Ad, soyad, sicil/).fill('davetlı');
   await expect(page.getByRole('article')).toHaveCount(1);
@@ -40,6 +53,10 @@ test('1. yonetici: liste kart izgarasiyla acilir, arar ve tabloya gecer (SYG-PER
   await page.getByRole('row', { name: /Deniz/ }).getByRole('link', { name: 'Deniz' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Deniz Davetli' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Genel Bilgiler' })).toBeVisible();
+  await expect(page.getByRole('img', { name: 'Deniz Davetli fotoğrafı' })).toHaveAttribute(
+    'src',
+    /^blob:/,
+  );
   await page.getByRole('link', { name: 'Listeye dön' }).click();
   await expect(page).toHaveURL(/view=table/);
   await expect(page).toHaveURL(/q=davetl/);

@@ -88,6 +88,13 @@
     <PackageVersion Include="PdfSharp.MigraDoc" Version="6.2.1" />
   </ItemGroup>
 
+  <ItemGroup Label="Goruntu">
+    <!-- Fotograf kucultme: MIT - ADR-0021 §5. ImageSharp lisansi ciroya bagli (KR-025 ilkesi). -->
+    <!-- Linux konteynerinde sistem kutuphanesi gerektirmeyen yerel paket kullanilir. -->
+    <PackageVersion Include="SkiaSharp" Version="4.152.3" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.152.3" />
+  </ItemGroup>
+
   <ItemGroup Label="Test">
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
