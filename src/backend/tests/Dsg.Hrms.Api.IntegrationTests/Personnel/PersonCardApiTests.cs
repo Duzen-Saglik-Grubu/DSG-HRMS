@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -8,6 +9,7 @@ using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Infrastructure.Data;
+using Dsg.Hrms.Infrastructure.Personnel.Protection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using static Dsg.Hrms.Api.IntegrationTests.Identity.RegistrationApiFixture;
@@ -39,6 +41,8 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
     public async Task InitializeAsync()
     {
         await _fixture.ResetAsync();
+        // Korumali alan satirlari kisiyle birlikte kalir; kan grubu her testte bastan yazilir.
+        await _fixture.WithDbAsync(context => context.Database.ExecuteSqlRawAsync("UPDATE personnel.person_sensitive SET blood_group = NULL"));
         await CreateAccountAsync(1);
         await SetDetailsAsync(1, new PersonProfile(Gender.Female, "Demir", MaritalStatus.Married, "Lisans"), "Ornek Mah. 1. Sok. No: 2");
         await SetDetailsAsync(4, new PersonProfile(Gender.Male, null, MaritalStatus.NotMarried, "Lise"), null);
@@ -128,7 +132,7 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
         card.EnumerateObject().Select(p => p.Name).ShouldBe(
             ["personId", "firstName", "lastName", "nationalId", "isNationalIdMasked", "birthDate", "age", "email", "mobilePhone", "isSelf", "employments",
              "gender", "previousSurname", "maritalStatus", "educationName", "sensitive", "hasPhoto"]);
-        card.GetProperty("sensitive").EnumerateObject().Select(p => p.Name).ShouldBe(["address"]);
+        card.GetProperty("sensitive").EnumerateObject().Select(p => p.Name).ShouldBe(["address", "bloodGroup"]);
     }
 
     [Fact]
@@ -220,6 +224,63 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
 
         // Kendi karti tek kayittir: kisinin kendisi kurali gecerlidir.
         (await GetAsync(client, $"{Persons}/me", token)).Body.TryGetProperty("sensitive", out _).ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Blood_group_is_shown_to_the_person_and_hr_and_logged_as_a_special_category_view()
+    {
+        // SYG-PERS-034, 044, 052: kan grubunu kisinin kendisi ve view_sensitive izni olan gorur.
+        // SYG-PERS-057: yanitta kan grubu yer aldiysa ayrica SpecialCategoryView yazilir.
+        await SetBloodGroupAsync(1, 3);
+        await SetBloodGroupAsync(4, 8);
+        using var client = _fixture.CreateClient();
+        var token = await SignInAsync(client);
+        var self = await PersonIdAsync(1);
+        var other = await PersonIdAsync(4);
+        var before = await _fixture.WithDbAsync(context => context.AccessLog.MaxAsync(e => (long?)e.Id)) ?? 0;
+
+        (await GetAsync(client, $"{Persons}/me", token)).Body.GetProperty("sensitive").GetProperty("bloodGroup").GetString()
+            .ShouldBe("A Rh+");
+
+        await GrantRoleAsync(1, Role.HrIdentityOperationsCode);
+        token = await SignInAsync(client);
+        (await GetAsync(client, $"{Persons}/{other}", token)).Body.GetProperty("sensitive").GetProperty("bloodGroup").GetString()
+            .ShouldBe("AB Rh-");
+
+        // Kan grubu kayitli olmayan kiside gosterilen deger yoktur: ozel nitelikli kayit yazilmaz.
+        var unknown = await PersonIdAsync(3);
+        (await GetAsync(client, $"{Persons}/{unknown}", token)).Body.GetProperty("sensitive").GetProperty("bloodGroup").ValueKind
+            .ShouldBe(JsonValueKind.Null);
+
+        var entries = await _fixture.WithDbAsync(context => context.AccessLog.Where(e => e.Id > before).OrderBy(e => e.Id).ToListAsync());
+        entries.Select(e => (e.AccessType, e.EntityId)).ShouldBe([
+            (AccessType.View, (Guid?)self),
+            (AccessType.SpecialCategoryView, (Guid?)self),
+            (AccessType.View, (Guid?)other),
+            (AccessType.SpecialCategoryView, (Guid?)other),
+            (AccessType.View, (Guid?)unknown),
+        ]);
+    }
+
+    [Fact]
+    public async Task Viewer_without_the_sensitive_permission_never_receives_or_decrypts_the_blood_group()
+    {
+        // SYG-PERS-052 (yetki sizintisi testi): izni olmayanin yanitinda kan grubu yoktur ve
+        // ozel nitelikli goruntuleme kaydi da yazilmaz.
+        await SetBloodGroupAsync(3, 5);
+        await GrantRoleAsync(1, await CreateRoleAsync(Permissions.PersonView));
+        using var client = _fixture.CreateClient();
+        var token = await SignInAsync(client);
+        var target = await PersonIdAsync(3);
+        var before = await _fixture.WithDbAsync(context => context.AccessLog.MaxAsync(e => (long?)e.Id)) ?? 0;
+
+        var (status, card) = await GetAsync(client, $"{Persons}/{target}", token);
+
+        status.ShouldBe(HttpStatusCode.OK);
+        card.GetRawText().ShouldNotContain("B Rh+");
+        card.GetRawText().ShouldNotContain("bloodGroup");
+        (await _fixture.WithDbAsync(context => context.AccessLog.Where(e => e.Id > before).Select(e => e.AccessType).ToListAsync()))
+            .ShouldBe([AccessType.View]);
     }
 
     [Fact]
@@ -399,6 +460,24 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
             }
 
             row.ApplyAddress(address);
+            return await context.SaveChangesAsync();
+        });
+
+    /// <summary>Kisinin kan grubunu, uygulamanin veri anahtariyla sifreleyerek yazar (ADR-0020).</summary>
+    private Task<int> SetBloodGroupAsync(int index, short code) =>
+        _fixture.WithServicesAsync(async services =>
+        {
+            var protector = services.GetRequiredService<PersonalDataProtector>();
+            var context = services.GetRequiredService<HrmsDbContext>();
+            var person = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(index));
+            var row = await context.Set<PersonSensitive>().SingleOrDefaultAsync(r => r.PersonId == person.Id);
+            if (row is null)
+            {
+                row = PersonSensitive.For(person.Id);
+                context.Add(row);
+            }
+
+            row.SetProtectedBloodGroup(protector.Protect(code.ToString(CultureInfo.InvariantCulture), ProtectedField.BloodGroup(person.PublicId)));
             return await context.SaveChangesAsync();
         });
 

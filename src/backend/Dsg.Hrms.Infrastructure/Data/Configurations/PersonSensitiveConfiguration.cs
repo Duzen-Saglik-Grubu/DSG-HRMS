@@ -17,6 +17,9 @@ public sealed class PersonSensitiveConfiguration : IEntityTypeConfiguration<Pers
         builder.ToTable("person_sensitive", PersonConfiguration.PersonnelSchema);
         builder.HasKey(row => row.Id);
 
+        // Sifreli deger (ADR-0020 §1); dizin ve arama yoktur, deterministik ozet tutulmaz (§4).
+        builder.Property(row => row.BloodGroup);
+
         builder.HasIndex(row => row.PersonId).IsUnique();
         builder.HasOne<Person>()
             .WithOne()

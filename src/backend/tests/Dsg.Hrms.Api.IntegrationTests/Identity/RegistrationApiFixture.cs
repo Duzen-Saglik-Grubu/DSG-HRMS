@@ -133,6 +133,7 @@ public class RegistrationApiFixture : IAsyncLifetime
                 builder.UseSetting("ReverseProxy:TrustedNetworks", "172.16.0.0/12");
                 builder.UseSetting("AccessControl:BootstrapAdministrators", BootstrapAdministratorEmail);
                 builder.UseSetting("ParameterProtection:Key", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
+                builder.UseSetting("PersonalDataProtection:Keys:k1", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
 
                 builder.ConfigureServices(services =>
                 {

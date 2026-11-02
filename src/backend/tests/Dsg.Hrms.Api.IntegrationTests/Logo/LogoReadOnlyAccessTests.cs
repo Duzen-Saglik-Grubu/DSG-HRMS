@@ -4,6 +4,7 @@ using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Infrastructure.Logo;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
 using Testcontainers.MsSql;
 
@@ -222,8 +223,14 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
     public async Task Details_are_read_and_mapped()
     {
         // SYG-PERS-003: kart basina genel bilgiler ve adres; sube ve birim tanimlari.
-        // SYG-PERS-004: kan grubu ve din tablosunda olsa da okunmaz (model bunlari esleyemez).
-        var details = await WithSourceAsync(ReaderConnection(), source => source.GetDetailsAsync(CancellationToken.None));
+        // SYG-PERS-004: din tablosunda olsa da okunmaz (model eslemez). SYG-PERS-005: ozel
+        // nitelikli senkronizasyon kapaliyken kan grubu da okunmaz.
+        var commands = new List<string>();
+        var details = await WithSourceAsync(ReaderConnection(), source => source.GetDetailsAsync(CancellationToken.None), log: commands.Add);
+
+        commands.ShouldNotBeEmpty();
+        commands.ShouldAllBe(command => !command.Contains("BLOODGROUP", StringComparison.OrdinalIgnoreCase));
+        details.Profiles.ShouldAllBe(profile => profile.BloodGroup == null);
 
         details.Profiles.Count.ShouldBe(3);
         details.Profiles.Single(p => p.LogoRef == 1).ShouldBe(
@@ -241,6 +248,24 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
             new LogoAssignmentRecord(1, 1, BranchNumber: 0, DepartmentNumber: 7, TitleCode: "1", StatusCode: "A", OccupationCode: "2511.01", OccupationName: "Programci"));
         details.Assignments.Single(a => a.LogoRef == 2).ShouldBe(
             new LogoAssignmentRecord(2, 2, null, null, null, null, null, null));
+    }
+
+    [Fact]
+    public async Task Blood_group_is_read_only_when_special_category_sync_is_enabled()
+    {
+        // SYG-PERS-005 (KR-125): UAT ve uretimde acik. Kartin kendi satirinin (yakinlik 0) kimlik
+        // ek bilgisinden okunur; es satirinin kan grubu (501) kullanilmaz. Gecersiz kod okunmaz.
+        await ExecuteAsync(AdminConnection(Database), """
+            INSERT INTO LH_001_PERIDINF (LREF, EXSURNAME, BLOODGROUP, RELIGION) VALUES (502, NULL, 9, NULL);
+            UPDATE LH_001_FAMILY SET IDREF = 502 WHERE LREF = 102;
+            """);
+        var enabled = new LogoOptions { SyncSpecialCategoryData = true };
+
+        var details = await WithSourceAsync(ReaderConnection(), source => source.GetDetailsAsync(CancellationToken.None), enabled);
+
+        details.Profiles.Single(p => p.LogoRef == 1).BloodGroup.ShouldBe((short)3);
+        details.Profiles.Single(p => p.LogoRef == 2).BloodGroup.ShouldBeNull(); // aile satiri yok
+        details.Profiles.Single(p => p.LogoRef == 3).BloodGroup.ShouldBeNull(); // 9 gecersiz kod
     }
 
     [Fact]
@@ -312,7 +337,7 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
             UPDATE LH_001_PERSON SET SEX = 2, EDUCATION = 3, TITLE = ' 1 ', SPECODE = 'A', JOBREF = 3, LOCNR = 0, DEPTNR = 7 WHERE LREF = 1;
             UPDATE LH_001_PERSON SET SEX = 1, EDUCATION = 99 WHERE LREF = 3;
 
-            -- Kartin kendi satiri yakinlik 0; es satiri (1) okunmaz. Kan grubu ve din OKUNMAZ.
+            -- Kartin kendi satiri yakinlik 0; es satiri (1) okunmaz. Din OKUNMAZ; kan grubu yalnizca ayar aciksa.
             INSERT INTO LH_001_FAMILY (LREF, PERREF, IDREF, RELATION, STATUS) VALUES
                 (100, 1, 500, 0, 1),
                 (101, 1, 501, 1, 2),
@@ -354,8 +379,9 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
             TrustServerCertificate = true,
         }.ConnectionString;
 
-    private static LogoDbContext CreateContext(string connectionString, bool retry = true) =>
+    private static LogoDbContext CreateContext(string connectionString, bool retry = true, Action<string>? log = null) =>
         new(new DbContextOptionsBuilder<LogoDbContext>()
+            .LogTo(log ?? (_ => { }), [RelationalEventId.CommandExecuting])
             .UseSqlServer(connectionString, sql =>
             {
                 if (retry)
@@ -366,10 +392,15 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
             .Options);
 
     /// <summary>Kaynagi olusturur, islemi calistirir ve baglami kapatir.</summary>
-    private static async Task<T> WithSourceAsync<T>(string connectionString, Func<LogoPersonnelSource, Task<T>> action, bool retry = true)
+    private static async Task<T> WithSourceAsync<T>(
+        string connectionString,
+        Func<LogoPersonnelSource, Task<T>> action,
+        LogoOptions? options = null,
+        bool retry = true,
+        Action<string>? log = null)
     {
-        await using var context = CreateContext(connectionString, retry);
-        return await action(new LogoPersonnelSource(context, NullLogger<LogoPersonnelSource>.Instance));
+        await using var context = CreateContext(connectionString, retry, log);
+        return await action(new LogoPersonnelSource(context, options ?? new LogoOptions(), NullLogger<LogoPersonnelSource>.Instance));
     }
 
     private static string TestFile(string name) => Path.Combine(AppContext.BaseDirectory, "Logo", name);

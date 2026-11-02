@@ -86,6 +86,13 @@ public sealed record PersonRecord(
 {
     /// <summary>Kisinin saklanan fotografi var mi (SYG-PERS-040).</summary>
     public bool HasPhoto { get; init; }
+
+    /// <summary>
+    /// Kan grubunun adi (ornek "A Rh+"; <c>KR-129</c>). Yalnizca korumali alanlari gorebilen
+    /// bakista (<c>view_sensitive</c> veya kisinin kendisi) cozulur; digerlerinde ve kayitli
+    /// degilse <c>null</c> (SYG-PERS-052, ADR-0020).
+    /// </summary>
+    public string? BloodGroup { get; init; }
 }
 
 /// <summary>Istihdamin okunan hali.</summary>

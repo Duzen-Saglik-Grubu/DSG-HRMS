@@ -367,7 +367,7 @@ ayrıca gösterilir. Diğer bulgular paydaş gereksinimlerinin anlamını deği�
 |---|---|---|
 | LOGO salt okunur hesabı | Senkronizasyon, şema denetimi | ✅ Mevcut; yazma reddi CI'da sınanıyor (SYG-KMLK-003). T1 tablolarını okuma yetkisi UAT'de doğrulanacak |
 | LOGO sunucusunda sorgu ölçümü | KPÖ-PERS-4 | ⏳ UAT'de, ilk fotoğraflı senkronizasyonda |
-| Özel nitelikli veri anahtarı | SYG-PERS-060, 061 | ⏳ UAT `.env.uat` ve yerel `docker/.env`'e kan grubu PR'ıyla eklenir; BK-29'a yeri işlenir |
+| Özel nitelikli veri anahtarı | SYG-PERS-060, 061 | Yerel `docker/.env`'de ✅ (#317). UAT `.env.uat`'te ⏳: kan grubunu içeren sürüm UAT'ye çıkmadan önce eklenir. Yeri BK-12, BK-16 ve BK-29'da |
 | UAT sunucusu | Kabul ve ölçüm | ✅ Mevcut; uygulama `hrms_app` rolüyle çalışıyor (`KR-118`) |
 | Kurum SMTP hesabı | "İK'ya bildir" e-postası | ✅ Mevcut (T3) |
 | ClosedXML, PDFsharp / MigraDoc | Dışa aktarma | ✅ Projede mevcut (ADR-0014) |

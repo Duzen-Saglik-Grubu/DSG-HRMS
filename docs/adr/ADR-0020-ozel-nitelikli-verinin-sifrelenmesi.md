@@ -121,6 +121,27 @@ kalmaz. Temizleme denetim izine "değişti" olarak yazılır.
 > kabul testi için onayladı; yerel geliştirme ortamında bulunmaz. R-25'in kapsamı buna göre
 > güncellendi.
 
+> **Gerçekleştirme notu (#317, 03.11.2026):**
+>
+> - **Kaynak:** `LH_001_PERIDINF.BLOODGROUP` (kart → kendi aile satırı, yakınlık 0 → `IDREF`).
+>   03.11.2026'da yalnızca toplam sayıyla: 1.555 kartın 186'sında geçerli kod (1–8), 1.369'unda
+>   0 "Belirtilmemiş"; aralık dışı kod yok. Aralık dışı kod saklanmaz.
+> - **Ayar kapalıyken kolon sorguya hiç girmez.** `LogoReadOnlyAccessTests` LOGO'ya giden komut
+>   metinlerinde `BLOODGROUP` olmadığını denetler.
+> - **Anahtar yapılandırması:** `PersonalDataProtection:Keys:k<n>` (ortam değişkeni
+>   `PersonalDataProtection__Keys__k1`). Yeni yazımlar en büyük numaralı anahtarla yapılır;
+>   kimlikler sayı olarak sıralanır (`k10` > `k2`).
+> - **Biçim ve AAD:** `k<n>:<Base64 nonce>:<Base64 şifreli metin ve etiket>`. AAD,
+>   `personnel.person_sensitive|blood_group|<public_id>`.
+> - **Çözülemeyen değer:** Bozuk değer, bilinmeyen anahtar veya başka satırdan kopya kartta
+>   "kayıtlı değil" gibi davranır. Bir sonraki senkronizasyon LOGO'daki kodu güncel anahtarla
+>   yeniden yazar (§3 anahtar kaybı yolu).
+> - **Ortamlar:** Yerel compose dosyasında `Logo__SyncSpecialCategoryData` sabit `false`,
+>   UAT'de sabit `true`. Sır dosyasından değiştirilemez. Anahtar her ortamda zorunludur; e2e
+>   yığını her açılışta rastgele bir anahtar üretir.
+> - **Bu işte olmayanlar:** kan grubu süzgeci (§4, SYG-PERS-063), yeniden şifreleme işi (§3,
+>   SYG-PERS-062) ve önerilen kan grubu (SYG-PERS-049) sonraki işlerdir.
+
 ## Gerekçe
 
 - Ayrı anahtar ve anahtar kimliği, B-03'teki üç eksiği birlikte kapatır: anahtar paylaşımı,
@@ -172,3 +193,4 @@ yeniden senkronizasyonla uygulanabilir.
 | 2026-10-22 | 1.1 | §6: UAT'de gerçek kan grubu KVKK Sorumlusu tarafından onaylandı (`KR-125`, #265) | Bilgi İşlem |
 | 2026-10-22 | 1.2 | Revizyon (#267, #268): şifreleme depo katmanında ve ayrı tabloda, AAD tablo + alan + kimlik (B-02); açık yeniden şifreleme işi, önerilen kan grubu talep kapanınca silinir (B-03); ayar ortam yapılandırması, kapalıyken mevcut değer temizlenir (B-04); bellek içi filtrede sıra (B-10) | Bilgi İşlem |
 | 2026-10-23 | 1.3 | §1: şifrelenen değer kan grubu kodudur; ad referans veriden (`KR-129`, #280) | Bilgi İşlem |
+| 2026-11-03 | 1.4 | §6 sonuna gerçekleştirme notu: kaynak kolon, anahtar yapılandırması, biçim ve AAD, çözülemeyen değer, ortamlar (#317) | Bilgi İşlem |

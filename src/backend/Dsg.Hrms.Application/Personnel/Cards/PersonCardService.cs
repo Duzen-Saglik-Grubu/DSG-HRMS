@@ -50,7 +50,8 @@ public sealed record PersonCard(
 
 /// <summary>Kartin korumali alanlari (ADR-0019 §2). Alan bos ise "Kayitli degil".</summary>
 /// <param name="Address">Adres; kayitli degilse <c>null</c>.</param>
-public sealed record SensitiveCard(string? Address);
+/// <param name="BloodGroup">Kan grubu (ornek "A Rh+"); kayitli degilse <c>null</c> (SYG-PERS-034).</param>
+public sealed record SensitiveCard(string? Address, string? BloodGroup);
 
 /// <summary>Kartta bir istihdam.</summary>
 /// <param name="RegistryCode">Sicil numarasi.</param>
@@ -150,6 +151,17 @@ public sealed class PersonCardService
     {
         await _accessLogger.LogAsync(AccessRecord.View(EntityName, record.PublicId), cancellationToken).ConfigureAwait(false);
 
+        var sensitive = PersonFieldVisibility.CanSeeSensitive(viewer, record.Id)
+            ? new SensitiveCard(record.Address, record.BloodGroup)
+            : null;
+
+        // Yanitta kan grubu yer aldiysa ayrica ozel nitelikli veri goruntulemesi yazilir
+        // (SYG-PERS-057, ADR-0020 §5); kayitli degilse gosterilen bir deger yoktur.
+        if (sensitive?.BloodGroup is not null)
+        {
+            await _accessLogger.LogAsync(AccessRecord.SpecialCategoryView(EntityName, record.PublicId), cancellationToken).ConfigureAwait(false);
+        }
+
         var today = _clock.Today;
         var fullNationalId = PersonFieldVisibility.CanSeeFullNationalId(viewer);
 
@@ -180,7 +192,7 @@ public sealed class PersonCardService
             record.Profile.PreviousSurname,
             record.Profile.MaritalStatus,
             record.Profile.EducationName,
-            PersonFieldVisibility.CanSeeSensitive(viewer, record.Id) ? new SensitiveCard(record.Address) : null)
+            sensitive)
         {
             HasPhoto = record.HasPhoto,
         };

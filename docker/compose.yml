@@ -68,6 +68,14 @@ services:
       # (SYG-KMLK-075). Bos birakilirsa sirlar ekrandan girilemez, yalnizca ortam
       # degiskeninden okunur. Deger sir dosyasinda durur; veritabaninda DEGIL.
       ParameterProtection__Key: ${PARAMETER_PROTECTION_KEY:-}
+      # Ozel nitelikli veri (kan grubu) anahtari (SYG-PERS-060, 061; ADR-0020). ZORUNLUDUR:
+      # tanimli degilse uygulama ACILMAZ. Sir parametre anahtarindan ayridir. Deger sir
+      # dosyasinda durur; veritabaninda ve depoda DEGIL. Kaybolursa kan grubu LOGO'dan
+      # yeniden senkronize edilir (ADR-0020 §3).
+      PersonalDataProtection__Keys__k1: ${PERSONAL_DATA_KEY_K1:?docker/.env icinde PERSONAL_DATA_KEY_K1 tanimlayin (openssl rand -base64 32)}
+      # Kan grubu yerel gelistirmede LOGO'dan OKUNMAZ (KR-125, ADR-0020 §6); mevcut deger
+      # temizlenir. Bilincli olarak sabittir: sir dosyasindan acilamaz.
+      Logo__SyncSpecialCategoryData: 'false'
       # Dogrulama kodu ozet anahtari (SYG-KMLK-025). Bos birakilirsa kod uretilemez.
       Identity__CodeHashKey: ${IDENTITY_CODE_HASH_KEY:-}
       # Erisim jetonu (JWT) imzalama anahtari (SYG-KMLK-037). ZORUNLU: bos ise API acilmaz.
