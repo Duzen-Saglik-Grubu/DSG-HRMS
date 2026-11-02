@@ -22,7 +22,13 @@ namespace Dsg.Hrms.Application.Personnel.Sync;
 public static class PersonnelPhotoSynchronizer
 {
     /// <summary>Ozetleri mevcut fotograflarla karsilastirir.</summary>
-    public static PhotoPlan Plan(IReadOnlyList<LogoPhotoDigest> digests, PersonnelPhotoSnapshot snapshot)
+    /// <param name="digests">LOGO'daki fotograflarin ozetleri.</param>
+    /// <param name="snapshot">Mevcut durum.</param>
+    /// <param name="thumbnailVersion">
+    /// Gecerli kucultme kuralinin surumu (<see cref="IPhotoThumbnailer.Version"/>); eski surumle
+    /// saklanan fotograf yeniden okunur.
+    /// </param>
+    public static PhotoPlan Plan(IReadOnlyList<LogoPhotoDigest> digests, PersonnelPhotoSnapshot snapshot, int thumbnailVersion)
     {
         ArgumentNullException.ThrowIfNull(digests);
         ArgumentNullException.ThrowIfNull(snapshot);
@@ -51,8 +57,10 @@ public static class PersonnelPhotoSynchronizer
                 continue;
             }
 
-            // Ozeti degismeyen fotograf ikinci calismada aktarilmaz (PG-PERS-41).
-            if (!string.Equals(existing?.SourceHash, hash, StringComparison.OrdinalIgnoreCase))
+            // Ozeti degismeyen fotograf ikinci calismada aktarilmaz (PG-PERS-41); kucultme kurali
+            // degistiyse LOGO'da degismese de yeniden kucultulur (#315).
+            if (!string.Equals(existing?.SourceHash, hash, StringComparison.OrdinalIgnoreCase)
+                || existing!.ThumbnailVersion != thumbnailVersion)
             {
                 toFetch[primary!.LogoRef] = personId;
             }
@@ -98,11 +106,11 @@ public static class PersonnelPhotoSynchronizer
 
             if (photoByPerson.TryGetValue(personId, out var existing))
             {
-                existing.Replace(photo.Hash, thumbnail);
+                existing.Replace(photo.Hash, thumbnail, thumbnailer.Version);
             }
             else
             {
-                added.Add(PersonPhoto.For(personId, photo.Hash, thumbnail));
+                added.Add(PersonPhoto.For(personId, photo.Hash, thumbnail, thumbnailer.Version));
             }
 
             changed++;

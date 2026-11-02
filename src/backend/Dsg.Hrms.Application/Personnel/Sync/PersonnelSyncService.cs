@@ -233,7 +233,7 @@ public sealed partial class PersonnelSyncService
 
             var digests = await _source.GetPhotoDigestsAsync(cancellationToken).ConfigureAwait(false);
             var snapshot = await session.LoadPhotosAsync(cancellationToken).ConfigureAwait(false);
-            var plan = PersonnelPhotoSynchronizer.Plan(digests, snapshot);
+            var plan = PersonnelPhotoSynchronizer.Plan(digests, snapshot, _thumbnailer.Version);
             session.RemovePhotos(plan.ToRemove);
 
             var changed = plan.ToRemove.Count;

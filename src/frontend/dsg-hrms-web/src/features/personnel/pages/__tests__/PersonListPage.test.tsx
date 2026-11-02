@@ -5,6 +5,7 @@ import { permissions } from '@/shared/auth/permissions';
 import { renderWithProviders } from '@/test/render';
 import { setSession } from '@/test/session';
 import { personsApi, type PersonFilterOptions, type PersonListItem } from '../../api/personsApi';
+import { personPhotosApi } from '@/shared/api/personPhotos';
 import { PersonListPage } from '../PersonListPage';
 
 /** Personel listesi ekrani (PG-PERS-13–18). Veriler SENTETIKTIR. */
@@ -105,17 +106,16 @@ describe('PersonListPage', () => {
       totalCount: 2,
       totalPages: 1,
     });
-    const photo = vi.spyOn(personsApi, 'photo').mockResolvedValue(new Blob(['jpeg']));
-    // jsdom nesne adresi uretmez; yalnizca bu iki islev tanimlanir.
-    URL.createObjectURL = () => 'blob:ayse';
-    URL.revokeObjectURL = vi.fn();
+    const photo = vi
+      .spyOn(personPhotosApi, 'photo')
+      .mockResolvedValue(new Blob(['jpeg'], { type: 'image/jpeg' }));
     renderWithProviders(<PersonListPage />);
 
     const ayse = await screen.findByRole('article', { name: 'AYŞE DEMİR' });
     await waitFor(() =>
       expect(within(ayse).getByRole('img', { name: 'AYŞE DEMİR fotoğrafı' })).toHaveAttribute(
         'src',
-        'blob:ayse',
+        'data:image/jpeg;base64,anBlZw==',
       ),
     );
     const mehmet = screen.getByRole('article', { name: 'MEHMET KAYA' });

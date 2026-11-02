@@ -16,9 +16,10 @@ namespace Dsg.Hrms.Api.Personnel;
 /// uretmez; kaydi yazilan kart veya liste goruntulemesinin parcasidir.
 /// </para>
 /// <para>
-/// ETag, LOGO'daki orijinalin ozetidir. <c>private</c> ortak onbelleklerde (vekil) saklanmayi
-/// engeller; <c>no-cache</c> tarayicinin her gosterimde ozeti sormasini saglar. Boylece LOGO'da
-/// degisen fotograf bir sonraki gosterimde gelir, degismeyen yeniden indirilmez.
+/// ETag, LOGO'daki orijinalin ozeti ile kucultme surumudur (<see cref="PhotoRecord.EntityTag"/>).
+/// <c>private</c> ortak onbelleklerde (vekil) saklanmayi engeller; <c>no-cache</c> tarayicinin
+/// her gosterimde ETag'i sormasini saglar. Boylece LOGO'da degisen ya da yeniden kucultulen
+/// fotograf bir sonraki gosterimde gelir, degismeyen yeniden indirilmez.
 /// </para>
 /// <para>
 /// Personelin fotograf yuklemesi icin uc yoktur (SYG-PERS-040); kaynak LOGO'dur.
@@ -63,10 +64,10 @@ public sealed class PersonPhotosController : ControllerBase
     public async Task<IActionResult> GetAsync(Guid personId, CancellationToken cancellationToken) =>
         Photo(await _cards.GetPhotoAsync(personId, cancellationToken));
 
-    /// <summary><c>If-None-Match</c> ozetle eslesirse cerceve <c>304</c> doner.</summary>
+    /// <summary><c>If-None-Match</c> surumle eslesirse cerceve <c>304</c> doner.</summary>
     private FileContentResult Photo(PhotoRecord photo)
     {
         Response.Headers.CacheControl = "private, no-cache";
-        return File(photo.Content, ContentType, lastModified: null, entityTag: new EntityTagHeaderValue($"\"{photo.SourceHash}\""));
+        return File(photo.Content, ContentType, lastModified: null, entityTag: new EntityTagHeaderValue($"\"{photo.EntityTag}\""));
     }
 }

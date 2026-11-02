@@ -21,6 +21,7 @@ public sealed class PersonPhotoConfiguration : IEntityTypeConfiguration<PersonPh
 
         builder.Property(photo => photo.Content).IsRequired();
         builder.Property(photo => photo.SourceHash).HasMaxLength(PersonPhoto.SourceHashLength).IsRequired();
+        builder.Property(photo => photo.ThumbnailVersion);
 
         builder.HasIndex(photo => photo.PersonId).IsUnique();
         builder.HasOne<Person>()

@@ -45,9 +45,18 @@ public interface IPersonnelQuery
 
 /// <summary>Saklanan fotograf.</summary>
 /// <param name="Content">Kucultulmus JPEG.</param>
-/// <param name="SourceHash">LOGO'daki orijinalin SHA-256 ozeti; ETag olarak kullanilir.</param>
+/// <param name="SourceHash">LOGO'daki orijinalin SHA-256 ozeti.</param>
+/// <param name="ThumbnailVersion">Goruntuyu ureten kucultme kuralinin surumu.</param>
 #pragma warning disable CA1819 // Goruntu baytlari kopyalanmadan yanita yazilir.
-public sealed record PhotoRecord(byte[] Content, string SourceHash);
+public sealed record PhotoRecord(byte[] Content, string SourceHash, int ThumbnailVersion)
+{
+    /// <summary>
+    /// Tarayici onbellegi icin surum: kaynak ozeti ve kucultme surumu. Yalnizca ozet kullanilsaydi
+    /// kural degisince (#315) ozet ayni kalir, tarayici <c>304</c> alir ve eski goruntuyu
+    /// gostermeye devam ederdi.
+    /// </summary>
+    public string EntityTag => $"{SourceHash}-{ThumbnailVersion}";
+}
 #pragma warning restore CA1819
 
 /// <summary>Kisi kaydinin okunan hali.</summary>

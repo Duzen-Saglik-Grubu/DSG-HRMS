@@ -2,7 +2,7 @@ import { Box, Card, CardContent, Chip, Stack, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import type { PersonListItem } from '../api/personsApi';
 import { joinParts } from '../display';
-import { PersonAvatar } from './PersonAvatar';
+import { PersonAvatar } from '@/shared/components/PersonAvatar';
 
 /**
  * Liste karti (SYG-PERS-023): fotograf, ad soyad, sicil, sube / birim ve unvan / gorev. Fotograf

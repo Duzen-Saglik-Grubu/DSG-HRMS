@@ -4,7 +4,7 @@ import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import type { EmploymentCard, PersonCard } from '../api/personsApi';
 import { displayDate, joinParts, orderEmployments } from '../display';
-import { PersonAvatar } from './PersonAvatar';
+import { PersonAvatar } from '@/shared/components/PersonAvatar';
 
 /**
  * Kisi karti gorunumu: "Profilim" ve listeden acilan kart ayni gorunumu kullanir (SYG-PERS-034,

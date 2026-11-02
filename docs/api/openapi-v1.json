@@ -4820,6 +4820,7 @@
           "firstName",
           "lastName",
           "email",
+          "hasPhoto",
           "permissions"
         ],
         "type": "object",
@@ -4838,6 +4839,10 @@
               "string"
             ],
             "description": "Giris e-postasi; kullanici kartinda adin altinda gosterilir. Tanimli degilse `null`."
+          },
+          "hasPhoto": {
+            "type": "boolean",
+            "description": "Kullanicinin fotografi var mi. Varsa kullanici kartinda `GET /personnel/persons/me/photo` ile gosterilir; yoksa bas harfler (#315)."
           },
           "permissions": {
             "type": "array",

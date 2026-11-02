@@ -49,7 +49,8 @@ public interface ISessionStore
 /// <param name="Account">Hesap (izlenen).</param>
 /// <param name="Person">Kisi.</param>
 /// <param name="HasActiveEmployment">En az bir aktif istihdam var mi.</param>
-public sealed record SignInCandidate(UserAccount Account, Person Person, bool HasActiveEmployment);
+/// <param name="HasPhoto">Kisinin fotografi var mi (kullanici kartinda gosterilir, #315).</param>
+public sealed record SignInCandidate(UserAccount Account, Person Person, bool HasActiveEmployment, bool HasPhoto);
 
 /// <summary>Erisim jetonu uretir (JWT).</summary>
 public interface IAccessTokenIssuer
@@ -71,6 +72,7 @@ public interface IAccessTokenIssuer
 /// <param name="FirstName">Kullanicinin adi.</param>
 /// <param name="LastName">Kullanicinin soyadi.</param>
 /// <param name="Email">Kullanicinin giris e-postasi (kurumsal e-posta); tanimli degilse <c>null</c>.</param>
+/// <param name="HasPhoto">Kullanicinin fotografi var mi; istemci fotografi yalnizca varsa ister (#315).</param>
 /// <param name="Permissions">Kullanicinin izinleri; istemci yalnizca GOSTERIM icin kullanir (ADR-0007 §3).</param>
 /// <param name="PasswordChangeRequired">Oturum parola degisimi bekliyorsa nedeni (SYG-KMLK-046, 050).</param>
 public sealed record SessionTokens(
@@ -82,6 +84,7 @@ public sealed record SessionTokens(
     string FirstName,
     string LastName,
     string? Email,
+    bool HasPhoto,
     IReadOnlyList<string> Permissions,
     PasswordChangeReason? PasswordChangeRequired = null)
 {

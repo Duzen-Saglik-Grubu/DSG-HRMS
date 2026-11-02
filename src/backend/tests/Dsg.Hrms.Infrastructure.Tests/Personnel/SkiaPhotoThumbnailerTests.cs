@@ -30,18 +30,33 @@ public sealed class SkiaPhotoThumbnailerTests
         (bitmap.Width, bitmap.Height).ShouldBe((120, 160));
     }
 
-    [Fact]
-    public void Exif_orientation_is_applied()
+    [Theory]
+    [InlineData(6)]
+    [InlineData(3)]
+    public void Exif_orientation_is_ignored(byte orientation)
     {
-        // Telefonla cekilen fotografta yon EXIF'tedir (6: saat yonunde 90 derece). Sol yari kirmizi
-        // olan yatay goruntu, dondurulunce dikey olur ve kirmizi yari uste gelir.
-        var rotated = WithExifOrientation(Encode(Halves(600, 200, SKColors.Red, SKColors.Blue), SKEncodedImageFormat.Jpeg), 6);
+        // #315: LOGO EXIF yonunu yok sayar; IK fotografi LOGO'da nasil goruyorsa HRMS'te de oyle
+        // gorunur. Etiketinde "dondur" (6: 90 derece, 3: 180 derece) yazan goruntu dondurulmez: sol
+        // yarisi kirmizi yatay goruntu yatay ve kirmizi yari solda kalir.
+        var tagged = WithExifOrientation(Encode(Halves(600, 200, SKColors.Red, SKColors.Blue), SKEncodedImageFormat.Jpeg), orientation);
 
-        using var bitmap = SKBitmap.Decode(_thumbnailer.CreateThumbnail(rotated)!);
+        using var bitmap = SKBitmap.Decode(_thumbnailer.CreateThumbnail(tagged)!);
 
-        (bitmap.Width, bitmap.Height).ShouldBe((133, 400));
-        IsReddish(bitmap.GetPixel(66, 20)).ShouldBeTrue();
-        IsReddish(bitmap.GetPixel(66, 380)).ShouldBeFalse();
+        (bitmap.Width, bitmap.Height).ShouldBe((400, 133));
+        IsReddish(bitmap.GetPixel(20, 66)).ShouldBeTrue();
+        IsReddish(bitmap.GetPixel(380, 66)).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Exif_tag_is_read_by_the_decoder_so_ignoring_it_is_deliberate()
+    {
+        // Testteki EXIF bolumunun gercekten okundugunu gosterir: aksi halde yukaridaki test, yon
+        // uygulansa da gecerdi.
+        var tagged = WithExifOrientation(Encode(Halves(600, 200, SKColors.Red, SKColors.Blue), SKEncodedImageFormat.Jpeg), 6);
+
+        using var codec = SKCodec.Create(new MemoryStream(tagged));
+
+        codec.EncodedOrigin.ShouldBe(SKEncodedOrigin.RightTop);
     }
 
     [Fact]

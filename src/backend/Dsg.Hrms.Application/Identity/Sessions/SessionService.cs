@@ -524,6 +524,7 @@ public sealed partial class SessionService
             candidate.Person.FirstName,
             candidate.Person.LastName,
             candidate.Person.Email,
+            candidate.HasPhoto,
             [.. permissions.Order(StringComparer.Ordinal)],
             session.PasswordChangeRequired);
     }

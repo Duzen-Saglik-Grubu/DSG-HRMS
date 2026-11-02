@@ -3687,6 +3687,8 @@ export interface components {
             lastName: string;
             /** @description Giris e-postasi; kullanici kartinda adin altinda gosterilir. Tanimli degilse `null`. */
             email: null | string;
+            /** @description Kullanicinin fotografi var mi. Varsa kullanici kartinda `GET /personnel/persons/me/photo` ile gosterilir; yoksa bas harfler (#315). */
+            hasPhoto: boolean;
             /** @description Izinler. Istemci yalnizca GOSTERIM icin kullanir; denetim her istekte sunucudadir (ADR-0007 §3). */
             permissions: string[];
         };

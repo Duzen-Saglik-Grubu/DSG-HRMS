@@ -10,6 +10,7 @@ import { permissions } from '@/shared/auth/permissions';
 import { routes } from '@/shared/routes';
 import { setSession } from '@/test/session';
 import { personsApi, type EmploymentCard, type PersonCard } from '../../api/personsApi';
+import { personPhotosApi } from '@/shared/api/personPhotos';
 import { orderEmployments } from '../../display';
 import { PersonCardPage } from '../PersonCardPage';
 import { ProfilePage } from '../ProfilePage';
@@ -193,16 +194,16 @@ describe('Profilim', () => {
   it('kendi fotografi "me" ucundan gelir (SYG-PERS-041)', async () => {
     await setSession({ status: 'authenticated' });
     vi.spyOn(personsApi, 'me').mockResolvedValue(person({ isSelf: true, hasPhoto: true }));
-    const myPhoto = vi.spyOn(personsApi, 'myPhoto').mockResolvedValue(new Blob(['jpeg']));
-    const photo = vi.spyOn(personsApi, 'photo');
-    URL.createObjectURL = () => 'blob:ben';
-    URL.revokeObjectURL = vi.fn();
+    const myPhoto = vi
+      .spyOn(personPhotosApi, 'myPhoto')
+      .mockResolvedValue(new Blob(['jpeg'], { type: 'image/jpeg' }));
+    const photo = vi.spyOn(personPhotosApi, 'photo');
     renderAt(routes.profile);
 
     await waitFor(() =>
       expect(screen.getByRole('img', { name: 'AYŞE DEMİR fotoğrafı' })).toHaveAttribute(
         'src',
-        'blob:ben',
+        'data:image/jpeg;base64,anBlZw==',
       ),
     );
     expect(myPhoto).toHaveBeenCalled();

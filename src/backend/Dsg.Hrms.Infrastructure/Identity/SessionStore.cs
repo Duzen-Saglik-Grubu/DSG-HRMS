@@ -119,6 +119,12 @@ public sealed class SessionStore : ISessionStore
             .AnyAsync(e => e.PersonId == person.Id && e.IsActive, cancellationToken)
             .ConfigureAwait(false);
 
-        return new SignInCandidate(account, person, hasActiveEmployment);
+        // Fotograf her oturum acilisinda ve yenilemede yeniden sorulur; senkronizasyonla gelen
+        // fotograf en gec erisim jetonunun omru kadar sonra kullanici kartina yansir (#315).
+        var hasPhoto = await _context.Set<PersonPhoto>()
+            .AnyAsync(p => p.PersonId == person.Id, cancellationToken)
+            .ConfigureAwait(false);
+
+        return new SignInCandidate(account, person, hasActiveEmployment, hasPhoto);
     }
 }

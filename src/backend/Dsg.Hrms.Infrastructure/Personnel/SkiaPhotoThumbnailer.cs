@@ -9,10 +9,12 @@ namespace Dsg.Hrms.Infrastructure.Personnel;
 /// </summary>
 /// <remarks>
 /// <para>
-/// LOGO'daki fotograflarin bir kismi telefonla cekilmistir ve yonu EXIF bilgisindedir
-/// (01.11.2026: 237 JPEG). <see cref="SKImage.FromEncodedData(SKData)"/> yonu cozumleme sirasinda
-/// uygular; ayrica dondurulmez. Bunu <c>SkiaPhotoThumbnailerTests</c> denetler: kutuphane
-/// davranisi degisirse fotograflar yan durur ve test duser.
+/// EXIF yon etiketi UYGULANMAZ (#315). LOGO etiketi yok sayar ve IK fotografi LOGO'da nasil
+/// goruyorsa oyle yukler. LOGO'da etiketinde "dondur" yazan 100 JPEG'in hepsinin pikselleri
+/// zaten dikti (02.11.2026: 96sinda 90, 4unde 180 derece). Fotograf bir aracla dondurulmus ama
+/// etiket silinmemisti. Etiketi uygulamak bu fotograflari yana yatiriyordu. Bu yuzden goruntu
+/// <see cref="SKImage.FromEncodedData(SKData)"/> ile degil, yonu uygulamayan
+/// <see cref="SKCodec"/> ile cozulur.
 /// </para>
 /// <para>
 /// PNG'deki saydam alanlar beyaza boyanir: JPEG saydamlik tasimaz ve siyah zemin olusurdu.
@@ -27,6 +29,10 @@ public sealed class SkiaPhotoThumbnailer : IPhotoThumbnailer
     public const int Quality = 85;
 
     /// <inheritdoc />
+    /// <remarks>1: EXIF yonu uygulanirdi (#313). 2: EXIF yonu uygulanmaz (#315).</remarks>
+    public int Version => 2;
+
+    /// <inheritdoc />
     public byte[]? CreateThumbnail(byte[] source)
     {
         ArgumentNullException.ThrowIfNull(source);
@@ -36,11 +42,19 @@ public sealed class SkiaPhotoThumbnailer : IPhotoThumbnailer
         }
 
         using var data = SKData.CreateCopy(source);
-        using var image = SKImage.FromEncodedData(data);
-        if (image is null)
+        using var codec = SKCodec.Create(data);
+        if (codec is null)
         {
             return null;
         }
+
+        using var bitmap = SKBitmap.Decode(codec);
+        if (bitmap is null)
+        {
+            return null;
+        }
+
+        using var image = SKImage.FromBitmap(bitmap);
 
         var scale = Math.Min(1f, (float)MaxSize / Math.Max(image.Width, image.Height));
         var width = Math.Max(1, (int)Math.Round(image.Width * scale));

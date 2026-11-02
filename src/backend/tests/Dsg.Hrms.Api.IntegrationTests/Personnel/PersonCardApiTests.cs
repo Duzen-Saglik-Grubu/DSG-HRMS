@@ -249,7 +249,20 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
     // ------------------------------------------------------------------ fotograf (SYG-PERS-040, 041)
 
     [Fact]
-    public async Task Photo_is_served_with_its_digest_as_etag_and_a_private_cache_policy()
+    public async Task Session_user_tells_whether_the_user_has_a_photo()
+    {
+        // #315: kullanici karti kendi fotografini yalnizca oturum "var" derse ister.
+        await SetPhotoAsync(1);
+        using var client = _fixture.CreateClient();
+
+        using var response = await client.PostAsJsonAsync(new Uri("/api/v1/identity/sessions", UriKind.Relative), new { email = UserEmail, password = Password });
+
+        var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+        body.GetProperty("session").GetProperty("user").GetProperty("hasPhoto").GetBoolean().ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Photo_is_served_with_its_digest_and_thumbnail_version_as_etag_and_a_private_cache_policy()
     {
         var hash = await SetPhotoAsync(1);
         using var client = _fixture.CreateClient();
@@ -261,15 +274,23 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
         {
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
             response.Content.Headers.ContentType!.MediaType.ShouldBe("image/jpeg");
-            response.Headers.ETag!.Tag.ShouldBe($"\"{hash}\"");
+            response.Headers.ETag!.Tag.ShouldBe($"\"{hash}-2\"");
             response.Headers.CacheControl!.Private.ShouldBeTrue();
             response.Headers.CacheControl.NoCache.ShouldBeTrue();
             (await response.Content.ReadAsByteArrayAsync()).ShouldBe(PhotoBytes);
         }
 
         // Tarayicidaki surum guncelse goruntu yeniden gonderilmez.
-        using var revalidated = await SendAsync(client, $"{Persons}/{await PersonIdAsync(1)}/photo", token, ifNoneMatch: hash);
-        revalidated.StatusCode.ShouldBe(HttpStatusCode.NotModified);
+        using (var revalidated = await SendAsync(client, $"{Persons}/{await PersonIdAsync(1)}/photo", token, ifNoneMatch: $"{hash}-2"))
+        {
+            revalidated.StatusCode.ShouldBe(HttpStatusCode.NotModified);
+        }
+
+        // #315: ilk surumun ETag'i yalnizca ozetti. Kucultme kurali degisince ozet ayni kalsa da
+        // tarayicidaki eski goruntu gecersiz sayilir ve yenisi gonderilir.
+        using var stale = await SendAsync(client, $"{Persons}/me/photo", token, ifNoneMatch: hash);
+        stale.StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await stale.Content.ReadAsByteArrayAsync()).ShouldBe(PhotoBytes);
     }
 
     [Fact]
@@ -329,7 +350,7 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
         {
             var person = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(index));
             var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(PhotoBytes));
-            context.Add(PersonPhoto.For(person.Id, hash, PhotoBytes));
+            context.Add(PersonPhoto.For(person.Id, hash, PhotoBytes, thumbnailVersion: 2));
             await context.SaveChangesAsync();
             return hash;
         });

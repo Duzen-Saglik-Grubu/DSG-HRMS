@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient } from '@tanstack/react-query';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { personPhotosApi } from '@/shared/api/personPhotos';
 import { fetchPublicSettings } from '@/shared/api/publicSettings';
 import { permissions } from '@/shared/auth/permissions';
 import { routes } from '@/shared/routes';
@@ -101,6 +102,33 @@ describe('kullanici menusu', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Profilim' }));
 
     expect(await screen.findByText('Profil sayfası')).toBeInTheDocument();
+  });
+
+  it('kullanici kartinda kendi fotografi, yoksa bas harfleri gorunur (#315)', async () => {
+    vi.mocked(fetchPublicSettings).mockResolvedValue(settings(false));
+    const myPhoto = vi
+      .spyOn(personPhotosApi, 'myPhoto')
+      .mockResolvedValue(new Blob(['jpeg'], { type: 'image/jpeg' }));
+    const first = renderLayout();
+
+    // Fotografi olmayan kullanici icin istek yapilmaz.
+    const card = await screen.findByRole('button', { name: 'Ahmet Yılmaz' });
+    expect(within(card).getByRole('img', { name: 'Ahmet Yılmaz fotoğrafı' })).toHaveTextContent(
+      'AY',
+    );
+    expect(myPhoto).not.toHaveBeenCalled();
+    first.unmount();
+
+    await setSession({ status: 'authenticated', hasPhoto: true });
+    renderLayout();
+
+    const withPhoto = await screen.findByRole('button', { name: 'Ahmet Yılmaz' });
+    await waitFor(() =>
+      expect(
+        within(withPhoto).getByRole('img', { name: 'Ahmet Yılmaz fotoğrafı' }),
+      ).toHaveAttribute('src', 'data:image/jpeg;base64,anBlZw=='),
+    );
+    expect(myPhoto).toHaveBeenCalledTimes(1);
   });
 });
 

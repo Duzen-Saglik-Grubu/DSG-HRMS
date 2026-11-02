@@ -1891,6 +1891,10 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("source_hash");
 
+                    b.Property<int>("ThumbnailVersion")
+                        .HasColumnType("integer")
+                        .HasColumnName("thumbnail_version");
+
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("updated_at");

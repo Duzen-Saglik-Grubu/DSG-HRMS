@@ -20,6 +20,7 @@ function sessionResponse(): SessionResponse {
       firstName: 'Ahmet',
       lastName: 'Yılmaz',
       email: 'ahmet.yilmaz@duzen.com.tr',
+      hasPhoto: false,
       permissions: [],
     },
     passwordChangeRequired: null,
