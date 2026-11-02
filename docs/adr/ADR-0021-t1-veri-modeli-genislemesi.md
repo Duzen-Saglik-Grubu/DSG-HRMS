@@ -167,8 +167,11 @@ gerçekleştirme notu düşülür.
 >   (`thumbnail_version`; 1: EXIF uygulanırdı, 2: uygulanmaz). Kural değişince eski sürümle
 >   saklanan fotoğraf, LOGO'da değişmese de bir sonraki senkronizasyonda yeniden okunur ve
 >   küçültülür.
-> - **Önbellek:** Yanıt `Cache-Control: private, no-cache` taşır: tarayıcı her gösterimde özeti
->   sorar (`If-None-Match`) ve değişmeyen fotoğraf için `304` alır.
+> - **Önbellek:** Yanıt `Cache-Control: private, no-cache` taşır: tarayıcı her gösterimde ETag'i
+>   sorar (`If-None-Match`) ve değişmeyen fotoğraf için `304` alır. ETag, kaynak özeti ile
+>   küçültme sürümünden oluşur (`"<özet>-<sürüm>"`, #315). İlk sürümde yalnızca özetti. Küçültme
+>   kuralı değişince özet aynı kaldığı için tarayıcı `304` alıyor ve eski (yan duran) görüntüyü
+>   göstermeye devam ediyordu.
 > - **İlk ölçüm (yerel ortam, gerçek LOGO, salt okunur; 01–02.11.2026):** 990 fotoğrafın özeti
 >   yaklaşık 1,6 sn. İlk aktarım (bütün fotoğraflar) 34 sn sürdü ve 867 fotoğraf saklandı;
 >   ortalama 14 KB, toplam 12 MB (tahmin ≈30 KB ve ≈15 MB idi). Fotoğrafı değişmeyen ikinci
@@ -274,4 +277,4 @@ yeniden üretilebilir.
 | 2026-10-22 | 1.2 | Revizyon (#267, #268): korumalı alanlar `person_sensitive` tablosunda (B-11); çalışma şekli kapsam dışı (#270, B-05); `branch`/`department` ile `organization_unit` (B-16); tarih aralığı kuralları (B-06); `btree_gist` yetkisi (B-19); `HASHBYTES` için `CAST` ve LOGO yükü ölçümü (B-13); fotoğraf ucu önbellek ve kayıt (B-18); sınıflandırma kapsamı (B-12); arama anahtarı ve dizin (B-17) | Bilgi İşlem |
 | 2026-10-24 | 1.3 | §1: atamaya firma (değişiklik talebi #284); §2: bitmiş istihdamın ilk kaydı, geriye dönük çıkış, atamada silme yok (SYG-PERS AN-19, #285) | Bilgi İşlem |
 | 2026-11-02 | 1.4 | §5 gerçekleştirme notu: fotoğrafın kaynağı esas istihdam, parçalı okuma, EXIF, önbellek ve ilk yerel ölçüm (#313) | Bilgi İşlem |
-| 2026-11-02 | 1.5 | §5 gerçekleştirme notu: EXIF yönü uygulanmaz, küçültme sürümü (#315) | Bilgi İşlem |
+| 2026-11-02 | 1.5 | §5 gerçekleştirme notu: EXIF yönü uygulanmaz, küçültme sürümü, ETag'de küçültme sürümü (#315) | Bilgi İşlem |

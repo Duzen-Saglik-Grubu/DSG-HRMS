@@ -14,7 +14,8 @@ namespace Dsg.Hrms.Domain.Personnel;
 /// <para>
 /// <see cref="SourceHash"/> LOGO'daki ORIJINAL goruntunun SHA-256 ozetidir; kucuk halin degil.
 /// Senkronizasyon her calismada yalnizca ozeti okur ve goruntuyu ozet degistiyse alir
-/// (PG-PERS-41). Ayni ozet tarayici onbellegi icin ETag olarak da kullanilir (SYG-PERS-041).
+/// (PG-PERS-41). Tarayici onbellegi icin ETag, ozet ile <see cref="ThumbnailVersion"/>'dan olusur
+/// (SYG-PERS-041, #315).
 /// </para>
 /// </remarks>
 public sealed class PersonPhoto : Entity, IAuditable

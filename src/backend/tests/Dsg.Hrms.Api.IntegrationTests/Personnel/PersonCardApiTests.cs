@@ -262,7 +262,7 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
     }
 
     [Fact]
-    public async Task Photo_is_served_with_its_digest_as_etag_and_a_private_cache_policy()
+    public async Task Photo_is_served_with_its_digest_and_thumbnail_version_as_etag_and_a_private_cache_policy()
     {
         var hash = await SetPhotoAsync(1);
         using var client = _fixture.CreateClient();
@@ -274,15 +274,23 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
         {
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
             response.Content.Headers.ContentType!.MediaType.ShouldBe("image/jpeg");
-            response.Headers.ETag!.Tag.ShouldBe($"\"{hash}\"");
+            response.Headers.ETag!.Tag.ShouldBe($"\"{hash}-2\"");
             response.Headers.CacheControl!.Private.ShouldBeTrue();
             response.Headers.CacheControl.NoCache.ShouldBeTrue();
             (await response.Content.ReadAsByteArrayAsync()).ShouldBe(PhotoBytes);
         }
 
         // Tarayicidaki surum guncelse goruntu yeniden gonderilmez.
-        using var revalidated = await SendAsync(client, $"{Persons}/{await PersonIdAsync(1)}/photo", token, ifNoneMatch: hash);
-        revalidated.StatusCode.ShouldBe(HttpStatusCode.NotModified);
+        using (var revalidated = await SendAsync(client, $"{Persons}/{await PersonIdAsync(1)}/photo", token, ifNoneMatch: $"{hash}-2"))
+        {
+            revalidated.StatusCode.ShouldBe(HttpStatusCode.NotModified);
+        }
+
+        // #315: ilk surumun ETag'i yalnizca ozetti. Kucultme kurali degisince ozet ayni kalsa da
+        // tarayicidaki eski goruntu gecersiz sayilir ve yenisi gonderilir.
+        using var stale = await SendAsync(client, $"{Persons}/me/photo", token, ifNoneMatch: hash);
+        stale.StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await stale.Content.ReadAsByteArrayAsync()).ShouldBe(PhotoBytes);
     }
 
     [Fact]

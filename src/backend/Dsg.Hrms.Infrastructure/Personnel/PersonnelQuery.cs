@@ -344,7 +344,7 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
         var persons = await VisibleAsync(InScope(viewer), cancellationToken).ConfigureAwait(false);
         return await persons
             .Where(person => person.PublicId == personId)
-            .Join(context.Set<PersonPhoto>(), person => person.Id, photo => photo.PersonId, (_, photo) => new PhotoRecord(photo.Content, photo.SourceHash))
+            .Join(context.Set<PersonPhoto>(), person => person.Id, photo => photo.PersonId, (_, photo) => new PhotoRecord(photo.Content, photo.SourceHash, photo.ThumbnailVersion))
             .SingleOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
     }
@@ -362,7 +362,7 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
         return await context.Set<PersonPhoto>()
             .AsNoTracking()
             .Where(photo => photo.PersonId == own)
-            .Select(photo => new PhotoRecord(photo.Content, photo.SourceHash))
+            .Select(photo => new PhotoRecord(photo.Content, photo.SourceHash, photo.ThumbnailVersion))
             .SingleOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
     }
