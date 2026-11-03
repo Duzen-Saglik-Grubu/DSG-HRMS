@@ -15,9 +15,10 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
+import { alpha, useTheme, type Theme } from '@mui/material/styles';
 import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
 import ChevronRightRounded from '@mui/icons-material/ChevronRightRounded';
+import HomeRounded from '@mui/icons-material/HomeRounded';
 import KeyboardDoubleArrowLeftRounded from '@mui/icons-material/KeyboardDoubleArrowLeftRounded';
 import KeyboardDoubleArrowRightRounded from '@mui/icons-material/KeyboardDoubleArrowRightRounded';
 import LockResetRounded from '@mui/icons-material/LockResetRounded';
@@ -62,9 +63,19 @@ function writeCollapsed(value: boolean): void {
   }
 }
 
+/** Sol menunun koyu, gecisli zemini; telefondaki cekmecede de ayni. */
+const sidebarSurface = (theme: Theme) => ({
+  color: theme.palette.navigation.text,
+  background: `linear-gradient(180deg, ${theme.palette.navigation.backgroundTop} 0%, ${theme.palette.navigation.backgroundBottom} 100%)`,
+});
+
+/** Koyu zemin uzerinde ikincil metin ve ince cizgiler (beyazin saydami). */
+const onDark = (theme: Theme, opacity: number) => alpha(theme.palette.navigation.text, opacity);
+
 /**
- * Uygulama kabugu (ornek tasarim MainScreen.jpeg, #309): bolum basliklari olan sol menu, konum
- * yolu ve hizli arama bulunan ust cubuk, icerik alani.
+ * Uygulama kabugu (ornek tasarimlar MainScreen.jpeg #309, MainScreen2.jpeg #322): koyu zeminli,
+ * bolum basliklari olan sol menu; konum yolu ve hizli arama bulunan ust cubuk; icerik alani.
+ * Menunun lacivert zemini giris ekraninin kurumsal paneliyle uyumludur.
  *
  * Genis ekranda menu sabittir ve daraltilabilir; telefonda ust cubuktaki dugmeyle acilan cekmece
  * olur. Menu ogeleri izne gore gorunur (ADR-0007); asil denetim sunucudadir.
@@ -103,10 +114,8 @@ export function AppLayout() {
               left: 0,
               width,
               transition: theme.transitions.create('width'),
-              borderRight: 1,
-              borderColor: 'divider',
-              bgcolor: 'background.paper',
               zIndex: theme.zIndex.appBar,
+              ...sidebarSurface(theme),
             }}
           >
             <Sidebar mini={mini} onToggle={toggle} />
@@ -116,7 +125,7 @@ export function AppLayout() {
         <Drawer
           open={mobileOpen}
           onClose={() => setMobileOpen(false)}
-          slotProps={{ paper: { sx: { width: SIDEBAR_WIDTH } } }}
+          slotProps={{ paper: { sx: (t) => ({ width: SIDEBAR_WIDTH, ...sidebarSurface(t) }) } }}
         >
           <Box component="nav" sx={{ height: '100%' }}>
             <Sidebar mini={false} onNavigate={() => setMobileOpen(false)} />
@@ -170,13 +179,13 @@ function Sidebar({ mini, onToggle, onNavigate }: SidebarProps) {
               <Typography
                 variant="overline"
                 component="h2"
-                sx={{
+                sx={(theme) => ({
                   display: 'block',
                   px: 1.5,
-                  color: 'text.secondary',
+                  color: onDark(theme, 0.62),
                   fontWeight: 600,
                   letterSpacing: '0.08em',
-                }}
+                })}
               >
                 {t(section.label)}
               </Typography>
@@ -216,30 +225,46 @@ function Brand({ mini, onToggle }: { mini: boolean; onToggle: (() => void) | und
         alignItems: 'center',
         gap: 1.5,
         px: mini ? 1.5 : 2.5,
-        height: 72,
-        borderBottom: 1,
-        borderColor: 'divider',
+        height: 80,
         justifyContent: mini ? 'center' : 'flex-start',
       }}
     >
       {mini ? null : (
         <>
+          {/* Logo beyaz bir zeminde: yuklenen logonun renkleri koyu menude de okunur. */}
           <Box
-            component="img"
-            src={logoUrl}
-            alt={t('app.organization')}
-            onError={() => setLogoFailed(true)}
-            sx={{ height: 36, maxWidth: 48, objectFit: 'contain' }}
-          />
+            sx={{
+              display: 'grid',
+              placeItems: 'center',
+              width: 44,
+              height: 44,
+              flexShrink: 0,
+              borderRadius: 2,
+              bgcolor: 'background.paper',
+            }}
+          >
+            <Box
+              component="img"
+              src={logoUrl}
+              alt={t('app.organization')}
+              onError={() => setLogoFailed(true)}
+              sx={{ width: 36, height: 36, objectFit: 'contain' }}
+            />
+          </Box>
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography
               variant="subtitle1"
               component="p"
-              sx={{ fontWeight: 800, color: 'primary.main', lineHeight: 1.2 }}
+              sx={{ fontWeight: 800, lineHeight: 1.2, letterSpacing: '0.02em' }}
             >
               {t('app.name')}
             </Typography>
-            <Typography variant="caption" color="text.secondary" noWrap component="p">
+            <Typography
+              variant="caption"
+              noWrap
+              component="p"
+              sx={(theme) => ({ color: onDark(theme, 0.72) })}
+            >
               {t('app.organization')}
             </Typography>
           </Box>
@@ -251,7 +276,12 @@ function Brand({ mini, onToggle }: { mini: boolean; onToggle: (() => void) | und
             size="small"
             onClick={onToggle}
             aria-label={mini ? t('nav.expand') : t('nav.collapse')}
-            sx={{ border: 1, borderColor: 'divider', borderRadius: 1.5 }}
+            sx={(theme) => ({
+              color: 'inherit',
+              borderRadius: '50%',
+              bgcolor: onDark(theme, 0.1),
+              '&:hover': { bgcolor: onDark(theme, 0.18) },
+            })}
           >
             {mini ? (
               <KeyboardDoubleArrowRightRounded fontSize="small" />
@@ -290,22 +320,23 @@ function NavEntry({
         alignItems: 'center',
         gap: 1.5,
         px: 1.5,
-        py: 1,
+        py: 1.25,
         justifyContent: mini ? 'center' : 'flex-start',
-        borderRadius: 2,
-        border: 1,
-        borderColor: 'transparent',
-        color: 'text.secondary',
+        borderRadius: 2.5,
+        color: onDark(theme, 0.82),
         textDecoration: 'none',
         fontWeight: 500,
-        transition: theme.transitions.create(['background-color', 'color']),
-        '&:hover': { bgcolor: 'action.hover', color: 'text.primary' },
-        '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
+        transition: theme.transitions.create(['background-color', 'color', 'box-shadow']),
+        '&:hover': { bgcolor: onDark(theme, 0.08), color: theme.palette.navigation.text },
+        '&:focus-visible': {
+          outline: `2px solid ${theme.palette.navigation.text}`,
+          outlineOffset: 2,
+        },
         '&.active': {
-          bgcolor: alpha(theme.palette.primary.main, 0.08),
-          borderColor: alpha(theme.palette.primary.main, 0.25),
-          color: 'primary.main',
+          bgcolor: theme.palette.navigation.active,
+          color: theme.palette.navigation.text,
           fontWeight: 600,
+          boxShadow: `0 8px 20px -8px ${alpha(theme.palette.navigation.active, 0.9)}`,
         },
       })}
     >
@@ -352,7 +383,7 @@ function UserPanel({ mini }: { mini: boolean }) {
   };
 
   return (
-    <Box sx={{ p: mini ? 1.5 : 2, borderTop: 1, borderColor: 'divider' }}>
+    <Box sx={{ p: mini ? 1.5 : 2 }}>
       <Button
         color="inherit"
         fullWidth
@@ -361,16 +392,18 @@ function UserPanel({ mini }: { mini: boolean }) {
         aria-expanded={anchor ? 'true' : undefined}
         aria-controls={anchor ? 'user-menu' : undefined}
         onClick={(event) => setAnchor(event.currentTarget)}
-        sx={{
+        sx={(theme) => ({
           justifyContent: mini ? 'center' : 'flex-start',
           gap: 1.5,
           p: 1,
           minWidth: 0,
           border: 1,
-          borderColor: 'divider',
-          borderRadius: 2,
+          borderColor: onDark(theme, 0.12),
+          borderRadius: 2.5,
+          bgcolor: onDark(theme, 0.06),
           textAlign: 'left',
-        }}
+          '&:hover': { bgcolor: onDark(theme, 0.12) },
+        })}
       >
         <PersonAvatar
           source="me"
@@ -386,11 +419,19 @@ function UserPanel({ mini }: { mini: boolean }) {
                 {name}
               </Typography>
               {/* Tasarimdaki gibi adin hemen altinda giris e-postasi (#311). */}
-              <Typography variant="caption" color="text.secondary" noWrap component="p">
+              <Typography
+                variant="caption"
+                noWrap
+                component="p"
+                sx={(theme) => ({ color: onDark(theme, 0.72) })}
+              >
                 {state.user.email ?? t('nav.myAccount')}
               </Typography>
             </Box>
-            <ChevronRightRounded fontSize="small" color="action" />
+            <ChevronRightRounded
+              fontSize="small"
+              sx={(theme) => ({ color: onDark(theme, 0.72) })}
+            />
           </>
         )}
       </Button>
@@ -439,11 +480,19 @@ function UserPanel({ mini }: { mini: boolean }) {
       {mini ? null : (
         <Button
           fullWidth
-          variant="outlined"
           color="inherit"
           endIcon={<LogoutRounded fontSize="small" />}
           onClick={() => void session.signOut()}
-          sx={{ mt: 1.5, borderColor: 'divider', bgcolor: 'action.hover' }}
+          sx={(theme) => ({
+            mt: 1.5,
+            py: 1,
+            borderRadius: 2.5,
+            fontWeight: 600,
+            border: 1,
+            borderColor: onDark(theme, 0.12),
+            bgcolor: onDark(theme, 0.1),
+            '&:hover': { bgcolor: onDark(theme, 0.18) },
+          })}
         >
           {t('session.signOut')}
         </Button>
@@ -484,10 +533,10 @@ function TopBar({ onOpenMenu }: { onOpenMenu: (() => void) | undefined }) {
         alignItems: 'center',
         gap: 2,
         px: { xs: 2, sm: 3, lg: 4 },
-        height: 72,
-        bgcolor: 'background.paper',
-        borderBottom: 1,
-        borderColor: 'divider',
+        height: 76,
+        // Zeminle butunlesik; kaydirilan icerik altinda hafifce bulaniklasir.
+        bgcolor: (theme) => alpha(theme.palette.background.default, 0.86),
+        backdropFilter: 'blur(8px)',
       }}
     >
       {onOpenMenu ? (
@@ -496,7 +545,24 @@ function TopBar({ onOpenMenu }: { onOpenMenu: (() => void) | undefined }) {
         </IconButton>
       ) : null}
 
-      <Breadcrumbs aria-label={t('nav.breadcrumb')} sx={{ flexShrink: 0 }}>
+      <Box
+        aria-hidden
+        sx={{
+          display: { xs: 'none', sm: 'grid' },
+          placeItems: 'center',
+          width: 40,
+          height: 40,
+          flexShrink: 0,
+          borderRadius: '50%',
+          color: 'primary.main',
+          bgcolor: 'background.paper',
+          boxShadow: (theme) => theme.palette.surface.shadow,
+        }}
+      >
+        <HomeRounded fontSize="small" />
+      </Box>
+
+      <Breadcrumbs aria-label={t('nav.breadcrumb')} sx={{ flexShrink: 0, minWidth: 0 }}>
         {found && 'section' in found ? (
           <Typography color="text.secondary">{t(found.section.label)}</Typography>
         ) : null}
@@ -533,7 +599,12 @@ function TopBar({ onOpenMenu }: { onOpenMenu: (() => void) | undefined }) {
                     <SearchRounded fontSize="small" />
                   </InputAdornment>
                 ),
-                sx: { bgcolor: 'background.default' },
+                sx: (theme) => ({
+                  borderRadius: 999,
+                  bgcolor: 'background.paper',
+                  boxShadow: theme.palette.surface.shadow,
+                  '& fieldset': { borderColor: alpha(theme.palette.primary.main, 0.12) },
+                }),
               },
             }}
           />

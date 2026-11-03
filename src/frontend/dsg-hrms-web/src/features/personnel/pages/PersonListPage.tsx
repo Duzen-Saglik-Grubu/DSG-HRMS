@@ -16,10 +16,12 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material';
+import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import FilterListRounded from '@mui/icons-material/FilterListRounded';
 import GridViewRounded from '@mui/icons-material/GridViewRounded';
 import SearchRounded from '@mui/icons-material/SearchRounded';
 import TableRowsRounded from '@mui/icons-material/TableRowsRounded';
+import type { Theme } from '@mui/material/styles';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useLocation, useSearchParams } from 'react-router';
@@ -66,6 +68,15 @@ const SORTS = ['firstName-asc', 'firstName-desc', 'lastName-asc', 'lastName-desc
  * §1). Ekranin durumu adres cubugundadir; gorunum degistirici ayni suzgec ve sayfayla tabloya
  * gecer ve geri doner (SYG-PERS-023).
  */
+/** Secili dugme lacivert dolgulu (ornek tasarim MainScreen2.jpeg, #322). */
+const selectedFilled = (theme: Theme) => ({
+  '& .MuiToggleButton-root.Mui-selected': {
+    color: theme.palette.primary.contrastText,
+    bgcolor: theme.palette.primary.main,
+    '&:hover': { bgcolor: theme.palette.primary.dark },
+  },
+});
+
 export function PersonListPage() {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
@@ -169,12 +180,18 @@ export function PersonListPage() {
 
   return (
     <Stack spacing={2.5}>
-      <PageHeader title={t('personnel.list.title')} description={t('personnel.list.subtitle')} />
+      <PageHeader
+        icon={BadgeOutlined}
+        title={t('personnel.list.title')}
+        description={t('personnel.list.subtitle')}
+      />
 
-      <Stack
+      <Paper
+        variant="outlined"
+        component={Stack}
         direction={{ xs: 'column', md: 'row' }}
         spacing={2}
-        sx={{ alignItems: { md: 'center' } }}
+        sx={{ alignItems: { md: 'center' }, p: 1.5 }}
       >
         <TextField
           label={
@@ -203,6 +220,7 @@ export function PersonListPage() {
           size="small"
           value={status}
           aria-label={t('personnel.list.status.label')}
+          sx={selectedFilled}
           onChange={(_, value: StatusFilter | null) => {
             if (value) {
               update({ status: value === 'active' ? null : value });
@@ -257,6 +275,7 @@ export function PersonListPage() {
           size="small"
           value={view}
           aria-label={t('personnel.list.view.label')}
+          sx={selectedFilled}
           onChange={(_, value: ListView | null) => {
             if (value) {
               // Gorunum suzgec degildir: sayfa korunur.
@@ -279,7 +298,7 @@ export function PersonListPage() {
             <TableRowsRounded fontSize="small" />
           </ToggleButton>
         </ToggleButtonGroup>
-      </Stack>
+      </Paper>
 
       <FilterChips
         params={params}

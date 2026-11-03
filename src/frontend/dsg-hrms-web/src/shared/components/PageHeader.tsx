@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import { Box, Breadcrumbs, Link as MuiLink, Stack, Typography } from '@mui/material';
+import { alpha } from '@mui/material/styles';
+import type { SvgIconComponent } from '@mui/icons-material';
 import { Link } from 'react-router';
 
 export interface Breadcrumb {
@@ -9,20 +11,34 @@ export interface Breadcrumb {
 
 interface PageHeaderProps {
   title: string;
-  description?: string;
+  description?: ReactNode;
   breadcrumbs?: Breadcrumb[];
   /** Sag ustte yer alan eylem dugmeleri. */
   actions?: ReactNode;
+  /** Basligin solundaki daire icindeki simge; genelde menudeki simgenin aynisi. */
+  icon?: SvgIconComponent;
+  /** Baslik duzeyi: sayfa basligi h2'dir; yalnizca kabugun h1'i olmayan ekranlar h1 kullanir. */
+  headingLevel?: 'h1' | 'h2';
 }
 
 /**
- * Sayfa basligi (ADR-0015 §5).
+ * Sayfa basligi (ADR-0015 §5; ornek tasarim MainScreen2.jpeg, #322).
  *
  * Her ekranin ayni yapida baslamasi, kullanicinin "neredeyim ve ne yapabilirim"
  * sorusunu her modulde ayni yerden cevaplamasini saglar. Modul basina ayri
  * yazilsaydi, baslik konumu ve dugme yerlesimi ekrandan ekrana degisirdi.
+ *
+ * Baslik, hafif gecisli ve dalga desenli bir seritte durur; desen yalnizca susleme amaclidir
+ * ve ekran okuyuculardan gizlenir.
  */
-export function PageHeader({ title, description, breadcrumbs, actions }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  description,
+  breadcrumbs,
+  actions,
+  icon: Icon,
+  headingLevel = 'h2',
+}: PageHeaderProps) {
   return (
     <Box component="header" sx={{ mb: 3 }}>
       {breadcrumbs && breadcrumbs.length > 0 ? (
@@ -47,31 +63,103 @@ export function PageHeader({ title, description, breadcrumbs, actions }: PageHea
         </Breadcrumbs>
       ) : null}
 
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
-        sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' } }}
+      <Box
+        sx={(theme) => ({
+          position: 'relative',
+          overflow: 'hidden',
+          isolation: 'isolate',
+          px: { xs: 2.5, sm: 3.5 },
+          py: { xs: 2.5, sm: 3 },
+          borderRadius: 4,
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
+          background: `linear-gradient(110deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.surface.accent, 0.07)} 50%, ${alpha(theme.palette.surface.accent, 0.16)} 100%)`,
+          boxShadow: theme.palette.surface.shadow,
+        })}
       >
-        <Box>
-          {/* Sayfa basligi h1 DEGIL h2'dir: h1 uygulama kabugundadir ve sayfada
-              tek bir h1 bulunur (erisilebilirlik - ADR-0015 §7). */}
-          <Typography variant="h5" component="h2">
-            {title}
-          </Typography>
+        <Wave />
 
-          {description ? (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              {description}
-            </Typography>
-          ) : null}
-        </Box>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' } }}
+        >
+          <Stack direction="row" spacing={2.5} sx={{ alignItems: 'center', minWidth: 0 }}>
+            {Icon ? (
+              <Box
+                aria-hidden
+                sx={(theme) => ({
+                  display: { xs: 'none', sm: 'grid' },
+                  placeItems: 'center',
+                  width: 64,
+                  height: 64,
+                  flexShrink: 0,
+                  borderRadius: '50%',
+                  color: 'primary.contrastText',
+                  bgcolor: 'primary.main',
+                  boxShadow: `0 0 0 6px ${alpha(theme.palette.primary.main, 0.08)}, 0 10px 24px -10px ${alpha(theme.palette.primary.main, 0.7)}`,
+                })}
+              >
+                <Icon />
+              </Box>
+            ) : null}
 
-        {actions ? (
-          <Stack direction="row" spacing={1}>
-            {actions}
+            <Box sx={{ minWidth: 0 }}>
+              {/* Sayfa basligi h1 DEGIL h2'dir: h1 uygulama kabugundadir ve sayfada
+                  tek bir h1 bulunur (erisilebilirlik - ADR-0015 §7). */}
+              <Typography
+                variant="h5"
+                component={headingLevel}
+                sx={{ fontWeight: 700, color: 'primary.main' }}
+              >
+                {title}
+              </Typography>
+
+              {description ? (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  {description}
+                </Typography>
+              ) : null}
+            </Box>
           </Stack>
-        ) : null}
-      </Stack>
+
+          {actions ? (
+            <Stack direction="row" spacing={1}>
+              {actions}
+            </Stack>
+          ) : null}
+        </Stack>
+      </Box>
+    </Box>
+  );
+}
+
+/** Seridin sagindaki yumusak dalga deseni. */
+function Wave() {
+  return (
+    <Box
+      aria-hidden
+      sx={{
+        position: 'absolute',
+        inset: 'auto 0 0 auto',
+        width: { xs: '70%', md: '45%' },
+        height: '100%',
+        zIndex: -1,
+        color: 'surface.accent',
+        pointerEvents: 'none',
+      }}
+    >
+      <svg viewBox="0 0 400 120" width="100%" height="100%" preserveAspectRatio="none">
+        <path
+          d="M0 120 C 70 112, 150 112, 240 86 S 360 26, 400 30 L 400 120 Z"
+          fill="currentColor"
+          fillOpacity="0.1"
+        />
+        <path
+          d="M120 120 C 200 108, 250 104, 310 70 S 380 10, 400 0 L 400 120 Z"
+          fill="currentColor"
+          fillOpacity="0.12"
+        />
+      </svg>
     </Box>
   );
 }

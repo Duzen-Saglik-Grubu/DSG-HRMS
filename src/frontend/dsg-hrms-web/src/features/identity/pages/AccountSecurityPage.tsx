@@ -16,6 +16,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import SecurityOutlined from '@mui/icons-material/SecurityOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -62,6 +63,7 @@ export function AccountSecurityPage() {
   return (
     <Stack spacing={3}>
       <PageHeader
+        icon={SecurityOutlined}
         title={t('identity.security.title')}
         description={t('identity.security.subtitle')}
       />

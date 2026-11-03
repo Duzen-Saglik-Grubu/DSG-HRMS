@@ -1,4 +1,5 @@
 import { Box, Card, CardContent, Chip, Stack, Typography } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import type { PersonListItem } from '../api/personsApi';
 import { joinParts } from '../display';
@@ -22,20 +23,32 @@ export function PersonCard({ person }: { person: PersonListItem }) {
       variant="outlined"
       component="article"
       aria-label={name}
-      sx={{
+      sx={(theme) => ({
         height: '100%',
-        transition: 'box-shadow 150ms ease, border-color 150ms ease',
-        '&:hover': { boxShadow: 3, borderColor: 'primary.light' },
-      }}
+        borderColor: 'transparent',
+        transition: theme.transitions.create(['box-shadow', 'transform', 'border-color'], {
+          duration: 150,
+        }),
+        '&:hover': {
+          boxShadow: theme.palette.surface.shadowHover,
+          borderColor: alpha(theme.palette.surface.accent, 0.3),
+          transform: 'translateY(-2px)',
+        },
+        '@media (prefers-reduced-motion: reduce)': { '&:hover': { transform: 'none' } },
+      })}
     >
       <CardContent sx={{ pt: 3, '&:last-child': { pb: 2.5 } }}>
         <Stack spacing={1} sx={{ alignItems: 'center', textAlign: 'center' }}>
           <Box
             sx={{
+              position: 'relative',
               p: '3px',
               borderRadius: '50%',
               border: 2,
-              borderColor: person.isActive ? 'primary.light' : 'warning.light',
+              borderColor: (theme) =>
+                person.isActive
+                  ? alpha(theme.palette.surface.accent, 0.45)
+                  : theme.palette.warning.light,
             }}
           >
             <PersonAvatar
@@ -43,14 +56,31 @@ export function PersonCard({ person }: { person: PersonListItem }) {
               hasPhoto={person.hasPhoto}
               firstName={person.firstName}
               lastName={person.lastName}
-              size={72}
+              size={80}
             />
+            {/* Aktiflik noktasi susleme amaclidir: ayrilan kiside "Ayrildi" etiketi metin olarak var. */}
+            {person.isActive ? (
+              <Box
+                aria-hidden
+                sx={{
+                  position: 'absolute',
+                  top: 4,
+                  right: 4,
+                  width: 14,
+                  height: 14,
+                  borderRadius: '50%',
+                  bgcolor: 'success.light',
+                  border: 2,
+                  borderColor: 'background.paper',
+                }}
+              />
+            ) : null}
           </Box>
           <Box sx={{ width: '100%', minWidth: 0 }}>
             <Typography
               variant="subtitle1"
               component="h3"
-              sx={{ fontWeight: 700, lineHeight: 1.3 }}
+              sx={{ fontWeight: 700, lineHeight: 1.3, color: 'primary.main' }}
               noWrap
               title={name}
             >
