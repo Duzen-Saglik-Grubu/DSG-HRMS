@@ -42,6 +42,7 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ### Değişti
 - **Arayüz yenilendi (#322).** Sol menü giriş ekranıyla uyumlu koyu lacivert zemine geçti; menünün üstünde sistemin tam adı (İnsan Kaynakları Yönetim Sistemi) yazıyor ve seçili öğe dolgulu mavi. İçerik zemini açık mavi-gri. Sayfa başlıkları simgeli, dalga desenli bir şeritte. Personel listesinde arama ve süzgeçler beyaz bir araç çubuğunda.
+- **Birden fazla aktif sicili olan kişide işe ilk girilen sicil esas alınır (#321, `KR-130`).** Liste kartındaki sicil, şube, birim ve ünvan; kişinin LOGO'dan gelen genel bilgileri ve fotoğrafı aktif siciller arasında işe giriş tarihi en eski olandan alınır. Önceden en son işe girilen sicil esastı. Aktif sicili olmayan kişide kural değişmedi: çıkış tarihi en yeni sicil.
 - **İK rolünün adı "İnsan Kaynakları" oldu ve T1 izinleri eklendi (#276).** İK artık senkronizasyonu elle de başlatabilir (`KR-126`); denetim kayıtlarını ve sistem parametrelerini de görür ve parametreleri değiştirebilir (#278, `KR-128`). Senkronizasyon izinlerinin kodu `identity.sync.*` iken `personnel.sync.*` oldu.
 - **Ad ve soyad Türkçe kurala göre sıralanır ve aranır (#244).** Hesap işlemleri ekranında Ç, İ, Ö, Ş ve Ü alfabedeki yerlerinde sıralanır. "ışık" araması IŞIK'ı, "ismail" araması İSMAİL'i bulur. Aramada ASCII `I`, Türkçedeki gibi `ı` sayılır; bu yüzden `ISMAIL` yazmak İSMAİL'i bulmaz.
 

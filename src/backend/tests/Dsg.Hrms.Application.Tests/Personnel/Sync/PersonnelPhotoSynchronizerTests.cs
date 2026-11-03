@@ -102,16 +102,16 @@ public sealed class PersonnelPhotoSynchronizerTests
     [Fact]
     public void Photo_comes_only_from_the_primary_employment_card()
     {
-        // KR-126: liste kartinda gorunen sicil ile fotografin kaynagi aynidir; esas kartta fotograf
+        // KR-126, KR-130: liste kartinda gorunen sicil ile fotografin kaynagi aynidir; esas kartta fotograf
         // yoksa baska sicilin fotografina dusulmez.
         var person = Person(1);
         var older = Employ(person, "00001", logoRef: 10, hire: new DateOnly(2015, 1, 1));
         var newer = Employ(person, "00002", logoRef: 20, hire: new DateOnly(2022, 1, 1));
 
-        PersonnelPhotoSynchronizer.Plan([new LogoPhotoDigest(10, HashA)], Snapshot([person], [older, newer], []), Version)
+        PersonnelPhotoSynchronizer.Plan([new LogoPhotoDigest(20, HashB)], Snapshot([person], [older, newer], []), Version)
             .ToFetch.ShouldBeEmpty();
         PersonnelPhotoSynchronizer.Plan([new LogoPhotoDigest(10, HashA), new LogoPhotoDigest(20, HashB)], Snapshot([person], [older, newer], []), Version)
-            .ToFetch.ShouldBe(new Dictionary<int, long> { [20] = 1 });
+            .ToFetch.ShouldBe(new Dictionary<int, long> { [10] = 1 });
     }
 
     [Fact]

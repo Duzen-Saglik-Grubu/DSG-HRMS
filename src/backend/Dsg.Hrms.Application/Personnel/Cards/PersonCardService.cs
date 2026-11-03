@@ -17,7 +17,7 @@ namespace Dsg.Hrms.Application.Personnel.Cards;
 /// <param name="Email">Kurumsal e-posta; kayitli degilse bos.</param>
 /// <param name="MobilePhone">Cep telefonu; kayitli degilse bos.</param>
 /// <param name="IsSelf">Kart kullanicinin kendisine mi ait.</param>
-/// <param name="Employments">Istihdamlar; once aktifler, ise giris tarihi yeniden eskiye (SYG-PERS-017).</param>
+/// <param name="Employments">Istihdamlar; esas sicil onde (SYG-PERS-017, <c>Employment.InPrimaryOrder</c>).</param>
 /// <param name="Gender">Cinsiyet.</param>
 /// <param name="PreviousSurname">Onceki soyadi; yalnizca kadin personelde ve LOGO'da doluysa.</param>
 /// <param name="MaritalStatus">Medeni hal.</param>
@@ -176,9 +176,7 @@ public sealed class PersonCardService
             record.Email,
             record.MobilePhone,
             viewer.IsSelf(record.Id),
-            [.. record.Employments
-                .OrderByDescending(e => e.IsActive)
-                .ThenByDescending(e => e.HireDate)
+            [.. Employment.InPrimaryOrder(record.Employments, e => (e.IsActive, e.HireDate, e.TerminationDate, e.RegistryCode))
                 .Select(e => new EmploymentCard(
                     e.RegistryCode,
                     e.CompanyName,

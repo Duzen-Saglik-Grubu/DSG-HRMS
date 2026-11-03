@@ -88,21 +88,41 @@ public sealed class Employment : Entity, IAuditable
         terminationDate is null || terminationDate.Value >= today;
 
     /// <summary>
-    /// Kisinin esas istihdami: aktif istihdamlardan ise giris tarihi en yeni olan; aktif yoksa
-    /// cikis tarihi en yeni olan (ADR-0019 §6, <c>KR-126</c>). Liste karti ve kisinin LOGO'dan
+    /// Kisinin esas istihdami: aktif istihdamlardan ise giris tarihi en eski olan; aktif yoksa
+    /// cikis tarihi en yeni olan (ADR-0019 §6, <c>KR-130</c>). Liste karti ve kisinin LOGO'dan
     /// gelen genel bilgileri bu istihdamin kartindan alinir.
     /// </summary>
+    /// <remarks>
+    /// Ayni giris tarihli iki aktif istihdamda sicil kodu kucuk olan secilir; secim her
+    /// cagrida aynidir.
+    /// </remarks>
     /// <returns>Istihdam yoksa <c>null</c>.</returns>
-    public static Employment? Primary(IEnumerable<Employment> employments)
+    public static Employment? Primary(IEnumerable<Employment> employments) =>
+        InPrimaryOrder(employments, e => (e.IsActive, e.HireDate, e.TerminationDate, e.RegistryCode)).FirstOrDefault();
+
+    /// <summary>
+    /// Istihdamlari esas istihdam onde olacak sekilde siralar (SYG-PERS-017, <c>KR-130</c>):
+    /// once aktifler ise giris tarihi eskiden yeniye, sonra ayrilanlar cikis tarihi yeniden eskiye.
+    /// Kisi kartindaki sekmeler bu siradadir; ilk eleman her zaman <see cref="Primary"/> olur.
+    /// </summary>
+    /// <remarks>
+    /// Kural tek yerde kalsin diye istihdamin kendisi yerine okuma modelleri de (kisi karti)
+    /// <paramref name="key"/> ile ayni siralamayi kullanir.
+    /// </remarks>
+    public static IEnumerable<T> InPrimaryOrder<T>(
+        IEnumerable<T> employments,
+        Func<T, (bool IsActive, DateOnly HireDate, DateOnly? TerminationDate, string RegistryCode)> key)
     {
         ArgumentNullException.ThrowIfNull(employments);
+        ArgumentNullException.ThrowIfNull(key);
 
         return employments
-            .OrderByDescending(e => e.IsActive)
-            .ThenByDescending(e => e.IsActive ? e.HireDate : e.TerminationDate ?? e.HireDate)
-            .ThenByDescending(e => e.HireDate)
-            .ThenBy(e => e.RegistryCode, StringComparer.Ordinal)
-            .FirstOrDefault();
+            .Select(e => (Item: e, Key: key(e)))
+            .OrderByDescending(x => x.Key.IsActive)
+            .ThenBy(x => x.Key.IsActive ? x.Key.HireDate.DayNumber : -(x.Key.TerminationDate ?? x.Key.HireDate).DayNumber)
+            .ThenByDescending(x => x.Key.HireDate)
+            .ThenBy(x => x.Key.RegistryCode, StringComparer.Ordinal)
+            .Select(x => x.Item);
     }
 
     /// <summary>Yeni istihdam olusturur.</summary>

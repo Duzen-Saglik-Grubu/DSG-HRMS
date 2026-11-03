@@ -96,7 +96,7 @@ public interface IPersonFilterOptionsQuery
 /// <param name="LastName">Soyad.</param>
 /// <param name="IsActive">En az bir aktif sicili var mi.</param>
 /// <param name="EmploymentCount">Sicil sayisi; 2 ve uzeri kartta "X sicil" isaretidir.</param>
-/// <param name="Primary">Esas istihdam (KR-126): aktiflerden ise giris tarihi en yeni olan.</param>
+/// <param name="Primary">Esas istihdam (KR-130): aktiflerden ise giris tarihi en eski olan.</param>
 public sealed record PersonListItem(
     Guid PersonId,
     string FirstName,

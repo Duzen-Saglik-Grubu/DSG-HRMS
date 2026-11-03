@@ -4236,7 +4236,7 @@
             "items": {
               "$ref": "#/components/schemas/EmploymentCardResponse"
             },
-            "description": "Istihdamlar; once aktifler, ise giris tarihi yeniden eskiye."
+            "description": "Istihdamlar; once aktifler ise giris tarihi eskiden yeniye, sonra ayrilanlar cikis tarihi yeniden eskiye (ilk eleman esas sicil, KR-130)."
           },
           "gender": {
             "oneOf": [

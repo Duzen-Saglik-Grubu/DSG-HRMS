@@ -22,7 +22,7 @@ namespace Dsg.Hrms.Application.Personnel.Sync;
 /// <para>
 /// Bir kisinin birden fazla karti olabilir. Genel bilgiler ve adres kisinin <b>esas
 /// istihdaminin</b> kartindan alinir (<see cref="Employment.Primary"/>): liste kartinda
-/// gorunen sicille ayni kural (<c>KR-126</c>).
+/// gorunen sicille ayni kural (<c>KR-126</c>, <c>KR-130</c>).
 /// </para>
 /// </remarks>
 public static class PersonnelDetailsSynchronizer

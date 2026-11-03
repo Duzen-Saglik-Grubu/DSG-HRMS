@@ -224,12 +224,12 @@ public sealed class PersonnelSynchronizer
 
     private static PersonGroup BuildPersonGroup(List<Card> cards, DateOnly today, Context context)
     {
-        // Esas kart: en guncel aktif istihdamin karti; yoksa en guncel kart.
-        // Esitlikte daha buyuk LOGO referansi (daha yeni kart) kazanir; siralama
-        // belirlenimcidir, her calismada ayni kart secilir.
+        // Esas kart (KR-130): aktif kartlardan ise giris tarihi en eski olan; aktif kart
+        // yoksa ise giris tarihi en yeni olan. Esitlikte daha buyuk LOGO referansi (daha
+        // yeni kart) kazanir; siralama belirlenimcidir, her calismada ayni kart secilir.
         var primary = cards
             .OrderByDescending(c => Employment.IsActiveOn(c.Record.TerminationDate, today))
-            .ThenByDescending(c => c.Record.HireDate)
+            .ThenBy(c => Employment.IsActiveOn(c.Record.TerminationDate, today) ? c.Record.HireDate.DayNumber : -c.Record.HireDate.DayNumber)
             .ThenByDescending(c => c.Record.LogoRef)
             .First();
 
