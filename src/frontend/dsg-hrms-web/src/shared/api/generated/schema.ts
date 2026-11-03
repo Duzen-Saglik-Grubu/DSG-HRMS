@@ -1189,6 +1189,51 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/sync-freshness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Verinin guncelligi. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Guncellik bilgisi. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SyncFreshnessResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/account/password": {
         parameters: {
             query?: never;
@@ -3738,6 +3783,18 @@ export interface components {
             length?: number | string;
             value?: null | string;
             hasValue?: boolean;
+        };
+        /** @description Personel verisinin guncelligi. */
+        SyncFreshnessResponse: {
+            /** @description LOGO baglantisi tanimli mi; degilse senkronizasyon bilincli olarak kapalidir ve bilgi gosterilmez. */
+            enabled: boolean;
+            /**
+             * Format: date-time
+             * @description Son basarili calismanin bitisi; hic yoksa bos.
+             */
+            lastSucceededAt: null | string;
+            /** @description Son biten calisma basarisiz (veya kismen tamamlandi); ekranda uyari isareti. */
+            lastRunFailed: boolean;
         };
         /** @description Elle calisma istegi alindi. */
         SyncRequestedResponse: {

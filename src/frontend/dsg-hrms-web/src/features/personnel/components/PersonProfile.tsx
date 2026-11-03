@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { EmploymentCard, PersonCard } from '../api/personsApi';
 import { displayDate, joinParts, orderEmployments } from '../display';
 import { PersonAvatar } from '@/shared/components/PersonAvatar';
+import { SyncFreshness } from './SyncFreshness';
 
 /**
  * Kisi karti gorunumu: "Profilim" ve listeden acilan kart ayni gorunumu kullanir (SYG-PERS-034,
@@ -106,6 +107,16 @@ function ProfileHeader({
             {primary ? <Chip size="small" variant="outlined" label={primary.registryCode} /> : null}
             {primary ? <Chip size="small" variant="outlined" label={primary.companyName} /> : null}
           </Stack>
+        </Box>
+        <Box
+          sx={{
+            flexGrow: 1,
+            display: 'flex',
+            justifyContent: { xs: 'center', sm: 'flex-end' },
+            alignSelf: { sm: 'flex-start' },
+          }}
+        >
+          <SyncFreshness />
         </Box>
       </Stack>
     </Paper>

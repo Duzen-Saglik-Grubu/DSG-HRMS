@@ -7,6 +7,7 @@ export type PersonFilterOptions = ApiSchemas['PersonFilterOptionsResponse'];
 export type FilterOption = ApiSchemas['FilterOptionResponse'];
 export type PersonCard = ApiSchemas['PersonCardResponse'];
 export type EmploymentCard = ApiSchemas['EmploymentCardResponse'];
+export type SyncFreshness = ApiSchemas['SyncFreshnessResponse'];
 
 const BASE = '/personnel/persons';
 
@@ -47,6 +48,12 @@ export const personsApi = {
   /** Kullanicinin kendi karti, "Profilim" (SYG-PERS-044). Izin gerektirmez. */
   me: async (): Promise<PersonCard> => {
     const response = await apiClient.get<PersonCard>(`${BASE}/me`);
+    return response.data;
+  },
+
+  /** "Son senkronizasyon" bilgisi (SYG-PERS-010). Giris yapmis her kullaniciya aciktir. */
+  syncFreshness: async (): Promise<SyncFreshness> => {
+    const response = await apiClient.get<SyncFreshness>('/personnel/sync-freshness');
     return response.data;
   },
 

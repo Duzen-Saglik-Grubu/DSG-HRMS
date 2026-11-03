@@ -1469,6 +1469,36 @@
         }
       }
     },
+    "/api/v1/personnel/sync-freshness": {
+      "get": {
+        "tags": [
+          "SyncFreshness"
+        ],
+        "summary": "Verinin guncelligi.",
+        "responses": {
+          "200": {
+            "description": "Guncellik bilgisi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncFreshnessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/identity/account/password": {
       "post": {
         "tags": [
@@ -4991,6 +5021,33 @@
           }
         }
       },
+      "SyncFreshnessResponse": {
+        "required": [
+          "enabled",
+          "lastSucceededAt",
+          "lastRunFailed"
+        ],
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "LOGO baglantisi tanimli mi; degilse senkronizasyon bilincli olarak kapalidir ve bilgi gosterilmez."
+          },
+          "lastSucceededAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Son basarili calismanin bitisi; hic yoksa bos.",
+            "format": "date-time"
+          },
+          "lastRunFailed": {
+            "type": "boolean",
+            "description": "Son biten calisma basarisiz (veya kismen tamamlandi); ekranda uyari isareti."
+          }
+        },
+        "description": "Personel verisinin guncelligi."
+      },
       "SyncRequestedResponse": {
         "required": [
           "alreadyQueued"
@@ -5414,6 +5471,9 @@
     },
     {
       "name": "Persons"
+    },
+    {
+      "name": "SyncFreshness"
     },
     {
       "name": "Account"

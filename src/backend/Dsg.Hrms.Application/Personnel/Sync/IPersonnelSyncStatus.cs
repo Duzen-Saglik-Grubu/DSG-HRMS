@@ -15,7 +15,22 @@ public interface IPersonnelSyncStatus
 
     /// <summary>En son baslayan calismayi dondurur; hic calisma yoksa <c>null</c>.</summary>
     Task<PersonnelSyncRunSummary?> GetLastRunAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Ekrandaki "Son senkronizasyon" bilgisi (SYG-PERS-010): verinin ne kadar guncel oldugu.
+    /// </summary>
+    Task<PersonnelSyncFreshness> GetFreshnessAsync(CancellationToken cancellationToken);
 }
+
+/// <summary>Personel verisinin guncelligi (SYG-PERS-010).</summary>
+/// <param name="LastSucceededAt">
+/// Son basarili calismanin bitisi; hic yoksa <c>null</c>. Uyarili tamamlanan calisma basarilidir
+/// (veri aktarildi); T1 adimi basarisiz olan ("kismen") calisma basarili sayilmaz.
+/// </param>
+/// <param name="LastRunFailed">
+/// Son BITEN calisma basarisiz veya kismen tamamlandi mi. Suren calisma hesaba katilmaz.
+/// </param>
+public sealed record PersonnelSyncFreshness(DateTimeOffset? LastSucceededAt, bool LastRunFailed);
 
 /// <summary>Bir calismanin ozeti.</summary>
 /// <param name="Status">Sonuc.</param>

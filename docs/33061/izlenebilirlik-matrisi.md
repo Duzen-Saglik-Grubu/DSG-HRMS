@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-11-03
+**Son güncelleme:** 2026-11-04
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 
@@ -228,7 +228,7 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 4 | `PG-PERS-04` Senkronizasyon 15 dakikada bir otomatik çalışır; periyot Sistem Yönetimi… | SYG-PERS-007 | `ADR-0003` §4 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
 | 5 | `PG-PERS-05` Yetkili kullanıcı "şimdi senkronize et" diyerek elle tetikleyebilir; periyodu… | SYG-PERS-008, 009, 055 | `ADR-0003` §4 | T3'te karşılandı (`KR-077`). SYG-055 (`personnel.sync.*`, elle başlatma İK'da da; `KR-126`) · PR #276 — senkronizasyon ekranı (SYG-008, 009) sonraki iş | `AccessControlApiTests` | — |
 | 6 | `PG-PERS-06` Her senkronizasyon bir çalışma kaydı üretir: okunan, eklenen, güncellenen ve uyarı… | SYG-PERS-008 | `ADR-0003` §4 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
-| 7 | `PG-PERS-07` Personel listesi ve kartında "son senkronizasyon" zamanı görünür. | SYG-PERS-010 | `ADR-0003` §4 | — | — | — |
+| 7 | `PG-PERS-07` Personel listesi ve kartında "son senkronizasyon" zamanı görünür. | SYG-PERS-010 | `ADR-0003` §4 | SYG-010 (son başarılı çalışmanın bitişi; son biten çalışma başarısız veya kısmen ise uyarı; AN-20) · PR #326 | `SyncFreshnessApiTests`, `PersonnelSyncStoreTests`, `SyncFreshness.test`, `PersonListPage.test`, `PersonCardPage.test` | — |
 | 8 | `PG-PERS-08` LOGO şemasındaki beklenmeyen değişiklikler (şema sapması) günlük olarak denetlenir… | SYG-PERS-011, 012 | `ADR-0003` §6; `ADR-0021` §4 | T3'te kısmen karşılandı. **Kısmen:** SYG-011 (şema denetimi T1 tablolarını kapsar) · PR #281 — bildirim (012) sonraki iş | `LogoFieldScopeTests`, `LogoReadOnlyAccessTests` | — |
 | 9 | `PG-PERS-09` Aynı TCKN'ye sahip farklı sicil kayıtları TEK kişi olarak gösterilir; her sicil ayrı… | SYG-PERS-015, 022 | `ADR-0005` §1 | T3'te karşılandı. SYG-015 (kişi listede bir kez) ve SYG-022 (esas istihdam, "X sicil", `KR-126`) · PR #300 (API); esas istihdam işe giriş tarihi en eski aktif sicil (`KR-130`, değişiklik talebi #321) | `PersonListApiTests`, `PersonnelDetailsSynchronizerTests`, `PersonnelSynchronizerTests`, `PersonnelPhotoSynchronizerTests` | — |
 | 10 | `PG-PERS-10` TCKN'si olmayan LOGO kartı kişi olarak oluşturulmaz; uyarı listesine alınır. | SYG-PERS-016 | `ADR-0003` §5 | T3'te karşılandı (`KR-077`); SYG-PERS'te T3 halkalarına bağlanır | — | — |
@@ -331,3 +331,4 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 2026-11-03 | 2.35 | §7: PG-PERS-19, 28, 36 gerçekleştirme ve doğrulama (kan grubu, #317) | Bilgi İşlem |
 | 2026-11-03 | 2.36 | §7: PG-PERS-09 esas sicil kuralı revize (`KR-130`, değişiklik talebi #321) | Bilgi İşlem |
 | 2026-11-03 | 2.37 | §7: PG-PERS-11 sekme sırası esas sicille uyumlu (`KR-130`, #321) | Bilgi İşlem |
+| 2026-11-04 | 2.38 | §7: PG-PERS-07 gerçekleştirme ve doğrulama ("Son senkronizasyon", #325) | Bilgi İşlem |
