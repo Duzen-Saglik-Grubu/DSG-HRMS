@@ -14,6 +14,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import ManageAccountsOutlined from '@mui/icons-material/ManageAccountsOutlined';
 import SearchRounded from '@mui/icons-material/SearchRounded';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -185,7 +186,7 @@ export function AccountsPage() {
   if (!canView) {
     return (
       <Stack spacing={3}>
-        <PageHeader title={t('identity.accounts.title')} />
+        <PageHeader icon={ManageAccountsOutlined} title={t('identity.accounts.title')} />
         <Alert severity="warning">{t('error.forbidden')}</Alert>
       </Stack>
     );
@@ -194,6 +195,7 @@ export function AccountsPage() {
   return (
     <Stack spacing={3}>
       <PageHeader
+        icon={ManageAccountsOutlined}
         title={t('identity.accounts.title')}
         description={t('identity.accounts.subtitle')}
       />

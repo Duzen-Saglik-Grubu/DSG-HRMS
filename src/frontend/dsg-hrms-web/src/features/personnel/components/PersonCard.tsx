@@ -22,11 +22,18 @@ export function PersonCard({ person }: { person: PersonListItem }) {
       variant="outlined"
       component="article"
       aria-label={name}
-      sx={{
+      sx={(theme) => ({
         height: '100%',
-        transition: 'box-shadow 150ms ease, border-color 150ms ease',
-        '&:hover': { boxShadow: 3, borderColor: 'primary.light' },
-      }}
+        transition: theme.transitions.create(['box-shadow', 'transform', 'border-color'], {
+          duration: 150,
+        }),
+        '&:hover': {
+          boxShadow: theme.palette.surface.shadowHover,
+          borderColor: theme.palette.primary.light,
+          transform: 'translateY(-2px)',
+        },
+        '@media (prefers-reduced-motion: reduce)': { '&:hover': { transform: 'none' } },
+      })}
     >
       <CardContent sx={{ pt: 3, '&:last-child': { pb: 2.5 } }}>
         <Stack spacing={1} sx={{ alignItems: 'center', textAlign: 'center' }}>
@@ -43,14 +50,14 @@ export function PersonCard({ person }: { person: PersonListItem }) {
               hasPhoto={person.hasPhoto}
               firstName={person.firstName}
               lastName={person.lastName}
-              size={72}
+              size={80}
             />
           </Box>
           <Box sx={{ width: '100%', minWidth: 0 }}>
             <Typography
               variant="subtitle1"
               component="h3"
-              sx={{ fontWeight: 700, lineHeight: 1.3 }}
+              sx={{ fontWeight: 700, lineHeight: 1.3, color: 'primary.main' }}
               noWrap
               title={name}
             >

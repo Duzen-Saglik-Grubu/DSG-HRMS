@@ -10,6 +10,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import LockResetRounded from '@mui/icons-material/LockResetRounded';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -139,7 +140,11 @@ export function ChangePasswordPage() {
 
   return (
     <Stack spacing={3}>
-      <PageHeader title={t('identity.change.title')} description={t('identity.change.subtitle')} />
+      <PageHeader
+        icon={LockResetRounded}
+        title={t('identity.change.title')}
+        description={t('identity.change.subtitle')}
+      />
 
       <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 }, maxWidth: 520 }}>
         <Stack

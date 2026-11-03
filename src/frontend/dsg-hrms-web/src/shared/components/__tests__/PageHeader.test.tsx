@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
+import { screen } from '@testing-library/react';
 import { Button } from '@mui/material';
+import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
+import { renderWithProviders } from '@/test/render';
 import { PageHeader } from '../PageHeader';
 
 function renderHeader(ui: React.ReactElement) {
-  return render(<MemoryRouter>{ui}</MemoryRouter>);
+  // Serit tema belirteclerini kullanir; uygulamadaki saglayicilarla render edilir.
+  return renderWithProviders(ui);
 }
 
 describe('PageHeader', () => {
@@ -40,5 +42,20 @@ describe('PageHeader', () => {
     renderHeader(<PageHeader title="İzin Talepleri" actions={<Button>Yeni talep</Button>} />);
 
     expect(screen.getByRole('button', { name: 'Yeni talep' })).toBeInTheDocument();
+  });
+
+  it('simge ve dalga deseni ekran okuyucudan gizlidir', () => {
+    // #322: simge menudeki simgenin tekraridir; anlam tasiyan tek icerik basliktir.
+    const { container } = renderHeader(<PageHeader title="Personel" icon={BadgeOutlined} />);
+
+    const hidden = container.querySelectorAll('[aria-hidden="true"]');
+    expect(hidden.length).toBeGreaterThanOrEqual(2);
+    hidden.forEach((element) => expect(element).not.toHaveTextContent(/\S/));
+  });
+
+  it('kabugu olmayan ekranda h1 olarak verilebilir', () => {
+    renderHeader(<PageHeader title="Günaydın" headingLevel="h1" />);
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Günaydın' })).toBeInTheDocument();
   });
 });

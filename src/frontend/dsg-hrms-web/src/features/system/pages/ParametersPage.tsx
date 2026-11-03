@@ -12,6 +12,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import TuneRounded from '@mui/icons-material/TuneRounded';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '@/shared/api/problemDetails';
@@ -53,7 +54,7 @@ export function ParametersPage() {
   if (!canView) {
     return (
       <Stack spacing={3}>
-        <PageHeader title={t('system.parameters.title')} />
+        <PageHeader icon={TuneRounded} title={t('system.parameters.title')} />
         <Alert severity="warning">{t('error.forbidden')}</Alert>
       </Stack>
     );
@@ -62,6 +63,7 @@ export function ParametersPage() {
   return (
     <Stack spacing={3}>
       <PageHeader
+        icon={TuneRounded}
         title={t('system.parameters.title')}
         description={t('system.parameters.subtitle')}
       />

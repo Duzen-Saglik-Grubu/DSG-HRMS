@@ -13,6 +13,7 @@ import {
 import { alpha } from '@mui/material/styles';
 import ArrowForwardRounded from '@mui/icons-material/ArrowForwardRounded';
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
+import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
 import LockResetRounded from '@mui/icons-material/LockResetRounded';
 import ManageAccountsOutlined from '@mui/icons-material/ManageAccountsOutlined';
 import TuneRounded from '@mui/icons-material/TuneRounded';
@@ -27,6 +28,7 @@ import { queryKeys } from '@/shared/api/queryKeys';
 import { permissions, type Permission } from '@/shared/auth/permissions';
 import { useSession } from '@/shared/auth/session';
 import { ErrorState } from '@/shared/components/ErrorState';
+import { PageHeader } from '@/shared/components/PageHeader';
 import { routes } from '@/shared/routes';
 
 interface QuickLink {
@@ -83,13 +85,13 @@ export function HomePage() {
 
   return (
     <Stack spacing={3}>
-      <Box>
-        <Typography variant="h5" component="h1" sx={{ fontWeight: 700 }}>
-          {t(`home.greeting.${greetingKey(now.getHours())}`, { name: firstName })}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {format(now, 'd MMMM yyyy, EEEE', { locale: tr })} · {t('home.subtitle')}
-        </Typography>
+      <Box sx={{ '& > header': { mb: 0 } }}>
+        <PageHeader
+          headingLevel="h1"
+          icon={DashboardOutlined}
+          title={t(`home.greeting.${greetingKey(now.getHours())}`, { name: firstName })}
+          description={`${format(now, 'd MMMM yyyy, EEEE', { locale: tr })} · ${t('home.subtitle')}`}
+        />
       </Box>
 
       <Grid container spacing={2.5}>
@@ -120,7 +122,15 @@ function QuickLinkCard({ link }: { link: QuickLink }) {
   const { t } = useTranslation();
 
   return (
-    <Card variant="outlined" sx={{ height: '100%' }}>
+    <Card
+      variant="outlined"
+      sx={(theme) => ({
+        height: '100%',
+        borderColor: 'transparent',
+        transition: theme.transitions.create('box-shadow', { duration: 150 }),
+        '&:hover': { boxShadow: theme.palette.surface.shadowHover },
+      })}
+    >
       <CardActionArea
         component={RouterLink}
         to={link.to}
