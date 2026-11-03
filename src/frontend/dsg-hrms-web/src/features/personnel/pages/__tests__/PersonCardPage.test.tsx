@@ -177,14 +177,27 @@ describe('PersonCardPage', () => {
     expect(await screen.findByText('Kişi bulunamadı')).toBeInTheDocument();
   });
 
-  it('istihdam sirasi: aktifler once, kendi icinde ise giris yeniden eskiye', () => {
+  it('istihdam sirasi: aktifler ise giris eskiden yeniye, ayrilanlar cikis yeniden eskiye', () => {
+    // KR-130: ilk sekme esas sicildir.
     const older = { ...ACTIVE, registryCode: 'A', hireDate: '2019-01-01' };
     const newer = { ...ACTIVE, registryCode: 'B', hireDate: '2022-01-01' };
+    const endedLater = { ...ENDED, registryCode: 'C', terminationDate: '2023-06-30' };
 
-    expect(orderEmployments([ENDED, older, newer]).map((e) => e.registryCode)).toEqual([
-      'B',
+    expect(orderEmployments([ENDED, newer, endedLater, older]).map((e) => e.registryCode)).toEqual([
       'A',
+      'B',
+      'C',
       '00004',
+    ]);
+  });
+
+  it('ayni giris tarihli aktiflerde sicil kodu kucuk olan once gelir', () => {
+    const second = { ...ACTIVE, registryCode: '00007', hireDate: '2020-01-01' };
+    const first = { ...ACTIVE, registryCode: '00003', hireDate: '2020-01-01' };
+
+    expect(orderEmployments([second, first]).map((e) => e.registryCode)).toEqual([
+      '00003',
+      '00007',
     ]);
   });
 });

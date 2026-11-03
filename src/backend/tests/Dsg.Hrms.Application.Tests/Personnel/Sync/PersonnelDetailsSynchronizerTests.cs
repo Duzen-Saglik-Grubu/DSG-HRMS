@@ -61,6 +61,21 @@ public sealed class PersonnelDetailsSynchronizerTests
         Employment.Primary([first, last]).ShouldBe(last);
     }
 
+    [Fact]
+    public void Card_tab_order_starts_with_the_primary_employment()
+    {
+        // SYG-PERS-017: aktifler ise giris eskiden yeniye, ayrilanlar cikis yeniden eskiye.
+        var person = Person(1);
+        var second = Employ(person, "00001", logoRef: 10, hire: new DateOnly(2021, 3, 1));
+        var first = Employ(person, "00009", logoRef: 90, hire: new DateOnly(2016, 9, 1));
+        var endedEarly = Employ(person, "00002", logoRef: 20, hire: new DateOnly(2005, 1, 1), terminated: new DateOnly(2010, 1, 1));
+        var endedLate = Employ(person, "00003", logoRef: 30, hire: new DateOnly(2011, 1, 1), terminated: new DateOnly(2015, 1, 1));
+
+        Employment.InPrimaryOrder([endedEarly, second, endedLate, first], e => (e.IsActive, e.HireDate, e.TerminationDate, e.RegistryCode))
+            .Select(e => e.RegistryCode)
+            .ShouldBe(["00009", "00001", "00003", "00002"]);
+    }
+
     [Theory]
     [InlineData((short)1, (short)1, Gender.Male, MaritalStatus.Married)]
     [InlineData((short)2, (short)2, Gender.Female, MaritalStatus.NotMarried)]

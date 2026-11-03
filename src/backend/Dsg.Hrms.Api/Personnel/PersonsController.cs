@@ -428,7 +428,7 @@ public sealed record PersonListItemResponse(
 /// <param name="Email">Kurumsal e-posta; kayitli degilse bos.</param>
 /// <param name="MobilePhone">Cep telefonu; kayitli degilse bos.</param>
 /// <param name="IsSelf">Kart kullanicinin kendisine mi ait.</param>
-/// <param name="Employments">Istihdamlar; once aktifler, ise giris tarihi yeniden eskiye.</param>
+/// <param name="Employments">Istihdamlar; once aktifler ise giris tarihi eskiden yeniye, sonra ayrilanlar cikis tarihi yeniden eskiye (ilk eleman esas sicil, KR-130).</param>
 /// <param name="Gender">Cinsiyet; LOGO'da tanimsizsa bos.</param>
 /// <param name="PreviousSurname">Onceki soyadi; yalnizca kadin personelde ve LOGO'da doluysa.</param>
 /// <param name="MaritalStatus">Medeni hal; LOGO'da satiri yoksa bos.</param>
