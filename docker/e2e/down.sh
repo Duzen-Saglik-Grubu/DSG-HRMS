@@ -5,5 +5,5 @@
 
 set -euo pipefail
 
-E2E_CODE_HASH_KEY=x E2E_JWT_SIGNING_KEY=x E2E_PARAMETER_PROTECTION_KEY=x \
+E2E_CODE_HASH_KEY=x E2E_JWT_SIGNING_KEY=x E2E_PARAMETER_PROTECTION_KEY=x E2E_PERSONAL_DATA_KEY=x \
   docker compose -f docker/compose.e2e.yml down --remove-orphans
