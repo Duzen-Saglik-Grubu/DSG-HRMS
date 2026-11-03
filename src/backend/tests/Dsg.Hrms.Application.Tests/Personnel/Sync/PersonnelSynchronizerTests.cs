@@ -174,7 +174,7 @@ public sealed class PersonnelSynchronizerTests
     }
 
     [Fact]
-    public void Person_data_comes_from_the_most_recent_active_card()
+    public void Person_data_comes_from_the_active_card_even_if_a_later_one_ended()
     {
         var outcome = Run(
         [
@@ -184,6 +184,19 @@ public sealed class PersonnelSynchronizerTests
         ]);
 
         outcome.NewPersons.Single().LastName.ShouldBe("Aktif");
+    }
+
+    [Fact]
+    public void Among_active_cards_the_earliest_hire_wins()
+    {
+        // KR-130: ayni anda iki aktif sicil; ilk ise girilen sicil esastir.
+        var outcome = Run(
+        [
+            Card("00001", NationalId(1), logoRef: 1, lastName: "Ikinci", hireDate: new DateOnly(2023, 6, 1)),
+            Card("00002", NationalId(1), logoRef: 2, lastName: "Ilk", hireDate: new DateOnly(2014, 2, 1)),
+        ]);
+
+        outcome.NewPersons.Single().LastName.ShouldBe("Ilk");
     }
 
     [Fact]
@@ -210,9 +223,9 @@ public sealed class PersonnelSynchronizerTests
         ]);
 
         var warning = outcome.Warnings.Single(w => w.Code == SyncWarningCode.ConflictingBirthDate);
-        warning.RegistryCode.ShouldBe("00002");
-        warning.Detail.ShouldContain("00001");
-        outcome.NewPersons.Single().BirthDate.ShouldBe(new DateOnly(1985, 12, 4));
+        warning.RegistryCode.ShouldBe("00001");
+        warning.Detail.ShouldContain("00002");
+        outcome.NewPersons.Single().BirthDate.ShouldBe(new DateOnly(1985, 4, 12));
     }
 
     [Fact]

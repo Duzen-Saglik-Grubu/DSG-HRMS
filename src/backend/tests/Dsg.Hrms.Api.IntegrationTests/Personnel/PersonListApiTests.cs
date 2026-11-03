@@ -171,15 +171,16 @@ public sealed class PersonListApiTests : IClassFixture<Identity.RegistrationApiF
     }
 
     [Fact]
-    public async Task Person_with_two_active_registrations_appears_once_with_the_latest_hire()
+    public async Task Person_with_two_active_registrations_appears_once_with_the_earliest_hire()
     {
-        // SYG-PERS-022 (KR-126): kart esas istihdami gosterir ve "X sicil" sayisini tasir.
+        // SYG-PERS-022 (KR-126, KR-130): kart esas istihdami (ilk ise girilen aktif sicil)
+        // gosterir ve "X sicil" sayisini tasir; sonradan girilen sicille de bulunur.
         var (client, token) = await HrAsync();
         using (client)
         {
             var item = (await ListAsync(client, token, "?q=00006")).GetProperty("items").EnumerateArray().Single();
 
-            item.GetProperty("registryCode").GetString().ShouldBe("00006");
+            item.GetProperty("registryCode").GetString().ShouldBe("00002");
             item.GetProperty("employmentCount").GetInt32().ShouldBe(2);
             (await ListAsync(client, token, "?q=00002")).GetProperty("totalCount").GetInt32().ShouldBe(1);
         }

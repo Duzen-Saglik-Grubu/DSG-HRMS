@@ -3464,7 +3464,7 @@ export interface components {
             mobilePhone: null | string;
             /** @description Kart kullanicinin kendisine mi ait. */
             isSelf: boolean;
-            /** @description Istihdamlar; once aktifler, ise giris tarihi yeniden eskiye. */
+            /** @description Istihdamlar; once aktifler ise giris tarihi eskiden yeniye, sonra ayrilanlar cikis tarihi yeniden eskiye (ilk eleman esas sicil, KR-130). */
             employments: components["schemas"]["EmploymentCardResponse"][];
             gender: null | components["schemas"]["GenderKind"];
             /** @description Onceki soyadi; yalnizca kadin personelde ve LOGO'da doluysa. */

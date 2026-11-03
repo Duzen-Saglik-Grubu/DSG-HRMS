@@ -2,7 +2,7 @@
 
 **Durum:** **Kabul Edildi**
 **Tarih:** 2026-10-22
-**Karar defteri karşılığı:** `KR-121`, `KR-125`, `KR-126`
+**Karar defteri karşılığı:** `KR-121`, `KR-125`, `KR-126`, `KR-130`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **Genişlettiği:** ADR-0007 §2–§3 (kapsam ve uygulama noktası), ADR-0009 §3 (erişim kaydı), ADR-0014 §4 (dışa aktarma)
 **İlgili gereksinimler:** PG-PERS-14, 20, 24–27, 31, 35, 36, 42, 44; `KR-116` madde 3
@@ -149,11 +149,12 @@ eklemek, atama yükünü artırır.
 
 ### 6. Birden fazla sicili olan kişi
 
-İK kararı (22.10.2026, `KR-126`; B-15). Bugün 13 kişinin aynı anda iki aktif sicili var.
+İK kararı (22.10.2026, `KR-126`; B-15). Bugün 13 kişinin aynı anda iki aktif sicili var. Esas sicil
+kuralı 03.11.2026'da revize edildi (`KR-130`, değişiklik talebi #321).
 
 | Konu | Kural |
 |---|---|
-| Liste kartı | Kişi bir kez görünür. Kartta **en son işe girdiği sicil** gösterilir: aktif sicillerden işe giriş tarihi en yeni olan; aktif sicil yoksa çıkış tarihi en yeni olan. Kartta **"X sicil"** işareti bulunur; X, kişinin sicil sayısıdır |
+| Liste kartı | Kişi bir kez görünür. Kartta **esas sicil** gösterilir: aktif sicillerden **işe giriş tarihi en eski** olan (`KR-130`); aktif sicil yoksa çıkış tarihi en yeni olan. Kişinin LOGO'dan gelen genel bilgileri ve fotoğrafı da bu sicilin kartından alınır. Kartta **"X sicil"** işareti bulunur; X, kişinin sicil sayısıdır |
 | Filtre | Şube, birim ve ünvan gibi istihdam filtreleri kişinin **herhangi bir** sicilinde eşleşir; "aktif" süzgeci yalnızca aktif sicillere bakar |
 | Aktif / ayrılan | Kişinin **en az bir aktif sicili** varsa kişi aktiftir |
 | Görünür kalma süresi | Ayrılan kişi için süre (PG-PERS-38) **son çıkış tarihinden** başlar |
@@ -210,3 +211,4 @@ ve testlerin bu bileşenlere dayanmasıdır.
 | 2026-10-22 | 1.1 | §2: evlilik bilgisi yalnızca İK ve Sistem Yöneticisi; §4 ve §5 kararları onaylandı (22.10.2026, #265) | Bilgi İşlem |
 | 2026-10-22 | 1.2 | Revizyon (T1 tasarım gözden geçirmesi #267, #268): korumalı alanlar ayrı tablolarda ve tip düzeyinde test (B-11); sıralama ve küme işlemleri (B-07); TCKN araması (B-17); izin tablosu ve dağılım (B-14, B-16); erişim kaydında süzgeç değeri yazılmaz, dışa aktarmada kişi kimlikleri, küme işleminde `SpecialCategoryView` (B-01, B-08, B-09); §6 çok sicilli kişi (B-15) | Bilgi İşlem |
 | 2026-10-23 | 1.3 | §4: denetim kayıtları ve parametre izinleri İK'da da (`KR-128`, #278) | Bilgi İşlem |
+| 2026-11-03 | 1.4 | §6: esas sicil, aktif sicillerden işe giriş tarihi en eski olan (`KR-130`, değişiklik talebi #321) | Bilgi İşlem |
