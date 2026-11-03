@@ -17,7 +17,7 @@ public sealed class PersonnelDetailsSynchronizerTests
     [Fact]
     public void Profile_comes_from_the_primary_employment_card()
     {
-        // KR-126: aktif istihdamlardan ise giris tarihi en yeni olanin karti esastir.
+        // KR-130: aktif istihdamlardan ise giris tarihi en eski olanin karti esastir.
         var person = Person(1);
         var older = Employ(person, "00001", logoRef: 10, hire: new DateOnly(2015, 1, 1));
         var newer = Employ(person, "00002", logoRef: 20, hire: new DateOnly(2022, 1, 1));
@@ -27,7 +27,28 @@ public sealed class PersonnelDetailsSynchronizerTests
             Details(Profile(10, education: "Lise"), Profile(20, education: "Lisans"), Profile(30, education: "Doktora")),
             Snapshot([person], [older, newer, ended]));
 
-        person.EducationName.ShouldBe("Lisans");
+        person.EducationName.ShouldBe("Lise");
+    }
+
+    [Fact]
+    public void Earliest_active_hire_wins_even_when_its_registry_code_is_larger()
+    {
+        // KR-130: sira kod sirasina degil ise giris tarihine bakar.
+        var person = Person(1);
+        var later = Employ(person, "00001", logoRef: 10, hire: new DateOnly(2021, 3, 1));
+        var earlier = Employ(person, "00009", logoRef: 90, hire: new DateOnly(2016, 9, 1));
+
+        Employment.Primary([later, earlier]).ShouldBe(earlier);
+    }
+
+    [Fact]
+    public void Active_employments_with_the_same_hire_date_take_the_smaller_registry_code()
+    {
+        var person = Person(1);
+        var second = Employ(person, "00007", logoRef: 70, hire: new DateOnly(2020, 1, 1));
+        var first = Employ(person, "00003", logoRef: 30, hire: new DateOnly(2020, 1, 1));
+
+        Employment.Primary([second, first]).ShouldBe(first);
     }
 
     [Fact]

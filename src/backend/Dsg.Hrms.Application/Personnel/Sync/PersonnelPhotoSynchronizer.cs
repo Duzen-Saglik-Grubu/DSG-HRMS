@@ -9,7 +9,7 @@ namespace Dsg.Hrms.Application.Personnel.Sync;
 /// <remarks>
 /// <para>
 /// Kisinin fotografi, genel bilgileri gibi <b>esas istihdaminin</b> kartindan alinir
-/// (<see cref="Employment.Primary"/>, <c>KR-126</c>). Esas kartta fotograf yoksa kisinin
+/// (<see cref="Employment.Primary"/>, <c>KR-126</c>, <c>KR-130</c>). Esas kartta fotograf yoksa kisinin
 /// fotografi yoktur; baska sicilin fotografina dusulmez. Boylece liste kartinda gorunen sicil ile
 /// fotografin kaynagi hep aynidir.
 /// </para>

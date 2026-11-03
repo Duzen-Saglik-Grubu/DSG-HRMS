@@ -88,10 +88,14 @@ public sealed class Employment : Entity, IAuditable
         terminationDate is null || terminationDate.Value >= today;
 
     /// <summary>
-    /// Kisinin esas istihdami: aktif istihdamlardan ise giris tarihi en yeni olan; aktif yoksa
-    /// cikis tarihi en yeni olan (ADR-0019 §6, <c>KR-126</c>). Liste karti ve kisinin LOGO'dan
+    /// Kisinin esas istihdami: aktif istihdamlardan ise giris tarihi en eski olan; aktif yoksa
+    /// cikis tarihi en yeni olan (ADR-0019 §6, <c>KR-130</c>). Liste karti ve kisinin LOGO'dan
     /// gelen genel bilgileri bu istihdamin kartindan alinir.
     /// </summary>
+    /// <remarks>
+    /// Ayni giris tarihli iki aktif istihdamda sicil kodu kucuk olan secilir; secim her
+    /// cagrida aynidir.
+    /// </remarks>
     /// <returns>Istihdam yoksa <c>null</c>.</returns>
     public static Employment? Primary(IEnumerable<Employment> employments)
     {
@@ -99,7 +103,7 @@ public sealed class Employment : Entity, IAuditable
 
         return employments
             .OrderByDescending(e => e.IsActive)
-            .ThenByDescending(e => e.IsActive ? e.HireDate : e.TerminationDate ?? e.HireDate)
+            .ThenBy(e => e.IsActive ? e.HireDate.DayNumber : -(e.TerminationDate ?? e.HireDate).DayNumber)
             .ThenByDescending(e => e.HireDate)
             .ThenBy(e => e.RegistryCode, StringComparer.Ordinal)
             .FirstOrDefault();
