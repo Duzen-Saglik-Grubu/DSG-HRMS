@@ -65,7 +65,7 @@ function person(overrides: Partial<PersonCard> = {}): PersonCard {
     previousSurname: 'KAYA',
     maritalStatus: 'married',
     educationName: 'Lisans',
-    sensitive: { address: 'Kızılay Mah. 1' },
+    sensitive: { address: 'Kızılay Mah. 1', bloodGroup: 'A Rh+' },
     hasPhoto: false,
     ...overrides,
   };
@@ -116,18 +116,32 @@ describe('PersonCardPage', () => {
     expect(within(general).getByText('12.04.1985')).toBeInTheDocument();
     expect(within(general).getByText('41 yaş')).toBeInTheDocument();
     expect(within(general).getByText('Evli')).toBeInTheDocument();
+    expect(within(general).getByText('A Rh+')).toBeInTheDocument();
     const contact = screen.getByRole('region', { name: 'İletişim Bilgileri' });
     expect(within(contact).getByText('Kızılay Mah. 1')).toBeInTheDocument();
     expect(within(contact).getByText('Kayıtlı değil')).toBeInTheDocument();
     expect(personsApi.card).toHaveBeenCalledWith('p-1');
   });
 
-  it('adresi goremeyen kullanicida adres alani hic yoktur', async () => {
+  it('korumali alanlari goremeyen kullanicida adres ve kan grubu alani hic yoktur', async () => {
     vi.spyOn(personsApi, 'card').mockResolvedValue(person({ sensitive: null }));
     renderAt('/personnel/p-1');
 
     const contact = await screen.findByRole('region', { name: 'İletişim Bilgileri' });
     expect(within(contact).queryByText('Adres')).not.toBeInTheDocument();
+    const general = screen.getByRole('region', { name: 'Genel Bilgiler' });
+    expect(within(general).queryByText('Kan grubu')).not.toBeInTheDocument();
+  });
+
+  it('kan grubu kayitli degilse "Kayitli degil" yazar (SYG-PERS-034)', async () => {
+    vi.spyOn(personsApi, 'card').mockResolvedValue(
+      person({ sensitive: { address: 'Kızılay Mah. 1', bloodGroup: null } }),
+    );
+    renderAt('/personnel/p-1');
+
+    const general = await screen.findByRole('region', { name: 'Genel Bilgiler' });
+    expect(within(general).getByText('Kan grubu')).toBeInTheDocument();
+    expect(within(general).getByText('Kayıtlı değil')).toBeInTheDocument();
   });
 
   it('her istihdam bir sekmedir: once aktif, sonra ayrilan; kidem yil ay gun', async () => {

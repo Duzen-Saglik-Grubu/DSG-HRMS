@@ -24,6 +24,7 @@ using Dsg.Hrms.Infrastructure.Identity.Passwords;
 using Dsg.Hrms.Infrastructure.Logo;
 using Dsg.Hrms.Infrastructure.Notifications;
 using Dsg.Hrms.Infrastructure.Personnel;
+using Dsg.Hrms.Infrastructure.Personnel.Protection;
 using Dsg.Hrms.Infrastructure.Reference;
 using Dsg.Hrms.Infrastructure.Settings;
 using Dsg.Hrms.Infrastructure.Time;
@@ -174,6 +175,12 @@ public static class InfrastructureRegistration
         services.AddScoped<DutyService>();
 
         services.AddScoped<IPersonnelSyncStore, PersonnelSyncStore>();
+
+        // Ozel nitelikli veri anahtari ZORUNLUDUR (SYG-PERS-061, ADR-0020 §2): tanimsiz veya
+        // gecersizse uygulama acilmaz. Hata iletisi anahtarin degerini icermez.
+        var protection = OptionsRegistration.ReadAndValidate<PersonalDataProtectionOptions>(
+            configuration, PersonalDataProtectionOptions.SectionName);
+        services.AddSingleton(new PersonalDataProtector(protection));
         services.AddScoped<IPersonnelSyncStatus, PersonnelSyncStatus>();
         services.AddScoped<PersonnelSyncService>();
         services.AddSingleton<IPhotoThumbnailer, SkiaPhotoThumbnailer>();

@@ -19,6 +19,7 @@ key() { node -e "console.log(require('crypto').randomBytes(32).toString('base64'
 export E2E_CODE_HASH_KEY="${E2E_CODE_HASH_KEY:-$(key)}"
 export E2E_JWT_SIGNING_KEY="${E2E_JWT_SIGNING_KEY:-$(key)}"
 export E2E_PARAMETER_PROTECTION_KEY="${E2E_PARAMETER_PROTECTION_KEY:-$(key)}"
+export E2E_PERSONAL_DATA_KEY="${E2E_PERSONAL_DATA_KEY:-$(key)}"
 
 echo '==> Veritabani ve Mailpit'
 "${COMPOSE[@]}" up -d --wait postgres mailpit

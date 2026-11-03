@@ -23,12 +23,14 @@ public sealed partial class LogoPersonnelSource : ILogoPersonnelSource
     private static readonly string[] DatabaseWritePermissions = ["INSERT", "UPDATE", "DELETE", "ALTER", "EXECUTE"];
 
     private readonly LogoDbContext _context;
+    private readonly LogoOptions _options;
     private readonly ILogger<LogoPersonnelSource> _logger;
 
     /// <summary>Yeni ornek olusturur.</summary>
-    public LogoPersonnelSource(LogoDbContext context, ILogger<LogoPersonnelSource> logger)
+    public LogoPersonnelSource(LogoDbContext context, LogoOptions options, ILogger<LogoPersonnelSource> logger)
     {
         _context = context;
+        _options = options;
         _logger = logger;
     }
 
@@ -197,6 +199,15 @@ public sealed partial class LogoPersonnelSource : ILogoPersonnelSource
                 .Select(i => new { i.LogicalRef, i.PreviousSurname })
                 .ToListAsync(cancellationToken).ConfigureAwait(false);
 
+            // Kan grubu ozel nitelikli veridir: ayar kapaliyken kolon SORGUYA HIC GIRMEZ
+            // (SYG-PERS-005, KR-125). Yalnizca gecerli kodlar (1-8) okunur.
+            var bloodGroups = _options.SyncSpecialCategoryData
+                ? await _context.IdentityInfos
+                    .Where(i => i.BloodGroup >= 1 && i.BloodGroup <= 8)
+                    .Select(i => new { i.LogicalRef, BloodGroup = i.BloodGroup!.Value })
+                    .ToDictionaryAsync(i => i.LogicalRef, i => i.BloodGroup, cancellationToken).ConfigureAwait(false)
+                : [];
+
             var educations = await _context.TypeDefinitions
                 .Where(d => d.Type == LogoSchema.EducationDefinition && d.Number != null)
                 .Select(d => new { Number = d.Number!.Value, d.Name })
@@ -234,7 +245,10 @@ public sealed partial class LogoPersonnelSource : ILogoPersonnelSource
                     family?.IdentityRef is { } info ? surnameByInfo.GetValueOrDefault(info) : null,
                     family?.MaritalStatus,
                     p.EducationNumber is { } education ? educationByNumber.GetValueOrDefault(education) : null,
-                    addressByCard.GetValueOrDefault(p.LogicalRef));
+                    addressByCard.GetValueOrDefault(p.LogicalRef))
+                {
+                    BloodGroup = family?.IdentityRef is { } idref && bloodGroups.TryGetValue(idref, out var code) ? code : null,
+                };
             }).ToList();
 
             var occupationByNumber = occupations.GroupBy(o => (int)o.Number).ToDictionary(g => g.Key, g => g.First());

@@ -3655,6 +3655,8 @@ export interface components {
         SensitiveResponse: {
             /** @description Adres; kayitli degilse bos ("Kayitli degil"). */
             address: null | string;
+            /** @description Kan grubu (ornek "A Rh+"); kayitli degilse bos ("Kayitli degil"). Gosterilmesi ayrica ozel nitelikli veri goruntulemesi olarak kaydedilir (SYG-PERS-057). */
+            bloodGroup: null | string;
         };
         /** @description Acik oturum. Yenileme jetonu burada DEGIL, HttpOnly cerezdedir. */
         SessionResponse: {

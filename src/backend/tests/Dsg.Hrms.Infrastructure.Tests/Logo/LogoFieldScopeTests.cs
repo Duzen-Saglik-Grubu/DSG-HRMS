@@ -49,6 +49,7 @@ public sealed class LogoFieldScopeTests
         "LH_001_FAMILY.LDATA",      // fotograf (SYG-PERS-014)
         "LH_001_PERIDINF.LREF",     // baglanti
         "LH_001_PERIDINF.EXSURNAME", // onceki soyadi
+        "LH_001_PERIDINF.BLOODGROUP", // kan grubu; yalnizca Logo:SyncSpecialCategoryData aciksa sorgulanir (KR-113, SYG-PERS-005)
         "LH_001_TYPEDEF.LREF",      // baglanti
         "LH_001_TYPEDEF.TYP",       // tanim turu
         "LH_001_TYPEDEF.NR",        // tanim numarasi

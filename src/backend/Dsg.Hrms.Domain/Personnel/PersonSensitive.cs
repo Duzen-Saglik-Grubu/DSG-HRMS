@@ -13,8 +13,9 @@ namespace Dsg.Hrms.Domain.Personnel;
 /// duzeyinde denetler.
 /// </para>
 /// <para>
-/// Kaynak LOGO'dur; senkronizasyon yazar. Kan grubu (sifreli, ADR-0020) ayri bir PR'da bu
-/// tabloya eklenir.
+/// Kaynak LOGO'dur; senkronizasyon yazar. Kan grubu sifreli tutulur (ADR-0020): bu varlik
+/// yalnizca sifreli degeri tasir. Sifreleme ve cozme depo katmanindadir; uygulama katmani duz
+/// degeri senkronizasyon ve kart kayitlari uzerinden gorur.
 /// </para>
 /// </remarks>
 public sealed class PersonSensitive : Entity, IAuditable
@@ -29,6 +30,14 @@ public sealed class PersonSensitive : Entity, IAuditable
     /// <summary>Adres (LOGO iletisim turu 1). Kayitli degilse <c>null</c>.</summary>
     [PersonalData(PersonalDataKind.Unspecified)]
     public string? Address { get; private set; }
+
+    /// <summary>
+    /// Kan grubunun LOGO kodu (1–8), sifreli (<c>k&lt;n&gt;:&lt;nonce&gt;:&lt;sifreli metin&gt;</c>;
+    /// ADR-0020 §1, <c>KR-129</c>). Kayitli degilse <c>null</c>. Denetim izine degeri yazilmaz,
+    /// yalnizca degistigi gorunur.
+    /// </summary>
+    [SpecialCategoryData]
+    public string? BloodGroup { get; private set; }
 
     /// <inheritdoc />
     public DateTimeOffset CreatedAt { get; set; }
@@ -48,6 +57,12 @@ public sealed class PersonSensitive : Entity, IAuditable
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(personId);
         return new PersonSensitive { PersonId = personId };
     }
+
+    /// <summary>
+    /// Kan grubunun sifreli degerini yazar. Degisip degismedigine duz deger uzerinden cagiran
+    /// karar verir: ayni kod her sifrelemede farkli metin uretir.
+    /// </summary>
+    public void SetProtectedBloodGroup(string? protectedValue) => BloodGroup = protectedValue;
 
     /// <summary>Adresi gunceller; degistiyse <c>true</c>. Bos metin "kayitli degil" sayilir.</summary>
     public bool ApplyAddress(string? address)

@@ -54,6 +54,7 @@ services:
       Identity__CodeHashKey: ${E2E_CODE_HASH_KEY:?up.sh ile calistirin}
       Identity__JwtSigningKey: ${E2E_JWT_SIGNING_KEY:?up.sh ile calistirin}
       ParameterProtection__Key: ${E2E_PARAMETER_PROTECTION_KEY:?up.sh ile calistirin}
+      PersonalDataProtection__Keys__k1: ${E2E_PERSONAL_DATA_KEY:?up.sh ile calistirin}
       AccessControl__BootstrapAdministrators: 'e2e.yonetici@duzen.com.tr'
       Identity__PublicBaseUrl: 'http://localhost:8090'
       Notifications__DeliveryMode: Send

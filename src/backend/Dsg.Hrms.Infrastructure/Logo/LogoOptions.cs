@@ -32,6 +32,14 @@ public sealed class LogoOptions
     [Range(5, 600, ErrorMessage = "LOGO komut zaman asimi 5-600 saniye araliginda olmalidir.")]
     public int CommandTimeoutSeconds { get; init; } = 60;
 
+    /// <summary>
+    /// Ozel nitelikli veri (kan grubu) LOGO'dan okunur mu (SYG-PERS-005; ADR-0020 §6). Bir
+    /// <b>ortam yapilandirmasidir</b> (<c>Logo__SyncSpecialCategoryData</c>); Sistem Yonetimi
+    /// parametresi degildir ve ekrandan degistirilemez. Yerel gelistirmede kapali, UAT ve
+    /// uretimde acik (<c>KR-125</c>). Kapaliyken kan grubu okunmaz ve mevcut deger temizlenir.
+    /// </summary>
+    public bool SyncSpecialCategoryData { get; init; }
+
     /// <summary>Baglanti tanimli mi.</summary>
     public bool IsConfigured => !string.IsNullOrWhiteSpace(ConnectionString);
 }

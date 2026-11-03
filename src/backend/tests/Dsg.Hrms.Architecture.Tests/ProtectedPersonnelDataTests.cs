@@ -32,6 +32,8 @@ public sealed class ProtectedPersonnelDataTests
         "Dsg.Hrms.Application.Personnel.Sync.PersonnelDetailsSynchronizer",
         "Dsg.Hrms.Application.Personnel.Sync.PersonnelDetailsSnapshot",
         "Dsg.Hrms.Application.Personnel.Sync.DetailsOutcome",
+        // Kan grubu degisikligi: duz kod ve hedef satir; sifrelemeyi depo yapar (ADR-0020 §1).
+        "Dsg.Hrms.Application.Personnel.Sync.BloodGroupChange",
         "Dsg.Hrms.Infrastructure.Personnel.PersonnelSyncStore",
         // EF eslemesi.
         "Dsg.Hrms.Infrastructure.Data.Configurations.PersonSensitiveConfiguration",

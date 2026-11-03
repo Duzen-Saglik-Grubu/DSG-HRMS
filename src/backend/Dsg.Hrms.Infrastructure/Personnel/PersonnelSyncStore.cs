@@ -1,9 +1,11 @@
+using System.Globalization;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Organization;
 using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Domain.Personnel.Sync;
 using Dsg.Hrms.Infrastructure.Data;
+using Dsg.Hrms.Infrastructure.Personnel.Protection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -26,6 +28,11 @@ namespace Dsg.Hrms.Infrastructure.Personnel;
 /// basarisiz kilar ve bir sonraki periyotta (15 dk) yeniden denenir; yari
 /// uygulanmis bir fark riski yerine bu tercih edildi.
 /// </para>
+/// <para>
+/// <b>Kan grubu (ADR-0020 §1):</b> sifreleme ve cozme burada, depo katmanindadir. Uygulama
+/// katmani yalnizca duz kodu gorur (<see cref="PersonnelDetailsSnapshot.BloodGroups"/>,
+/// <see cref="DetailsOutcome.BloodGroups"/>).
+/// </para>
 /// </remarks>
 public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
 {
@@ -37,13 +44,15 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
 
     private readonly DbContextOptions<HrmsDbContext> _options;
     private readonly IDbContextFactory<HrmsDbContext> _factory;
+    private readonly PersonalDataProtector _protector;
     private HrmsDbContext? _runContext;
 
     /// <summary>Yeni ornek olusturur.</summary>
-    public PersonnelSyncStore(DbContextOptions<HrmsDbContext> options, IDbContextFactory<HrmsDbContext> factory)
+    public PersonnelSyncStore(DbContextOptions<HrmsDbContext> options, IDbContextFactory<HrmsDbContext> factory, PersonalDataProtector protector)
     {
         _options = options;
         _factory = factory;
+        _protector = protector;
     }
 
     /// <inheritdoc />
@@ -74,7 +83,7 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
             }
 
             // Sahiplik oturuma gecer; asagidaki finally blogu artik kapatmaz.
-            var session = new Session(context, transaction);
+            var session = new Session(context, transaction, _protector);
             context = null;
             transaction = null;
             return session;
@@ -119,7 +128,7 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
         }
     }
 
-    private sealed class Session(HrmsDbContext context, IDbContextTransaction firstTransaction) : IPersonnelSyncSession
+    private sealed class Session(HrmsDbContext context, IDbContextTransaction firstTransaction, PersonalDataProtector protector) : IPersonnelSyncSession
     {
         private IDbContextTransaction _transaction = firstTransaction;
 
@@ -184,15 +193,47 @@ public sealed class PersonnelSyncStore : IPersonnelSyncStore, IAsyncDisposable
             {
                 Assignments = assignments,
                 Duties = duties,
+                BloodGroups = BloodGroups(persons, sensitive),
             };
         }
 
         public void AddDetails(DetailsOutcome outcome)
         {
             ArgumentNullException.ThrowIfNull(outcome);
+
+            foreach (var change in outcome.BloodGroups)
+            {
+                change.Row.SetProtectedBloodGroup(change.Code is { } code
+                    ? protector.Protect(code.ToString(CultureInfo.InvariantCulture), ProtectedField.BloodGroup(change.PersonPublicId))
+                    : null);
+            }
+
             context.Set<PersonSensitive>().AddRange(outcome.NewSensitive);
             context.Set<Branch>().AddRange(outcome.NewBranches);
             context.Set<Department>().AddRange(outcome.NewDepartments);
+        }
+
+        /// <summary>
+        /// Kan grubu kodlarini cozer. Cozulemeyen deger (anahtar kaybi, baska satirdan kopya)
+        /// yok sayilir; LOGO'daki kod guncel anahtarla yeniden yazilir (ADR-0020 §3).
+        /// </summary>
+        private Dictionary<long, short> BloodGroups(IReadOnlyList<Person> persons, IReadOnlyList<PersonSensitive> sensitive)
+        {
+            var publicIds = persons.ToDictionary(p => p.Id, p => p.PublicId);
+            var codes = new Dictionary<long, short>();
+
+            foreach (var row in sensitive)
+            {
+                if (row.BloodGroup is { } value
+                    && publicIds.TryGetValue(row.PersonId, out var publicId)
+                    && protector.TryUnprotect(value, ProtectedField.BloodGroup(publicId)) is { } plain
+                    && short.TryParse(plain, NumberStyles.None, CultureInfo.InvariantCulture, out var code))
+                {
+                    codes[row.PersonId] = code;
+                }
+            }
+
+            return codes;
         }
 
         public async Task<PersonnelPhotoSnapshot> LoadPhotosAsync(CancellationToken cancellationToken)

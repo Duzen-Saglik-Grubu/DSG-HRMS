@@ -35,6 +35,9 @@ jobs:
       # Belge uretimi uygulamayi ayaga kaldirir; JWT anahtari zorunlu oldugu icin tasarim
       # zamani bir anahtar verilir. Hicbir ortamda gecerli degildir (ADR-0008).
       Identity__JwtSigningKey: 'b3BlbmFwaS1kZXNpZ24tdGltZS1rZXktbm90LWEtc2VjcmV0ISE='
+      # Ozel nitelikli veri anahtari da zorunludur (SYG-PERS-061); tasarim zamani degeri,
+      # hicbir ortamda gecerli degildir.
+      PersonalDataProtection__Keys__k1: 'b3BlbmFwaS1wZXJzb25hbC1kYXRhLWtleS1ub3Qtc2U='
 
     steps:
       - name: Depoyu al

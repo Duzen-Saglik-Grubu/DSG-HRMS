@@ -1939,6 +1939,10 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("address");
 
+                    b.Property<string>("BloodGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("blood_group");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("created_at");

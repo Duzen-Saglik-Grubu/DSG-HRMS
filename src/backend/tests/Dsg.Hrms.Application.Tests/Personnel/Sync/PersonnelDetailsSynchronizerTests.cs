@@ -119,6 +119,51 @@ public sealed class PersonnelDetailsSynchronizerTests
         outcome.UnitsChanged.ShouldBe(3);
     }
 
+    [Fact]
+    public void Blood_group_change_is_reported_with_the_plain_code_and_unchanged_value_is_not()
+    {
+        // SYG-PERS-005, ADR-0020: bu adim duz kodu karsilastirir; sifrelemeyi depo yapar. Adresi
+        // olmayan kisiye yalnizca kan grubu icin korumali alan satiri acilir.
+        var person = Person(1);
+        var employment = Employ(person, "00001", 10);
+
+        var created = PersonnelDetailsSynchronizer.Synchronize(Details(Profile(10) with { BloodGroup = 3 }), Snapshot([person], [employment]));
+
+        var row = created.NewSensitive.ShouldHaveSingleItem();
+        created.BloodGroups.ShouldBe([new BloodGroupChange(row, person.PublicId, 3)]);
+        created.PersonsUpdated.ShouldBe(1);
+
+        var unchanged = PersonnelDetailsSynchronizer.Synchronize(
+            Details(Profile(10) with { BloodGroup = 3 }),
+            Snapshot([person], [employment], [row]) with { BloodGroups = new Dictionary<long, short> { [person.Id] = 3 } });
+        unchanged.BloodGroups.ShouldBeEmpty();
+        unchanged.PersonsUpdated.ShouldBe(0);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData((short)0)]
+    [InlineData((short)9)]
+    public void Missing_unspecified_or_invalid_code_clears_the_stored_blood_group(short? logoCode)
+    {
+        // Ayar kapaliyken (null) mevcut deger temizlenir (SYG-PERS-005); 0 "Belirtilmemis" ve
+        // aralik disi kod saklanmaz (KR-129).
+        var person = Person(1);
+        var employment = Employ(person, "00001", 10);
+        var row = PersonSensitive.For(person.Id);
+
+        var outcome = PersonnelDetailsSynchronizer.Synchronize(
+            Details(Profile(10) with { BloodGroup = logoCode }),
+            Snapshot([person], [employment], [row]) with { BloodGroups = new Dictionary<long, short> { [person.Id] = 6 } });
+
+        outcome.BloodGroups.ShouldBe([new BloodGroupChange(row, person.PublicId, null)]);
+
+        // Hic kan grubu olmayan kiside temizlenecek bir sey yoktur ve satir acilmaz.
+        var nothing = PersonnelDetailsSynchronizer.Synchronize(Details(Profile(10) with { BloodGroup = logoCode }), Snapshot([person], [employment]));
+        nothing.BloodGroups.ShouldBeEmpty();
+        nothing.NewSensitive.ShouldBeEmpty();
+    }
+
     private static LogoProfileRecord Profile(int logoRef, short? sex = 1, string? previousSurname = null, short? marital = 2, string? education = null, string? address = null) =>
         new(logoRef, sex, previousSurname, marital, education, address);
 

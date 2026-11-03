@@ -137,6 +137,7 @@ public sealed class LogoDbContext : DbContext
             info.HasKey(i => i.LogicalRef);
             info.Property(i => i.LogicalRef).HasColumnName("LREF");
             info.Property(i => i.PreviousSurname).HasColumnName("EXSURNAME");
+            info.Property(i => i.BloodGroup).HasColumnName("BLOODGROUP");
         });
 
         modelBuilder.Entity<LogoTypeDefinition>(definition =>
@@ -288,6 +289,12 @@ public sealed class LogoIdentityInfo
 
     /// <summary>Onceki soyadi.</summary>
     public string? PreviousSurname { get; init; }
+
+    /// <summary>
+    /// Kan grubu kodu (0 belirtilmemis, 1–8; <c>KR-129</c>). Ozel nitelikli veridir; yalnizca
+    /// <see cref="LogoOptions.SyncSpecialCategoryData"/> aciksa sorguya girer.
+    /// </summary>
+    public short? BloodGroup { get; init; }
 }
 
 /// <summary>LOGO tanimi (<c>LH_001_TYPEDEF</c>).</summary>

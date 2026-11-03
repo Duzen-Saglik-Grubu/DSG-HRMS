@@ -7,6 +7,7 @@ using Dsg.Hrms.Domain.Organization;
 using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Domain.Reference;
 using Dsg.Hrms.Infrastructure.Data;
+using Dsg.Hrms.Infrastructure.Personnel.Protection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dsg.Hrms.Infrastructure.Personnel;
@@ -15,7 +16,7 @@ namespace Dsg.Hrms.Infrastructure.Personnel;
 /// Kisi okumalarinin tek giris noktasi (ADR-0019 §1, SYG-PERS-050). Kapsam suzgeci her
 /// sorguya burada eklenir.
 /// </summary>
-public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters parameters, IDateTimeProvider clock) : IPersonnelQuery
+public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters parameters, IDateTimeProvider clock, PersonalDataProtector protector) : IPersonnelQuery
 {
     /// <inheritdoc />
     public async Task<PersonRecord?> FindAsync(Guid personId, PersonnelViewer viewer, CancellationToken cancellationToken)
@@ -24,7 +25,7 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
 
         // Gorunur kalma suresi dolan ayrilan kisinin karti herkes icin 404'tur (SYG-PERS-028).
         var persons = await VisibleAsync(InScope(viewer), cancellationToken).ConfigureAwait(false);
-        return await FirstAsync(persons.Where(person => person.PublicId == personId), cancellationToken).ConfigureAwait(false);
+        return await FirstAsync(persons.Where(person => person.PublicId == personId), viewer, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -373,7 +374,7 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
         ArgumentNullException.ThrowIfNull(viewer);
 
         return viewer.PersonId is { } own
-            ? FirstAsync(context.Set<Person>().Where(person => person.Id == own), cancellationToken)
+            ? FirstAsync(context.Set<Person>().Where(person => person.Id == own), viewer, cancellationToken)
             : Task.FromResult<PersonRecord?>(null);
     }
 
@@ -392,10 +393,21 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
         };
     }
 
-    private async Task<PersonRecord?> FirstAsync(IQueryable<Person> query, CancellationToken cancellationToken)
+    private async Task<PersonRecord?> FirstAsync(IQueryable<Person> query, PersonnelViewer viewer, CancellationToken cancellationToken)
     {
         var record = await ReadAsync(query, cancellationToken).ConfigureAwait(false);
-        if (record is null || record.Employments.Count == 0)
+        if (record is null)
+        {
+            return null;
+        }
+
+        // Kan grubu yalnizca gorebilen bakista cozulur; gormeyen icin sifreli deger hic okunmaz.
+        if (PersonFieldVisibility.CanSeeSensitive(viewer, record.Id))
+        {
+            record = record with { BloodGroup = await BloodGroupAsync(record, cancellationToken).ConfigureAwait(false) };
+        }
+
+        if (record.Employments.Count == 0)
         {
             return record;
         }
@@ -459,6 +471,33 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
             .ToDictionary(
                 g => g.Key,
                 g => g.OrderByDescending(r => r.Record.ValidTo is null).ThenByDescending(r => r.Record.ValidFrom).First().Record);
+    }
+
+    /// <summary>
+    /// Kan grubunu cozer ve referans veriden adini bulur (ADR-0020 §1, ADR-0022 §1). Cozulemeyen
+    /// deger (anahtar kaybi, baska satirdan kopya) "kayitli degil" gibi davranir; bir sonraki
+    /// senkronizasyon LOGO'daki kodu yeniden yazar.
+    /// </summary>
+    private async Task<string?> BloodGroupAsync(PersonRecord record, CancellationToken cancellationToken)
+    {
+        var value = await context.Set<PersonSensitive>()
+            .AsNoTracking()
+            .Where(s => s.PersonId == record.Id)
+            .Select(s => s.BloodGroup)
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        if (value is null || protector.TryUnprotect(value, ProtectedField.BloodGroup(record.PublicId)) is not { } code)
+        {
+            return null;
+        }
+
+        return await context.Set<ReferenceDefinition>()
+            .AsNoTracking()
+            .Where(d => d.Type == ReferenceType.BloodGroup && d.Code == code)
+            .Select(d => d.Name)
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 
     private async Task<PersonRecord?> ReadAsync(IQueryable<Person> query, CancellationToken cancellationToken) =>

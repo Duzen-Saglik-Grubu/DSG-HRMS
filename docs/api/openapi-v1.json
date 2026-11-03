@@ -4749,7 +4749,8 @@
       },
       "SensitiveResponse": {
         "required": [
-          "address"
+          "address",
+          "bloodGroup"
         ],
         "type": "object",
         "properties": {
@@ -4759,6 +4760,13 @@
               "string"
             ],
             "description": "Adres; kayitli degilse bos (\"Kayitli degil\")."
+          },
+          "bloodGroup": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Kan grubu (ornek \"A Rh+\"); kayitli degilse bos (\"Kayitli degil\"). Gosterilmesi ayrica ozel nitelikli veri goruntulemesi olarak kaydedilir (SYG-PERS-057)."
           }
         },
         "description": "Kartin korumali alanlari (ADR-0019 §2)."

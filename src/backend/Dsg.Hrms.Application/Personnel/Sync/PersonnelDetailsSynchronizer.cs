@@ -14,6 +14,12 @@ namespace Dsg.Hrms.Application.Personnel.Sync;
 /// kapanmasi (SYG-KMLK-078) bu adimdan etkilenmez.
 /// </para>
 /// <para>
+/// <b>Kan grubu</b> (SYG-PERS-005, ADR-0020): bu adim yalnizca duz kodu karsilastirir ve
+/// degisenleri <see cref="DetailsOutcome.BloodGroups"/> ile bildirir; sifreleme ve cozme depo
+/// katmanindadir. LOGO'da 1–8 disindaki kod (0 "Belirtilmemis") saklanmaz. Ozel nitelikli
+/// senkronizasyon kapaliyken LOGO kodu gelmez ve mevcut deger temizlenir.
+/// </para>
+/// <para>
 /// Bir kisinin birden fazla karti olabilir. Genel bilgiler ve adres kisinin <b>esas
 /// istihdaminin</b> kartindan alinir (<see cref="Employment.Primary"/>): liste kartinda
 /// gorunen sicille ayni kural (<c>KR-126</c>).
@@ -76,6 +82,7 @@ public static class PersonnelDetailsSynchronizer
         var employmentsByPerson = snapshot.Employments.ToLookup(e => e.PersonId);
         var sensitiveByPerson = snapshot.Sensitive.ToDictionary(s => s.PersonId);
         var newSensitive = new List<PersonSensitive>();
+        var bloodGroups = new List<BloodGroupChange>();
         var personsUpdated = 0;
 
         foreach (var person in snapshot.Persons)
@@ -88,11 +95,15 @@ public static class PersonnelDetailsSynchronizer
 
             var changed = person.ApplyProfile(ToProfile(profile));
 
+            var bloodGroup = profile.BloodGroup is >= BloodGroupChange.MinCode and <= BloodGroupChange.MaxCode ? profile.BloodGroup : null;
+            short? current = snapshot.BloodGroups.TryGetValue(person.Id, out var stored) ? stored : null;
+            var bloodGroupChanged = current != bloodGroup;
+
             if (sensitiveByPerson.TryGetValue(person.Id, out var sensitive))
             {
                 changed |= sensitive.ApplyAddress(profile.Address);
             }
-            else if (!string.IsNullOrWhiteSpace(profile.Address))
+            else if (!string.IsNullOrWhiteSpace(profile.Address) || bloodGroup is not null)
             {
                 sensitive = PersonSensitive.For(person.Id);
                 sensitive.ApplyAddress(profile.Address);
@@ -100,10 +111,19 @@ public static class PersonnelDetailsSynchronizer
                 changed = true;
             }
 
+            if (bloodGroupChanged && sensitive is not null)
+            {
+                bloodGroups.Add(new BloodGroupChange(sensitive, person.PublicId, bloodGroup));
+                changed = true;
+            }
+
             personsUpdated += changed ? 1 : 0;
         }
 
-        return new DetailsOutcome(newSensitive, newBranches, newDepartments, personsUpdated, unitsChanged + newBranches.Count + newDepartments.Count);
+        return new DetailsOutcome(newSensitive, newBranches, newDepartments, personsUpdated, unitsChanged + newBranches.Count + newDepartments.Count)
+        {
+            BloodGroups = bloodGroups,
+        };
     }
 
     /// <summary>
@@ -207,6 +227,12 @@ public sealed record PersonnelDetailsSnapshot(
 
     /// <summary>Silinmemis gorev kayitlari (izlenen).</summary>
     public IReadOnlyList<EmploymentDuty> Duties { get; init; } = [];
+
+    /// <summary>
+    /// Kisilerin mevcut kan grubu kodlari, depo katmaninda cozulmus (ADR-0020). Kayitli olmayan
+    /// veya cozulemeyen deger listede yoktur.
+    /// </summary>
+    public IReadOnlyDictionary<long, short> BloodGroups { get; init; } = new Dictionary<long, short>();
 }
 
 /// <summary>T1 adiminin sonucu.</summary>
@@ -220,4 +246,21 @@ public sealed record DetailsOutcome(
     IReadOnlyList<Branch> NewBranches,
     IReadOnlyList<Department> NewDepartments,
     int PersonsUpdated,
-    int UnitsChanged);
+    int UnitsChanged)
+{
+    /// <summary>Kan grubu degisen kisiler; depo yeni degeri sifreleyerek yazar.</summary>
+    public IReadOnlyList<BloodGroupChange> BloodGroups { get; init; } = [];
+}
+
+/// <summary>Bir kisinin kan grubunun yeni degeri (SYG-PERS-005, ADR-0020).</summary>
+/// <param name="Row">Kisinin korumali alan satiri (izlenen veya yeni).</param>
+/// <param name="PersonPublicId">Kisinin dis kimligi; sifrelemeye baglanir (AAD).</param>
+/// <param name="Code">Yeni LOGO kodu (1–8); temizlenecekse <c>null</c>.</param>
+public sealed record BloodGroupChange(PersonSensitive Row, Guid PersonPublicId, short? Code)
+{
+    /// <summary>Gecerli en kucuk LOGO kodu (0 Rh+).</summary>
+    public const short MinCode = 1;
+
+    /// <summary>Gecerli en buyuk LOGO kodu (AB Rh-).</summary>
+    public const short MaxCode = 8;
+}

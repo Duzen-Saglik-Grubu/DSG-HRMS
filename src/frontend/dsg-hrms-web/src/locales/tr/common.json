@@ -524,6 +524,7 @@
         "age": "Yaş",
         "education": "Eğitim",
         "maritalStatus": "Medeni hâl",
+        "bloodGroup": "Kan grubu",
         "email": "E-posta",
         "phone": "Telefon",
         "address": "Adres",

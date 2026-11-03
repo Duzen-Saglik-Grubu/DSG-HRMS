@@ -130,7 +130,15 @@ public sealed record LogoProfileRecord(
     string? PreviousSurname,
     short? MaritalStatus,
     string? EducationName,
-    string? Address);
+    string? Address)
+{
+    /// <summary>
+    /// Kan grubu kodu (<c>LH_001_PERIDINF.BLOODGROUP</c>; 0 belirtilmemis, 1–8, <c>KR-129</c>).
+    /// Ozel nitelikli senkronizasyon kapaliyken (<c>Logo:SyncSpecialCategoryData</c>) LOGO'dan
+    /// okunmaz ve hep <c>null</c>'dir (SYG-PERS-005).
+    /// </summary>
+    public short? BloodGroup { get; init; }
+}
 
 /// <summary>Bir kartin fotograf ozeti.</summary>
 /// <param name="LogoRef">Kartin <c>LREF</c>'i.</param>

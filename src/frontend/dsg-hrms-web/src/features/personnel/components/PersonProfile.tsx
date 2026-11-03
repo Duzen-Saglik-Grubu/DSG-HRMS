@@ -202,6 +202,10 @@ function GeneralInfo({ person }: { person: PersonCard }) {
             : null
         }
       />
+      {/* Kan grubu yalnizca gorme hakki olana gelir (SYG-PERS-034, 052); digerinde alan yoktur. */}
+      {person.sensitive ? (
+        <Field label={field('bloodGroup')} value={person.sensitive.bloodGroup} />
+      ) : null}
     </Fields>
   );
 }

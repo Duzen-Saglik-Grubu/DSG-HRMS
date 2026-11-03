@@ -12,6 +12,7 @@ using Dsg.Hrms.Infrastructure.Data;
 using Dsg.Hrms.Infrastructure.Data.Interceptors;
 using Dsg.Hrms.Infrastructure.Logo;
 using Dsg.Hrms.Infrastructure.Personnel;
+using Dsg.Hrms.Infrastructure.Personnel.Protection;
 using Dsg.Hrms.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,6 +53,11 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ILogoPersonnelSource _source = Substitute.For<ILogoPersonnelSource>();
+
+    private readonly PersonalDataProtector _protector = new(new PersonalDataProtectionOptions
+    {
+        Keys = new() { ["k1"] = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)) },
+    });
 
     private DbContextOptions<HrmsDbContext> _options = null!;
     private SystemParameters _parameters = null!;
@@ -95,7 +101,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         await _container.DisposeAsync();
     }
 
-    private PersonnelSyncStore CreateStore() => new(_options, new Factory(_options));
+    private PersonnelSyncStore CreateStore() => new(_options, new Factory(_options), _protector);
 
     private async Task<PersonnelSyncResult> SyncAsync(params LogoPersonnelRecord[] cards)
     {
@@ -173,6 +179,100 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
 
         (await context.Set<Domain.Organization.Branch>().SingleAsync()).City.ShouldBe("Ankara");
         (await context.Set<Domain.Organization.Department>().SingleAsync()).Name.ShouldBe("Bilgi Islem");
+    }
+
+    [Fact]
+    public async Task Blood_group_is_stored_encrypted_bound_to_its_person_and_cleared_when_not_provided()
+    {
+        // SYG-PERS-060 (ADR-0020 §1): veritabaninda duz metin yok; ayni deger iki kiside farkli
+        // sifreli metin uretir; baska kisinin satirina kopyalanan deger cozulemez.
+        // SYG-PERS-005: ozel nitelikli senkronizasyon kapaliyken kod gelmez ve deger temizlenir.
+        // SYG-PERS-066: denetim izinde deger yok, yalnizca degistigi var. Veriler SENTETIKTIR.
+        LogoPersonnelDetails Details(short? first, short? second) => new(
+            [
+                new LogoProfileRecord(1, Sex: 2, PreviousSurname: null, MaritalStatus: null, EducationName: null, Address: null) { BloodGroup = first },
+                new LogoProfileRecord(3, Sex: 1, PreviousSurname: null, MaritalStatus: null, EducationName: null, Address: null) { BloodGroup = second },
+            ],
+            [],
+            [],
+            []);
+        LogoPersonnelRecord[] cards = [Card("00001", NationalId(1), logoRef: 1), Card("00003", NationalId(2), logoRef: 3)];
+
+        _source.GetDetailsAsync(Arg.Any<CancellationToken>()).Returns(Details(3, 3));
+        await SyncAsync(cards);
+
+        await using (var context = Read())
+        {
+            var rows = await (
+                from s in context.Set<PersonSensitive>()
+                join person in context.Set<Person>() on s.PersonId equals person.Id
+                orderby person.NationalId
+                select new { s.BloodGroup, person.PublicId, s.Id })
+                .ToListAsync();
+
+            rows.Count.ShouldBe(2);
+            rows.ShouldAllBe(r => r.BloodGroup!.StartsWith("k1:"));
+            rows[0].BloodGroup.ShouldNotBe(rows[1].BloodGroup);
+            _protector.TryUnprotect(rows[0].BloodGroup!, ProtectedField.BloodGroup(rows[0].PublicId)).ShouldBe("3");
+            _protector.TryUnprotect(rows[1].BloodGroup!, ProtectedField.BloodGroup(rows[1].PublicId)).ShouldBe("3");
+
+            // Birinci kisinin degeri ikinci kisinin satirina kopyalanirsa cozulemez.
+            _protector.TryUnprotect(rows[0].BloodGroup!, ProtectedField.BloodGroup(rows[1].PublicId)).ShouldBeNull();
+
+            var changes = string.Join('\n', await context.ChangeLog
+                .Where(e => e.EntityName == nameof(PersonSensitive))
+                .Select(e => e.Changes)
+                .ToListAsync());
+            changes.ShouldContain("BloodGroup");
+            changes.ShouldNotContain(rows[0].BloodGroup!);
+            changes.ShouldNotContain("k1:");
+        }
+
+        // Degismeyen deger yeniden sifrelenmez: denetim izine yeni kayit dusmez.
+        var before = await CountChangesAsync();
+        await SyncAsync(cards);
+        (await CountChangesAsync()).ShouldBe(before);
+
+        // Ayar kapali (kod gelmiyor) veya LOGO'da silinmis: deger temizlenir.
+        _source.GetDetailsAsync(Arg.Any<CancellationToken>()).Returns(Details(null, 5));
+        await SyncAsync(cards);
+
+        await using (var context = Read())
+        {
+            var values = await context.Set<PersonSensitive>().Join(context.Set<Person>(), s => s.PersonId, p => p.Id, (s, p) => new { p.NationalId, s.BloodGroup, p.PublicId }).ToListAsync();
+            values.Single(v => v.NationalId == NationalId(1)).BloodGroup.ShouldBeNull();
+            var second = values.Single(v => v.NationalId == NationalId(2));
+            _protector.TryUnprotect(second.BloodGroup!, ProtectedField.BloodGroup(second.PublicId)).ShouldBe("5");
+        }
+
+        async Task<int> CountChangesAsync()
+        {
+            await using var context = Read();
+            return await context.ChangeLog.CountAsync(e => e.EntityName == nameof(PersonSensitive));
+        }
+    }
+
+    [Fact]
+    public async Task Undecryptable_blood_group_is_rewritten_from_logo_with_the_current_key()
+    {
+        // ADR-0020 §3: anahtar kaybinda veya bozuk degerde alan LOGO'dan yeniden yazilir.
+        _source.GetDetailsAsync(Arg.Any<CancellationToken>()).Returns(new LogoPersonnelDetails(
+            [new LogoProfileRecord(1, Sex: 2, PreviousSurname: null, MaritalStatus: null, EducationName: null, Address: null) { BloodGroup = 4 }],
+            [],
+            [],
+            []));
+        await SyncAsync(Card("00001", NationalId(1), logoRef: 1));
+
+        await using (var context = Read())
+        {
+            await context.Database.ExecuteSqlRawAsync("UPDATE personnel.person_sensitive SET blood_group = 'k1:bozuk:deger'");
+        }
+
+        await SyncAsync(Card("00001", NationalId(1), logoRef: 1));
+
+        await using var read = Read();
+        var row = await read.Set<PersonSensitive>().Join(read.Set<Person>(), s => s.PersonId, p => p.Id, (s, p) => new { s.BloodGroup, p.PublicId }).SingleAsync();
+        _protector.TryUnprotect(row.BloodGroup!, ProtectedField.BloodGroup(row.PublicId)).ShouldBe("4");
     }
 
     [Fact]
