@@ -1,5 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useNavigate } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { permissions } from '@/shared/auth/permissions';
 import { renderWithProviders } from '@/test/render';
@@ -156,6 +157,28 @@ describe('PersonListPage', () => {
     await user.type(screen.getByLabelText('Ad, soyad veya sicil'), 'isik');
 
     await waitFor(() => expect(lastQuery().get('q')).toBe('isik'));
+  });
+
+  it('ust cubuktan gelen arama korunur ve kutuya yazilir', async () => {
+    // Ust cubuk ayni sayfadayken adresi degistirir; sayfa eski terimi geri yazmamali.
+    function TopBarSearch() {
+      const navigate = useNavigate();
+      return <button onClick={() => void navigate('/?q=kaya')}>Üst çubukta ara</button>;
+    }
+    const user = userEvent.setup();
+    renderWithProviders(
+      <>
+        <TopBarSearch />
+        <PersonListPage />
+      </>,
+    );
+    await screen.findByRole('article', { name: 'AYŞE DEMİR' });
+
+    await user.click(screen.getByRole('button', { name: 'Üst çubukta ara' }));
+
+    await waitFor(() => expect(screen.getByLabelText('Ad, soyad veya sicil')).toHaveValue('kaya'));
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    expect(lastQuery().get('q')).toBe('kaya');
   });
 
   it('secilen suzgec etiket olarak gorunur; Temizle hepsini kaldirir', async () => {

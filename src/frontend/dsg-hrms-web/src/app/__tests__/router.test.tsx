@@ -38,7 +38,7 @@ describe('uygulama kabugu', () => {
     renderAt('/');
 
     await waitFor(() => {
-      expect(screen.getByText('DSG-HRMS')).toBeInTheDocument();
+      expect(screen.getByText('İnsan Kaynakları Yönetim Sistemi')).toBeInTheDocument();
     });
 
     expect(screen.getByText('Düzen Sağlık Grubu')).toBeInTheDocument();

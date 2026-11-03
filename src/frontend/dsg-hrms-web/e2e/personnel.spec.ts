@@ -31,6 +31,13 @@ test('1. yonetici: liste kart izgarasiyla acilir, arar ve tabloya gecer (SYG-PER
       .getByRole('img', { name: 'Yusuf Yonetici fotoğrafı' }),
   ).toHaveText('YY');
 
+  // Ust cubuktaki arama liste acikken de suzer ve suzgec geri alinmaz (#322).
+  await page.getByRole('search').getByRole('textbox').fill('davetli');
+  await page.getByRole('search').getByRole('textbox').press('Enter');
+  await expect(page.getByLabel(/Ad, soyad, sicil/)).toHaveValue('davetli');
+  await page.waitForTimeout(600);
+  await expect(page.getByRole('article')).toHaveCount(1);
+
   // Turkce karakterden bagimsiz, yazma durunca aranir.
   await page.getByLabel(/Ad, soyad, sicil/).fill('davetlı');
   await expect(page.getByRole('article')).toHaveCount(1);

@@ -1,5 +1,4 @@
 import { Box, Card, CardContent, Chip, Stack, Typography } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import type { PersonListItem } from '../api/personsApi';
 import { joinParts } from '../display';
@@ -25,13 +24,12 @@ export function PersonCard({ person }: { person: PersonListItem }) {
       aria-label={name}
       sx={(theme) => ({
         height: '100%',
-        borderColor: 'transparent',
         transition: theme.transitions.create(['box-shadow', 'transform', 'border-color'], {
           duration: 150,
         }),
         '&:hover': {
           boxShadow: theme.palette.surface.shadowHover,
-          borderColor: alpha(theme.palette.surface.accent, 0.3),
+          borderColor: theme.palette.primary.light,
           transform: 'translateY(-2px)',
         },
         '@media (prefers-reduced-motion: reduce)': { '&:hover': { transform: 'none' } },
@@ -41,14 +39,10 @@ export function PersonCard({ person }: { person: PersonListItem }) {
         <Stack spacing={1} sx={{ alignItems: 'center', textAlign: 'center' }}>
           <Box
             sx={{
-              position: 'relative',
               p: '3px',
               borderRadius: '50%',
               border: 2,
-              borderColor: (theme) =>
-                person.isActive
-                  ? alpha(theme.palette.surface.accent, 0.45)
-                  : theme.palette.warning.light,
+              borderColor: person.isActive ? 'primary.light' : 'warning.light',
             }}
           >
             <PersonAvatar
@@ -58,23 +52,6 @@ export function PersonCard({ person }: { person: PersonListItem }) {
               lastName={person.lastName}
               size={80}
             />
-            {/* Aktiflik noktasi susleme amaclidir: ayrilan kiside "Ayrildi" etiketi metin olarak var. */}
-            {person.isActive ? (
-              <Box
-                aria-hidden
-                sx={{
-                  position: 'absolute',
-                  top: 4,
-                  right: 4,
-                  width: 14,
-                  height: 14,
-                  borderRadius: '50%',
-                  bgcolor: 'success.light',
-                  border: 2,
-                  borderColor: 'background.paper',
-                }}
-              />
-            ) : null}
           </Box>
           <Box sx={{ width: '100%', minWidth: 0 }}>
             <Typography

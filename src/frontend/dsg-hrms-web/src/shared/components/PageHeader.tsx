@@ -40,7 +40,7 @@ export function PageHeader({
   headingLevel = 'h2',
 }: PageHeaderProps) {
   return (
-    <Box component="header" sx={{ mb: 3 }}>
+    <Box component="header" sx={{ mb: 2.5 }}>
       {breadcrumbs && breadcrumbs.length > 0 ? (
         <Breadcrumbs sx={{ mb: 1 }} aria-label="sayfa yolu">
           {breadcrumbs.map((item) =>
@@ -69,8 +69,8 @@ export function PageHeader({
           overflow: 'hidden',
           isolation: 'isolate',
           px: { xs: 2.5, sm: 3.5 },
-          py: { xs: 2.5, sm: 3 },
-          borderRadius: 4,
+          py: { xs: 1.75, sm: 2 },
+          borderRadius: 3,
           border: `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
           background: `linear-gradient(110deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.surface.accent, 0.07)} 50%, ${alpha(theme.palette.surface.accent, 0.16)} 100%)`,
           boxShadow: theme.palette.surface.shadow,
@@ -83,23 +83,23 @@ export function PageHeader({
           spacing={2}
           sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' } }}
         >
-          <Stack direction="row" spacing={2.5} sx={{ alignItems: 'center', minWidth: 0 }}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center', minWidth: 0 }}>
             {Icon ? (
               <Box
                 aria-hidden
                 sx={(theme) => ({
                   display: { xs: 'none', sm: 'grid' },
                   placeItems: 'center',
-                  width: 64,
-                  height: 64,
+                  width: 48,
+                  height: 48,
                   flexShrink: 0,
                   borderRadius: '50%',
                   color: 'primary.contrastText',
                   bgcolor: 'primary.main',
-                  boxShadow: `0 0 0 6px ${alpha(theme.palette.primary.main, 0.08)}, 0 10px 24px -10px ${alpha(theme.palette.primary.main, 0.7)}`,
+                  boxShadow: `0 0 0 5px ${alpha(theme.palette.primary.main, 0.08)}, 0 8px 20px -10px ${alpha(theme.palette.primary.main, 0.7)}`,
                 })}
               >
-                <Icon />
+                <Icon fontSize="small" />
               </Box>
             ) : null}
 
@@ -115,7 +115,7 @@ export function PageHeader({
               </Typography>
 
               {description ? (
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
                   {description}
                 </Typography>
               ) : null}

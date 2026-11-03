@@ -137,7 +137,14 @@ export function AppLayout() {
         <TopBar onOpenMenu={desktop ? undefined : () => setMobileOpen(true)} />
         <Box
           component="main"
-          sx={{ flexGrow: 1, px: { xs: 2, sm: 3, lg: 4 }, py: 3, maxWidth: 1600, width: '100%' }}
+          sx={{
+            flexGrow: 1,
+            px: { xs: 2, sm: 3, lg: 4 },
+            pt: 1,
+            pb: 3,
+            maxWidth: 1600,
+            width: '100%',
+          }}
         >
           <Outlet />
         </Box>
@@ -253,11 +260,11 @@ function Brand({ mini, onToggle }: { mini: boolean; onToggle: (() => void) | und
           </Box>
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography
-              variant="subtitle1"
+              variant="subtitle2"
               component="p"
-              sx={{ fontWeight: 800, lineHeight: 1.2, letterSpacing: '0.02em' }}
+              sx={{ fontWeight: 700, lineHeight: 1.25 }}
             >
-              {t('app.name')}
+              {t('app.description')}
             </Typography>
             <Typography
               variant="caption"
@@ -533,7 +540,7 @@ function TopBar({ onOpenMenu }: { onOpenMenu: (() => void) | undefined }) {
         alignItems: 'center',
         gap: 2,
         px: { xs: 2, sm: 3, lg: 4 },
-        height: 76,
+        height: 64,
         // Zeminle butunlesik; kaydirilan icerik altinda hafifce bulaniklasir.
         bgcolor: (theme) => alpha(theme.palette.background.default, 0.86),
         backdropFilter: 'blur(8px)',

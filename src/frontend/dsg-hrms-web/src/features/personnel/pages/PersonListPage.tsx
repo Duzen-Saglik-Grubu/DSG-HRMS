@@ -83,7 +83,17 @@ export function PersonListPage() {
   // Karttan geri donuldugunde liste ayni suzgec, sayfa ve gorunumle acilir.
   const cardState = { listSearch: useLocation().search };
   const [panelOpen, setPanelOpen] = useState(false);
-  const [term, setTerm] = useState(() => params.get('q') ?? '');
+  const urlTerm = params.get('q') ?? '';
+  const [term, setTerm] = useState(urlTerm);
+  // Adres disaridan degisirse (ust cubuktaki arama, geri tusu) kutu adresi izler. Aksi hâlde
+  // asagidaki etki eski terimi adrese geri yazar ve arama kaybolur.
+  const [seenUrlTerm, setSeenUrlTerm] = useState(urlTerm);
+  if (urlTerm !== seenUrlTerm) {
+    setSeenUrlTerm(urlTerm);
+    if (urlTerm !== term.trim()) {
+      setTerm(urlTerm);
+    }
+  }
 
   // Yazma durunca aranir; her tusta istek gitmez. Yeni arama ilk sayfadan baslar.
   useEffect(() => {
