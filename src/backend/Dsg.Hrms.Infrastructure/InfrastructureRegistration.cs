@@ -1,5 +1,6 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
+using Dsg.Hrms.Application.Common.Reports;
 using Dsg.Hrms.Application.Identity.Accounts;
 using Dsg.Hrms.Application.Identity.Authorization;
 using Dsg.Hrms.Application.Identity.Invitations;
@@ -13,6 +14,7 @@ using Dsg.Hrms.Application.Personnel.Access;
 using Dsg.Hrms.Application.Personnel.Cards;
 using Dsg.Hrms.Application.Personnel.Corrections;
 using Dsg.Hrms.Application.Personnel.Duties;
+using Dsg.Hrms.Application.Personnel.Export;
 using Dsg.Hrms.Application.Personnel.Listing;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Application.Reference;
@@ -28,6 +30,7 @@ using Dsg.Hrms.Infrastructure.Notifications;
 using Dsg.Hrms.Infrastructure.Personnel;
 using Dsg.Hrms.Infrastructure.Personnel.Protection;
 using Dsg.Hrms.Infrastructure.Reference;
+using Dsg.Hrms.Infrastructure.Reports;
 using Dsg.Hrms.Infrastructure.Settings;
 using Dsg.Hrms.Infrastructure.Time;
 using Microsoft.EntityFrameworkCore;
@@ -171,6 +174,11 @@ public static class InfrastructureRegistration
         services.AddScoped<PersonCardService>();
         services.AddScoped<PersonListService>();
         services.AddScoped<IPersonFilterOptionsQuery, PersonFilterOptionsQuery>();
+        services.AddScoped<PersonExportService>();
+
+        // Dis aktarma yazicilari (ADR-0014; KR-131): Excel ClosedXML, PDF SkiaSharp.
+        services.AddSingleton<IReportWriter, ExcelReportWriter>();
+        services.AddSingleton<IReportWriter, PdfReportWriter>();
 
         // Gorev girisi (SYG-PERS-042).
         services.AddScoped<IDutyStore, DutyStore>();

@@ -34,34 +34,10 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
         ArgumentNullException.ThrowIfNull(viewer);
         ArgumentNullException.ThrowIfNull(criteria);
 
-        var persons = await VisibleAsync(InScope(viewer), cancellationToken).ConfigureAwait(false);
-
-        persons = criteria.Status switch
-        {
-            EmploymentStatusFilter.Active => persons.Where(p => p.Employments.Any(e => e.IsActive)),
-            EmploymentStatusFilter.Terminated => persons.Where(p => !p.Employments.Any(e => e.IsActive)),
-            _ => persons,
-        };
-
-        if (criteria.Search is { } term)
-        {
-            persons = Search(persons, term, PersonFieldVisibility.CanSearchByNationalId(viewer));
-        }
-
-        persons = ApplyFilters(persons, criteria.Filters);
-
+        var persons = await MatchingAsync(viewer, criteria, cancellationToken).ConfigureAwait(false);
         var total = await persons.CountAsync(cancellationToken).ConfigureAwait(false);
 
-        var ordered = (criteria.Sort, criteria.Descending) switch
-        {
-            (PersonSort.LastName, false) => persons.OrderBy(p => p.LastName).ThenBy(p => p.FirstName),
-            (PersonSort.LastName, true) => persons.OrderByDescending(p => p.LastName).ThenByDescending(p => p.FirstName),
-            (_, true) => persons.OrderByDescending(p => p.FirstName).ThenByDescending(p => p.LastName),
-            _ => persons.OrderBy(p => p.FirstName).ThenBy(p => p.LastName),
-        };
-
-        var page = await ordered
-            .ThenBy(p => p.Id)
+        var page = await Ordered(persons, criteria)
             .Skip(criteria.Page.Skip)
             .Take(criteria.Page.PageSize)
             .Select(p => new { p.Id, p.PublicId, p.FirstName, p.LastName })
@@ -117,6 +93,149 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
 
         return new PagedResult<PersonListItem>(items, Math.Max(1, criteria.Page.Page), criteria.Page.PageSize, total);
     }
+
+    /// <inheritdoc />
+    public async Task<PersonExportResult> ExportAsync(PersonnelViewer viewer, PersonListCriteria criteria, PersonExportNeeds needs, int limit, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(viewer);
+        ArgumentNullException.ThrowIfNull(criteria);
+        ArgumentNullException.ThrowIfNull(needs);
+
+        var persons = await MatchingAsync(viewer, criteria, cancellationToken).ConfigureAwait(false);
+        var total = await persons.CountAsync(cancellationToken).ConfigureAwait(false);
+        if (total > limit)
+        {
+            return new PersonExportResult(total, []);
+        }
+
+        var people = await Ordered(persons, criteria)
+            .Select(p => new
+            {
+                p.Id,
+                p.PublicId,
+                p.FirstName,
+                p.LastName,
+                p.NationalId,
+                p.BirthDate,
+                p.Email,
+                p.MobilePhone,
+                p.Gender,
+                p.PreviousSurname,
+                p.MaritalStatus,
+                p.EducationName,
+            })
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        long[] personIds = [.. people.Select(p => p.Id)];
+        var employments = (await context.Set<Employment>()
+            .AsNoTracking()
+            .Include(e => e.Company)
+            .Where(e => personIds.Contains(e.PersonId))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false)).ToLookup(e => e.PersonId);
+
+        var primaries = people
+            .Select(p => (p.Id, Primary: Employment.Primary(employments[p.Id])))
+            .Where(x => x.Primary is not null)
+            .ToDictionary(x => x.Id, x => x.Primary!);
+        long[] primaryIds = [.. primaries.Values.Select(e => e.Id)];
+        var assignments = await CurrentAssignmentsAsync(primaryIds, cancellationToken).ConfigureAwait(false);
+        var duties = await CurrentDutiesAsync(primaryIds, cancellationToken).ConfigureAwait(false);
+
+        var sensitive = needs.Address || needs.BloodGroup
+            ? await context.Set<PersonSensitive>()
+                .AsNoTracking()
+                .Where(s => personIds.Contains(s.PersonId))
+                .Select(s => new SensitiveValues(s.PersonId, s.Address, s.BloodGroup))
+                .ToDictionaryAsync(s => s.PersonId, cancellationToken)
+                .ConfigureAwait(false)
+            : [];
+        var bloodGroupNames = needs.BloodGroup
+            ? await context.Set<ReferenceDefinition>()
+                .AsNoTracking()
+                .Where(d => d.Type == ReferenceType.BloodGroup)
+                .ToDictionaryAsync(d => d.Code, d => d.Name, StringComparer.Ordinal, cancellationToken)
+                .ConfigureAwait(false)
+            : [];
+        var photos = needs.Photo
+            ? await context.Set<PersonPhoto>()
+                .AsNoTracking()
+                .Where(photo => personIds.Contains(photo.PersonId))
+                .ToDictionaryAsync(photo => photo.PersonId, photo => photo.Content, cancellationToken)
+                .ConfigureAwait(false)
+            : [];
+
+        var rows = people.Select(p =>
+        {
+            List<EmploymentRecord> own = [.. employments[p.Id]
+                .Select(e => new EmploymentRecord(e.Id, e.RegistryCode, e.Company.Name, e.HireDate, e.TerminationDate, e.IsActive))];
+            var primary = primaries.GetValueOrDefault(p.Id) is { } entity
+                ? own.Single(e => e.Id == entity.Id) with
+                {
+                    Current = assignments.GetValueOrDefault(entity.Id),
+                    CurrentDuty = duties.GetValueOrDefault(entity.Id),
+                }
+                : null;
+            var values = sensitive.GetValueOrDefault(p.Id);
+
+            // Cozulemeyen kan grubu (anahtar kaybi, baska satirdan kopya) kartta oldugu gibi
+            // "kayitli degil" sayilir.
+            string? bloodGroup = null;
+            if (needs.BloodGroup && values?.BloodGroup is { } cipher
+                && protector.TryUnprotect(cipher, ProtectedField.BloodGroup(p.PublicId)) is { } code)
+            {
+                bloodGroup = bloodGroupNames.GetValueOrDefault(code);
+            }
+
+            var person = new PersonRecord(
+                p.Id, p.PublicId, p.FirstName, p.LastName, p.NationalId, p.BirthDate, p.Email, p.MobilePhone,
+                own, new PersonProfile(p.Gender, p.PreviousSurname, p.MaritalStatus, p.EducationName),
+                needs.Address ? values?.Address : null)
+            {
+                HasPhoto = photos.ContainsKey(p.Id),
+                BloodGroup = bloodGroup,
+            };
+            return new PersonExportRecord(person, primary, photos.GetValueOrDefault(p.Id));
+        }).ToList();
+
+        return new PersonExportResult(total, rows);
+    }
+
+    private sealed record SensitiveValues(long PersonId, string? Address, string? BloodGroup);
+
+    /// <summary>
+    /// Listenin ve disa aktarmanin ortak kumesi: kapsam, gorunur kalma suresi, calisma durumu, hizli
+    /// arama ve suzgecler. Iki yer ayni kumeyi kullanir; dosyadaki kisiler ekrandaki listeyle aynidir.
+    /// </summary>
+    private async Task<IQueryable<Person>> MatchingAsync(PersonnelViewer viewer, PersonListCriteria criteria, CancellationToken cancellationToken)
+    {
+        var persons = await VisibleAsync(InScope(viewer), cancellationToken).ConfigureAwait(false);
+
+        persons = criteria.Status switch
+        {
+            EmploymentStatusFilter.Active => persons.Where(p => p.Employments.Any(e => e.IsActive)),
+            EmploymentStatusFilter.Terminated => persons.Where(p => !p.Employments.Any(e => e.IsActive)),
+            _ => persons,
+        };
+
+        if (criteria.Search is { } term)
+        {
+            persons = Search(persons, term, PersonFieldVisibility.CanSearchByNationalId(viewer));
+        }
+
+        return ApplyFilters(persons, criteria.Filters);
+    }
+
+    /// <summary>Liste siralamasi (SYG-PERS-031); esitlikte ic kimlik, sayfalar kararli kalir.</summary>
+    private static IOrderedQueryable<Person> Ordered(IQueryable<Person> persons, PersonListCriteria criteria) =>
+        ((criteria.Sort, criteria.Descending) switch
+        {
+            (PersonSort.LastName, false) => persons.OrderBy(p => p.LastName).ThenBy(p => p.FirstName),
+            (PersonSort.LastName, true) => persons.OrderByDescending(p => p.LastName).ThenByDescending(p => p.FirstName),
+            (_, true) => persons.OrderByDescending(p => p.FirstName).ThenByDescending(p => p.LastName),
+            _ => persons.OrderBy(p => p.FirstName).ThenBy(p => p.LastName),
+        }).ThenBy(p => p.Id);
 
     /// <summary>
     /// Suzgecler (SYG-PERS-024, 025). Her suzgec ayri kosuldur ve birlikte (VE) uygulanir; coklu secimde

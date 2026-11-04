@@ -19,32 +19,10 @@ namespace Dsg.Hrms.Infrastructure.Time;
 /// </remarks>
 public sealed class SystemDateTimeProvider : IDateTimeProvider
 {
-    private static readonly TimeZoneInfo CorporateTimeZone = ResolveTimeZone();
-
     /// <inheritdoc />
     public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
 
     /// <inheritdoc />
     public DateOnly Today =>
-        DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, CorporateTimeZone).Date);
-
-    /// <summary>
-    /// Saat dilimi kimligi isletim sistemine gore degisir: Linux'ta IANA
-    /// ("Europe/Istanbul"), Windows'ta ("Turkey Standard Time"). Uretim Linux,
-    /// gelistirme Windows oldugu icin ikisi de denenir.
-    /// </summary>
-    private static TimeZoneInfo ResolveTimeZone()
-    {
-        foreach (var id in new[] { "Europe/Istanbul", "Turkey Standard Time" })
-        {
-            if (TimeZoneInfo.TryFindSystemTimeZoneById(id, out var timeZone))
-            {
-                return timeZone;
-            }
-        }
-
-        throw new TimeZoneNotFoundException(
-            "Europe/Istanbul saat dilimi bulunamadi. Konteyner imajinda saat dilimi " +
-            "verisi (tzdata) eksik olabilir; InvariantGlobalization ayari da kontrol edilmeli.");
-    }
+        DateOnly.FromDateTime(CorporateTime.ToLocal(DateTimeOffset.UtcNow).Date);
 }

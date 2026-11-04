@@ -34,6 +34,15 @@ public interface IPersonnelQuery
     Task<PagedResult<PersonListItem>> ListAsync(PersonnelViewer viewer, PersonListCriteria criteria, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Disa aktarma (SYG-PERS-032): listeyle ayni kapsam, gorunur kalma kurali, arama, suzgec ve
+    /// siralama; sayfalama yoktur. Eslesen kisi sayisi <paramref name="limit"/> degerini asarsa
+    /// satir okunmaz, yalnizca sayi doner. Korumali degerler yalnizca <paramref name="needs"/>
+    /// isterse okunur; gorunurluk denetimi cagiran servisindir.
+    /// </summary>
+    /// <remarks><see cref="PersonListCriteria.Page"/> kullanilmaz.</remarks>
+    Task<PersonExportResult> ExportAsync(PersonnelViewer viewer, PersonListCriteria criteria, PersonExportNeeds needs, int limit, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Kisinin fotografi (SYG-PERS-041); kart ile ayni kapsam ve gorunur kalma kurali. Kapsam
     /// disindaysa, kisi yoksa veya fotografi yoksa <c>null</c>.
     /// </summary>
@@ -42,6 +51,25 @@ public interface IPersonnelQuery
     /// <summary>Kullanicinin kendi fotografi; yoksa <c>null</c>.</summary>
     Task<PhotoRecord?> FindOwnPhotoAsync(PersonnelViewer viewer, CancellationToken cancellationToken);
 }
+
+/// <summary>Disa aktarmada okunacak korumali ve agir degerler.</summary>
+/// <param name="Address">Adres.</param>
+/// <param name="BloodGroup">Kan grubu (cozulur).</param>
+/// <param name="Photo">Kucuk fotograf.</param>
+public sealed record PersonExportNeeds(bool Address, bool BloodGroup, bool Photo);
+
+/// <summary>Disa aktarma sonucu.</summary>
+/// <param name="TotalCount">Eslesen kisi sayisi.</param>
+/// <param name="Rows">Satirlar; sinir asildiysa bos.</param>
+public sealed record PersonExportResult(int TotalCount, IReadOnlyList<PersonExportRecord> Rows);
+
+/// <summary>Disa aktarilan kisi.</summary>
+/// <param name="Person">Kisi; adres ve kan grubu yalnizca istendiyse dolu.</param>
+/// <param name="Primary">Esas istihdam (KR-130), guncel nitelikleri ve goreviyle; sicili yoksa <c>null</c>.</param>
+/// <param name="Photo">Kucuk fotograf (JPEG); istenmediyse veya yoksa <c>null</c>.</param>
+#pragma warning disable CA1819 // Goruntu baytlari kopyalanmadan rapora yazilir.
+public sealed record PersonExportRecord(PersonRecord Person, EmploymentRecord? Primary, byte[]? Photo);
+#pragma warning restore CA1819
 
 /// <summary>Saklanan fotograf.</summary>
 /// <param name="Content">Kucultulmus JPEG.</param>

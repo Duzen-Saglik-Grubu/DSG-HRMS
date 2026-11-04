@@ -55,9 +55,9 @@ public sealed class PersonsController : ControllerBase
 
         var result = await _list.ListAsync(
             request.Q,
-            (EmploymentStatusFilter)request.Status,
-            request.Sort == PersonSortField.LastName ? PersonSort.LastName : PersonSort.FirstName,
-            request.Order == SortOrder.Desc,
+            request.ToStatusFilter(),
+            request.ToSort(),
+            request.IsDescending(),
             request.Page,
             request.PageSize,
             request.ToFilters(),
@@ -97,8 +97,11 @@ public sealed class PersonsController : ControllerBase
         PersonCardResponse.From(await _cards.GetAsync(personId, cancellationToken));
 }
 
-/// <summary>Liste istegi.</summary>
-public sealed class PersonListRequest
+/// <summary>
+/// Listenin ve disa aktarmanin ortak kumesi: arama, calisma durumu, siralama ve suzgecler. Iki uc
+/// ayni kumeyi ayni sekilde alir; dosyadaki kisiler ekrandaki listeyle aynidir (SYG-PERS-032).
+/// </summary>
+public abstract class PersonFilterRequest
 {
     /// <summary>Hizli arama: ad, soyad, sicil; izinle TCKN. Turkce karakterden bagimsiz.</summary>
     [FromQuery(Name = "q")]
@@ -107,14 +110,6 @@ public sealed class PersonListRequest
     /// <summary>Calisma durumu (varsayilan aktif).</summary>
     [FromQuery(Name = "status")]
     public EmploymentStatusKind Status { get; init; } = EmploymentStatusKind.Active;
-
-    /// <summary>Sayfa (1'den baslar).</summary>
-    [FromQuery(Name = "page")]
-    public int Page { get; init; } = 1;
-
-    /// <summary>Sayfa boyutu; verilmezse parametredeki varsayilan (24).</summary>
-    [FromQuery(Name = "pageSize")]
-    public int? PageSize { get; init; }
 
     /// <summary>Siralama alani.</summary>
     [FromQuery(Name = "sort")]
@@ -269,6 +264,28 @@ public sealed class PersonListRequest
         SeniorityYears = SeniorityMin is null && SeniorityMax is null ? null : new NumberRange(SeniorityMin, SeniorityMax),
     };
 
+    /// <summary>Calisma durumu (uygulama katmani).</summary>
+    /// <remarks>Ozellik degil metot: ozellik olsaydi OpenAPI belgesine sorgu parametresi olarak girerdi.</remarks>
+    public EmploymentStatusFilter ToStatusFilter() => (EmploymentStatusFilter)Status;
+
+    /// <summary>Siralama (uygulama katmani).</summary>
+    public PersonSort ToSort() => Sort == PersonSortField.LastName ? PersonSort.LastName : PersonSort.FirstName;
+
+    /// <summary>Azalan siralama.</summary>
+    public bool IsDescending() => Order == SortOrder.Desc;
+}
+
+/// <summary>Liste istegi.</summary>
+public sealed class PersonListRequest : PersonFilterRequest
+{
+    /// <summary>Sayfa (1'den baslar).</summary>
+    [FromQuery(Name = "page")]
+    public int Page { get; init; } = 1;
+
+    /// <summary>Sayfa boyutu; verilmezse parametredeki varsayilan (24).</summary>
+    [FromQuery(Name = "pageSize")]
+    public int? PageSize { get; init; }
+
     /// <inheritdoc />
     public override string ToString() => nameof(PersonListRequest);
 }
@@ -348,17 +365,14 @@ public enum PersonSortField
     LastName = 2,
 }
 
-/// <summary>Liste isteginin dogrulamasi.</summary>
-public sealed class PersonListRequestValidator : AbstractValidator<PersonListRequest>
+/// <summary>Arama, durum, siralama ve suzgeclerin dogrulamasi; liste ve disa aktarma ortak.</summary>
+/// <typeparam name="T">Istek.</typeparam>
+public abstract class PersonFilterRequestValidator<T> : AbstractValidator<T>
+    where T : PersonFilterRequest
 {
-    /// <summary>Yeni ornek olusturur.</summary>
-    public PersonListRequestValidator()
+    /// <summary>Ortak kurallari kurar.</summary>
+    protected PersonFilterRequestValidator()
     {
-        RuleFor(r => r.Page).GreaterThanOrEqualTo(1).WithMessage("Sayfa numarası 1 veya daha büyük olmalıdır.");
-        RuleFor(r => r.PageSize)
-            .InclusiveBetween(1, PagedResult<object>.MaxPageSize)
-            .When(r => r.PageSize is not null)
-            .WithMessage($"Sayfa boyutu 1 ile {PagedResult<object>.MaxPageSize} arasında olmalıdır.");
         RuleFor(r => r.Q).MaximumLength(100).WithMessage("Arama metni en fazla 100 karakter olabilir.");
         RuleFor(r => r.Status).IsInEnum().WithMessage("Geçersiz çalışma durumu.");
         RuleFor(r => r.Sort).IsInEnum().WithMessage("Geçersiz sıralama alanı.");
@@ -372,6 +386,20 @@ public sealed class PersonListRequestValidator : AbstractValidator<PersonListReq
         RuleForEach(r => new[] { r.FirstName, r.LastName, r.PreviousSurname, r.RegistryCode, r.NationalId, r.Email, r.Phone, r.Address })
             .MaximumLength(100).WithMessage("Süzgeç metni en fazla 100 karakter olabilir.")
             .OverridePropertyName("filters");
+    }
+}
+
+/// <summary>Liste isteginin dogrulamasi.</summary>
+public sealed class PersonListRequestValidator : PersonFilterRequestValidator<PersonListRequest>
+{
+    /// <summary>Yeni ornek olusturur.</summary>
+    public PersonListRequestValidator()
+    {
+        RuleFor(r => r.Page).GreaterThanOrEqualTo(1).WithMessage("Sayfa numarası 1 veya daha büyük olmalıdır.");
+        RuleFor(r => r.PageSize)
+            .InclusiveBetween(1, PagedResult<object>.MaxPageSize)
+            .When(r => r.PageSize is not null)
+            .WithMessage($"Sayfa boyutu 1 ile {PagedResult<object>.MaxPageSize} arasında olmalıdır.");
     }
 }
 
