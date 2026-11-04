@@ -99,7 +99,19 @@ function renderAt(path: string) {
 describe('PersonCardPage', () => {
   beforeEach(async () => {
     vi.restoreAllMocks();
+    vi.spyOn(personsApi, 'syncFreshness').mockResolvedValue({
+      enabled: true,
+      lastSucceededAt: '2026-11-04T06:15:00Z',
+      lastRunFailed: false,
+    });
     await setSession({ status: 'authenticated', permissions: [permissions.personView] });
+  });
+
+  it('kart basliginda son senkronizasyon bilgisi yer alir (SYG-PERS-010)', async () => {
+    vi.spyOn(personsApi, 'card').mockResolvedValue(person());
+    renderAt('/personnel/p-1');
+
+    expect(await screen.findByText(/Son senkronizasyon/)).toBeInTheDocument();
   });
 
   it('genel ve iletisim bilgilerini gosterir; bos alanda "Kayitli degil" yazar', async () => {

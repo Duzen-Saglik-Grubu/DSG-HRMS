@@ -18,6 +18,7 @@ export const queryKeys = {
     card: (personId: string) => ['personnel', 'card', personId] as const,
     me: ['personnel', 'card', 'me'] as const,
     photo: (personId: string) => ['personnel', 'photo', personId] as const,
+    syncFreshness: ['personnel', 'sync-freshness'] as const,
   },
   identity: {
     publicSettings: ['identity', 'public-settings'] as const,

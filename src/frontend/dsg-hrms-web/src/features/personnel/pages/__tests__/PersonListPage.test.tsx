@@ -70,6 +70,11 @@ function lastQuery(): URLSearchParams {
 describe('PersonListPage', () => {
   beforeEach(async () => {
     vi.restoreAllMocks();
+    vi.spyOn(personsApi, 'syncFreshness').mockResolvedValue({
+      enabled: true,
+      lastSucceededAt: '2026-11-04T06:15:00Z',
+      lastRunFailed: false,
+    });
     await setSession({ status: 'authenticated', permissions: [permissions.personView] });
     vi.spyOn(personsApi, 'list').mockResolvedValue({
       items: [AYSE, MEHMET],
@@ -147,6 +152,12 @@ describe('PersonListPage', () => {
     await user.click(screen.getByRole('button', { name: 'Kart görünümü' }));
     expect(await screen.findByRole('article', { name: 'AYŞE DEMİR' })).toBeInTheDocument();
     expect(lastQuery().get('status')).toBe('terminated');
+  });
+
+  it('basliktaki son senkronizasyon bilgisini gosterir (SYG-PERS-010)', async () => {
+    renderWithProviders(<PersonListPage />);
+
+    expect(await screen.findByText(/Son senkronizasyon/)).toBeInTheDocument();
   });
 
   it('yazma durunca hizli arama yapar', async () => {

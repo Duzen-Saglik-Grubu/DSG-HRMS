@@ -524,6 +524,43 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         new PersonnelSyncStatus(context, new LogoOptions()).IsEnabled.ShouldBeFalse();
     }
 
+    [Fact]
+    public async Task Freshness_is_empty_before_the_first_run()
+    {
+        await using var context = Read();
+
+        var freshness = await new PersonnelSyncStatus(context, new LogoOptions()).GetFreshnessAsync(CancellationToken.None);
+
+        freshness.ShouldBe(new PersonnelSyncFreshness(null, false));
+    }
+
+    [Fact]
+    public async Task A_failed_run_keeps_the_last_success_time_and_raises_the_warning()
+    {
+        // SYG-PERS-010: "Son senkronizasyon" son BASARILI calismanin bitisidir.
+        await SyncAsync(Card("00001", NationalId(1)));
+        DateTimeOffset? successAt;
+        await using (var context = Read())
+        {
+            var succeeded = await new PersonnelSyncStatus(context, new LogoOptions()).GetFreshnessAsync(CancellationToken.None);
+            succeeded.LastSucceededAt.ShouldNotBeNull();
+            succeeded.LastRunFailed.ShouldBeFalse();
+            successAt = succeeded.LastSucceededAt;
+        }
+
+        _source.GetAllAsync(Arg.Any<CancellationToken>()).ThrowsAsync(new LogoUnavailableException());
+        await using (var store = CreateStore())
+        {
+            await new PersonnelSyncService(_source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), NullLogger<PersonnelSyncService>.Instance)
+                .RunAsync(SyncTrigger.Scheduled, CancellationToken.None);
+        }
+
+        await using var after = Read();
+        var freshness = await new PersonnelSyncStatus(after, new LogoOptions()).GetFreshnessAsync(CancellationToken.None);
+        freshness.LastSucceededAt.ShouldBe(successAt);
+        freshness.LastRunFailed.ShouldBeTrue();
+    }
+
     // ------------------------------------------------------------------ kilit
 
     [Fact]

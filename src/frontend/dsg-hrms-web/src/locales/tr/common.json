@@ -392,6 +392,11 @@
     }
   },
   "personnel": {
+    "freshness": {
+      "label": "Son senkronizasyon",
+      "never": "henüz yapılmadı",
+      "lastRunFailed": "Son deneme başarısız"
+    },
     "list": {
       "title": "Personel",
       "subtitle": "Personeli arayın, süzün ve kart ya da tablo görünümünde inceleyin.",

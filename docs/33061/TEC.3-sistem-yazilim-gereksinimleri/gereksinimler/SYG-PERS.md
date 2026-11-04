@@ -5,7 +5,7 @@
 **Modül:** T1 Personel Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-PERS.md` (19.10.2026'da İK onaylı, 45 gereksinim; değişiklik talebi #270)
 **Tasarım:** ADR-0019…ADR-0022 (`KR-121`…`KR-126`); T1 tasarım gözden geçirmesi (`TEC.5-tasarim-tanimlama/raporlar/2026-10-22-t1-tasarim-gozden-gecirme.md`)
-**Son güncelleme:** 2026-11-03
+**Son güncelleme:** 2026-11-04
 **Sahibi:** Bilgi İşlem
 **Onay durumu:** Bilgi İşlem (RACI TEC.3 A); değişiklikler PR onayıyla (`KR-096`). Baseline, T1'in kabul etiketiyle yazılır (`KR-097`, `KR-111`); o zamana kadar geliştirme sürüyor.
 
@@ -337,6 +337,7 @@ geçirmesinin bulgularıyla birlikte karşılaştırıldı. Kapanmamış olanlar
 | AN-17 | PG-PERS-33 "üyelik akışını etkileyen kayıtları" tanımlamaz. | Tanım T3'ün üyelik koşulundan alındı: doğum tarihi, kurumsal e-posta, kabul edilen alan adı, tekil e-posta (SYG-PERS-071). | ✅ |
 | AN-18 | PG-PERS-36'daki gizlilik taahhüdü bir yazılım davranışı değil, kurum kontrolüdür. | Doğrulaması İnceleme'dir: kabulde rol üyeleri taahhüt kayıtlarıyla karşılaştırılır (SYG-PERS-065). İK, taahhüt kayıtlarını tutar. | ✅ |
 | AN-19 | **Türetilmiş davranış (24.10.2026, #285).** ADR-0021 §2 iki durumu tanımlamıyordu: (1) T1 devreye girdiğinde zaten bitmiş olan istihdamın nitelikleri; LOGO yalnızca bugünkü değeri verir ve "bugünden başlayan" kayıt çıkış tarihiyle çelişir. (2) LOGO'ya geriye dönük girilen ve kaydın başlangıcından önceki bir çıkış tarihi; ertesi gün kuralı boş veya ters aralık üretir. | (1) LOGO kartı çıkıştan sonra donar; karttaki değer çıkış günündeki değer sayılır ve [çıkış günü, ertesi gün) aralıklı tek kayıt açılır. Kartta ayrılan istihdamın son bilinen nitelikleri böylece görünür. Bitmiş istihdamda sonradan yapılan LOGO düzeltmesi son kaydı yerinde günceller. (2) Kayıt başladığı günün ertesi kapanır (SYG-PERS-018, 021). İkisi de paydaş gereksiniminin anlamını değiştirmez: değer uydurulmaz, yalnızca son bilinen değer saklanır. | ✅ |
+| AN-20 | **Türetilmiş davranış (04.11.2026, #325).** SYG-PERS-010 "başarılı" çalışmayı ve süren çalışmanın uyarıya etkisini tanımlamaz. | Uyarılı tamamlanan çalışma başarılıdır: veri aktarıldı, uyarılar İK'nın LOGO'da düzelteceği kayıtlardır. T1 adımı başarısız olan ("kısmen") çalışma başarılı sayılmaz ve uyarı işareti çıkarır; sağlık denetimi de onu "bozulmuş" sayar. Uyarı son **biten** çalışmaya bakar; süren çalışma uyarıyı ne açar ne kapatır. Senkronizasyonun tanımlı olmadığı ortamda (LOGO bağlantısı yok) bilgi gösterilmez. Bilgi, kendi kartını gören izinsiz kullanıcıya da açıktır; yalnızca zaman ve durum döner, ayrıntı `personnel.sync.view` izniyle görülür. | ✅ |
 
 **T1 tasarım gözden geçirmesinin test tanımı olmayan kuralları** (rapor §4) şu maddelerde,
 doğrulama yöntemiyle yer alır:
@@ -461,3 +462,4 @@ madde `İptal` notuyla kalır.
 | 2026-11-03 | 0.7 | §7 ortam hazırlığı: özel nitelikli veri anahtarı yerelde eklendi, UAT'de sürümden önce; yeri BK-12, BK-16, BK-29 (#317). Gereksinim metni değişmedi | Bilgi İşlem |
 | 2026-11-03 | 0.8 | Değişiklik talebi #321: SYG-PERS-022'de esas sicil, aktif sicillerden işe giriş tarihi en eski olan (`KR-130`; onay 03.11.2026) | Bilgi İşlem |
 | 2026-11-03 | 0.9 | Değişiklik talebi #321: SYG-PERS-017'de kişi kartındaki sicil sekmelerinin sırası esas sicille uyumlu hâle getirildi; ilk sekme esas sicil (`KR-130`) | Bilgi İşlem |
+| 2026-11-04 | 0.10 | §6: AN-20, SYG-PERS-010'daki "başarılı çalışma" ve uyarı tanımı (#325) | Bilgi İşlem |

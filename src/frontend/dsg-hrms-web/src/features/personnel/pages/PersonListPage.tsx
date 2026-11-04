@@ -37,6 +37,7 @@ import { personsApi, type PersonListItem } from '../api/personsApi';
 import { FilterChips } from '../components/FilterChips';
 import { FilterPanel } from '../components/FilterPanel';
 import { PersonCard } from '../components/PersonCard';
+import { SyncFreshness } from '../components/SyncFreshness';
 import { joinParts } from '../display';
 import { filterTags } from '../filterTags';
 import {
@@ -194,6 +195,7 @@ export function PersonListPage() {
         icon={BadgeOutlined}
         title={t('personnel.list.title')}
         description={t('personnel.list.subtitle')}
+        actions={<SyncFreshness />}
       />
 
       <Paper
