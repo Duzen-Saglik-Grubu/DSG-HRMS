@@ -8,6 +8,7 @@
     "home": "Ana Sayfa",
     "openMenu": "Menüyü aç",
     "personnel": "Personel listesi",
+    "corrections": "Düzeltme talepleri",
     "sections": {
       "overview": "Genel Bakış",
       "people": "Personel",
@@ -391,7 +392,74 @@
       "removed": "Varsayılan logoya dönüldü."
     }
   },
+  "notifications": {
+    "title": "Bildirimler",
+    "open": "Bildirimler",
+    "openWithCount": "Bildirimler, {{count}} okunmamış",
+    "empty": "Bildiriminiz yok.",
+    "unread": "okunmadı",
+    "kinds": {
+      "correctionRequested": "Yeni düzeltme talebi",
+      "unknown": "Yeni bildirim"
+    }
+  },
   "personnel": {
+    "report": {
+      "open": "İK'ya bildir",
+      "title": "İK'ya bildir",
+      "text": "Kartınızdaki bilgiler LOGO'dan gelir. Hatalı bir bilgi görürseniz doğrusunu yazın; İK düzeltmeyi LOGO'da yapar ve bilgi bir sonraki senkronizasyonda kartınıza yansır.",
+      "field": "Düzeltilecek bilgi",
+      "fieldRequired": "Düzeltilecek bilgiyi seçin.",
+      "value": "Doğru bilgi",
+      "valueRequired": "Doğru bilgiyi yazın.",
+      "pending": "İK'da bekleyen talebiniz var",
+      "send": "Gönder",
+      "sent": "Talebiniz İK'ya iletildi. İK düzeltmeyi LOGO'da yaptığında bilgi kartınıza yansır.",
+      "fields": {
+        "mobilePhone": "Cep telefonu",
+        "email": "E-posta",
+        "address": "Adres",
+        "education": "Eğitim",
+        "maritalStatus": "Medeni hâl",
+        "bloodGroup": "Kan grubu"
+      },
+      "hints": {
+        "mobilePhone": "Örneğin 0532 123 45 67",
+        "email": "Örneğin ad.soyad@duzen.com.tr",
+        "address": "En fazla 500 karakter",
+        "education": "Örneğin Lisans, İstanbul Üniversitesi Biyoloji",
+        "maritalStatus": "Listeden seçin",
+        "bloodGroup": "Listeden seçin"
+      },
+      "marital": {
+        "married": "Evli",
+        "notMarried": "Bekar"
+      }
+    },
+    "corrections": {
+      "title": "Düzeltme talepleri",
+      "subtitle": "Personelin \"İK'ya bildir\" ile ilettiği düzeltmeleri LOGO'da yapın, ardından talebi tamamlayın.",
+      "statusFilter": "Durum",
+      "statusNew": "Yeni",
+      "statusCompleted": "Tamamlandı",
+      "statusAll": "Tümü",
+      "complete": "Tamamlandı olarak kapat",
+      "completed": "{{name}} için talep kapatıldı.",
+      "confirmTitle": "Talep kapatılsın mı?",
+      "confirmText": "Düzeltmeyi LOGO'da yaptıysanız talebi kapatın. Kapatınca önerilen değer silinir; talepte yalnızca alan ve tarihler kalır.",
+      "valueRemoved": "Talep kapatıldığı için silindi",
+      "fromNotification": "Bildirimden gelen talep",
+      "dismiss": "Kapat",
+      "empty": "Bekleyen talep yok",
+      "emptyText": "Personel \"İK'ya bildir\" ile bir düzeltme ilettiğinde burada görünür.",
+      "columns": {
+        "person": "Personel",
+        "field": "Bilgi",
+        "value": "Önerilen değer",
+        "submittedAt": "Gönderim",
+        "action": "İşlem"
+      }
+    },
     "freshness": {
       "label": "Son senkronizasyon",
       "never": "henüz yapılmadı",

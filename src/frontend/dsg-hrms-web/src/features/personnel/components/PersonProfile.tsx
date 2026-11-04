@@ -1,10 +1,12 @@
 import { useState, type ReactNode } from 'react';
-import { Box, Chip, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Alert, Box, Button, Chip, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import FeedbackOutlined from '@mui/icons-material/FeedbackOutlined';
 import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import type { EmploymentCard, PersonCard } from '../api/personsApi';
 import { displayDate, joinParts, orderEmployments } from '../display';
 import { PersonAvatar } from '@/shared/components/PersonAvatar';
+import { ReportToHrDialog } from './ReportToHrDialog';
 import { SyncFreshness } from './SyncFreshness';
 
 /**
@@ -16,10 +18,32 @@ export function PersonProfile({ person }: { person: PersonCard }) {
   const { t } = useTranslation();
   const employments = orderEmployments(person.employments);
   const primary = employments[0];
+  const [reporting, setReporting] = useState(false);
+  const [sent, setSent] = useState(false);
 
   return (
     <Stack spacing={2.5}>
-      <ProfileHeader person={person} primary={primary} />
+      <ProfileHeader
+        person={person}
+        primary={primary}
+        onReport={person.isSelf ? () => setReporting(true) : undefined}
+      />
+
+      {sent ? (
+        <Alert severity="success" role="status" onClose={() => setSent(false)}>
+          {t('personnel.report.sent')}
+        </Alert>
+      ) : null}
+
+      {reporting ? (
+        <ReportToHrDialog
+          onClose={() => setReporting(false)}
+          onSent={() => {
+            setReporting(false);
+            setSent(true);
+          }}
+        />
+      ) : null}
 
       <Grid container spacing={2.5}>
         <Grid size={{ xs: 12, md: 5 }}>
@@ -43,9 +67,12 @@ export function PersonProfile({ person }: { person: PersonCard }) {
 function ProfileHeader({
   person,
   primary,
+  onReport,
 }: {
   person: PersonCard;
   primary: EmploymentCard | undefined;
+  /** "IK'ya bildir": yalnizca kisinin kendi kartinda (SYG-PERS-045). */
+  onReport: (() => void) | undefined;
 }) {
   const { t } = useTranslation();
   const name = `${person.firstName} ${person.lastName}`;
@@ -108,16 +135,22 @@ function ProfileHeader({
             {primary ? <Chip size="small" variant="outlined" label={primary.companyName} /> : null}
           </Stack>
         </Box>
-        <Box
+        <Stack
+          spacing={1.5}
           sx={{
             flexGrow: 1,
-            display: 'flex',
-            justifyContent: { xs: 'center', sm: 'flex-end' },
-            alignSelf: { sm: 'flex-start' },
+            alignItems: { xs: 'center', sm: 'flex-end' },
+            alignSelf: { sm: 'stretch' },
+            justifyContent: 'space-between',
           }}
         >
           <SyncFreshness />
-        </Box>
+          {onReport ? (
+            <Button variant="outlined" startIcon={<FeedbackOutlined />} onClick={onReport}>
+              {t('personnel.report.open')}
+            </Button>
+          ) : null}
+        </Stack>
       </Stack>
     </Paper>
   );

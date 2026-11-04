@@ -230,6 +230,22 @@ describe('Profilim', () => {
     expect(personsApi.me).toHaveBeenCalled();
   });
 
+  it('yalnizca kendi kartinda IK-ya bildir dugmesi vardir (SYG-PERS-045)', async () => {
+    await setSession({ status: 'authenticated', permissions: [permissions.personView] });
+    vi.spyOn(personsApi, 'me').mockResolvedValue(person({ isSelf: true }));
+    vi.spyOn(personsApi, 'card').mockResolvedValue(person({ isSelf: false }));
+
+    const own = renderAt(routes.profile);
+    expect(await screen.findByRole('button', { name: "İK'ya bildir" })).toBeInTheDocument();
+    own.unmount();
+
+    renderAt('/personnel/p-1');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'AYŞE DEMİR' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: "İK'ya bildir" })).not.toBeInTheDocument();
+  });
+
   it('kendi fotografi "me" ucundan gelir (SYG-PERS-041)', async () => {
     await setSession({ status: 'authenticated' });
     vi.spyOn(personsApi, 'me').mockResolvedValue(person({ isSelf: true, hasPhoto: true }));
