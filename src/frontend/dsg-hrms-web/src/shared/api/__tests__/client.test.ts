@@ -92,6 +92,26 @@ describe('apiClient', () => {
     expect(error.status).toBe(422);
   });
 
+  it('dosya isteginde Blob olarak gelen Problem Details mesajini da tasir', async () => {
+    // Disa aktarma gibi responseType: 'blob' isteklerinde hata govdesi de Blob gelir.
+    fakeError(
+      400,
+      new Blob(
+        [JSON.stringify({ status: 400, detail: "Fotoğraf yalnızca PDF'e aktarılabilir." })],
+        {
+          type: 'application/problem+json',
+        },
+      ),
+    );
+
+    const error = (await apiClient
+      .get('/deneme', { responseType: 'blob' })
+      .catch((e: unknown) => e)) as ApiError;
+
+    expect(error.message).toBe("Fotoğraf yalnızca PDF'e aktarılabilir.");
+    expect(error.status).toBe(400);
+  });
+
   it('sunucu mesaj dondurmediginde duruma uygun Turkce mesaj uretir', async () => {
     fakeError(403, '');
 

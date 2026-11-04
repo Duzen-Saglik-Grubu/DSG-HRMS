@@ -144,9 +144,27 @@ apiClient.interceptors.response.use(
       return Promise.reject(toApiError(undefined, undefined, i18n.t('error.network')));
     }
 
-    return Promise.reject(toApiError(error.response?.data, status, defaultMessageFor(status)));
+    return Promise.reject(
+      toApiError(await readBody(error.response?.data), status, defaultMessageFor(status)),
+    );
   },
 );
+
+/**
+ * Dosya indiren isteklerde (`responseType: 'blob'`) hata govdesi de Blob gelir. Problem
+ * ayrintisi okunmazsa kullanici sunucunun Turkce iletisi yerine genel bir hata gorurdu.
+ */
+async function readBody(data: unknown): Promise<unknown> {
+  if (typeof Blob !== 'undefined' && data instanceof Blob && data.type.includes('json')) {
+    try {
+      return JSON.parse(await data.text()) as unknown;
+    } catch {
+      return undefined;
+    }
+  }
+
+  return data;
+}
 
 /**
  * `401` yanitinda jetonu yeniler ve istegi BIR KEZ tekrarlar (ADR-0015 §3).
