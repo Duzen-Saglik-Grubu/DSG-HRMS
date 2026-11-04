@@ -30,11 +30,12 @@ public sealed class CorrectionStore(HrmsDbContext context, PersonalDataProtector
             .ConfigureAwait(false);
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<long>> ListHrRecipientsAsync(CancellationToken cancellationToken) =>
+    public async Task<IReadOnlyList<long>> ListRecipientsAsync(CancellationToken cancellationToken) =>
         await (from userRole in context.Set<UserRole>()
                join role in context.Set<Role>() on userRole.RoleId equals role.Id
                join account in context.Set<UserAccount>() on userRole.UserAccountId equals account.Id
-               where role.Code == Role.HrIdentityOperationsCode && account.Status == AccountStatus.Active
+               where (role.Code == Role.HrIdentityOperationsCode || role.Code == Role.SystemAdministratorCode)
+                     && account.Status == AccountStatus.Active
                select account.Id)
             .Distinct()
             .ToListAsync(cancellationToken)

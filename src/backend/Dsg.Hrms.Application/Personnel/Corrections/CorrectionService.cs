@@ -16,8 +16,11 @@ public interface ICorrectionStore
     /// <summary>Kisinin acik ("Yeni") taleplerinin alanlari.</summary>
     Task<IReadOnlyList<CorrectionField>> ListOpenFieldsAsync(long personId, CancellationToken cancellationToken);
 
-    /// <summary>IK rolundeki aktif hesaplarin ic kimlikleri (SYG-PERS-046).</summary>
-    Task<IReadOnlyList<long>> ListHrRecipientsAsync(CancellationToken cancellationToken);
+    /// <summary>
+    /// Bildirimi alacak aktif hesaplarin ic kimlikleri: IK ve Sistem Yoneticisi rolleri; iki role
+    /// sahip hesap bir kez (SYG-PERS-046, #333).
+    /// </summary>
+    Task<IReadOnlyList<long>> ListRecipientsAsync(CancellationToken cancellationToken);
 
     /// <summary>Kan grubu secenekleri: kod ve ad (referans veri, <c>KR-129</c>).</summary>
     Task<IReadOnlyList<CorrectionOption>> ListBloodGroupsAsync(CancellationToken cancellationToken);
@@ -86,7 +89,7 @@ public sealed record OwnCorrectionState(IReadOnlyList<CorrectionField> OpenField
 /// kisi kimligi yoktur. Boylece baskasi adina talep acmanin bir yolu yoktur.
 /// </para>
 /// <para>
-/// Talep ve IK'daki herkese giden uygulama ici bildirim ayni islemde yazilir. E-posta kaydin
+/// Talep ve IK ile sistem yoneticilerine giden uygulama ici bildirim ayni islemde yazilir. E-posta kaydin
 /// ardindan bellek ici kuyruga alinir; kuyruk dolu veya kayipsa yalnizca e-posta kaybolur, IK
 /// talebi uygulamada yine gorur (ADR-0012 §4 notu).
 /// </para>
@@ -158,7 +161,7 @@ public sealed class CorrectionService
         var request = CorrectionRequest.Submit(personId, field, value, now);
         _store.Add(request);
 
-        var recipients = await _store.ListHrRecipientsAsync(cancellationToken).ConfigureAwait(false);
+        var recipients = await _store.ListRecipientsAsync(cancellationToken).ConfigureAwait(false);
         _store.Add(recipients.Select(userId => InboxItem.For(userId, InboxItemKind.CorrectionRequested, request.PublicId, now)));
 
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
