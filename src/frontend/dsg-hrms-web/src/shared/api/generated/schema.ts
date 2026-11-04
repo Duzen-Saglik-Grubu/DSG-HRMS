@@ -1142,6 +1142,166 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/persons/export/fields": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Kullanicinin secebilecegi alanlar (PG-PERS-42). Gorunurluk politikasindan gelir: adres ve
+         *     kan grubu yalnizca `personnel.person.view_sensitive` iznine sunulur.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Alanlar, dosyadaki sirada. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PersonExportFieldResponse"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Disa aktarma izni yok. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/persons/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Suzgece uyan butun kisileri Excel veya PDF olarak indirir. Ad ve soyad her satirda vardir;
+         *     diger sutunlar `field` ile secilir. En fazla 50.000 kisi.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    format?: components["schemas"]["ExportFormatKind"];
+                    field?: components["schemas"]["PersonExportFieldName"][];
+                    q?: string;
+                    status?: components["schemas"]["EmploymentStatusKind"];
+                    sort?: components["schemas"]["PersonSortField"];
+                    order?: components["schemas"]["SortOrder"];
+                    companyId?: string[];
+                    city?: string[];
+                    branchId?: string[];
+                    departmentId?: string[];
+                    titleCode?: string[];
+                    dutyId?: string[];
+                    statusCode?: string[];
+                    occupationCode?: string[];
+                    education?: string[];
+                    maritalStatus?: components["schemas"]["MaritalStatusKind"][];
+                    gender?: components["schemas"]["GenderKind"][];
+                    firstName?: string;
+                    lastName?: string;
+                    previousSurname?: string;
+                    registryCode?: string;
+                    nationalId?: string;
+                    email?: string;
+                    phone?: string;
+                    address?: string;
+                    birthDateFrom?: string;
+                    birthDateTo?: string;
+                    hireDateFrom?: string;
+                    hireDateTo?: string;
+                    terminationDateFrom?: string;
+                    terminationDateTo?: string;
+                    ageMin?: number | string;
+                    ageMax?: number | string;
+                    seniorityMin?: number | string;
+                    seniorityMax?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Dosya. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": components["schemas"]["Stream"];
+                        "application/pdf": components["schemas"]["Stream"];
+                    };
+                };
+                /** @description Gecersiz istek, izin disi alan veya suzgec, Excel'de fotograf ya da satir siniri asildi. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Disa aktarma izni yok. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/me/photo": {
         parameters: {
             query?: never;
@@ -1280,10 +1440,10 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    q?: string;
-                    status?: components["schemas"]["EmploymentStatusKind"];
                     page?: number | string;
                     pageSize?: number | string;
+                    q?: string;
+                    status?: components["schemas"]["EmploymentStatusKind"];
                     sort?: components["schemas"]["PersonSortField"];
                     order?: components["schemas"]["SortOrder"];
                     companyId?: string[];
@@ -3821,6 +3981,11 @@ export interface components {
             tag?: components["schemas"]["StringSegment"];
             isWeak?: boolean;
         };
+        /**
+         * @description Dosya bicimi.
+         * @enum {unknown}
+         */
+        ExportFormatKind: "excel" | "pdf";
         FileContentResult: {
             /** Format: byte */
             fileContents?: string;
@@ -4107,6 +4272,20 @@ export interface components {
             /** @description Fotografi var mi; varsa `/persons/{personId}/photo` (kendi kartinda `/persons/me/photo`) ucundan alinir. */
             hasPhoto: boolean;
         };
+        /**
+         * @description Disa aktarilabilen alan; degerler uygulama katmanindaki PersonExportField ile aynidir.
+         * @enum {unknown}
+         */
+        PersonExportFieldName: "registryCode" | "nationalId" | "gender" | "birthDate" | "age" | "previousSurname" | "maritalStatus" | "education" | "bloodGroup" | "email" | "phone" | "address" | "employmentStatus" | "company" | "city" | "branch" | "department" | "title" | "duty" | "statusCode" | "occupationCode" | "occupationName" | "hireDate" | "terminationDate" | "seniority" | "photo";
+        /** @description Secilebilir alan. */
+        PersonExportFieldResponse: {
+            /** @description Istekte `field` olarak gonderilen ad. */
+            field: components["schemas"]["PersonExportFieldName"];
+            /** @description Basliktaki ad. */
+            label: string;
+            /** @description Yalnizca PDF'te secilebilir (fotograf). */
+            pdfOnly: boolean;
+        };
         /** @description Suzgec secenekleri (SYG-PERS-024, 026). */
         PersonFilterOptionsResponse: {
             /** @description Firmalar. */
@@ -4361,6 +4540,8 @@ export interface components {
             /** @description Kurumsal e-posta. */
             email: string;
         };
+        /** Format: binary */
+        Stream: string;
         StringSegment: {
             buffer?: null | string;
             /** Format: int32 */

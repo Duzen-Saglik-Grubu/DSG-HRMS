@@ -219,6 +219,9 @@ public sealed class LayerDependencyTests
     private static readonly string[] SharedNamespaces =
     [
         "Common", "Data", "Configuration", "Logging", "Time", "Logo",
+        // Rapor yazicilari (Excel, PDF; ADR-0014): Application.Common.Reports'un altyapi uygulamasi,
+        // is kurali tasimaz (#330).
+        "Reports",
         // Api'nin yatay ad alanlari (#246): istek boru hatti, saglik, gozlemlenebilirlik.
         "Validation", "OpenApi", "Observability", "Networking", "Health", "ErrorHandling",
     ];

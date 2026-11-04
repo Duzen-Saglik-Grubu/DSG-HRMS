@@ -20,6 +20,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
     <PackageReference Include="MailKit" />
+    <!-- Dis aktarma: Excel ClosedXML, PDF SkiaSharp (ADR-0014, KR-131). -->
+    <PackageReference Include="ClosedXML" />
+    <PackageReference Include="SixLabors.Fonts" />
     <PackageReference Include="SkiaSharp" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
@@ -36,6 +39,9 @@
   <ItemGroup>
     <!-- Yaygin parola listesi (SYG-KMLK-045). Kaynak ve lisans: Identity/Passwords/README.md -->
     <EmbeddedResource Include="Identity/Passwords/common-passwords.txt.gz" LogicalName="Dsg.Hrms.Infrastructure.CommonPasswords" />
+    <!-- PDF raporlarinin gomulu yazi tipi (ADR-0014 §1). Kaynak ve lisans: Reports/Fonts/README.md -->
+    <EmbeddedResource Include="Reports/Fonts/NotoSans-Regular.ttf" LogicalName="Dsg.Hrms.Infrastructure.Fonts.Regular" />
+    <EmbeddedResource Include="Reports/Fonts/NotoSans-Bold.ttf" LogicalName="Dsg.Hrms.Infrastructure.Fonts.Bold" />
   </ItemGroup>
 
 </Project>

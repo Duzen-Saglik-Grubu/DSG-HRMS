@@ -1227,6 +1227,417 @@
         }
       }
     },
+    "/api/v1/personnel/persons/export/fields": {
+      "get": {
+        "tags": [
+          "PersonExport"
+        ],
+        "summary": "Kullanicinin secebilecegi alanlar (PG-PERS-42). Gorunurluk politikasindan gelir: adres ve\nkan grubu yalnizca `personnel.person.view_sensitive` iznine sunulur.",
+        "responses": {
+          "200": {
+            "description": "Alanlar, dosyadaki sirada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PersonExportFieldResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Disa aktarma izni yok.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/persons/export": {
+      "get": {
+        "tags": [
+          "PersonExport"
+        ],
+        "summary": "Suzgece uyan butun kisileri Excel veya PDF olarak indirir. Ad ve soyad her satirda vardir;\ndiger sutunlar `field` ile secilir. En fazla 50.000 kisi.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ExportFormatKind"
+            }
+          },
+          {
+            "name": "field",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/PersonExportFieldName"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/EmploymentStatusKind"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PersonSortField"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          },
+          {
+            "name": "companyId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "branchId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "titleCode",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "dutyId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "statusCode",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "occupationCode",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "education",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "maritalStatus",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/MaritalStatusKind"
+              }
+            }
+          },
+          {
+            "name": "gender",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/GenderKind"
+              }
+            }
+          },
+          {
+            "name": "firstName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lastName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "previousSurname",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registryCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nationalId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "phone",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "address",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "birthDateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "birthDateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "hireDateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "hireDateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "terminationDateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "terminationDateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "ageMin",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "ageMax",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "seniorityMin",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "seniorityMax",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dosya.",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              },
+              "application/pdf": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek, izin disi alan veya suzgec, Excel'de fotograf ya da satir siniri asildi.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Disa aktarma izni yok.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/me/photo": {
       "get": {
         "tags": [
@@ -1332,20 +1743,6 @@
         "summary": "Personel listesi: kart izgarasi ve tablo icin (SYG-PERS-022, 023, 027–031). Varsayilan olarak\nyalnizca aktif personel; kapsam disindaki kisiler listede yoktur.",
         "parameters": [
           {
-            "name": "q",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/EmploymentStatusKind"
-            }
-          },
-          {
             "name": "page",
             "in": "query",
             "schema": {
@@ -1367,6 +1764,20 @@
                 "string"
               ],
               "format": "int32"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/EmploymentStatusKind"
             }
           },
           {
@@ -4319,6 +4730,13 @@
           }
         }
       },
+      "ExportFormatKind": {
+        "enum": [
+          "excel",
+          "pdf"
+        ],
+        "description": "Dosya bicimi."
+      },
       "FileContentResult": {
         "type": "object",
         "properties": {
@@ -5006,6 +5424,60 @@
         },
         "description": "Kisi karti."
       },
+      "PersonExportFieldName": {
+        "enum": [
+          "registryCode",
+          "nationalId",
+          "gender",
+          "birthDate",
+          "age",
+          "previousSurname",
+          "maritalStatus",
+          "education",
+          "bloodGroup",
+          "email",
+          "phone",
+          "address",
+          "employmentStatus",
+          "company",
+          "city",
+          "branch",
+          "department",
+          "title",
+          "duty",
+          "statusCode",
+          "occupationCode",
+          "occupationName",
+          "hireDate",
+          "terminationDate",
+          "seniority",
+          "photo"
+        ],
+        "description": "Disa aktarilabilen alan; degerler uygulama katmanindaki PersonExportField ile aynidir."
+      },
+      "PersonExportFieldResponse": {
+        "required": [
+          "field",
+          "label",
+          "pdfOnly"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "description": "Istekte `field` olarak gonderilen ad.",
+            "$ref": "#/components/schemas/PersonExportFieldName"
+          },
+          "label": {
+            "type": "string",
+            "description": "Basliktaki ad."
+          },
+          "pdfOnly": {
+            "type": "boolean",
+            "description": "Yalnizca PDF'te secilebilir (fotograf)."
+          }
+        },
+        "description": "Secilebilir alan."
+      },
       "PersonFilterOptionsResponse": {
         "required": [
           "companies",
@@ -5669,6 +6141,10 @@
         },
         "description": "Uyelik baslatma istegi (SYG-KMLK-013)."
       },
+      "Stream": {
+        "type": "string",
+        "format": "binary"
+      },
       "StringSegment": {
         "type": "object",
         "properties": {
@@ -6198,6 +6674,9 @@
     },
     {
       "name": "EmploymentDuties"
+    },
+    {
+      "name": "PersonExport"
     },
     {
       "name": "PersonPhotos"

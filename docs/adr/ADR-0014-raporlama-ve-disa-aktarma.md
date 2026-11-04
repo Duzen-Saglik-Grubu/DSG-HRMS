@@ -2,7 +2,8 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-025`, `KR-026`
+**Karar defteri karşılığı:** `KR-025`, `KR-026`, `KR-131`
+**Son güncelleme:** 2026-11-04
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **İlgili riskler:** `R-03`
 
@@ -24,10 +25,17 @@ kurum dışına çıkarabilecek bir dosyaya dönüştürmek aynı şey değildir
 | Biçim | Kütüphane | Lisans |
 |---|---|---|
 | Excel (`.xlsx`) | **ClosedXML** | MIT |
-| PDF | **PDFsharp / MigraDoc 6.x** | MIT |
+| PDF | **SkiaSharp** (`KR-131`) | MIT |
 
 **QuestPDF kullanılmayacaktır** (`KR-025`): Community lisansı ciro eşiğine bağlıdır;
 kurum koşullu lisanslı paket istemiyor.
+
+> **Revizyon (04.11.2026, `KR-131`, #330).** Karar ilk hâlinde PDF için PDFsharp/MigraDoc
+> 6.x'i seçmişti. Paket 6.5.0'dan (14.10.2026) itibaren AGPL-3.0 lisanslıdır; kullanılmaz.
+> PDF, projede fotoğraf küçültme için zaten bulunan SkiaSharp ile çizilir (`IReportWriter`,
+> `PdfReportWriter`). ClosedXML'in yazı tipi bağımlılığı SixLabors.Fonts 1.0.1'e (Apache-2.0)
+> sabittir; 2.x ciroya bağlı lisanslıdır. Yazı tipi Noto Sans (OFL) gömülüdür; SkiaSharp'ın
+> bağımlılıksız yerel paketi alt kümeleme yapmadığı için her PDF'e yaklaşık 0,65 MB sabit ek gelir.
 
 **Türkçe karakter:** PDF üretiminde font **açıkça gömülecek** (örn. DejaVu Sans veya
 Noto Sans) ve Linux için font çözücü tanımlanacaktır. Bu, PDFsharp'ta atlanırsa Türkçe
@@ -38,9 +46,9 @@ ortak bir yardımcı sınıfa alınacaktır.
 
 ```
 Uygulama katmanı
-   └── IReportGenerator<TRequest>
-            ├── ExcelReportGenerator   (ClosedXML)
-            └── PdfReportGenerator     (PDFsharp/MigraDoc)
+   └── IReportWriter (ReportDocument → dosya)
+            ├── ExcelReportWriter   (ClosedXML)
+            └── PdfReportWriter     (SkiaSharp; KR-131)
 ```
 
 - Rapor **verisi** ile rapor **biçimi** ayrılır. Aynı rapor sorgusu hem Excel hem PDF
@@ -110,7 +118,7 @@ listeleri PDF üretmeden yazdırabilmesi sağlanır.
 
 ## Gerekçe
 
-- ClosedXML ve PDFsharp, MIT lisanslı ve Linux uyumludur; kurumun koşullu lisans
+- ClosedXML ve SkiaSharp, MIT lisanslı ve Linux uyumludur (ilk hâlinde PDFsharp; `KR-131`); kurumun koşullu lisans
   istememesi kararıyla uyumludur.
 - Veri/biçim ayrımı, aynı raporu iki biçimde üretmeyi ve yeni biçim eklemeyi kolaylaştırır.
 - `export` izninin ve dışa aktarma kaydının ayrılması, KVKK açısından somut ve
@@ -123,6 +131,7 @@ listeleri PDF üretmeden yazdırabilmesi sağlanır.
 | Alternatif | Neden seçilmedi |
 |---|---|
 | QuestPDF | Koşullu ticari lisans (`KR-025`) |
+| PDFsharp / MigraDoc | 6.5.0’dan itibaren AGPL-3.0 (`KR-131`); ilk hâlinde seçilmişti |
 | EPPlus | 5.x sürümünden itibaren ticari lisans |
 | HTML → PDF (headless tarayıcı) | Ağır bağımlılık (Chromium), konteyner boyutu, bellek kullanımı |
 | Rapor sunucusu (JasperReports vb.) | Ek sistem, ek bakım; ölçek gerektirmiyor |
@@ -135,8 +144,8 @@ listeleri PDF üretmeden yazdırabilmesi sağlanır.
 kendi kendini açıklıyor.
 
 **Olumsuz / kabul edilen ödünler:**
-- PDFsharp/MigraDoc, karmaşık tablo düzenlerinde QuestPDF'e göre daha fazla kod
-  gerektirir. Ortak yardımcı sınıflarla bu maliyet bir kez ödenecektir.
+- SkiaSharp bir belge düzeni kütüphanesi değildir; tablo, satır kaydırma ve sayfalama
+  elle çizilir (`PdfReportWriter`). Bu maliyet ortak yazıcıda bir kez ödendi (`KR-131`).
 - Eşzamanlı üretim, çok büyük raporlarda kullanıcıyı bekletir; satır sınırı bu riski
   yönetir.
 
@@ -147,7 +156,7 @@ kendi kendini açıklıyor.
 
 ## Geri dönüş maliyeti
 
-**Düşük.** `IReportGenerator` soyutlaması sayesinde kütüphane değişimi tek uygulamayı
+**Düşük.** `IReportWriter` soyutlaması sayesinde kütüphane değişimi tek uygulamayı
 etkiler.
 
 ---
@@ -158,3 +167,4 @@ etkiler.
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-10-22 | 0.2 | §4: alan seçmeli dışa aktarma (`KR-121`, `KR-124`) | Bilgi İşlem |
+| 2026-11-04 | 0.3 | §1: PDF kütüphanesi SkiaSharp; PDFsharp/MigraDoc AGPL-3.0'a geçti; SixLabors.Fonts 1.x'e sabit (`KR-131`, #330) | Bilgi İşlem |
