@@ -9,7 +9,8 @@ namespace Dsg.Hrms.Infrastructure.Reports;
 /// <remarks>
 /// <para>
 /// Ilk sayfa "Rapor bilgisi"dir: zorunlu ust bilgi ve KVKK uyarisi (ADR-0014 §3, §6). Ikinci
-/// sayfa duz listedir: baslik satiri dondurulur, otomatik suzgec aciktir.
+/// sayfa duz listedir: baslik satiri dondurulur, otomatik suzgec aciktir. Ek sayfalar
+/// (<see cref="ReportDocument.AdditionalSheets"/>) ayni bicimde arkasindan gelir.
 /// </para>
 /// <para>
 /// Metin sutunlari (TCKN, sicil, telefon dahil) metin olarak ve metin bicimiyle yazilir; Excel
@@ -38,7 +39,11 @@ public sealed class ExcelReportWriter : IReportWriter
 
         using var workbook = new XLWorkbook();
         WriteInfo(workbook.AddWorksheet("Rapor bilgisi"), document);
-        WriteData(workbook.AddWorksheet(SheetName(document.Title)), document);
+        WriteData(workbook.AddWorksheet(SheetName(document.DataSheetName ?? document.Title)), document.Columns, document.Rows);
+        foreach (var sheet in document.AdditionalSheets)
+        {
+            WriteData(workbook.AddWorksheet(SheetName(sheet.Name)), sheet.Columns, sheet.Rows);
+        }
 
         using var stream = new MemoryStream();
         workbook.SaveAs(stream);
@@ -74,9 +79,8 @@ public sealed class ExcelReportWriter : IReportWriter
         sheet.Column(2).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Top);
     }
 
-    private static void WriteData(IXLWorksheet sheet, ReportDocument document)
+    private static void WriteData(IXLWorksheet sheet, IReadOnlyList<ReportColumn> columns, IReadOnlyList<ReportRow> rows)
     {
-        var columns = document.Columns;
         for (var c = 0; c < columns.Count; c++)
         {
             var header = sheet.Cell(1, c + 1);
@@ -85,9 +89,9 @@ public sealed class ExcelReportWriter : IReportWriter
             header.Style.Fill.SetBackgroundColor(XLColor.FromHtml("#E8EEF7"));
         }
 
-        for (var r = 0; r < document.Rows.Count; r++)
+        for (var r = 0; r < rows.Count; r++)
         {
-            var values = document.Rows[r].Values;
+            var values = rows[r].Values;
             for (var c = 0; c < columns.Count; c++)
             {
                 var cell = sheet.Cell(r + 2, c + 1);
@@ -109,7 +113,7 @@ public sealed class ExcelReportWriter : IReportWriter
             }
         }
 
-        var lastRow = Math.Max(1, document.Rows.Count + 1);
+        var lastRow = Math.Max(1, rows.Count + 1);
         for (var c = 0; c < columns.Count; c++)
         {
             var column = sheet.Column(c + 1);

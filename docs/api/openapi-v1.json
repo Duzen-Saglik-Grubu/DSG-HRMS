@@ -1034,6 +1034,220 @@
         }
       }
     },
+    "/api/v1/personnel/quality": {
+      "get": {
+        "tags": [
+          "DataQuality"
+        ],
+        "summary": "Son senkronizasyon, uyari turu sayilari ve suzgece uyan uyarilar (SYG-PERS-070).",
+        "parameters": [
+          {
+            "name": "Issue",
+            "in": "query",
+            "description": "Uyari turu; verilmezse hepsi.",
+            "schema": {
+              "$ref": "#/components/schemas/DataQualityIssueName"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "Sayfa (1'den baslar).",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "Sayfa boyutu (1–100).",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rapor.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataQualityReportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz sayfa veya sayfa boyutu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.quality.view`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/quality/ineligible": {
+      "get": {
+        "tags": [
+          "DataQuality"
+        ],
+        "summary": "Uye olamayacak kisiler: aktif, hesabi yok, uyelik kosulunu karsilamiyor (SYG-PERS-071).",
+        "parameters": [
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "Sayfa (1'den baslar).",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "Sayfa boyutu (1–100).",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sayfalanmis liste.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResponseOfIneligiblePersonResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz sayfa veya sayfa boyutu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.quality.view`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/quality/export": {
+      "get": {
+        "tags": [
+          "DataQuality"
+        ],
+        "summary": "Raporu Excel'e aktarir: \"Uyarılar\" (tur suzgeciyle) ve \"Üye olamayacak kişiler\" sayfalari.\nAktarim erisim kaydina yazilir (SYG-PERS-033).",
+        "parameters": [
+          {
+            "name": "Issue",
+            "in": "query",
+            "description": "Uyari turu; verilmezse hepsi. \"Üye olamayacak kişiler\" sayfasi suzulmez.",
+            "schema": {
+              "$ref": "#/components/schemas/DataQualityIssueName"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Excel dosyasi.",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.quality.export`).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties": {
       "post": {
         "tags": [
@@ -4610,6 +4824,164 @@
         },
         "description": "Yeni tanim istegi."
       },
+      "DataQualityCountResponse": {
+        "required": [
+          "issue",
+          "count"
+        ],
+        "type": "object",
+        "properties": {
+          "issue": {
+            "description": "Tur.",
+            "$ref": "#/components/schemas/DataQualityIssueName"
+          },
+          "count": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayi.",
+            "format": "int32"
+          }
+        },
+        "description": "Bir uyari turunun sayisi."
+      },
+      "DataQualityIssueName": {
+        "enum": [
+          "missingNationalId",
+          "invalidNationalId",
+          "missingBirthDate",
+          "noContact",
+          "invalidMobilePhone",
+          "sharedEmail",
+          "missingTitle",
+          "missingDuty"
+        ],
+        "description": "Uyari turu."
+      },
+      "DataQualityItemResponse": {
+        "required": [
+          "issue",
+          "registryCode",
+          "personId",
+          "firstName",
+          "lastName",
+          "company",
+          "branch",
+          "department"
+        ],
+        "type": "object",
+        "properties": {
+          "issue": {
+            "description": "Tur.",
+            "$ref": "#/components/schemas/DataQualityIssueName"
+          },
+          "registryCode": {
+            "type": "string",
+            "description": "Sicil kodu."
+          },
+          "personId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Kisinin dis kimligi; kisi olusturulmadiysa bos.",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Ad."
+          },
+          "lastName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Soyad."
+          },
+          "company": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Firma."
+          },
+          "branch": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Sube."
+          },
+          "department": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Birim."
+          }
+        },
+        "description": "Bir uyari."
+      },
+      "DataQualityReportResponse": {
+        "required": [
+          "lastRun",
+          "warningsRun",
+          "counts",
+          "ineligibleCount",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "lastRun": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "En son biten senkronizasyon; hic yoksa bos.",
+                "$ref": "#/components/schemas/SyncRunResponse"
+              }
+            ]
+          },
+          "warningsRun": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Kart uyarilarinin alindigi calisma; hic yoksa bos.",
+                "$ref": "#/components/schemas/SyncRunResponse"
+              }
+            ]
+          },
+          "counts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataQualityCountResponse"
+            },
+            "description": "Her uyari turunun sayisi (suzgecten bagimsiz)."
+          },
+          "ineligibleCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Uye olamayacak kisi sayisi.",
+            "format": "int32"
+          },
+          "items": {
+            "description": "Suzgece uyan uyarilar.",
+            "$ref": "#/components/schemas/PagedResponseOfDataQualityItemResponse"
+          }
+        },
+        "description": "Rapor ekrani."
+      },
       "DutyResponse": {
         "required": [
           "id",
@@ -4847,6 +5219,73 @@
         },
         "description": "Bildirim."
       },
+      "IneligiblePersonResponse": {
+        "required": [
+          "personId",
+          "registryCode",
+          "firstName",
+          "lastName",
+          "company",
+          "branch",
+          "department",
+          "reasons"
+        ],
+        "type": "object",
+        "properties": {
+          "personId": {
+            "type": "string",
+            "description": "Kisinin dis kimligi.",
+            "format": "uuid"
+          },
+          "registryCode": {
+            "type": "string",
+            "description": "Esas istihdamin sicil kodu."
+          },
+          "firstName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Ad."
+          },
+          "lastName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Soyad."
+          },
+          "company": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Firma."
+          },
+          "branch": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Sube."
+          },
+          "department": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Birim."
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MembershipBlockerName"
+            },
+            "description": "Nedenler."
+          }
+        },
+        "description": "Uye olamayacak kisi."
+      },
       "InvitationInfoResponse": {
         "required": [
           "firstName",
@@ -4917,6 +5356,14 @@
           "notMarried"
         ],
         "description": "Medeni hal."
+      },
+      "MembershipBlockerName": {
+        "enum": [
+          "noEmail",
+          "domainNotAccepted",
+          "sharedEmail"
+        ],
+        "description": "Uye olamama nedeni."
       },
       "OwnCorrectionStateResponse": {
         "required": [
@@ -5012,6 +5459,118 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CorrectionResponse"
+            },
+            "description": "Bu sayfadaki kayitlar."
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa numarasi.",
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa boyutu.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam kayit sayisi.",
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam sayfa sayisi.",
+            "format": "int32"
+          }
+        },
+        "description": "Sayfalanmis yanit (ADR-0010 §4)."
+      },
+      "PagedResponseOfDataQualityItemResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataQualityItemResponse"
+            },
+            "description": "Bu sayfadaki kayitlar."
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa numarasi.",
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa boyutu.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam kayit sayisi.",
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam sayfa sayisi.",
+            "format": "int32"
+          }
+        },
+        "description": "Sayfalanmis yanit (ADR-0010 §4)."
+      },
+      "PagedResponseOfIneligiblePersonResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IneligiblePersonResponse"
             },
             "description": "Bu sayfadaki kayitlar."
           },
@@ -6254,13 +6813,14 @@
           "status",
           "startedAt",
           "finishedAt",
-          "failureReason"
+          "recordsRead",
+          "warningCount"
         ],
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "description": "Sonuc (`running`, `succeeded`, `completedWithWarnings`, `failed`)."
+            "description": "Sonuc (`succeeded`, `completedWithWarnings`, `failed`, `partiallyCompleted`)."
           },
           "startedAt": {
             "type": "string",
@@ -6272,18 +6832,29 @@
               "null",
               "string"
             ],
-            "description": "Bitis; suruyorsa bos.",
+            "description": "Bitis.",
             "format": "date-time"
           },
-          "failureReason": {
+          "recordsRead": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
-              "null",
+              "integer",
               "string"
             ],
-            "description": "Basarisizlik nedeni."
+            "description": "Okunan kart sayisi.",
+            "format": "int32"
+          },
+          "warningCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Uretilen uyari sayisi.",
+            "format": "int32"
           }
         },
-        "description": "Bir calismanin ozeti."
+        "description": "Senkronizasyon calismasinin ozeti."
       },
       "SyncStatusResponse": {
         "required": [
@@ -6671,6 +7242,9 @@
     },
     {
       "name": "Corrections"
+    },
+    {
+      "name": "DataQuality"
     },
     {
       "name": "EmploymentDuties"

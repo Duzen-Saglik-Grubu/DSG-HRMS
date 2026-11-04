@@ -116,6 +116,21 @@ public sealed class PersonnelSynchronizerTests
     }
 
     [Fact]
+    public void Card_warning_records_whether_the_card_is_active()
+    {
+        // SYG-PERS-070: veri kalitesi raporu yalnizca aktif kartlarin uyarilarini gosterir.
+        var outcome = Run(
+        [
+            Card("00001", nationalId: ""),
+            Card("00002", nationalId: "", terminationDate: Today.AddDays(-1)),
+            Card("00003", nationalId: "", terminationDate: Today),
+        ]);
+
+        outcome.Warnings.ToDictionary(w => w.RegistryCode, w => w.IsActiveCard)
+            .ShouldBe(new Dictionary<string, bool> { ["00001"] = true, ["00002"] = false, ["00003"] = true });
+    }
+
+    [Fact]
     public void Card_with_invalid_national_id_creates_no_person_and_warns()
     {
         var outcome = Run([Card("00001", nationalId: "12345678901")]);

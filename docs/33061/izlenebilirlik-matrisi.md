@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-11-04
+**Son güncelleme:** 2026-11-05
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 
@@ -253,8 +253,8 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 29 | `PG-PERS-29` Dışa aktarma (Excel/PDF) ayrı bir yetkidir; görüntüleme yetkisi dışa aktarma hakkı… | SYG-PERS-032, 055 | `ADR-0014` §4; `ADR-0019` §4 | **Kısmen:** SYG-032 (`personnel.person.export`; izinsize `403`; süzgece uyan bütün kayıtlar, liste ile aynı küme ve sıra; Excel ClosedXML, PDF SkiaSharp, `KR-131`; 50.000 satır sınırı; AN-21) · PR #331 (arka uç); liste ekranında yalnızca izinliye görünen "Dışa aktar" düğmesi, biçim ve alan seçimi · PR #332 (ekran) | `PersonExportApiTests`, `ReportWriterTests`, `ExportDialog.test`, `PersonListPage.test`, `personnel.spec` (4) | — |
 | 30 | `PG-PERS-30` Her dışa aktarma işlemi kaydedilir: kim, hangi filtreyle, kaç kayıt aktardı. | SYG-PERS-033, 069 | `ADR-0014` §4; `ADR-0022` §4 | **Kısmen:** SYG-033 (erişim kaydında `Export`: biçim, alanlar, süzgeç, sayı, kişiler; korumalı süzgecin değeri yazılmaz, SYG-059; kan grubunda kişi başına `SpecialCategoryView`) · PR #331 (arka uç); ekranda aktarımın kayda geçtiği bildirilir · PR #332 — SYG-069 denetim ekranı sonraki iş | `PersonExportApiTests` | — |
 | 31 | `PG-PERS-31` TCKN ekranda maskelenmiş gösterilir (örn. 123*89). İK ve Sistem Yöneticisi tam… | SYG-PERS-052, 053 | `ADR-0019` §2 | **Kısmen:** SYG-052, 053 (ekran maskesi `123******01`, tam TCKN `view_national_id`) · PR #276 (API) — ekran sonraki iş | `PersonCardApiTests`, `PersonFieldVisibilityTests` | — |
-| 32 | `PG-PERS-32` Senkronizasyonda uyarı üreten kayıtlar (TCKN yok, doğum tarihi yok, iletişim bilgisi… | SYG-PERS-055, 070 | `ADR-0003` §5 | — | — | — |
-| 33 | `PG-PERS-33` Veri kalitesi raporu, T3 Kimlik Yönetimi'nin üyelik akışını etkileyen kayıtları… | SYG-PERS-071 | `ADR-0003` §5 | — | — | — |
+| 32 | `PG-PERS-32` Senkronizasyonda uyarı üreten kayıtlar (TCKN yok, doğum tarihi yok, iletişim bilgisi… | SYG-PERS-055, 070 | `ADR-0003` §5, `ADR-0014` | SYG-070 (kart uyarıları veriyi aktaran son çalışmadan, yalnızca aktif kartlar; iletişim yok, paylaşılan e-posta, ünvanı boş, görevi boş güncel veriden; tür süzgeci ve sayıları; son çalışmanın sonucu; TCKN, e-posta ve telefon yok; Excel'e aktarım `Export` kaydıyla; AN-22) · PR (arka uç, #335) — ekran sonraki PR | `DataQualityApiTests`, `PersonnelSynchronizerTests`, `ReportWriterTests` | — |
+| 33 | `PG-PERS-33` Veri kalitesi raporu, T3 Kimlik Yönetimi'nin üyelik akışını etkileyen kayıtları… | SYG-PERS-071 | `ADR-0003` §5 | SYG-071 (aktif, hesabı yok ve T3 üyelik koşulunu karşılamayan kişiler; neden: kurumsal e-posta yok, alan adı kabul edilmiyor, paylaşılan; Excel'de ayrı sayfa) · PR (arka uç, #335) — ekran sonraki PR | `DataQualityApiTests` | — |
 | 34 | `PG-PERS-34` "Yöneticisi" filtresi T2 Organizasyon Yönetimi ile BİRLİKTE devreye alınır; T2 hazır… | SYG-PERS-056 | `ADR-0007` §2 (T2) | — | — | — |
 | 35 | `PG-PERS-35` T2 Organizasyon Yönetimi ve T4 Rol ve Yetki Yönetimi devreye girene kadar geçiş… | SYG-PERS-050, 055 | `ADR-0019` §1 | **Kısmen:** SYG-050, 055 (kapsam `All`/`Self`, T1 izinleri, rol adı "İnsan Kaynakları") · PR #276 (API) — ekranlar sonraki iş | `PersonCardApiTests`, `AccessControlApiTests` | — |
 | 36 | `PG-PERS-36` Din ve sağlık bilgileri LOGO'dan senkronize edilmez, HRMS'te saklanmaz ve hiçbir… | SYG-PERS-004, 005, 049, 052, 054, 057, 059, 060, 061, 062, 063, 064, 065, 067, 072 | `ADR-0020`; `ADR-0019` §2; `ADR-0021` §4 | **Kısmen:** SYG-004 (din ve sağlık okunmaz) · PR #281; SYG-005 (kan grubu yalnızca ayar açıkken okunur, kapalıyken temizlenir), SYG-052, 054, 057 (kartta görme hakkına göre; yanıtta yoksa çözülmez; `SpecialCategoryView`), SYG-060, 061 (AES-256-GCM, anahtar kimliği, AAD; anahtarsız uygulama açılmaz) · PR #318 — süzgeç (063), yeniden şifreleme (062), önerilen kan grubu (049) sonraki iş | `LogoFieldScopeTests`, `LogoReadOnlyAccessTests`, `PersonalDataProtectorTests`, `PersonalDataKeyStartupTests`, `PersonnelDetailsSynchronizerTests`, `PersonnelSyncStoreTests`, `PersonCardApiTests`, `PersonCardPage.test` | — |
@@ -337,3 +337,4 @@ eksiksiz → **%100**. Kabul halkası İK kabul oturumunda doldu (`TEC.11-gecerl
 | 2026-11-04 | 2.41 | §7: PG-PERS-29, 30, 42 arka uç gerçekleştirmesi (dışa aktarma, #330) | Bilgi İşlem |
 | 2026-11-04 | 2.42 | §7: PG-PERS-29, 30, 42 ekranı ve uçtan uca doğrulama (#330) | Bilgi İşlem |
 | 2026-11-04 | 2.43 | §7: PG-PERS-37 satırı, değişiklik talebi #333 (bildirim Sistem Yöneticisine de) | Bilgi İşlem |
+| 2026-11-05 | 2.44 | §7: PG-PERS-32, 33 arka uç gerçekleştirmesi (veri kalitesi raporu, #335) | Bilgi İşlem |

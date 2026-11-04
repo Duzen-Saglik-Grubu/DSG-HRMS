@@ -1,7 +1,7 @@
 # İzin Listesi
 
 **Belge kimliği:** MIM-IZIN
-**Son güncelleme:** 2026-11-04
+**Son güncelleme:** 2026-11-05
 **Sahibi:** Bilgi İşlem
 **İlgili:** ADR-0007 §1, ADR-0019 §4, `KR-021`, `KR-089`, `KR-126`, SYG-KMLK-074, SYG-PERS-055
 
@@ -35,8 +35,8 @@
 | `personnel.person.export` | Personel listesini dışa aktarma | `GET /personnel/persons/export`, `/export/fields` (#330) | PERS-032 |
 | `personnel.correction.view` | "İK'ya bildir" taleplerini görme | Düzeltme talepleri (sonraki iş) | PERS-048 |
 | `personnel.correction.update` | "İK'ya bildir" taleplerini kapatma | Düzeltme talepleri (sonraki iş) | PERS-048 |
-| `personnel.quality.view` | Veri kalitesi raporunu görme | Veri kalitesi (sonraki iş) | PERS-070 |
-| `personnel.quality.export` | Veri kalitesi raporunu dışa aktarma | Veri kalitesi (sonraki iş) | PERS-070 |
+| `personnel.quality.view` | Veri kalitesi raporunu görme | `GET /personnel/quality`, `/quality/ineligible` (#335) | PERS-070, 071 |
+| `personnel.quality.export` | Veri kalitesi raporunu dışa aktarma | `GET /personnel/quality/export` (#335) | PERS-070 |
 | `reference.definition.view` | Ünvan ve görev tanımlarını görme | Referans veri (sonraki iş) | PERS-072 |
 | `reference.definition.update` | Ünvan ve görev tanımlarını değiştirme | Referans veri (sonraki iş) | PERS-072 |
 | `audit.log.view` | Denetim kayıtlarını görme | Denetim kayıtları (sonraki iş) | PERS-069 |
@@ -63,3 +63,4 @@ Kişi kartı ve "Profilim" (`GET /api/v1/personnel/persons/{id}`, `/me`) izin de
 | 2026-10-22 | 0.3 | T1 izinleri eklendi; `identity.sync.*` → `personnel.sync.*`; İK rolünün adı "İnsan Kaynakları", elle senkronizasyon İK'da (`KR-126`, #276) | Bilgi İşlem |
 | 2026-10-23 | 0.4 | İK rolüne `audit.log.view` ve `system.parameter.*`; T4 yönü (`KR-128`, #278) | Bilgi İşlem |
 | 2026-11-04 | 0.5 | `personnel.person.export` uçlara bağlandı (#330) | Bilgi İşlem |
+| 2026-11-05 | 0.6 | `personnel.quality.view` ve `.export` uçlara bağlandı (#335) | Bilgi İşlem |

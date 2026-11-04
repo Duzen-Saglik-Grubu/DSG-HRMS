@@ -59,6 +59,10 @@ public sealed class PdfReportWriter : IReportWriter
     public byte[] Write(ReportDocument document)
     {
         ArgumentNullException.ThrowIfNull(document);
+        if (document.AdditionalSheets.Count > 0)
+        {
+            throw new NotSupportedException("PDF yazicisi ek sayfali raporu yazmaz; ek sayfalar yalnizca Excel'dedir.");
+        }
 
         // Sutun cogaldikca yazi kuculur; sozcukler bolunmeden sigana kadar kademeli denenir.
         var size = document.Columns.Count switch

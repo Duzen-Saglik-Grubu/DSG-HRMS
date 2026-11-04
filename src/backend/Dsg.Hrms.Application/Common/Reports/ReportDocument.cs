@@ -43,6 +43,12 @@ public sealed record ReportInfo(string Label, string Value);
 /// <param name="Values">Degerler.</param>
 public sealed record ReportRow(IReadOnlyList<object?> Values);
 
+/// <summary>Ek veri sayfasi (yalnizca Excel): ayni rapordaki ikinci bir liste.</summary>
+/// <param name="Name">Sayfa adi.</param>
+/// <param name="Columns">Sutunlar.</param>
+/// <param name="Rows">Satirlar.</param>
+public sealed record ReportSheet(string Name, IReadOnlyList<ReportColumn> Columns, IReadOnlyList<ReportRow> Rows);
+
 /// <summary>
 /// Bicimden bagimsiz rapor (ADR-0014 §2): ayni belge Excel'e de PDF'e de yazilir. Veri ve
 /// bicim ayridir; yazici yalnizca bu modeli bilir.
@@ -57,6 +63,15 @@ public sealed record ReportDocument(
     IReadOnlyList<ReportColumn> Columns,
     IReadOnlyList<ReportRow> Rows)
 {
+    /// <summary>Ana veri sayfasinin adi (Excel); verilmezse rapor adi.</summary>
+    public string? DataSheetName { get; init; }
+
+    /// <summary>
+    /// Ana listeden sonraki ek sayfalar. Yalnizca Excel yazar; PDF yazicisi ek sayfali belgeyi
+    /// reddeder (ikinci listeyi sessizce dusurmemek icin).
+    /// </summary>
+    public IReadOnlyList<ReportSheet> AdditionalSheets { get; init; } = [];
+
     /// <summary>Kurum adi; her raporun basinda yazar.</summary>
     public string Organization { get; init; } = "Düzen Sağlık Grubu";
 
