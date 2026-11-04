@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   CardActionArea,
-  Grid,
   InputAdornment,
   Link,
   MenuItem,
@@ -369,6 +368,24 @@ export function PersonListPage() {
   );
 }
 
+/**
+ * Kart izgarasi: telefonda 1, tablette 2-3, genis ekranda 4 sutun. 1920 pikselden genis
+ * ekranda sutun sayisi genislige gore artar (2560 pikselde 6); kartlar asiri genislemez.
+ */
+const CARD_GRID = {
+  display: 'grid',
+  gap: 2,
+  gridTemplateColumns: {
+    xs: 'minmax(0, 1fr)',
+    sm: 'repeat(2, minmax(0, 1fr))',
+    md: 'repeat(3, minmax(0, 1fr))',
+    lg: 'repeat(4, minmax(0, 1fr))',
+  },
+  '@media (min-width: 1921px)': {
+    gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+  },
+} as const;
+
 interface CardGridProps {
   rows: PersonListItem[] | undefined;
   loading: boolean;
@@ -399,26 +416,23 @@ function CardGrid({
 
   return (
     <Stack spacing={1}>
-      <Grid container spacing={2} component="section" aria-label={t('personnel.list.title')}>
+      <Box component="section" aria-label={t('personnel.list.title')} sx={CARD_GRID}>
         {loading || !rows
           ? Array.from({ length: 6 }, (_, index) => (
-              <Grid key={`iskelet-${String(index)}`} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                <Skeleton variant="rounded" height={120} />
-              </Grid>
+              <Skeleton key={`iskelet-${String(index)}`} variant="rounded" height={120} />
             ))
           : rows.map((person) => (
-              <Grid key={person.personId} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                <CardActionArea
-                  component={RouterLink}
-                  to={personCardPath(person.personId)}
-                  state={cardState}
-                  sx={{ height: '100%', borderRadius: 1 }}
-                >
-                  <PersonCard person={person} />
-                </CardActionArea>
-              </Grid>
+              <CardActionArea
+                key={person.personId}
+                component={RouterLink}
+                to={personCardPath(person.personId)}
+                state={cardState}
+                sx={{ height: '100%', borderRadius: 1 }}
+              >
+                <PersonCard person={person} />
+              </CardActionArea>
             ))}
-      </Grid>
+      </Box>
       <Paper variant="outlined">
         <TablePagination
           component="div"

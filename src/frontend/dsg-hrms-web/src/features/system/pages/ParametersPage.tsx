@@ -28,10 +28,23 @@ import { parametersApi, type Parameter } from '../api/parametersApi';
 /** Iki adimli dogrulama parametresi; acilmadan once etki onayi istenir (SYG-KMLK-035). */
 const TWO_FACTOR_KEY = 'PRM-KML-08';
 
-/** Katalog kimliginin onekine gore gruplar (Y4 katalogundaki bolumler). */
-const GROUPS = ['GRN', 'KML', 'HSP', 'ENT', 'BLD'] as const;
+/**
+ * Katalog kimliginin onekine gore gruplar (Y4 katalogundaki bolumler). Burada olmayan bir onek
+ * de sonda kendi grubunda gosterilir; yeni bir bolumun parametreleri ekrandan dusmez
+ * (PRM-PRS-01 bu yuzden gorunmuyordu).
+ */
+const GROUPS = ['GRN', 'KML', 'HSP', 'PRS', 'ENT', 'BLD'] as const;
 
 const groupOf = (key: string) => key.split('-')[1] ?? 'GRN';
+
+/** Bilinen gruplar katalog sirasinda, bilinmeyenler sonda. */
+function groupsOf(items: readonly Parameter[]): string[] {
+  const known: readonly string[] = GROUPS;
+  const extra = [...new Set(items.map((item) => groupOf(item.key)))].filter(
+    (group) => !known.includes(group),
+  );
+  return [...known, ...extra];
+}
 
 /**
  * En kucuk parametre ekrani (SYG-KMLK-076): yalnizca T3 parametreleri ve kurumsal logo.
@@ -41,7 +54,7 @@ const groupOf = (key: string) => key.split('-')[1] ?? 'GRN';
  * Parametre ekraninin tamami Y4 kapsamindadir ve bu ekrani genisletir.
  */
 export function ParametersPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const canView = usePermission(permissions.parameterView);
   const canUpdate = usePermission(permissions.parameterUpdate);
 
@@ -81,7 +94,7 @@ export function ParametersPage() {
         />
       ) : null}
 
-      {GROUPS.map((group) => {
+      {groupsOf(parameters.data ?? []).map((group) => {
         const items = (parameters.data ?? []).filter((item) => groupOf(item.key) === group);
         if (items.length === 0) {
           return null;
@@ -100,7 +113,9 @@ export function ParametersPage() {
               component="h2"
               sx={{ px: 3, pt: 2.5, pb: 1 }}
             >
-              {t(`system.parameters.groups.${group}`)}
+              {i18n.exists(`system.parameters.groups.${group}`)
+                ? t(`system.parameters.groups.${group}`)
+                : group}
             </Typography>
             <Stack divider={<Divider flexItem />}>
               {items.map((item) => (

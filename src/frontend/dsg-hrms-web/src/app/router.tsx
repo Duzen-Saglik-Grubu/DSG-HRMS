@@ -70,6 +70,12 @@ const PersonCardPage = lazy(async () => {
   return { default: page.PersonCardPage };
 });
 
+const CorrectionsPage = lazy(async () => {
+  const page = await import('@/features/personnel/pages/CorrectionsPage');
+
+  return { default: page.CorrectionsPage };
+});
+
 const ProfilePage = lazy(async () => {
   const page = await import('@/features/personnel/pages/ProfilePage');
 
@@ -173,6 +179,15 @@ export const router = createBrowserRouter([
               <PersonListPage />
             </Suspense>
           </PersonnelListRoute>
+        ),
+      },
+      {
+        // Statik yol, kisi kartinin dinamik yolundan once eslesir.
+        path: routes.corrections,
+        element: (
+          <Suspense fallback={<RouteFallback />}>
+            <CorrectionsPage />
+          </Suspense>
         ),
       },
       {

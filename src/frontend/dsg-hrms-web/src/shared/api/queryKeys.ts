@@ -19,6 +19,16 @@ export const queryKeys = {
     me: ['personnel', 'card', 'me'] as const,
     photo: (personId: string) => ['personnel', 'photo', personId] as const,
     syncFreshness: ['personnel', 'sync-freshness'] as const,
+    ownCorrections: ['personnel', 'corrections', 'me'] as const,
+    correctionsAll: ['personnel', 'corrections'] as const,
+    corrections: (status: string, page: number, pageSize: number) =>
+      ['personnel', 'corrections', 'list', status, page, pageSize] as const,
+    correction: (requestId: string) => ['personnel', 'corrections', 'item', requestId] as const,
+  },
+  notifications: {
+    all: ['notifications'] as const,
+    inbox: ['notifications', 'inbox'] as const,
+    unread: ['notifications', 'unread'] as const,
   },
   identity: {
     publicSettings: ['identity', 'public-settings'] as const,

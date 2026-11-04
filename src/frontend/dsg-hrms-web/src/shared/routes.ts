@@ -16,6 +16,7 @@ export const routes = {
   invite: '/invite',
   parameters: '/system/parameters',
   personnel: '/personnel',
+  corrections: '/personnel/corrections',
   profile: '/profile',
 } as const;
 

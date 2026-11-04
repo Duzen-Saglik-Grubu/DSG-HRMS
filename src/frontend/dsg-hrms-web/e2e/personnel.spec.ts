@@ -100,6 +100,47 @@ test('2. rolu olmayan personel listeyi gormez; adresi yazsa da profiline gider (
   await expect(page).toHaveURL(/\/profile$/);
 });
 
+test('3. IK-ya bildir: personel kendi kartindan bildirir, IK talebi kapatir (SYG-PERS-045, 048)', async ({
+  page,
+}) => {
+  await signIn(page, people.unprivileged.email, passwords.first);
+  await page.getByRole('link', { name: 'Profilim' }).click();
+  await page.getByRole('button', { name: "İK'ya bildir" }).click();
+
+  const dialog = page.getByRole('dialog', { name: "İK'ya bildir" });
+  await dialog.getByRole('combobox', { name: /Düzeltilecek bilgi/ }).click();
+  await page.getByRole('option', { name: 'Adres' }).click();
+  await dialog.getByRole('textbox', { name: /Doğru bilgi/ }).fill('Ornek Mah. 7. Sok. No: 3');
+  await dialog.getByRole('button', { name: 'Gönder' }).click();
+  await expect(page.getByText("Talebiniz İK'ya iletildi.", { exact: false })).toBeVisible();
+
+  // Ayni alan icin ikinci talep acilamaz (AN-08).
+  await page.getByRole('button', { name: "İK'ya bildir" }).click();
+  await dialog.getByRole('combobox', { name: /Düzeltilecek bilgi/ }).click();
+  await expect(page.getByRole('option', { name: /Adres/ })).toHaveAttribute(
+    'aria-disabled',
+    'true',
+  );
+  await page.keyboard.press('Escape');
+  await dialog.getByRole('button', { name: 'Vazgeç' }).click();
+  await signOut(page, people.unprivileged.fullName);
+
+  // Sistem Yoneticisi talepleri gorur ve kapatir; kapatinca onerilen deger silinir.
+  await signIn(page, people.admin.email, passwords.first);
+  await page.getByRole('link', { name: 'Düzeltme talepleri' }).click();
+  const row = page.getByRole('row', { name: /Zeynep Izinsiz/ });
+  await expect(row).toContainText('Ornek Mah. 7. Sok. No: 3');
+  await row.getByRole('button', { name: 'Tamamlandı olarak kapat' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Tamamlandı olarak kapat' }).click();
+  await expect(page.getByText('Zeynep Izinsiz için talep kapatıldı.')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Tamamlandı', exact: true }).click();
+  await expect(page.getByRole('row', { name: /Zeynep Izinsiz/ })).toContainText(
+    'Talep kapatıldığı için silindi',
+  );
+  await signOut(page, people.admin.fullName);
+});
+
 /** Fotograf goruntusu gercekten yuklendi: bas harflere dusmedi. */
 async function expectPhotoLoaded(photo: Locator) {
   await expect(photo).toHaveAttribute('src', /^data:image\/jpeg;base64,/);

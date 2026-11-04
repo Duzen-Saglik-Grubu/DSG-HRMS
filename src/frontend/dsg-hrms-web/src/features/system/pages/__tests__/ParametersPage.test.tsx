@@ -78,6 +78,40 @@ describe('ParametersPage', () => {
     expect(screen.getByText('Bu ekrandan')).toBeInTheDocument();
   });
 
+  it('personel grubunu ve listede olmayan bir grubu da gosterir', async () => {
+    vi.spyOn(parametersApi, 'list').mockResolvedValue([
+      ...PARAMETERS,
+      {
+        key: 'PRM-PRS-02',
+        description: 'IK adresi',
+        type: 'text',
+        min: null,
+        max: null,
+        value: null,
+        isSet: false,
+        source: 'none',
+      },
+      {
+        key: 'PRM-YNI-01',
+        description: 'Yeni bolumun parametresi',
+        type: 'text',
+        min: null,
+        max: null,
+        value: null,
+        isSet: false,
+        source: 'none',
+      },
+    ]);
+    renderWithProviders(<ParametersPage />);
+
+    expect(await screen.findByRole('heading', { name: 'Personel' })).toBeInTheDocument();
+    expect(
+      screen.getByText("İK'ya bildir e-posta adresi (boş = e-posta gönderilmez)"),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'YNI' })).toBeInTheDocument();
+    expect(screen.getByText('Yeni bolumun parametresi')).toBeInTheDocument();
+  });
+
   it('gizli degeri gostermez; yalnizca tanimli oldugunu soyler ve yeni degeri yazdirir', async () => {
     const update = vi.spyOn(parametersApi, 'update').mockResolvedValue(undefined);
     const user = userEvent.setup();

@@ -179,6 +179,16 @@ describe('sol menu ve ust cubuk', () => {
     expect(await screen.findByText('Personel sayfası ?q=i%C5%9F%C4%B1k')).toBeInTheDocument();
   });
 
+  it('bildirim zili ust cubukta arama alaninin sagindadir', async () => {
+    await setSession({ status: 'authenticated', permissions: [permissions.personView] });
+    renderLayout();
+
+    const search = await screen.findByRole('search');
+    const bell = await screen.findByRole('button', { name: /^Bildirimler/ });
+    // DOCUMENT_POSITION_FOLLOWING: zil, arama formundan sonra gelir.
+    expect(search.compareDocumentPosition(bell) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('personeli goremeyen kullaniciya hizli arama sunulmaz', async () => {
     await setSession({ status: 'authenticated' });
     renderLayout();

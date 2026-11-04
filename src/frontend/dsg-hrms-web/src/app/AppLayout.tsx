@@ -28,7 +28,7 @@ import SearchRounded from '@mui/icons-material/SearchRounded';
 import SecurityOutlined from '@mui/icons-material/SecurityOutlined';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
+import { Link as RouterLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { fetchPublicSettings } from '@/shared/api/publicSettings';
 import { queryKeys } from '@/shared/api/queryKeys';
 import { permissions } from '@/shared/auth/permissions';
@@ -39,6 +39,7 @@ import { usePermission } from '@/shared/auth/usePermission';
 import { DEFAULT_LOGO_URL, uploadedLogoUrl } from '@/shared/branding';
 import { routes } from '@/shared/routes';
 import { findNavItem, navigation } from './navigation';
+import { NotificationBell } from '@/shared/components/NotificationBell';
 
 /** Acik ve daraltilmis sol menu genisligi. */
 const SIDEBAR_WIDTH = 264;
@@ -142,7 +143,7 @@ export function AppLayout() {
             px: { xs: 2, sm: 3, lg: 4 },
             pt: 1,
             pb: 3,
-            maxWidth: 1600,
+            // Ust sinir yok: genis ekranda (2560 px) icerik saga kadar uzanir.
             width: '100%',
           }}
         >
@@ -312,14 +313,20 @@ function NavEntry({
   onNavigate: (() => void) | undefined;
 }) {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
   const Icon = item.icon;
   const label = t(item.label);
+  // Secili oge en ozel eslesmedir (findNavItem). NavLink on ek eslemesiyle
+  // /personnel/corrections adresinde "Personel listesi"ni de secerdi; bu yuzden duz baglanti.
+  const found = findNavItem(pathname);
+  const active = found !== null && 'item' in found && found.item.to === item.to;
 
   const link = (
     <Box
-      component={NavLink}
+      component={RouterLink}
       to={item.to}
-      end={item.to === routes.home}
+      className={active ? 'active' : undefined}
+      aria-current={active ? 'page' : undefined}
       onClick={onNavigate}
       aria-label={mini ? label : undefined}
       sx={(theme) => ({
@@ -617,6 +624,9 @@ function TopBar({ onOpenMenu }: { onOpenMenu: (() => void) | undefined }) {
           />
         </Box>
       ) : null}
+
+      {/* Zil arama alaninin saginda; ust cubugun en sag ogesi. */}
+      <NotificationBell />
     </Box>
   );
 }
