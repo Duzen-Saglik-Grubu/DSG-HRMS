@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from '@playwright/test';
+import { expect, test, type Download, type Locator } from '@playwright/test';
 import { signIn, signOut } from './support/flows';
 import { passwords, people } from './support/people';
 
@@ -140,6 +140,50 @@ test('3. IK-ya bildir: personel kendi kartindan bildirir, IK talebi kapatir (SYG
   );
   await signOut(page, people.admin.fullName);
 });
+
+test('4. disa aktarma: yonetici suzgece uyan listeyi Excel ve PDF olarak indirir (SYG-PERS-032)', async ({
+  page,
+}) => {
+  await signIn(page, people.admin.email, passwords.first);
+  await page.getByRole('link', { name: 'Personel listesi', exact: true }).click();
+  await expect(page.getByRole('article', { name: 'Deniz Davetli' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Dışa aktar' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Personel listesini dışa aktar' });
+  await expect(dialog.getByText(/Süzgece uyan \d+ kişi aktarılacak\./)).toBeVisible();
+  // Fotograf yalnizca PDF'te secilebilir.
+  await expect(dialog.getByRole('checkbox', { name: /Fotoğraf/ })).toBeDisabled();
+  await dialog.getByRole('checkbox', { name: 'TCKN' }).check();
+
+  const excel = page.waitForEvent('download');
+  await dialog.getByRole('button', { name: 'İndir' }).click();
+  const excelFile = await excel;
+  expect(excelFile.suggestedFilename()).toMatch(/^personel-listesi-\d{8}-\d{4}\.xlsx$/);
+  const xlsx = await readDownload(excelFile);
+  expect(xlsx.subarray(0, 2).toString('latin1')).toBe('PK'); // xlsx bir zip arsividir
+  await expect(dialog).toBeHidden();
+
+  // PDF: secim hatirlanir; fotograf eklenebilir.
+  await page.getByRole('button', { name: 'Dışa aktar' }).click();
+  await expect(dialog.getByRole('checkbox', { name: 'TCKN' })).toBeChecked();
+  await dialog.getByRole('button', { name: 'PDF' }).click();
+  await dialog.getByRole('checkbox', { name: /Fotoğraf/ }).check();
+  const pdf = page.waitForEvent('download');
+  await dialog.getByRole('button', { name: 'İndir' }).click();
+  const pdfFile = await pdf;
+  expect(pdfFile.suggestedFilename()).toMatch(/\.pdf$/);
+  expect((await readDownload(pdfFile)).subarray(0, 4).toString('latin1')).toBe('%PDF');
+  await signOut(page, people.admin.fullName);
+});
+
+async function readDownload(download: Download): Promise<Buffer> {
+  const stream = await download.createReadStream();
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) {
+    chunks.push(chunk as Buffer);
+  }
+  return Buffer.concat(chunks);
+}
 
 /** Fotograf goruntusu gercekten yuklendi: bas harflere dusmedi. */
 async function expectPhotoLoaded(photo: Locator) {

@@ -19,6 +19,7 @@ export const queryKeys = {
     me: ['personnel', 'card', 'me'] as const,
     photo: (personId: string) => ['personnel', 'photo', personId] as const,
     syncFreshness: ['personnel', 'sync-freshness'] as const,
+    exportFields: ['personnel', 'export-fields'] as const,
     ownCorrections: ['personnel', 'corrections', 'me'] as const,
     correctionsAll: ['personnel', 'corrections'] as const,
     corrections: (status: string, page: number, pageSize: number) =>

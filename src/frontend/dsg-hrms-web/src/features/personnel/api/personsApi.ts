@@ -8,6 +8,34 @@ export type FilterOption = ApiSchemas['FilterOptionResponse'];
 export type PersonCard = ApiSchemas['PersonCardResponse'];
 export type EmploymentCard = ApiSchemas['EmploymentCardResponse'];
 export type SyncFreshness = ApiSchemas['SyncFreshnessResponse'];
+export type ExportField = ApiSchemas['PersonExportFieldResponse'];
+export type ExportFieldName = ExportField['field'];
+export type ExportFormat = 'excel' | 'pdf';
+
+/** Indirilen dosya. */
+export interface ExportedFile {
+  blob: Blob;
+  fileName: string;
+}
+
+/** `Content-Disposition` basligindan dosya adi; once RFC 5987 bicimi (`filename*`). */
+export function fileNameOf(header: unknown): string | null {
+  if (typeof header !== 'string') {
+    return null;
+  }
+
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(header);
+  if (encoded?.[1]) {
+    try {
+      return decodeURIComponent(encoded[1]);
+    } catch {
+      return null;
+    }
+  }
+
+  const plain = /filename="?([^";]+)"?/i.exec(header);
+  return plain?.[1] ?? null;
+}
 
 const BASE = '/personnel/persons';
 
@@ -55,6 +83,42 @@ export const personsApi = {
   syncFreshness: async (): Promise<SyncFreshness> => {
     const response = await apiClient.get<SyncFreshness>('/personnel/sync-freshness');
     return response.data;
+  },
+
+  /**
+   * Disa aktarilabilen alanlar (PG-PERS-42). Gorulemeyen alan listede yoktur; sunucu
+   * gorunurluk politikasindan verir (ADR-0019 §2).
+   */
+  exportFields: async (): Promise<ExportField[]> => {
+    const response = await apiClient.get<ExportField[]>(`${BASE}/export/fields`);
+    return response.data;
+  },
+
+  /**
+   * Suzgece uyan butun kisileri dosya olarak indirir (SYG-PERS-032). Suzgecler listeyle
+   * aynidir; sayfa ve sayfa boyutu gonderilmez. Aktarim sunucuda kayda gecer (SYG-PERS-033).
+   */
+  exportFile: async (
+    listParams: URLSearchParams,
+    format: ExportFormat,
+    fields: readonly ExportFieldName[],
+  ): Promise<ExportedFile> => {
+    const params = new URLSearchParams(listParams);
+    params.delete('page');
+    params.delete('pageSize');
+    params.set('format', format);
+    fields.forEach((field) => params.append('field', field));
+
+    const response = await apiClient.get<Blob>(`${BASE}/export`, {
+      params,
+      responseType: 'blob',
+    });
+    return {
+      blob: response.data,
+      fileName:
+        fileNameOf(response.headers['content-disposition']) ??
+        `personel-listesi.${format === 'pdf' ? 'pdf' : 'xlsx'}`,
+    };
   },
 
   /** Secim listelerinin degerleri, kullanilabilen korumali suzgecler ve sayfa boyutlari. */

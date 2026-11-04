@@ -16,6 +16,7 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
+import FileDownloadOutlined from '@mui/icons-material/FileDownloadOutlined';
 import FilterListRounded from '@mui/icons-material/FilterListRounded';
 import GridViewRounded from '@mui/icons-material/GridViewRounded';
 import SearchRounded from '@mui/icons-material/SearchRounded';
@@ -31,8 +32,11 @@ import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { PageHeader } from '@/shared/components/PageHeader';
+import { permissions } from '@/shared/auth/permissions';
+import { usePermission } from '@/shared/auth/usePermission';
 import { personCardPath } from '@/shared/routes';
 import { personsApi, type PersonListItem } from '../api/personsApi';
+import { ExportDialog } from '../components/ExportDialog';
 import { FilterChips } from '../components/FilterChips';
 import { FilterPanel } from '../components/FilterPanel';
 import { PersonCard } from '../components/PersonCard';
@@ -83,6 +87,9 @@ export function PersonListPage() {
   // Karttan geri donuldugunde liste ayni suzgec, sayfa ve gorunumle acilir.
   const cardState = { listSearch: useLocation().search };
   const [panelOpen, setPanelOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
+  // Dugme yalnizca izni olana gorunur; asil denetim sunucudadir (SYG-PERS-032).
+  const canExport = usePermission(permissions.personExport);
   const urlTerm = params.get('q') ?? '';
   const [term, setTerm] = useState(urlTerm);
   // Adres disaridan degisirse (ust cubuktaki arama, geri tusu) kutu adresi izler. Aksi hâlde
@@ -194,8 +201,35 @@ export function PersonListPage() {
         icon={BadgeOutlined}
         title={t('personnel.list.title')}
         description={t('personnel.list.subtitle')}
-        actions={<SyncFreshness />}
+        actions={
+          <Stack
+            direction="row"
+            spacing={2}
+            useFlexGap
+            sx={{ alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}
+          >
+            <SyncFreshness />
+            {canExport ? (
+              <Button
+                variant="outlined"
+                startIcon={<FileDownloadOutlined />}
+                onClick={() => setExportOpen(true)}
+                sx={{ bgcolor: 'background.paper' }}
+              >
+                {t('personnel.export.open')}
+              </Button>
+            ) : null}
+          </Stack>
+        }
       />
+
+      {exportOpen ? (
+        <ExportDialog
+          listParams={apiParams}
+          totalCount={list.data?.totalCount ?? 0}
+          onClose={() => setExportOpen(false)}
+        />
+      ) : null}
 
       <Paper
         variant="outlined"

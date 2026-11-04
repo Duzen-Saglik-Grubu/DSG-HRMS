@@ -409,6 +409,25 @@
     }
   },
   "personnel": {
+    "export": {
+      "open": "Dışa aktar",
+      "title": "Personel listesini dışa aktar",
+      "count_one": "Süzgece uyan {{value}} kişi aktarılacak.",
+      "count_other": "Süzgece uyan {{value}} kişi aktarılacak.",
+      "none": "Süzgece uyan kişi yok; aktarılacak kayıt bulunmuyor.",
+      "format": "Dosya biçimi",
+      "excel": "Excel",
+      "pdf": "PDF",
+      "fields": "Aktarılacak alanlar",
+      "alwaysIncluded": "Ad ve soyad her satırda bulunur.",
+      "selectAll": "Tümünü seç",
+      "clear": "Temizle",
+      "pdfOnly": "yalnızca PDF",
+      "notice": "Dosya kişisel veri içerir. Aktarım; alanlar, süzgeçler ve kişilerle birlikte kayıt altına alınır.",
+      "tooMany": "Bir seferde en fazla {{limit}} kişi aktarılabilir. Süzgeci daraltın.",
+      "download": "İndir",
+      "preparing": "Hazırlanıyor…"
+    },
     "report": {
       "open": "İK'ya bildir",
       "title": "İK'ya bildir",
