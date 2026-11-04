@@ -143,7 +143,7 @@ export function AppLayout() {
             px: { xs: 2, sm: 3, lg: 4 },
             pt: 1,
             pb: 3,
-            maxWidth: 1600,
+            // Ust sinir yok: genis ekranda (2560 px) icerik saga kadar uzanir.
             width: '100%',
           }}
         >
@@ -594,8 +594,6 @@ function TopBar({ onOpenMenu }: { onOpenMenu: (() => void) | undefined }) {
 
       <Box sx={{ flexGrow: 1 }} />
 
-      <NotificationBell />
-
       {canSearch ? (
         <Box
           component="form"
@@ -626,6 +624,9 @@ function TopBar({ onOpenMenu }: { onOpenMenu: (() => void) | undefined }) {
           />
         </Box>
       ) : null}
+
+      {/* Zil arama alaninin saginda; ust cubugun en sag ogesi. */}
+      <NotificationBell />
     </Box>
   );
 }

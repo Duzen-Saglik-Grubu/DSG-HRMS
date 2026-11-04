@@ -319,6 +319,7 @@
         "GRN": "Genel",
         "KML": "Kimlik ve oturum",
         "HSP": "Hesap işlemleri",
+        "PRS": "Personel",
         "ENT": "Entegrasyonlar",
         "BLD": "Bildirim"
       },
@@ -369,7 +370,11 @@
         "PRM-HSP-01": "İK'nın personele parola oluşturma bağlantısı gönderebilmesi",
         "PRM-HSP-02": "Çalışma kaydı biten hesabın otomatik pasifleştirilmesi",
         "PRM-HSP-04": "Parola oluşturma bağlantısının geçerlilik süresi (saat)",
+        "PRM-GRN-02": "Listelerin varsayılan sayfa boyutu",
+        "PRM-GRN-03": "Listelerin en büyük sayfa boyutu",
         "PRM-GRN-04": "Destek iletişim bilgisi (üyelik ve giriş ekranları)",
+        "PRM-PRS-01": "Ayrılan personelin görünür kalma süresi (yıl; boş = süresiz)",
+        "PRM-PRS-02": "İK'ya bildir e-posta adresi (boş = e-posta gönderilmez)",
         "PRM-BLD-03": "Bildirim istisnasının işlemsel iletileri kapsamaması"
       },
       "twoFactor": {

@@ -50,6 +50,8 @@ sürümleme [Semantic Versioning](https://semver.org/lang/tr/) kurallarına daya
 
 ### Düzeltildi
 - **Üst çubuktaki personel araması personel listesi açıkken kayboluyordu (#322).** Liste önce süzülüyor, ardından sayfa eski arama terimini geri yazdığı için süzgeç kalkıyordu. Artık arama korunur ve listenin arama kutusuna da yazılır.
+- **Geniş ekranda sağda boşluk kalıyordu (#327).** İçerik alanı 1600 pikselle sınırlıydı; 2560 piksel genişlikteki ekranda sağda yaklaşık 700 piksel boş kalıyordu. Sınır kaldırıldı. Personel kartları 1920 pikselden geniş ekranda daha çok sütuna yayılır (2560 pikselde 6), böylece kartlar aşırı genişlemez.
+- **Personel parametreleri ekranda görünmüyordu (#327).** Sistem parametreleri ekranı yalnızca tanıdığı bölümleri gösteriyordu ve "Personel" bölümü bu listede yoktu. Bu yüzden ayrılan personelin görünür kalma süresi (PRM-PRS-01) ekrandan değiştirilemiyordu. "Personel" bölümü eklendi. Tanınmayan bir bölüm artık gizlenmez, sonda gösterilir. Sayfa boyutu parametrelerine de Türkçe ad verildi.
 
 ---
 
