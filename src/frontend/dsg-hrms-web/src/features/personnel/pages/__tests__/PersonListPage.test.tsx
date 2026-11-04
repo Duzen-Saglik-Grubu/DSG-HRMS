@@ -154,6 +154,28 @@ describe('PersonListPage', () => {
     expect(lastQuery().get('status')).toBe('terminated');
   });
 
+  it('disa aktarma dugmesi yalnizca izni olana gorunur ve diyalogu acar (SYG-PERS-032)', async () => {
+    vi.spyOn(personsApi, 'exportFields').mockResolvedValue([
+      { field: 'registryCode', label: 'Sicil numarası', pdfOnly: false },
+    ]);
+    const { unmount } = renderWithProviders(<PersonListPage />);
+    await screen.findByRole('article', { name: 'AYŞE DEMİR' });
+    expect(screen.queryByRole('button', { name: 'Dışa aktar' })).not.toBeInTheDocument();
+    unmount();
+
+    await setSession({
+      status: 'authenticated',
+      permissions: [permissions.personView, permissions.personExport],
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<PersonListPage />);
+    await screen.findByRole('article', { name: 'AYŞE DEMİR' });
+    await user.click(screen.getByRole('button', { name: 'Dışa aktar' }));
+
+    const dialog = await screen.findByRole('dialog', { name: 'Personel listesini dışa aktar' });
+    expect(within(dialog).getByText('Süzgece uyan 2 kişi aktarılacak.')).toBeInTheDocument();
+  });
+
   it('basliktaki son senkronizasyon bilgisini gosterir (SYG-PERS-010)', async () => {
     renderWithProviders(<PersonListPage />);
 

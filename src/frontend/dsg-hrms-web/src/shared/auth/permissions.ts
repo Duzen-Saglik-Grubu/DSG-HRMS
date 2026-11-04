@@ -9,6 +9,7 @@ export const permissions = {
   personView: 'personnel.person.view',
   personViewNationalId: 'personnel.person.view_national_id',
   personViewSensitive: 'personnel.person.view_sensitive',
+  personExport: 'personnel.person.export',
   correctionView: 'personnel.correction.view',
   correctionUpdate: 'personnel.correction.update',
   syncView: 'personnel.sync.view',
