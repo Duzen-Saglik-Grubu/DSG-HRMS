@@ -116,6 +116,12 @@ public enum NotificationPurpose
 
     /// <summary>Kullanicinin kendi iki adimli dogrulamasini acma kodu (SYG-KMLK-080).</summary>
     TwoFactorSetupCode = 5,
+
+    /// <summary>
+    /// Yeni "IK'ya bildir" talebinin IK adresine bildirimi (SYG-PERS-047). Kisiye degil kurumsal
+    /// bir adrese gider; icerikte kisisel veri yoktur.
+    /// </summary>
+    CorrectionRequested = 6,
 }
 
 /// <summary>Gonderim sonucu.</summary>

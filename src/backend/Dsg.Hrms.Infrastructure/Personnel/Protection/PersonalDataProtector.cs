@@ -120,6 +120,13 @@ public sealed record ProtectedField(string Table, string Column, Guid OwnerPubli
     public static ProtectedField BloodGroup(Guid personPublicId) =>
         new("personnel.person_sensitive", "blood_group", personPublicId);
 
+    /// <summary>
+    /// Duzeltme talebinde onerilen kan grubu (<c>personnel.correction_request.proposed_value</c>;
+    /// SYG-PERS-049). Sahibi talebin kendisidir: deger baska bir talebe kopyalanirsa cozulemez.
+    /// </summary>
+    public static ProtectedField CorrectionValue(Guid requestPublicId) =>
+        new("personnel.correction_request", "proposed_value", requestPublicId);
+
     /// <summary>Sifrelemeye baglanan ilisiklendirilmis veri.</summary>
     internal byte[] AssociatedData => Encoding.UTF8.GetBytes($"{Table}|{Column}|{OwnerPublicId:D}");
 }

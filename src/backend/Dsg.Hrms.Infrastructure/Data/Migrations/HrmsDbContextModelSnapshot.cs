@@ -1206,6 +1206,62 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Dsg.Hrms.Domain.Notifications.InboxItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("integer")
+                        .HasColumnName("kind");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_id");
+
+                    b.Property<DateTimeOffset?>("ReadAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("read_at");
+
+                    b.Property<long>("RecipientUserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("recipient_user_id");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("subject_id");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_inbox_item");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_inbox_item_public_id");
+
+                    b.HasIndex("RecipientUserId")
+                        .HasDatabaseName("ix_inbox_item_unread")
+                        .HasFilter("read_at IS NULL");
+
+                    b.HasIndex("RecipientUserId", "CreatedAt")
+                        .HasDatabaseName("ix_inbox_item_recipient_user_id_created_at");
+
+                    b.ToTable("inbox_item", "notification");
+                });
+
             modelBuilder.Entity("Dsg.Hrms.Domain.Notifications.NotificationDelivery", b =>
                 {
                     b.Property<long>("Id")
@@ -1463,6 +1519,90 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasDatabaseName("ix_department_company_id_logo_number");
 
                     b.ToTable("department", "organization");
+                });
+
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.CorrectionRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("completed_at");
+
+                    b.Property<long?>("CompletedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("completed_by");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_by");
+
+                    b.Property<int>("Field")
+                        .HasColumnType("integer")
+                        .HasColumnName("field");
+
+                    b.Property<long>("PersonId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("person_id");
+
+                    b.Property<string>("ProposedValue")
+                        .HasColumnType("text")
+                        .HasColumnName("proposed_value");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_id");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset>("SubmittedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("submitted_at");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("updated_by");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_correction_request");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_correction_request_public_id");
+
+                    b.HasIndex("PersonId", "Field")
+                        .IsUnique()
+                        .HasDatabaseName("ux_correction_request_open_field")
+                        .HasFilter("status = 1");
+
+                    b.HasIndex("Status", "SubmittedAt")
+                        .HasDatabaseName("ix_correction_request_status_submitted_at");
+
+                    b.ToTable("correction_request", "personnel", t =>
+                        {
+                            t.HasCheckConstraint("ck_correction_request_closed_without_value", "status = 1 OR proposed_value IS NULL");
+                        });
                 });
 
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.Employment", b =>
@@ -2706,6 +2846,16 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasConstraintName("fk_verification_code_person_person_id");
                 });
 
+            modelBuilder.Entity("Dsg.Hrms.Domain.Notifications.InboxItem", b =>
+                {
+                    b.HasOne("Dsg.Hrms.Domain.Identity.UserAccount", null)
+                        .WithMany()
+                        .HasForeignKey("RecipientUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_inbox_item_user_account_recipient_user_id");
+                });
+
             modelBuilder.Entity("Dsg.Hrms.Domain.Organization.Branch", b =>
                 {
                     b.HasOne("Dsg.Hrms.Domain.Organization.Company", null)
@@ -2724,6 +2874,16 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_department_company_company_id");
+                });
+
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.CorrectionRequest", b =>
+                {
+                    b.HasOne("Dsg.Hrms.Domain.Personnel.Person", null)
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_correction_request_person_person_id");
                 });
 
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.Employment", b =>

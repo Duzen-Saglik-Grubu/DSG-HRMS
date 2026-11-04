@@ -698,6 +698,342 @@
         }
       }
     },
+    "/api/v1/personnel/corrections/me": {
+      "get": {
+        "tags": [
+          "Corrections"
+        ],
+        "summary": "Kendi acik taleplerim ve formun secenekleri.",
+        "responses": {
+          "200": {
+            "description": "Acik talebi olan alanlar ve kan grubu secenekleri.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnCorrectionStateResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Hesaba bagli kisi kaydi yok.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Corrections"
+        ],
+        "summary": "Kendi kartimdaki bir alan icin IK'ya duzeltme talebi gonderir (SYG-PERS-045).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitCorrectionRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitCorrectionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitCorrectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Talep olustu; IK'ya bildirim gitti.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionSubmittedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Alan secilmedi veya deger alana gore gecersiz.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Hesaba bagli kisi kaydi yok.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Bu alan icin acik bir talep zaten var (AN-08).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/corrections": {
+      "get": {
+        "tags": [
+          "Corrections"
+        ],
+        "summary": "Talepleri listeler, en yeni once (SYG-PERS-048).",
+        "parameters": [
+          {
+            "name": "Status",
+            "in": "query",
+            "description": "Durum; verilmezse \"Yeni\".",
+            "schema": {
+              "$ref": "#/components/schemas/CorrectionStatusFilter"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "Sayfa (1'den baslar).",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "Sayfa boyutu (1–100).",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sayfalanmis liste.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResponseOfCorrectionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz sayfa veya sayfa boyutu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.correction.view`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/corrections/{requestId}": {
+      "get": {
+        "tags": [
+          "Corrections"
+        ],
+        "summary": "Tek talep; bildirimden acilir.",
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Talep.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.correction.view`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Talep yok.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/corrections/{requestId}/complete": {
+      "post": {
+        "tags": [
+          "Corrections"
+        ],
+        "summary": "Talebi \"Tamamlandi\" olarak kapatir; onerilen deger silinir (SYG-PERS-048).",
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kapatilan talep (degersiz).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.correction.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Talep yok.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Talep zaten tamamlandi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties": {
       "post": {
         "tags": [
@@ -1488,6 +1824,120 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/notifications/inbox": {
+      "get": {
+        "tags": [
+          "Inbox"
+        ],
+        "summary": "En yeni bildirimler (en fazla 50), en yeni once.",
+        "responses": {
+          "200": {
+            "description": "Bildirimler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InboxItemResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/notifications/inbox/unread-count": {
+      "get": {
+        "tags": [
+          "Inbox"
+        ],
+        "summary": "Okunmamis bildirim sayisi (menude gosterilir).",
+        "responses": {
+          "200": {
+            "description": "Sayi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCountResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/notifications/inbox/{itemId}/read": {
+      "post": {
+        "tags": [
+          "Inbox"
+        ],
+        "summary": "Bildirimi okundu olarak isaretler.",
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bildirim.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboxItemResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bildirim yok veya baskasinin.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3609,6 +4059,120 @@
         },
         "description": "Hesap olusturma istegi."
       },
+      "CorrectionFieldName": {
+        "enum": [
+          "mobilePhone",
+          "email",
+          "address",
+          "education",
+          "maritalStatus",
+          "bloodGroup"
+        ],
+        "description": "Bildirilebilen alan."
+      },
+      "CorrectionOptionResponse": {
+        "required": [
+          "value",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Gonderilecek deger."
+          },
+          "label": {
+            "type": "string",
+            "description": "Gorunen ad."
+          }
+        },
+        "description": "Secim listesi ogesi."
+      },
+      "CorrectionResponse": {
+        "required": [
+          "id",
+          "personId",
+          "firstName",
+          "lastName",
+          "field",
+          "proposedValue",
+          "status",
+          "submittedAt",
+          "completedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Talebin dis kimligi.",
+            "format": "uuid"
+          },
+          "personId": {
+            "type": "string",
+            "description": "Kisinin dis kimligi (kisi kartina baglanti).",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Ad."
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Soyad."
+          },
+          "field": {
+            "description": "Alan.",
+            "$ref": "#/components/schemas/CorrectionFieldName"
+          },
+          "proposedValue": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Onerilen deger (kan grubunda adi, medeni halde `married`/`notMarried`); tamamlanan talepte bos."
+          },
+          "status": {
+            "type": "string",
+            "description": "Durum (`new`, `completed`)."
+          },
+          "submittedAt": {
+            "type": "string",
+            "description": "Gonderim ani.",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Kapatilma ani.",
+            "format": "date-time"
+          }
+        },
+        "description": "IK'nin gordugu talep."
+      },
+      "CorrectionStatusFilter": {
+        "enum": [
+          "new",
+          "completed",
+          "all"
+        ],
+        "description": "Talep listesi durum suzgeci."
+      },
+      "CorrectionSubmittedResponse": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Talebin dis kimligi.",
+            "format": "uuid"
+          }
+        },
+        "description": "Olusan talep."
+      },
       "CreateReferenceDefinitionRequest": {
         "required": [
           "type",
@@ -3825,6 +4389,46 @@
         "type": "string",
         "format": "binary"
       },
+      "InboxItemResponse": {
+        "required": [
+          "id",
+          "kind",
+          "subjectId",
+          "createdAt",
+          "readAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Bildirimin dis kimligi.",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "description": "Tur (`correctionRequested`)."
+          },
+          "subjectId": {
+            "type": "string",
+            "description": "Ilgili kaydin dis kimligi (ornegin duzeltme talebi).",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Olusma ani.",
+            "format": "date-time"
+          },
+          "readAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Okunma ani; okunmadiysa bos.",
+            "format": "date-time"
+          }
+        },
+        "description": "Bildirim."
+      },
       "InvitationInfoResponse": {
         "required": [
           "firstName",
@@ -3896,6 +4500,30 @@
         ],
         "description": "Medeni hal."
       },
+      "OwnCorrectionStateResponse": {
+        "required": [
+          "openFields",
+          "bloodGroups"
+        ],
+        "type": "object",
+        "properties": {
+          "openFields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CorrectionFieldName"
+            },
+            "description": "Acik talebi olan alanlar."
+          },
+          "bloodGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CorrectionOptionResponse"
+            },
+            "description": "Kan grubu secenekleri."
+          }
+        },
+        "description": "Kisinin \"IK'ya bildir\" formu icin durumu."
+      },
       "PagedResponseOfAccountSummaryResponse": {
         "required": [
           "items",
@@ -3910,6 +4538,62 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AccountSummaryResponse"
+            },
+            "description": "Bu sayfadaki kayitlar."
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa numarasi.",
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa boyutu.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam kayit sayisi.",
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam sayfa sayisi.",
+            "format": "int32"
+          }
+        },
+        "description": "Sayfalanmis yanit (ADR-0010 §4)."
+      },
+      "PagedResponseOfCorrectionResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CorrectionResponse"
             },
             "description": "Bu sayfadaki kayitlar."
           },
@@ -5021,6 +5705,34 @@
           }
         }
       },
+      "SubmitCorrectionRequest": {
+        "required": [
+          "field",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Alan.",
+                "$ref": "#/components/schemas/CorrectionFieldName"
+              }
+            ]
+          },
+          "value": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Dogru deger: telefon `5XXXXXXXXX` (bosluk ve on ek kabul edilir), medeni hal\n`married`/`notMarried`, kan grubu secenek kodu; adres ve egitim en fazla 500 karakter."
+          }
+        },
+        "description": "Talep gonderimi."
+      },
       "SyncFreshnessResponse": {
         "required": [
           "enabled",
@@ -5307,6 +6019,24 @@
         },
         "description": "Iki adimli dogrulama sonucu."
       },
+      "UnreadCountResponse": {
+        "required": [
+          "count"
+        ],
+        "type": "object",
+        "properties": {
+          "count": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayi.",
+            "format": "int32"
+          }
+        },
+        "description": "Okunmamis bildirim sayisi."
+      },
       "UpdateParameterRequest": {
         "required": [
           "value"
@@ -5464,6 +6194,9 @@
       "name": "ReferenceDefinitions"
     },
     {
+      "name": "Corrections"
+    },
+    {
       "name": "EmploymentDuties"
     },
     {
@@ -5474,6 +6207,9 @@
     },
     {
       "name": "SyncFreshness"
+    },
+    {
+      "name": "Inbox"
     },
     {
       "name": "Account"

@@ -20,6 +20,8 @@ public static class NotificationPurposeRules
         NotificationPurpose.TwoFactorCode => true,
         NotificationPurpose.Invitation => true,
         NotificationPurpose.TwoFactorSetupCode => true,
+        // IK'ya giden is bildirimi; kisinin girisi icin gerekli degildir.
+        NotificationPurpose.CorrectionRequested => false,
         _ => throw new ArgumentOutOfRangeException(nameof(purpose), purpose, "Ileti amaci siniflandirilmamis (SYG-KMLK-062)."),
     };
 }
