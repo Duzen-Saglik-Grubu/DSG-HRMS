@@ -81,6 +81,26 @@ public sealed class CorrectionsApiTests : IClassFixture<Identity.RegistrationApi
     }
 
     [Fact]
+    public async Task System_administrators_are_notified_too_and_each_account_once()
+    {
+        // #333: bildirim Sistem Yoneticisi rolune de gider; iki role sahip hesap tek bildirim alir.
+        await CreateAccountAsync(5);
+        await AssignRoleAsync(5, Role.SystemAdministratorCode);
+        await AssignRoleAsync(2, Role.SystemAdministratorCode);
+        using var client = _fixture.CreateClient();
+        var requester = await SignInAsync(client, RequesterEmail);
+
+        (await SendAsync(client, HttpMethod.Post, $"{Corrections}/me", requester, new { field = "address", value = "Yeni Mah. 3. Sok. No: 4" })).Status.ShouldBe(HttpStatusCode.Created);
+
+        var recipients = await _fixture.WithDbAsync(context =>
+            (from item in context.Set<InboxItem>()
+             join account in context.Set<UserAccount>() on item.RecipientUserId equals account.Id
+             join person in context.Set<Person>() on account.PersonId equals person.Id
+             select person.NationalId).ToListAsync());
+        recipients.Order().ShouldBe([NationalId(2), NationalId(5)]);
+    }
+
+    [Fact]
     public async Task Notice_email_carries_no_name_field_or_value()
     {
         // SYG-PERS-047: kisisel veri, hele kan grubu, e-postada dolasmaz; yalnizca baglanti.
