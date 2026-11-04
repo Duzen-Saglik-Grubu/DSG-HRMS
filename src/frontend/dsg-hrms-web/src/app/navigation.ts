@@ -3,6 +3,7 @@ import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
 import FactCheckOutlined from '@mui/icons-material/FactCheckOutlined';
+import RuleRounded from '@mui/icons-material/RuleRounded';
 import ManageAccountsOutlined from '@mui/icons-material/ManageAccountsOutlined';
 import TuneRounded from '@mui/icons-material/TuneRounded';
 import { permissions, type Permission } from '@/shared/auth/permissions';
@@ -53,6 +54,12 @@ export const navigation: NavSection[] = [
         label: 'nav.corrections',
         icon: FactCheckOutlined,
         permission: permissions.correctionView,
+      },
+      {
+        to: routes.quality,
+        label: 'nav.quality',
+        icon: RuleRounded,
+        permission: permissions.qualityView,
       },
     ],
   },

@@ -9,6 +9,7 @@
     "openMenu": "Menüyü aç",
     "personnel": "Personel listesi",
     "corrections": "Düzeltme talepleri",
+    "quality": "Veri kalitesi",
     "sections": {
       "overview": "Genel Bakış",
       "people": "Personel",
@@ -482,6 +483,75 @@
         "value": "Önerilen değer",
         "submittedAt": "Gönderim",
         "action": "İşlem"
+      }
+    },
+    "quality": {
+      "title": "Veri kalitesi",
+      "subtitle": "LOGO'da düzeltilmesi gereken kayıtlar. Kaydı LOGO'da sicil numarasıyla bulun; düzeltme bir sonraki senkronizasyonla buraya yansır.",
+      "export": "Excel'e aktar",
+      "exporting": "Hazırlanıyor…",
+      "exportFailed": "Dosya hazırlanamadı.",
+      "run": {
+        "title": "Son senkronizasyon",
+        "none": "Henüz tamamlanmış bir senkronizasyon yok.",
+        "finishedAt": "Bitiş",
+        "recordsRead": "{{count}} kart okundu",
+        "warnings": "{{count}} uyarı",
+        "cardWarningsFrom": "Kart uyarıları {{when}} tarihli çalışmadan; diğer uyarılar güncel veriden.",
+        "status": {
+          "succeeded": "Başarılı",
+          "completedWithWarnings": "Uyarılarla tamamlandı",
+          "partiallyCompleted": "Kısmen tamamlandı",
+          "failed": "Başarısız",
+          "running": "Sürüyor"
+        }
+      },
+      "tabs": {
+        "label": "Rapor bölümleri",
+        "issues": "Uyarılar",
+        "ineligible": "Üye olamayacak kişiler"
+      },
+      "filter": "Uyarı türü",
+      "all": "Tümü",
+      "issues": {
+        "missingNationalId": "TCKN yok",
+        "invalidNationalId": "TCKN geçersiz",
+        "missingBirthDate": "Doğum tarihi yok",
+        "noContact": "İletişim bilgisi yok",
+        "invalidMobilePhone": "Geçersiz telefon biçimi",
+        "sharedEmail": "Paylaşılan e-posta",
+        "missingTitle": "Ünvanı boş",
+        "missingDuty": "Görevi boş"
+      },
+      "hints": {
+        "missingNationalId": "Kartta TCKN yok; kişi HRMS'te oluşturulmadı. TCKN'yi LOGO'da girin.",
+        "invalidNationalId": "Karttaki TCKN geçerli değil; kişi HRMS'te oluşturulmadı. TCKN'yi LOGO'da düzeltin.",
+        "missingBirthDate": "Kartta doğum tarihi yok; kişi HRMS'te oluşturulmadı. Doğum tarihini LOGO'da girin.",
+        "noContact": "Kişinin ne e-postası ne cep telefonu var. Kendi başına üye olamaz ve bildirim alamaz.",
+        "invalidMobilePhone": "Cep telefonu 10 hane ve 5 ile başlamalı. Geçersiz numara kullanılmadı.",
+        "sharedEmail": "Aynı e-posta başka bir aktif kişide de tanımlı. Bu adres giriş ve doğrulama için kullanılamaz.",
+        "missingTitle": "İstihdamın ünvan bilgisi boş. Ünvanı LOGO'da girin.",
+        "missingDuty": "İstihdamın açık bir görevi yok. Görev HRMS'te kişi kartından atanır."
+      },
+      "columns": {
+        "issue": "Uyarı",
+        "registryCode": "Sicil",
+        "person": "Personel",
+        "company": "Firma",
+        "branch": "Şube",
+        "department": "Birim",
+        "reasons": "Neden"
+      },
+      "noPerson": "Kişi oluşturulmadı",
+      "empty": "Uyarı yok",
+      "emptyText": "Bu türde düzeltilmesi gereken kayıt bulunmuyor.",
+      "ineligibleNote": "Bu kişilerin hesabı yok ve üyelik koşulunu karşılamıyor; kendi başlarına üye olamazlar. E-posta bilgisi LOGO'da düzeltilebilir ya da hesap, Hesap işlemleri ekranından davet bağlantısıyla açılabilir.",
+      "ineligibleEmpty": "Üye olamayacak kişi yok",
+      "ineligibleEmptyText": "Hesabı olmayan aktif personelin hepsi üyelik koşulunu karşılıyor.",
+      "reasons": {
+        "noEmail": "Kurumsal e-postası yok",
+        "domainNotAccepted": "E-postası kabul edilen alan adlarında değil",
+        "sharedEmail": "E-postası başka bir kişiyle paylaşılıyor"
       }
     },
     "freshness": {

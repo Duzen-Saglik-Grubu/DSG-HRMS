@@ -76,6 +76,12 @@ const CorrectionsPage = lazy(async () => {
   return { default: page.CorrectionsPage };
 });
 
+const DataQualityPage = lazy(async () => {
+  const page = await import('@/features/personnel/pages/DataQualityPage');
+
+  return { default: page.DataQualityPage };
+});
+
 const ProfilePage = lazy(async () => {
   const page = await import('@/features/personnel/pages/ProfilePage');
 
@@ -187,6 +193,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<RouteFallback />}>
             <CorrectionsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: routes.quality,
+        element: (
+          <Suspense fallback={<RouteFallback />}>
+            <DataQualityPage />
           </Suspense>
         ),
       },

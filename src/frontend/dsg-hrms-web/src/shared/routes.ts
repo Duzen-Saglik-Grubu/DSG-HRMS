@@ -17,6 +17,7 @@ export const routes = {
   parameters: '/system/parameters',
   personnel: '/personnel',
   corrections: '/personnel/corrections',
+  quality: '/personnel/quality',
   profile: '/profile',
 } as const;
 

@@ -12,6 +12,8 @@ export const permissions = {
   personExport: 'personnel.person.export',
   correctionView: 'personnel.correction.view',
   correctionUpdate: 'personnel.correction.update',
+  qualityView: 'personnel.quality.view',
+  qualityExport: 'personnel.quality.export',
   syncView: 'personnel.sync.view',
   syncCreate: 'personnel.sync.create',
   parameterView: 'system.parameter.view',
