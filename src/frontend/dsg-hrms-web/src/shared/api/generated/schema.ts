@@ -651,6 +651,331 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/corrections/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kendi acik taleplerim ve formun secenekleri. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Acik talebi olan alanlar ve kan grubu secenekleri. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OwnCorrectionStateResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Hesaba bagli kisi kaydi yok. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Kendi kartimdaki bir alan icin IK'ya duzeltme talebi gonderir (SYG-PERS-045). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SubmitCorrectionRequest"];
+                    "text/json": components["schemas"]["SubmitCorrectionRequest"];
+                    "application/*+json": components["schemas"]["SubmitCorrectionRequest"];
+                };
+            };
+            responses: {
+                /** @description Talep olustu; IK'ya bildirim gitti. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CorrectionSubmittedResponse"];
+                    };
+                };
+                /** @description Alan secilmedi veya deger alana gore gecersiz. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Hesaba bagli kisi kaydi yok. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Bu alan icin acik bir talep zaten var (AN-08). */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/corrections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Talepleri listeler, en yeni once (SYG-PERS-048). */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Durum; verilmezse "Yeni". */
+                    Status?: components["schemas"]["CorrectionStatusFilter"];
+                    /** @description Sayfa (1'den baslar). */
+                    Page?: number | string;
+                    /** @description Sayfa boyutu (1–100). */
+                    PageSize?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Sayfalanmis liste. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResponseOfCorrectionResponse"];
+                    };
+                };
+                /** @description Gecersiz sayfa veya sayfa boyutu. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.correction.view`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/corrections/{requestId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tek talep; bildirimden acilir. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    requestId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Talep. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CorrectionResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.correction.view`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Talep yok. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/corrections/{requestId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Talebi "Tamamlandi" olarak kapatir; onerilen deger silinir (SYG-PERS-048). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    requestId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Kapatilan talep (degersiz). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CorrectionResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.correction.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Talep yok. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Talep zaten tamamlandi. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties": {
         parameters: {
             query?: never;
@@ -1228,6 +1553,152 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/inbox": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** En yeni bildirimler (en fazla 50), en yeni once. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Bildirimler. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InboxItemResponse"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/inbox/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Okunmamis bildirim sayisi (menude gosterilir). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Sayi. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnreadCountResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/inbox/{itemId}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Bildirimi okundu olarak isaretler. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    itemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Bildirim. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InboxItemResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Bildirim yok veya baskasinin. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -3231,6 +3702,64 @@ export interface components {
             /** @description Parola. */
             password: string;
         };
+        /**
+         * @description Bildirilebilen alan.
+         * @enum {unknown}
+         */
+        CorrectionFieldName: "mobilePhone" | "email" | "address" | "education" | "maritalStatus" | "bloodGroup";
+        /** @description Secim listesi ogesi. */
+        CorrectionOptionResponse: {
+            /** @description Gonderilecek deger. */
+            value: string;
+            /** @description Gorunen ad. */
+            label: string;
+        };
+        /** @description IK'nin gordugu talep. */
+        CorrectionResponse: {
+            /**
+             * Format: uuid
+             * @description Talebin dis kimligi.
+             */
+            id: string;
+            /**
+             * Format: uuid
+             * @description Kisinin dis kimligi (kisi kartina baglanti).
+             */
+            personId: string;
+            /** @description Ad. */
+            firstName: string;
+            /** @description Soyad. */
+            lastName: string;
+            /** @description Alan. */
+            field: components["schemas"]["CorrectionFieldName"];
+            /** @description Onerilen deger (kan grubunda adi, medeni halde `married`/`notMarried`); tamamlanan talepte bos. */
+            proposedValue: null | string;
+            /** @description Durum (`new`, `completed`). */
+            status: string;
+            /**
+             * Format: date-time
+             * @description Gonderim ani.
+             */
+            submittedAt: string;
+            /**
+             * Format: date-time
+             * @description Kapatilma ani.
+             */
+            completedAt: null | string;
+        };
+        /**
+         * @description Talep listesi durum suzgeci.
+         * @enum {unknown}
+         */
+        CorrectionStatusFilter: "new" | "completed" | "all";
+        /** @description Olusan talep. */
+        CorrectionSubmittedResponse: {
+            /**
+             * Format: uuid
+             * @description Talebin dis kimligi.
+             */
+            id: string;
+        };
         /** @description Yeni tanim istegi. */
         CreateReferenceDefinitionRequest: {
             /** @description Tur (unvan veya gorev). */
@@ -3316,6 +3845,31 @@ export interface components {
         GenderKind: "male" | "female";
         /** Format: binary */
         IFormFile: string;
+        /** @description Bildirim. */
+        InboxItemResponse: {
+            /**
+             * Format: uuid
+             * @description Bildirimin dis kimligi.
+             */
+            id: string;
+            /** @description Tur (`correctionRequested`). */
+            kind: string;
+            /**
+             * Format: uuid
+             * @description Ilgili kaydin dis kimligi (ornegin duzeltme talebi).
+             */
+            subjectId: string;
+            /**
+             * Format: date-time
+             * @description Olusma ani.
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Okunma ani; okunmadiysa bos.
+             */
+            readAt: null | string;
+        };
         /** @description Baglanti bilgisi. */
         InvitationInfoResponse: {
             /** @description Kisinin adi (karsilama icin). */
@@ -3351,10 +3905,42 @@ export interface components {
          * @enum {unknown}
          */
         MaritalStatusKind: "married" | "notMarried";
+        /** @description Kisinin "IK'ya bildir" formu icin durumu. */
+        OwnCorrectionStateResponse: {
+            /** @description Acik talebi olan alanlar. */
+            openFields: components["schemas"]["CorrectionFieldName"][];
+            /** @description Kan grubu secenekleri. */
+            bloodGroups: components["schemas"]["CorrectionOptionResponse"][];
+        };
         /** @description Sayfalanmis yanit (ADR-0010 §4). */
         PagedResponseOfAccountSummaryResponse: {
             /** @description Bu sayfadaki kayitlar. */
             items: components["schemas"]["AccountSummaryResponse"][];
+            /**
+             * Format: int32
+             * @description Sayfa numarasi.
+             */
+            page: number | string;
+            /**
+             * Format: int32
+             * @description Sayfa boyutu.
+             */
+            pageSize: number | string;
+            /**
+             * Format: int32
+             * @description Toplam kayit sayisi.
+             */
+            totalCount: number | string;
+            /**
+             * Format: int32
+             * @description Toplam sayfa sayisi.
+             */
+            totalPages: number | string;
+        };
+        /** @description Sayfalanmis yanit (ADR-0010 §4). */
+        PagedResponseOfCorrectionResponse: {
+            /** @description Bu sayfadaki kayitlar. */
+            items: components["schemas"]["CorrectionResponse"][];
             /**
              * Format: int32
              * @description Sayfa numarasi.
@@ -3784,6 +4370,15 @@ export interface components {
             value?: null | string;
             hasValue?: boolean;
         };
+        /** @description Talep gonderimi. */
+        SubmitCorrectionRequest: {
+            field: null | components["schemas"]["CorrectionFieldName"];
+            /**
+             * @description Dogru deger: telefon `5XXXXXXXXX` (bosluk ve on ek kabul edilir), medeni hal
+             *     `married`/`notMarried`, kan grubu secenek kodu; adres ve egitim en fazla 500 karakter.
+             */
+            value: null | string;
+        };
         /** @description Personel verisinin guncelligi. */
         SyncFreshnessResponse: {
             /** @description LOGO baglantisi tanimli mi; degilse senkronizasyon bilincli olarak kapalidir ve bilgi gosterilmez. */
@@ -3903,6 +4498,14 @@ export interface components {
             /** @description Sonuc. */
             result: components["schemas"]["VerificationOutcome"];
             session: null | components["schemas"]["SessionResponse"];
+        };
+        /** @description Okunmamis bildirim sayisi. */
+        UnreadCountResponse: {
+            /**
+             * Format: int32
+             * @description Sayi.
+             */
+            count: number | string;
         };
         /** @description Parametre degisikligi. */
         UpdateParameterRequest: {

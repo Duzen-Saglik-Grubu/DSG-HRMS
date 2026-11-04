@@ -8,8 +8,10 @@ using Dsg.Hrms.Application.Identity.Registration;
 using Dsg.Hrms.Application.Identity.Sessions;
 using Dsg.Hrms.Application.Identity.Verification;
 using Dsg.Hrms.Application.Notifications;
+using Dsg.Hrms.Application.Notifications.Inbox;
 using Dsg.Hrms.Application.Personnel.Access;
 using Dsg.Hrms.Application.Personnel.Cards;
+using Dsg.Hrms.Application.Personnel.Corrections;
 using Dsg.Hrms.Application.Personnel.Duties;
 using Dsg.Hrms.Application.Personnel.Listing;
 using Dsg.Hrms.Application.Personnel.Sync;
@@ -173,6 +175,12 @@ public static class InfrastructureRegistration
         // Gorev girisi (SYG-PERS-042).
         services.AddScoped<IDutyStore, DutyStore>();
         services.AddScoped<DutyService>();
+
+        // "IK'ya bildir" ve uygulama ici bildirim kutusu (ADR-0022 §3, SYG-PERS-045…049).
+        services.AddScoped<ICorrectionStore, CorrectionStore>();
+        services.AddScoped<CorrectionService>();
+        services.AddScoped<IInboxStore, InboxStore>();
+        services.AddScoped<InboxService>();
 
         services.AddScoped<IPersonnelSyncStore, PersonnelSyncStore>();
 

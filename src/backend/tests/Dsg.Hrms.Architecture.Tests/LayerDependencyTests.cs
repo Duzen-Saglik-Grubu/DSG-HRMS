@@ -248,6 +248,11 @@ public sealed class LayerDependencyTests
         ["Infrastructure: Personnel -> Settings"] = "senkronizasyon periyodu",
         ["Infrastructure: Notifications -> Settings"] = "SMTP ve NetGSM parametreleri",
 
+        // "IK'ya bildir": talep ile IK'ya giden uygulama ici bildirim ayni islemde yazilir, e-posta
+        // ortak kuyruga alinir (ADR-0022 §3, SYG-PERS-046, 047).
+        ["Application: Personnel -> Notifications"] = "duzeltme talebinin uygulama ici bildirimi ve e-postasi",
+        ["Infrastructure: Personnel -> Notifications"] = "duzeltme talebiyle ayni islemde bildirim kaydi",
+
         // Api katmani (#246, B-10).
         ["Api: Identity -> Personnel"] = "uyelik isteginde TCKN bicim dogrulamasi (Domain.Personnel.NationalId)",
         ["Api: Identity -> Settings"] = "giris ekraninin herkese acik ayarlari (SYG-KMLK-070)",

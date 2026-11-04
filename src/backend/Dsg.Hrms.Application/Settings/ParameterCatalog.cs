@@ -196,6 +196,15 @@ public static partial class ParameterCatalog
         "Ayrilan personelin listede ve kartta gorunur kalma suresi (yil; bos = suresiz)",
         DefaultValue: null, Min: 1, Max: 50, AllowEmpty: true);
 
+    /// <summary>
+    /// "IK'ya bildir" taleplerinin e-postayla bildirilecegi IK adresi (PG-PERS-37, S-12;
+    /// SYG-PERS-047). Bos = e-posta gonderilmez; uygulama ici bildirim yine yazilir.
+    /// </summary>
+    public static readonly ParameterDefinition CorrectionNoticeEmail = new(
+        "PRM-PRS-02", $"{Section}:CorrectionNoticeEmail", ParameterType.Text,
+        "\"IK'ya bildir\" taleplerinin e-postayla bildirilecegi IK adresi (bos = e-posta gonderilmez)",
+        Pattern: EmailAddress(), FormatHint: "bir e-posta adresi olmalıdır (örneğin ik@duzen.com.tr)", AllowEmpty: true);
+
     /// <summary>Bildirim istisnasinin islemsel iletileri kapsamamasi.</summary>
     public static readonly ParameterDefinition TransactionalMessagesBypassExemption = Boolean(
         "PRM-BLD-03", "TransactionalMessagesBypassExemption", "Bildirim istisnasinin islemsel iletileri kapsamamasi", true);
@@ -213,7 +222,7 @@ public static partial class ParameterCatalog
             RegistrationLimitPerNationalId, RegistrationLimitPerIp, RequirePasswordChangeOnFirstLogin, PasswordMaxAgeDays,
             HrInviteEnabled, AutoDeactivateOnEmploymentEnd, InviteLinkLifetimeHours,
             SupportContact, TransactionalMessagesBypassExemption,
-            DefaultPageSize, MaxPageSize, TerminatedVisibilityYears,
+            DefaultPageSize, MaxPageSize, TerminatedVisibilityYears, CorrectionNoticeEmail,
         }.OrderBy(p => p.Key, StringComparer.Ordinal),
     ];
 
@@ -230,6 +239,9 @@ public static partial class ParameterCatalog
 
     private static ParameterDefinition Boolean(string key, string name, string description, bool @default) =>
         new(key, $"{Section}:{name}", ParameterType.Toggle, description, @default ? "true" : "false");
+
+    [GeneratedRegex(@"^(?=.{3,254}$)[^@\s]+@([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex EmailAddress();
 
     [GeneratedRegex(@"^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$", RegexOptions.CultureInvariant)]
     private static partial Regex DomainName();

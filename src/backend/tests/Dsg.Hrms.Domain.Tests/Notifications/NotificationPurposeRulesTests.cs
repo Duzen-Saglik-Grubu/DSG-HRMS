@@ -25,4 +25,10 @@ public sealed class NotificationPurposeRulesTests
     {
         purpose.IsTransactional().ShouldBeTrue();
     }
+
+    [Fact]
+    public void Correction_notice_is_not_transactional()
+    {
+        NotificationPurpose.CorrectionRequested.IsTransactional().ShouldBeFalse();
+    }
 }
