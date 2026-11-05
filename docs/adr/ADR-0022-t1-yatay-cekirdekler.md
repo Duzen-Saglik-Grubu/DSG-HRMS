@@ -88,7 +88,7 @@ Onaylanmamış gereksinime dayanan hiçbir şey yazılmaz (`KR-068`).
 - **İkinci bildirim türü** (SYG-PERS AN-06, #274): Şema sapması ve başarısız senkronizasyon,
   `PRM-BLD-01`'deki roldeki kullanıcılara aynı çekirdekle uygulama içi bildirim olarak yazılır
   (PG-PERS-08). T3 bu bildirimi Y1'e bırakmıştı; çekirdek T1'de kurulduğu için yeni altyapı
-  gerekmez. E-posta ve tercihler Y1'de kalır.
+  gerekmez. Bildirimi alan kullanıcının kurumsal adresine e-posta da gider; aynı türde okunmamış bildirim varken ikisi de yazılmaz (`KR-134`, #344). Alıcı roller `PRM-BLD-01`'dedir (`KR-133`). Tercihler Y1'de kalır.
 
 ### 4. Dışa aktarma (ADR-0014)
 
@@ -167,3 +167,4 @@ Düşük–orta. Çekirdekler küçüktür ve kendi ad alanlarındadır.
 | 2026-10-22 | 1.2 | §3: şema sapması ve başarısız senkronizasyon için ikinci bildirim türü (SYG-PERS AN-06, #274) | Bilgi İşlem |
 | 2026-10-23 | 1.3 | §2: `audit.log.view` İK'da da (`KR-128`, #278) | Bilgi İşlem |
 | 2026-10-23 | 1.4 | §1: üçüncü referans türü kan grubu, değiştirilemez sistem tanımı (`KR-129`, #280) | Bilgi İşlem |
+| 2026-11-05 | 1.5 | §3: senkronizasyon uyarısı e-postayla da gider (`KR-134`); alıcı roller `PRM-BLD-01` (`KR-133`) (#344) | Bilgi İşlem |

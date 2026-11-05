@@ -203,6 +203,13 @@ public static class InfrastructureRegistration
         services.AddScoped<IPersonnelSyncStatus, PersonnelSyncStatus>();
         services.AddScoped<IPersonnelSyncAlertStore, PersonnelSyncAlertStore>();
         services.AddScoped<IPersonnelSyncAlerts, PersonnelSyncAlerts>();
+
+        // E-postadaki baglanti icin; arka plan isinde istek olmadigindan yalnizca yapilandirmadan
+        // gelir. Tanimli degilse e-postada baglanti yerine menudeki yeri yazar (KR-134).
+        var publicBaseUrl = configuration["Identity:PublicBaseUrl"];
+        services.AddSingleton(new PersonnelSyncAlertOptions(
+            Uri.TryCreate(publicBaseUrl?.TrimEnd('/') + PersonnelSyncAlertOptions.SyncPagePath, UriKind.Absolute, out var syncPage)
+            && !string.IsNullOrWhiteSpace(publicBaseUrl) ? syncPage : null));
         services.AddScoped<PersonnelSyncService>();
         services.AddSingleton<IPhotoThumbnailer, SkiaPhotoThumbnailer>();
 

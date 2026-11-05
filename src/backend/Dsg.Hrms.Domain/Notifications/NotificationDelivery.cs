@@ -122,6 +122,12 @@ public enum NotificationPurpose
     /// bir adrese gider; icerikte kisisel veri yoktur.
     /// </summary>
     CorrectionRequested = 6,
+
+    /// <summary>
+    /// Senkronizasyon hatasi veya sema sapmasi uyarisi (SYG-PERS-012, KR-134). <c>PRM-BLD-01</c>
+    /// rolundeki kullanicinin kurumsal adresine gider; icerikte kisisel veri yoktur.
+    /// </summary>
+    SyncAlert = 7,
 }
 
 /// <summary>Gonderim sonucu.</summary>

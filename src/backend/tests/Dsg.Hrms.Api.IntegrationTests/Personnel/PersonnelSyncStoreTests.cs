@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using Dsg.Hrms.Api.IntegrationTests.Settings;
 using Dsg.Hrms.Application.Common.Abstractions;
+using Dsg.Hrms.Application.Notifications;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Audit;
@@ -118,7 +119,17 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
     private HrmsDbContext Read() => new(_options);
 
     private PersonnelSyncAlerts Alerts() =>
-        new(new PersonnelSyncAlertStore(new Factory(_options)), _parameters, _clock, NullLogger<PersonnelSyncAlerts>.Instance);
+        new(new PersonnelSyncAlertStore(new Factory(_options)), _parameters, AlertMail(), new PersonnelSyncAlertOptions(null), _clock, NullLogger<PersonnelSyncAlerts>.Instance);
+
+    private readonly List<OutboundMessage> _alertMails = [];
+
+    /// <summary>Uyari e-postalarini <see cref="_alertMails"/> listesine toplayan gonderici.</summary>
+    private INotificationDispatch AlertMail()
+    {
+        var dispatch = Substitute.For<INotificationDispatch>();
+        dispatch.TryEnqueue(Arg.Do<OutboundMessage>(_alertMails.Add)).Returns(true);
+        return dispatch;
+    }
 
     // ------------------------------------------------------------------ yazma
 
@@ -705,7 +716,10 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
     [Fact]
     public async Task Failed_run_notifies_active_users_of_the_alert_role_once_per_unread_problem()
     {
-        await SyncAsync(Card("00001", NationalId(1)), Card("00002", NationalId(2)), Card("00003", NationalId(3)));
+        await SyncAsync(
+            Card("00001", NationalId(1), emails: ["sistem.yonetici@duzen.com.tr"]),
+            Card("00002", NationalId(2), emails: ["ik.uzmani@duzen.com.tr"]),
+            Card("00003", NationalId(3), emails: ["eski.yonetici@duzen.com.tr"]));
         var admin = await AccountWithRoleAsync(NationalId(1), Role.SystemAdministratorCode);
         await AccountWithRoleAsync(NationalId(2), Role.HrIdentityOperationsCode);
         await AccountWithRoleAsync(NationalId(3), Role.SystemAdministratorCode, active: false);
@@ -716,9 +730,19 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         drift.Status.ShouldBe(SyncStatus.Failed);
         (await InboxAsync()).ShouldBe([(admin, InboxItemKind.SyncSchemaDrift, drift.RunId!.Value)]);
 
+        // E-posta, bildirimi alan yoneticinin LOGO'daki kurumsal adresine gider (KR-134).
+        await using (var context = Read())
+        {
+            var adminPerson = await context.Set<UserAccount>().Where(a => a.Id == admin).Select(a => a.PersonId).SingleAsync();
+            var adminEmail = await context.Set<Person>().Where(p => p.Id == adminPerson).Select(p => p.Email).SingleAsync();
+            adminEmail.ShouldNotBeNullOrWhiteSpace();
+            _alertMails.Select(m => (m.Recipient, m.PersonId, m.Purpose)).ShouldBe([(adminEmail!, adminPerson, NotificationPurpose.SyncAlert)]);
+        }
+
         // Ayni sorun, bildirim okunmadan yeniden: yeni bildirim yazilmaz.
         await SyncAsync(Card("00001", NationalId(1)));
         (await InboxAsync()).Count.ShouldBe(1);
+        _alertMails.Count.ShouldBe(1);
 
         // Baska bir sorun (LOGO'ya erisilemedi) kendi turuyle yazilir.
         _source.VerifySchemaAsync(Arg.Any<CancellationToken>()).Returns(new LogoSchemaCheckResult(true, []));
