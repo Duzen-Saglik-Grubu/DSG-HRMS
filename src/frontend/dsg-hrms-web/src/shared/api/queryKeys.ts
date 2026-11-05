@@ -25,6 +25,10 @@ export const queryKeys = {
     corrections: (status: string, page: number, pageSize: number) =>
       ['personnel', 'corrections', 'list', status, page, pageSize] as const,
     correction: (requestId: string) => ['personnel', 'corrections', 'item', requestId] as const,
+    quality: (issue: string, page: number, pageSize: number) =>
+      ['personnel', 'quality', issue, page, pageSize] as const,
+    qualityIneligible: (page: number, pageSize: number) =>
+      ['personnel', 'quality', 'ineligible', page, pageSize] as const,
   },
   notifications: {
     all: ['notifications'] as const,
