@@ -176,6 +176,31 @@ test('4. disa aktarma: yonetici suzgece uyan listeyi Excel ve PDF olarak indirir
   await signOut(page, people.admin.fullName);
 });
 
+test('5. veri kalitesi: yonetici uyarilari turle suzer ve raporu Excel olarak indirir (SYG-PERS-070, 071)', async ({
+  page,
+}) => {
+  await signIn(page, people.admin.email, passwords.first);
+  await page.getByRole('link', { name: 'Veri kalitesi', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Veri kalitesi' })).toBeVisible();
+
+  // Tohumdaki istihdamlarin unvani yok: tur suzgeci sayisiyla gorunur.
+  const titleFilter = page.getByRole('button', { name: /^Ünvanı boş · [1-9]\d*$/ });
+  await titleFilter.click();
+  await expect(titleFilter).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('note')).toContainText("Ünvanı LOGO'da girin.");
+  await expect(page.getByRole('row').nth(1)).toContainText('Ünvanı boş');
+
+  await page.getByRole('tab', { name: /^Üye olamayacak kişiler/ }).click();
+  await expect(page.getByRole('tabpanel')).toBeVisible();
+
+  const excel = page.waitForEvent('download');
+  await page.getByRole('button', { name: "Excel'e aktar" }).click();
+  const file = await excel;
+  expect(file.suggestedFilename()).toMatch(/^veri-kalitesi-\d{8}-\d{4}\.xlsx$/);
+  expect((await readDownload(file)).subarray(0, 2).toString('latin1')).toBe('PK');
+  await signOut(page, people.admin.fullName);
+});
+
 async function readDownload(download: Download): Promise<Buffer> {
   const stream = await download.createReadStream();
   const chunks: Buffer[] = [];
