@@ -1500,6 +1500,133 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/sync-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Son calismalar, en yeni once (SYG-PERS-008). */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Sayfa (1'den baslar). */
+                    Page?: number | string;
+                    /** @description Sayfa boyutu (1–100). */
+                    PageSize?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Durum ve sayfalanmis calismalar. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SyncRunListResponse"];
+                    };
+                };
+                /** @description Gecersiz sayfa veya sayfa boyutu. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.sync.view`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Senkronizasyonu elle baslatir (SYG-PERS-009).
+         * @description Calismayi BEKLEMEZ (`202`): sonuc listede gorunur. Calisma surerken istek reddedilir.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Calisma sira aldi (veya zaten sirada bekliyordu). */
+                202: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SyncStartResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.sync.create`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Senkronizasyon su anda calisiyor. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Senkronizasyon bu ortamda tanimli degil. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/me/photo": {
         parameters: {
             query?: never;
@@ -4503,6 +4630,31 @@ export interface components {
              */
             totalPages: number | string;
         };
+        /** @description Sayfalanmis yanit (ADR-0010 §4). */
+        PagedResponseOfSyncRunItemResponse: {
+            /** @description Bu sayfadaki kayitlar. */
+            items: components["schemas"]["SyncRunItemResponse"][];
+            /**
+             * Format: int32
+             * @description Sayfa numarasi.
+             */
+            page: number | string;
+            /**
+             * Format: int32
+             * @description Sayfa boyutu.
+             */
+            pageSize: number | string;
+            /**
+             * Format: int32
+             * @description Toplam kayit sayisi.
+             */
+            totalCount: number | string;
+            /**
+             * Format: int32
+             * @description Toplam sayfa sayisi.
+             */
+            totalPages: number | string;
+        };
         /**
          * @description Parametre turu.
          * @enum {unknown}
@@ -4903,6 +5055,80 @@ export interface components {
             /** @description Sirada zaten bekleyen bir istek vardi. */
             alreadyQueued: boolean;
         };
+        /** @description Bir calisma (SYG-PERS-008). */
+        SyncRunItemResponse: {
+            /**
+             * Format: uuid
+             * @description Calismanin kimligi.
+             */
+            id: string;
+            /** @description Tetikleyen: `scheduled` veya `manual`. */
+            trigger: string;
+            /**
+             * @description Sonuc: `running`, `succeeded`, `completedWithWarnings`, `partiallyCompleted`,
+             *     `failed`; uygulama calisma sirasinda durduysa `interrupted`.
+             */
+            status: string;
+            /**
+             * Format: date-time
+             * @description Baslangic.
+             */
+            startedAt: string;
+            /**
+             * Format: date-time
+             * @description Bitis; suruyorsa veya yarida kaldiysa bos.
+             */
+            finishedAt: null | string;
+            /**
+             * @description Basarisizlik nedeni: `sourceUnavailable`, `sourceWritable`, `schemaDrift`,
+             *     `persistenceFailed`, `unexpected`.
+             */
+            failureReason: null | string;
+            /**
+             * Format: int32
+             * @description LOGO'dan okunan kart.
+             */
+            recordsRead: number | string;
+            /**
+             * Format: int32
+             * @description Eklenen kisi.
+             */
+            personsCreated: number | string;
+            /**
+             * Format: int32
+             * @description Guncellenen kisi.
+             */
+            personsUpdated: number | string;
+            /**
+             * Format: int32
+             * @description Eklenen istihdam (sicil).
+             */
+            employmentsCreated: number | string;
+            /**
+             * Format: int32
+             * @description Guncellenen istihdam.
+             */
+            employmentsUpdated: number | string;
+            /**
+             * Format: int32
+             * @description Pasiflesen istihdam.
+             */
+            employmentsDeactivated: number | string;
+            /**
+             * Format: int32
+             * @description Uretilen uyari.
+             */
+            warningCount: number | string;
+        };
+        /** @description "Senkronizasyon durumu" ekrani. */
+        SyncRunListResponse: {
+            /** @description LOGO baglantisi tanimli mi; degilse senkronizasyon bu ortamda kapalidir. */
+            enabled: boolean;
+            /** @description Su anda bir calisma suruyor mu. */
+            running: boolean;
+            /** @description Calismalar, en yeni once. */
+            runs: components["schemas"]["PagedResponseOfSyncRunItemResponse"];
+        };
         /** @description Senkronizasyon calismasinin ozeti. */
         SyncRunResponse: {
             /** @description Sonuc (`succeeded`, `completedWithWarnings`, `failed`, `partiallyCompleted`). */
@@ -4927,6 +5153,11 @@ export interface components {
              * @description Uretilen uyari sayisi.
              */
             warningCount: number | string;
+        };
+        /** @description Elle calisma istegi alindi. */
+        SyncStartResponse: {
+            /** @description Sirada zaten bekleyen bir istek vardi. */
+            alreadyQueued: boolean;
         };
         /** @description Senkronizasyon durumu. */
         SyncStatusResponse: {

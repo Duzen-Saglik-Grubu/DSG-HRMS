@@ -1,3 +1,4 @@
+using Dsg.Hrms.Application.Common.Paging;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Domain.Personnel.Sync;
 using Dsg.Hrms.Infrastructure.Data;
@@ -54,5 +55,37 @@ public sealed class PersonnelSyncStatus : IPersonnelSyncStatus
         return new PersonnelSyncFreshness(
             lastSucceededAt,
             lastFinished is SyncStatus.Failed or SyncStatus.PartiallyCompleted);
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedResult<PersonnelSyncRunDetail>> ListRunsAsync(PageRequest page, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+
+        var runs = _context.Set<PersonnelSyncRun>().AsNoTracking();
+        var total = await runs.CountAsync(cancellationToken).ConfigureAwait(false);
+        var items = await runs
+            .OrderByDescending(run => run.StartedAt)
+            .ThenByDescending(run => run.Id)
+            .Skip(page.Skip)
+            .Take(page.PageSize)
+            .Select(run => new PersonnelSyncRunDetail(
+                run.PublicId,
+                run.Trigger,
+                run.Status,
+                run.StartedAt,
+                run.FinishedAt,
+                run.FailureReason,
+                run.RecordsRead,
+                run.PersonsCreated,
+                run.PersonsUpdated,
+                run.EmploymentsCreated,
+                run.EmploymentsUpdated,
+                run.EmploymentsDeactivated,
+                run.WarningCount))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return new PagedResult<PersonnelSyncRunDetail>(items, page.Page, page.PageSize, total);
     }
 }

@@ -101,3 +101,18 @@ SELECT p.id,
 FROM personnel.person p
 WHERE p.national_id = '20000000428'
 ON CONFLICT (person_id) DO NOTHING;
+
+-- Senkronizasyon durumu ekrani (SYG-PERS-008, #340): sentetik iki calisma. Bu ortamda LOGO
+-- tanimli degildir; ekran onceki calismalari gosterir, elle baslatma pasiftir.
+INSERT INTO personnel.sync_run (public_id, trigger, started_at, finished_at, status, records_read, records_skipped,
+                                persons_created, persons_updated, employments_created, employments_updated,
+                                employments_deactivated, companies_changed, warning_count, failure_reason)
+SELECT gen_random_uuid(), 'Scheduled', now() - interval '45 minutes', now() - interval '44 minutes', 'Succeeded',
+       12, 0, 2, 3, 2, 4, 1, 0, 0, NULL
+WHERE NOT EXISTS (SELECT 1 FROM personnel.sync_run);
+INSERT INTO personnel.sync_run (public_id, trigger, started_at, finished_at, status, records_read, records_skipped,
+                                persons_created, persons_updated, employments_created, employments_updated,
+                                employments_deactivated, companies_changed, warning_count, failure_reason)
+SELECT gen_random_uuid(), 'Manual', now() - interval '30 minutes', now() - interval '30 minutes', 'Failed',
+       0, 0, 0, 0, 0, 0, 0, 0, 0, 'SourceUnavailable'
+WHERE (SELECT count(*) FROM personnel.sync_run) = 1;

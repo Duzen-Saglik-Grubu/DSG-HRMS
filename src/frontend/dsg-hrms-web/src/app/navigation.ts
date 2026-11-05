@@ -3,6 +3,7 @@ import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
 import FactCheckOutlined from '@mui/icons-material/FactCheckOutlined';
+import CloudSyncOutlined from '@mui/icons-material/CloudSyncOutlined';
 import RuleRounded from '@mui/icons-material/RuleRounded';
 import ManageAccountsOutlined from '@mui/icons-material/ManageAccountsOutlined';
 import TuneRounded from '@mui/icons-material/TuneRounded';
@@ -60,6 +61,12 @@ export const navigation: NavSection[] = [
         label: 'nav.quality',
         icon: RuleRounded,
         permission: permissions.qualityView,
+      },
+      {
+        to: routes.syncRuns,
+        label: 'nav.syncRuns',
+        icon: CloudSyncOutlined,
+        permission: permissions.syncView,
       },
     ],
   },

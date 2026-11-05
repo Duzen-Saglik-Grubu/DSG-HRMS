@@ -24,8 +24,8 @@
 | `identity.account.view` | Hesap durumunu görme | İK hesap işlemleri ekranı (sonraki iş) | 073 |
 | `identity.account.update` | Hesabı pasife alma ve yeniden aktifleştirme | İK hesap işlemleri ekranı (sonraki iş) | 057, 073 |
 | `identity.invite.create` | Parola oluşturma bağlantısı gönderme | İK davet (sonraki iş) | 051 |
-| `personnel.sync.view` | Senkronizasyon durumunu görme (T3'te `identity.sync.view`) | `GET /api/v1/identity/sync-runs/latest` | KMLK-072; PERS-008 |
-| `personnel.sync.create` | Senkronizasyonu elle başlatma (T3'te `identity.sync.create`) | `POST /api/v1/identity/sync-runs` | KMLK-072; PERS-009 |
+| `personnel.sync.view` | Senkronizasyon durumunu görme (T3'te `identity.sync.view`) | `GET /api/v1/identity/sync-runs/latest`; `GET /api/v1/personnel/sync-runs` | KMLK-072; PERS-008 |
+| `personnel.sync.create` | Senkronizasyonu elle başlatma (T3'te `identity.sync.create`) | `POST /api/v1/identity/sync-runs`; `POST /api/v1/personnel/sync-runs` | KMLK-072; PERS-009 |
 | `system.parameter.view` | Sistem parametrelerini görme | Parametre ekranı (sonraki iş) | 076 |
 | `system.parameter.update` | Sistem parametrelerini değiştirme | Parametre ekranı (sonraki iş) | 076 |
 | `personnel.person.view` | Tüm personeli görme (kapsam `All`); yoksa yalnızca kendisi | Kişi okumaları (`IPersonnelQuery`) | PERS-050 |
@@ -64,3 +64,4 @@ Kişi kartı ve "Profilim" (`GET /api/v1/personnel/persons/{id}`, `/me`) izin de
 | 2026-10-23 | 0.4 | İK rolüne `audit.log.view` ve `system.parameter.*`; T4 yönü (`KR-128`, #278) | Bilgi İşlem |
 | 2026-11-04 | 0.5 | `personnel.person.export` uçlara bağlandı (#330) | Bilgi İşlem |
 | 2026-11-05 | 0.6 | `personnel.quality.view` ve `.export` uçlara bağlandı (#335) | Bilgi İşlem |
+| 2026-11-05 | 0.7 | `personnel.sync.view` ve `.create` personel uçlarına da bağlandı (#340) | Bilgi İşlem |
