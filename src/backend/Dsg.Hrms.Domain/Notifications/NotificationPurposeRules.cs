@@ -22,6 +22,8 @@ public static class NotificationPurposeRules
         NotificationPurpose.TwoFactorSetupCode => true,
         // IK'ya giden is bildirimi; kisinin girisi icin gerekli degildir.
         NotificationPurpose.CorrectionRequested => false,
+        // Sistem uyarisi; kisinin baslattigi bir islemin parcasi degildir (KR-134).
+        NotificationPurpose.SyncAlert => false,
         _ => throw new ArgumentOutOfRangeException(nameof(purpose), purpose, "Ileti amaci siniflandirilmamis (SYG-KMLK-062)."),
     };
 }

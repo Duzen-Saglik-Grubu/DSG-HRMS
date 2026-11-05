@@ -1,6 +1,7 @@
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Notifications;
+using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +14,7 @@ namespace Dsg.Hrms.Infrastructure.Personnel;
 public sealed class PersonnelSyncAlertStore(IDbContextFactory<HrmsDbContext> factory) : IPersonnelSyncAlertStore
 {
     /// <inheritdoc />
-    public async Task<IReadOnlyList<long>> ListRecipientsAsync(
+    public async Task<IReadOnlyList<SyncAlertRecipient>> ListRecipientsAsync(
         IReadOnlyCollection<string> roleCodes,
         InboxItemKind kind,
         CancellationToken cancellationToken)
@@ -33,12 +34,14 @@ public sealed class PersonnelSyncAlertStore(IDbContextFactory<HrmsDbContext> fac
             return await (from userRole in context.Set<UserRole>()
                           join role in context.Set<Role>() on userRole.RoleId equals role.Id
                           join account in context.Set<UserAccount>() on userRole.UserAccountId equals account.Id
+                          join person in context.Set<Person>() on account.PersonId equals person.Id
                           where codes.Contains(role.Code)
                                 && account.Status == AccountStatus.Active
                                 && !context.Set<InboxItem>().Any(item =>
                                     item.RecipientUserId == account.Id && item.Kind == kind && item.ReadAt == null)
-                          select account.Id)
+                          select new { account.Id, account.PersonId, person.Email })
                 .Distinct()
+                .Select(r => new SyncAlertRecipient(r.Id, r.PersonId, r.Email))
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
