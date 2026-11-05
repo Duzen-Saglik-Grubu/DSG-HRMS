@@ -12,8 +12,7 @@ namespace Dsg.Hrms.Application.Settings;
 /// </para>
 /// <para>
 /// <b>Katalogda olmayanlar:</b> <c>PRM-GRN-01</c> (logo dosyasi) bir dosya oldugu icin ayri
-/// tabloda tutulur (<see cref="BrandingService"/>, <c>KR-091</c>). <c>PRM-BLD-01</c> (bildirim
-/// rolu) rol yonetimiyle (T4) birlikte eklenecektir.
+/// tabloda tutulur (<see cref="BrandingService"/>, <c>KR-091</c>).
 /// </para>
 /// <para>
 /// Yapilandirma anahtarlari Ingilizcedir (<c>KR-058</c>). Ortam degiskeninde
@@ -205,6 +204,17 @@ public static partial class ParameterCatalog
         "\"IK'ya bildir\" taleplerinin e-postayla bildirilecegi IK adresi (bos = e-posta gonderilmez)",
         Pattern: EmailAddress(), FormatHint: "bir e-posta adresi olmalıdır (örneğin ik@duzen.com.tr)", AllowEmpty: true);
 
+    /// <summary>
+    /// Sistem uyarilarinin (senkronizasyon hatasi, sema sapmasi) uygulama ici bildirimle gonderildigi
+    /// roller (PG-PERS-08; SYG-PERS-012). Alici tek kisi degil roldur; rol kodlari virgulle ayrilir.
+    /// Rol yonetimi (T4) ayni parametreyi kullanir.
+    /// </summary>
+    public static readonly ParameterDefinition AlertRecipientRoles = new(
+        "PRM-BLD-01", $"{Section}:AlertRecipientRoles", ParameterType.List,
+        "Sistem uyarilarinin (senkronizasyon hatasi, sema sapmasi) bildirildigi roller",
+        Domain.Identity.Role.SystemAdministratorCode, Pattern: RoleCode(),
+        FormatHint: "bir rol kodu olmalıdır (örneğin system-administrator)");
+
     /// <summary>Bildirim istisnasinin islemsel iletileri kapsamamasi.</summary>
     public static readonly ParameterDefinition TransactionalMessagesBypassExemption = Boolean(
         "PRM-BLD-03", "TransactionalMessagesBypassExemption", "Bildirim istisnasinin islemsel iletileri kapsamamasi", true);
@@ -221,7 +231,7 @@ public static partial class ParameterCatalog
             SingleActiveSession, TwoFactorImpactWarning, MaxVerificationAttempts, CodeSendLimit,
             RegistrationLimitPerNationalId, RegistrationLimitPerIp, RequirePasswordChangeOnFirstLogin, PasswordMaxAgeDays,
             HrInviteEnabled, AutoDeactivateOnEmploymentEnd, InviteLinkLifetimeHours,
-            SupportContact, TransactionalMessagesBypassExemption,
+            SupportContact, AlertRecipientRoles, TransactionalMessagesBypassExemption,
             DefaultPageSize, MaxPageSize, TerminatedVisibilityYears, CorrectionNoticeEmail,
         }.OrderBy(p => p.Key, StringComparer.Ordinal),
     ];
@@ -242,6 +252,9 @@ public static partial class ParameterCatalog
 
     [GeneratedRegex(@"^(?=.{3,254}$)[^@\s]+@([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex EmailAddress();
+
+    [GeneratedRegex(@"^[a-z0-9]+(-[a-z0-9]+)*$", RegexOptions.CultureInvariant)]
+    private static partial Regex RoleCode();
 
     [GeneratedRegex(@"^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$", RegexOptions.CultureInvariant)]
     private static partial Regex DomainName();

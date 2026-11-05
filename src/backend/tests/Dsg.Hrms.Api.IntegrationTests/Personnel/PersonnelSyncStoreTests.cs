@@ -6,6 +6,7 @@ using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
+using Dsg.Hrms.Domain.Notifications;
 using Dsg.Hrms.Domain.Personnel;
 using Dsg.Hrms.Domain.Personnel.Sync;
 using Dsg.Hrms.Infrastructure.Data;
@@ -109,12 +110,15 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
 
         await using var store = CreateStore();
         var service = new PersonnelSyncService(
-            _source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), NullLogger<PersonnelSyncService>.Instance);
+            _source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), Alerts(), NullLogger<PersonnelSyncService>.Instance);
 
         return await service.RunAsync(SyncTrigger.Scheduled, CancellationToken.None);
     }
 
     private HrmsDbContext Read() => new(_options);
+
+    private PersonnelSyncAlerts Alerts() =>
+        new(new PersonnelSyncAlertStore(new Factory(_options)), _parameters, _clock, NullLogger<PersonnelSyncAlerts>.Instance);
 
     // ------------------------------------------------------------------ yazma
 
@@ -511,7 +515,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         _source.GetAllAsync(Arg.Any<CancellationToken>()).ThrowsAsync(new LogoUnavailableException());
         await using (var store = CreateStore())
         {
-            await new PersonnelSyncService(_source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), NullLogger<PersonnelSyncService>.Instance)
+            await new PersonnelSyncService(_source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), Alerts(), NullLogger<PersonnelSyncService>.Instance)
                 .RunAsync(SyncTrigger.Scheduled, CancellationToken.None);
         }
 
@@ -551,7 +555,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         _source.GetAllAsync(Arg.Any<CancellationToken>()).ThrowsAsync(new LogoUnavailableException());
         await using (var store = CreateStore())
         {
-            await new PersonnelSyncService(_source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), NullLogger<PersonnelSyncService>.Instance)
+            await new PersonnelSyncService(_source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), Alerts(), NullLogger<PersonnelSyncService>.Instance)
                 .RunAsync(SyncTrigger.Scheduled, CancellationToken.None);
         }
 
@@ -621,7 +625,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         await using (var store = CreateStore())
         {
             var service = new PersonnelSyncService(
-                _source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), NullLogger<PersonnelSyncService>.Instance);
+                _source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), Alerts(), NullLogger<PersonnelSyncService>.Instance);
             (await service.RunAsync(SyncTrigger.Scheduled, CancellationToken.None)).Status.ShouldBe(SyncStatus.Failed);
         }
 
@@ -669,6 +673,89 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
         context.Add(account);
         await context.SaveChangesAsync();
         return account;
+    }
+
+    // ------------------------------------------------------------------ uyari bildirimi (SYG-PERS-012)
+
+    private async Task<long> AccountWithRoleAsync(string nationalId, string roleCode, bool active = true)
+    {
+        var account = await CreateAccountAsync(nationalId);
+
+        await using var context = Read();
+        var stored = await context.Set<UserAccount>().SingleAsync(a => a.Id == account.Id);
+        if (!active)
+        {
+            stored.DeactivateManually("test");
+        }
+
+        var role = await context.Set<Role>().SingleAsync(r => r.Code == roleCode);
+        context.Add(UserRole.Assign(account.Id, role.Id));
+        await context.SaveChangesAsync();
+        return account.Id;
+    }
+
+    private async Task<List<(long User, InboxItemKind Kind, Guid Subject)>> InboxAsync()
+    {
+        await using var context = Read();
+        return (await context.Set<InboxItem>().OrderBy(i => i.Id).ToListAsync())
+            .Select(i => (i.RecipientUserId, i.Kind, i.SubjectId))
+            .ToList();
+    }
+
+    [Fact]
+    public async Task Failed_run_notifies_active_users_of_the_alert_role_once_per_unread_problem()
+    {
+        await SyncAsync(Card("00001", NationalId(1)), Card("00002", NationalId(2)), Card("00003", NationalId(3)));
+        var admin = await AccountWithRoleAsync(NationalId(1), Role.SystemAdministratorCode);
+        await AccountWithRoleAsync(NationalId(2), Role.HrIdentityOperationsCode);
+        await AccountWithRoleAsync(NationalId(3), Role.SystemAdministratorCode, active: false);
+
+        // Sema sapmasi: yalnizca rolde ve aktif olan yonetici bildirim alir.
+        _source.VerifySchemaAsync(Arg.Any<CancellationToken>()).Returns(new LogoSchemaCheckResult(false, ["X"]));
+        var drift = await SyncAsync(Card("00001", NationalId(1)));
+        drift.Status.ShouldBe(SyncStatus.Failed);
+        (await InboxAsync()).ShouldBe([(admin, InboxItemKind.SyncSchemaDrift, drift.RunId!.Value)]);
+
+        // Ayni sorun, bildirim okunmadan yeniden: yeni bildirim yazilmaz.
+        await SyncAsync(Card("00001", NationalId(1)));
+        (await InboxAsync()).Count.ShouldBe(1);
+
+        // Baska bir sorun (LOGO'ya erisilemedi) kendi turuyle yazilir.
+        _source.VerifySchemaAsync(Arg.Any<CancellationToken>()).Returns(new LogoSchemaCheckResult(true, []));
+        _source.GetAllAsync(Arg.Any<CancellationToken>()).ThrowsAsync(new LogoUnavailableException());
+        await using (var store = CreateStore())
+        {
+            await new PersonnelSyncService(_source, store, _clock, _parameters, new PersonnelSyncOptions(), new SkiaPhotoThumbnailer(), Alerts(), NullLogger<PersonnelSyncService>.Instance)
+                .RunAsync(SyncTrigger.Manual, CancellationToken.None);
+        }
+
+        (await InboxAsync()).Select(i => i.Kind).ShouldBe([InboxItemKind.SyncSchemaDrift, InboxItemKind.SyncFailed]);
+
+        // Okunduktan sonraki yeni sapma yine bildirilir.
+        await using (var context = Read())
+        {
+            foreach (var item in await context.Set<InboxItem>().ToListAsync())
+            {
+                item.MarkRead(_clock.UtcNow);
+            }
+
+            await context.SaveChangesAsync();
+        }
+
+        _source.VerifySchemaAsync(Arg.Any<CancellationToken>()).Returns(new LogoSchemaCheckResult(false, ["X"]));
+        await SyncAsync(Card("00001", NationalId(1)));
+        (await InboxAsync()).Count.ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task Successful_run_writes_no_alert()
+    {
+        await SyncAsync(Card("00001", NationalId(1)));
+        await AccountWithRoleAsync(NationalId(1), Role.SystemAdministratorCode);
+
+        (await SyncAsync(Card("00001", NationalId(1)))).Status.ShouldBe(SyncStatus.Succeeded);
+
+        (await InboxAsync()).ShouldBeEmpty();
     }
 
     [Fact]

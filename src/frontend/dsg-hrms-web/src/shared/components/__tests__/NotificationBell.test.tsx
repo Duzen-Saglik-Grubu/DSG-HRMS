@@ -96,6 +96,34 @@ describe('NotificationBell', () => {
     expect(queryClient.getQueryState(listKey)?.isInvalidated).toBe(true);
   });
 
+  it.each([
+    ['syncFailed', 'Senkronizasyon başarısız'],
+    ['syncSchemaDrift', 'LOGO şemasında sapma bulundu, senkronizasyon yapılmadı'],
+  ])(
+    'senkronizasyon uyarisi (%s) senkronizasyon ekranina goturur ve listeyi yeniler',
+    async (kind, text) => {
+      // SYG-PERS-012: bildirim kisisel veri tasimaz; ayrinti senkronizasyon ekranindadir.
+      const item: InboxItem = { ...ITEM, id: 'n-2', kind, subjectId: 'run-1' };
+      vi.spyOn(inboxApi, 'unreadCount').mockResolvedValue(1);
+      vi.spyOn(inboxApi, 'list').mockResolvedValue([item]);
+      const markRead = vi
+        .spyOn(inboxApi, 'markRead')
+        .mockResolvedValue({ ...item, readAt: item.createdAt });
+      const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+      const runsKey = queryKeys.personnel.syncRuns(1, 25);
+      queryClient.setQueryData(runsKey, { enabled: true, running: false, runs: { items: [] } });
+      const user = userEvent.setup();
+      renderBell(queryClient);
+
+      await user.click(await screen.findByRole('button', { name: 'Bildirimler, 1 okunmamış' }));
+      await user.click(await screen.findByRole('menuitem', { name: new RegExp(text) }));
+
+      expect(markRead).toHaveBeenCalledWith('n-2');
+      expect(screen.getByTestId('where')).toHaveTextContent(/^\/personnel\/sync$/);
+      expect(queryClient.getQueryState(runsKey)?.isInvalidated).toBe(true);
+    },
+  );
+
   it('bildirim yoksa bunu soyler', async () => {
     vi.spyOn(inboxApi, 'unreadCount').mockResolvedValue(0);
     vi.spyOn(inboxApi, 'list').mockResolvedValue([]);

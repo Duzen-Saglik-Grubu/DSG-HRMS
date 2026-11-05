@@ -377,6 +377,7 @@
         "PRM-GRN-04": "Destek iletişim bilgisi (üyelik ve giriş ekranları)",
         "PRM-PRS-01": "Ayrılan personelin görünür kalma süresi (yıl; boş = süresiz)",
         "PRM-PRS-02": "İK'ya bildir e-posta adresi (boş = e-posta gönderilmez)",
+        "PRM-BLD-01": "Sistem uyarılarının (senkronizasyon hatası, şema sapması) bildirildiği roller",
         "PRM-BLD-03": "Bildirim istisnasının işlemsel iletileri kapsamaması"
       },
       "twoFactor": {
@@ -407,6 +408,8 @@
     "unread": "okunmadı",
     "kinds": {
       "correctionRequested": "Yeni düzeltme talebi",
+      "syncFailed": "Senkronizasyon başarısız",
+      "syncSchemaDrift": "LOGO şemasında sapma bulundu, senkronizasyon yapılmadı",
       "unknown": "Yeni bildirim"
     }
   },

@@ -29,6 +29,7 @@ export const queryKeys = {
       ['personnel', 'quality', issue, page, pageSize] as const,
     qualityIneligible: (page: number, pageSize: number) =>
       ['personnel', 'quality', 'ineligible', page, pageSize] as const,
+    syncRunsAll: ['personnel', 'sync-runs'] as const,
     syncRuns: (page: number, pageSize: number) =>
       ['personnel', 'sync-runs', page, pageSize] as const,
   },

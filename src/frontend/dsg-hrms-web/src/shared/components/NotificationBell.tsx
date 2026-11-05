@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import NotificationsNoneRounded from '@mui/icons-material/NotificationsNoneRounded';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type QueryKey, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
@@ -23,11 +23,24 @@ import { routes } from '@/shared/routes';
 /** Okunmamis sayisinin yenilenme araligi: yeni talep sayfa yenilenmeden gorunsun. */
 const REFRESH_MS = 60_000;
 
-/** Bildirimin goturdugu adres; bilinmeyen turde bildirim yalnizca okunur. */
-function targetOf(item: InboxItem): string | null {
-  return item.kind === 'correctionRequested'
-    ? `${routes.corrections}?request=${encodeURIComponent(item.subjectId)}`
-    : null;
+/**
+ * Bildirimin goturdugu adres ve acilmadan once yenilenecek liste; bilinmeyen turde bildirim
+ * yalnizca okunur.
+ */
+function targetOf(item: InboxItem): { path: string; refresh: QueryKey } | null {
+  switch (item.kind) {
+    case 'correctionRequested':
+      return {
+        path: `${routes.corrections}?request=${encodeURIComponent(item.subjectId)}`,
+        refresh: queryKeys.personnel.correctionsAll,
+      };
+    case 'syncFailed':
+    case 'syncSchemaDrift':
+      // SYG-PERS-012: ayrinti (neden, sayilar) senkronizasyon ekranindadir.
+      return { path: routes.syncRuns, refresh: queryKeys.personnel.syncRunsAll };
+    default:
+      return null;
+  }
 }
 
 /**
@@ -67,11 +80,9 @@ export function NotificationBell() {
     const target = targetOf(item);
     if (target) {
       // Bildirim yeni bir kaydi haber verir; liste onbellekte "taze" sayilsa da (staleTime) ya da
-      // ekran zaten aciksa sunucudan yeniden alinmali, yoksa yeni talep gorunmez (#338).
-      if (item.kind === 'correctionRequested') {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.personnel.correctionsAll });
-      }
-      void navigate(target);
+      // ekran zaten aciksa sunucudan yeniden alinmali, yoksa yeni kayit gorunmez (#338).
+      void queryClient.invalidateQueries({ queryKey: target.refresh });
+      void navigate(target.path);
     }
   };
 

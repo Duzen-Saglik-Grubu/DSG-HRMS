@@ -201,6 +201,8 @@ public static class InfrastructureRegistration
             configuration, PersonalDataProtectionOptions.SectionName);
         services.AddSingleton(new PersonalDataProtector(protection));
         services.AddScoped<IPersonnelSyncStatus, PersonnelSyncStatus>();
+        services.AddScoped<IPersonnelSyncAlertStore, PersonnelSyncAlertStore>();
+        services.AddScoped<IPersonnelSyncAlerts, PersonnelSyncAlerts>();
         services.AddScoped<PersonnelSyncService>();
         services.AddSingleton<IPhotoThumbnailer, SkiaPhotoThumbnailer>();
 

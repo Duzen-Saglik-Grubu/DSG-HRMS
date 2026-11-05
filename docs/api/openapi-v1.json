@@ -5333,7 +5333,7 @@
           },
           "kind": {
             "type": "string",
-            "description": "Tur (`correctionRequested`)."
+            "description": "Tur (`correctionRequested`, `syncFailed`, `syncSchemaDrift`)."
           },
           "subjectId": {
             "type": "string",
