@@ -224,7 +224,7 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
             persons = Search(persons, term, PersonFieldVisibility.CanSearchByNationalId(viewer));
         }
 
-        return ApplyFilters(persons, criteria.Filters);
+        return ApplyFilters(persons, criteria.Filters, activeOnly: criteria.Status == EmploymentStatusFilter.Active);
     }
 
     /// <summary>Liste siralamasi (SYG-PERS-031); esitlikte ic kimlik, sayfalar kararli kalir.</summary>
@@ -240,15 +240,18 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
     /// <summary>
     /// Suzgecler (SYG-PERS-024, 025). Her suzgec ayri kosuldur ve birlikte (VE) uygulanir; coklu secimde
     /// secilenlerden herhangi biri yeter. Istihdam suzgecleri kisinin HERHANGI BIR sicilinin guncel
-    /// doneminde (baslangici en yeni kayit) eslesir (KR-126). Gorunurluk denetimi servistedir; bu metot
+    /// doneminde (baslangici en yeni kayit) eslesir (KR-126). "Aktif" secildiginde yalnizca aktif
+    /// siciller aranir (SYG-PERS-022, ADR-0019 §6); aksi halde eski bir sicili Tunus'ta olan, bugun
+    /// baska subede calisan kisi Tunus suzgecine girerdi (#338). Cikis tarihi suzgeci bunun
+    /// disindadir: yalnizca ayrilmis sicilde anlamlidir. Gorunurluk denetimi servistedir; bu metot
     /// yalnizca izinli istekle cagrilir.
     /// </summary>
-    private IQueryable<Person> ApplyFilters(IQueryable<Person> persons, PersonListFilters f)
+    private IQueryable<Person> ApplyFilters(IQueryable<Person> persons, PersonListFilters f, bool activeOnly)
     {
         var today = clock.Today;
         var assignments = context.Set<EmploymentAssignment>();
         var current = assignments.Where(a => a.ValidFrom == assignments.Where(x => x.EmploymentId == a.EmploymentId).Max(x => x.ValidFrom));
-        var employments = context.Set<Employment>();
+        var employments = context.Set<Employment>().Where(e => !activeOnly || e.IsActive);
 
         IQueryable<Person> WithAssignment(IQueryable<Person> source, IQueryable<EmploymentAssignment> matching)
         {
@@ -340,7 +343,7 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
 
         if (Trimmed(f.RegistryCode) is { } registryCode)
         {
-            persons = persons.Where(p => p.Employments.Any(e => e.RegistryCode.Contains(registryCode)));
+            persons = persons.Where(p => p.Employments.Any(e => (!activeOnly || e.IsActive) && e.RegistryCode.Contains(registryCode)));
         }
 
         if (Trimmed(f.NationalId) is { } nationalId)
@@ -381,7 +384,7 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
 
         if (f.HireDate is { } hire)
         {
-            persons = persons.Where(p => p.Employments.Any(e =>
+            persons = persons.Where(p => p.Employments.Any(e => (!activeOnly || e.IsActive) &&
                 (hire.From == null || e.HireDate >= hire.From) && (hire.To == null || e.HireDate <= hire.To)));
         }
 
@@ -412,7 +415,7 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
             // Kidem bitisi: aktifte bugun, ayrilanda cikis gunu dahil (SYG-PERS-039).
             var min = seniority.Min;
             var max = seniority.Max;
-            persons = persons.Where(p => p.Employments.Any(e =>
+            persons = persons.Where(p => p.Employments.Any(e => (!activeOnly || e.IsActive) &&
                 (min == null || e.HireDate.AddYears(min.Value) <= (e.TerminationDate == null ? today : e.TerminationDate.Value.AddDays(1))) &&
                 (max == null || e.HireDate.AddYears(max.Value + 1) > (e.TerminationDate == null ? today : e.TerminationDate.Value.AddDays(1)))));
         }

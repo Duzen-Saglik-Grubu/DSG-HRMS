@@ -5,6 +5,7 @@ import { createMemoryRouter, RouterProvider, useLocation } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppProviders } from '@/app/AppProviders';
 import { inboxApi, type InboxItem } from '@/shared/api/inbox';
+import { queryKeys } from '@/shared/api/queryKeys';
 import { setSession } from '@/test/session';
 import { NotificationBell } from '../NotificationBell';
 
@@ -22,7 +23,9 @@ function Where() {
   return <p data-testid="where">{`${location.pathname}${location.search}`}</p>;
 }
 
-function renderBell() {
+function renderBell(
+  queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } }),
+) {
   const router = createMemoryRouter(
     [
       {
@@ -37,8 +40,6 @@ function renderBell() {
     ],
     { initialEntries: ['/'] },
   );
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-
   return render(
     <AppProviders queryClient={queryClient}>
       <RouterProvider router={router} />
@@ -75,6 +76,24 @@ describe('NotificationBell', () => {
 
     expect(markRead).toHaveBeenCalledWith('n-1');
     expect(screen.getByTestId('where')).toHaveTextContent('/personnel/corrections?request=c-1');
+  });
+
+  it('talep bildirimine tiklaninca talep listesini sunucudan yeniden ister', async () => {
+    // #338: liste onbellekte "taze" sayilsa da yeni talep gorunmeli.
+    vi.spyOn(inboxApi, 'unreadCount').mockResolvedValue(1);
+    vi.spyOn(inboxApi, 'list').mockResolvedValue([ITEM]);
+    vi.spyOn(inboxApi, 'markRead').mockResolvedValue({ ...ITEM, readAt: ITEM.createdAt });
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const listKey = queryKeys.personnel.corrections('new', 1, 25);
+    queryClient.setQueryData(listKey, { items: [], totalCount: 0 });
+    const user = userEvent.setup();
+    renderBell(queryClient);
+
+    expect(queryClient.getQueryState(listKey)?.isInvalidated).toBe(false);
+    await user.click(await screen.findByRole('button', { name: 'Bildirimler, 1 okunmamış' }));
+    await user.click(await screen.findByRole('menuitem', { name: /Yeni düzeltme talebi/ }));
+
+    expect(queryClient.getQueryState(listKey)?.isInvalidated).toBe(true);
   });
 
   it('bildirim yoksa bunu soyler', async () => {
