@@ -99,12 +99,12 @@ export function SyncRunsPage() {
         result.alreadyQueued ? t('personnel.sync.alreadyQueued') : t('personnel.sync.started'),
       );
       setAwaitingSince(Date.now());
-      void queryClient.invalidateQueries({ queryKey: ['personnel', 'sync-runs'] });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.personnel.syncRunsAll });
     },
     onError: () => {
       setNotice(null);
       // 409: baska bir calisma suruyor; liste "calisiyor" durumunu gostersin.
-      void queryClient.invalidateQueries({ queryKey: ['personnel', 'sync-runs'] });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.personnel.syncRunsAll });
     },
   });
 

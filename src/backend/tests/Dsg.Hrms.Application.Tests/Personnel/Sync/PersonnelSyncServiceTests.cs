@@ -19,6 +19,7 @@ public sealed class PersonnelSyncServiceTests
     private readonly IPersonnelSyncSession _session = Substitute.For<IPersonnelSyncSession>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly FakeSystemParameters _parameters = new();
+    private readonly IPersonnelSyncAlerts _alerts = Substitute.For<IPersonnelSyncAlerts>();
     private readonly List<(SyncStatus Status, SyncFailureReason? Reason)> _savedRuns = [];
 
     public PersonnelSyncServiceTests()
@@ -38,7 +39,7 @@ public sealed class PersonnelSyncServiceTests
     }
 
     private PersonnelSyncService CreateService() =>
-        new(_source, _store, _clock, _parameters, new PersonnelSyncOptions(), Substitute.For<IPhotoThumbnailer>(), NullLogger<PersonnelSyncService>.Instance);
+        new(_source, _store, _clock, _parameters, new PersonnelSyncOptions(), Substitute.For<IPhotoThumbnailer>(), _alerts, NullLogger<PersonnelSyncService>.Instance);
 
     [Fact]
     public async Task Successful_run_applies_changes_and_records_the_run()
@@ -96,6 +97,21 @@ public sealed class PersonnelSyncServiceTests
         result.Status.ShouldBe(SyncStatus.Failed);
         _savedRuns.Last().Reason.ShouldBe(SyncFailureReason.SchemaDrift);
         await _source.DidNotReceiveWithAnyArgs().GetAllAsync(default);
+    }
+
+    [Fact]
+    public async Task Every_finished_run_is_handed_to_alerts_after_it_is_saved()
+    {
+        // SYG-PERS-012: bildirim karari kapanmis kayda gore verilir.
+        _source.GetAllAsync(Arg.Any<CancellationToken>()).ThrowsAsync(new LogoUnavailableException());
+        _alerts.NotifyAsync(Arg.Do<PersonnelSyncRun>(_ => _savedRuns.Count.ShouldBe(2)), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+
+        await CreateService().RunAsync(SyncTrigger.Scheduled, CancellationToken.None);
+
+        await _alerts.Received(1).NotifyAsync(
+            Arg.Is<PersonnelSyncRun>(r => r.Status == SyncStatus.Failed && r.FailureReason == SyncFailureReason.SourceUnavailable),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]

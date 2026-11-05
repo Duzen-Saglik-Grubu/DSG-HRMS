@@ -50,4 +50,10 @@ public enum InboxItemKind
 {
     /// <summary>Yeni "IK'ya bildir" duzeltme talebi (SYG-PERS-046).</summary>
     CorrectionRequested = 1,
+
+    /// <summary>Senkronizasyon basarisiz oldu (SYG-PERS-012); ilgili kayit calismadir.</summary>
+    SyncFailed = 2,
+
+    /// <summary>LOGO semasinda sapma bulundu, senkronizasyon yapilmadi (SYG-PERS-012, PG-PERS-08).</summary>
+    SyncSchemaDrift = 3,
 }

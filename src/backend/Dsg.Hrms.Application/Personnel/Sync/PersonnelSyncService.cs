@@ -15,7 +15,7 @@ namespace Dsg.Hrms.Application.Personnel.Sync;
 ///   <item>Calisma kaydi "suruyor" olarak yazilir.</item>
 ///   <item>LOGO oturumunun salt okunur oldugu ve semanin beklenen yapida oldugu denetlenir.</item>
 ///   <item>Kartlar okunur, fark hesaplanir ve tek islemde uygulanir.</item>
-///   <item>Calisma kaydi sonucla kapatilir.</item>
+///   <item>Calisma kaydi sonucla kapatilir; basarisizsa uyari bildirimi yazilir (SYG-PERS-012).</item>
 /// </list>
 /// <para>
 /// Herhangi bir adimda hata olursa islem geri alinir, calisma "basarisiz" kaydedilir
@@ -30,6 +30,7 @@ public sealed partial class PersonnelSyncService
     private readonly ISystemParameters _parameters;
     private readonly PersonnelSyncOptions _options;
     private readonly IPhotoThumbnailer _thumbnailer;
+    private readonly IPersonnelSyncAlerts _alerts;
     private readonly ILogger<PersonnelSyncService> _logger;
 
     /// <summary>Yeni ornek olusturur.</summary>
@@ -40,6 +41,7 @@ public sealed partial class PersonnelSyncService
         ISystemParameters parameters,
         PersonnelSyncOptions options,
         IPhotoThumbnailer thumbnailer,
+        IPersonnelSyncAlerts alerts,
         ILogger<PersonnelSyncService> logger)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -50,6 +52,7 @@ public sealed partial class PersonnelSyncService
         _parameters = parameters;
         _options = options;
         _thumbnailer = thumbnailer;
+        _alerts = alerts;
         _logger = logger;
     }
 
@@ -77,6 +80,9 @@ public sealed partial class PersonnelSyncService
         // Kayit, iptal istense bile yazilir: yarim kalan bir calismanin "suruyor"
         // olarak asili kalmasi, sagligi yanlis gosterirdi.
         await _store.SaveRunAsync(run, CancellationToken.None).ConfigureAwait(false);
+
+        // Kilit hala bu calismada: iki calisma ayni anda bildirim yazip tekrar uretemez.
+        await _alerts.NotifyAsync(run, CancellationToken.None).ConfigureAwait(false);
 
         LogFinished(_logger, run.PublicId, run.Status, run.RecordsRead, run.WarningCount);
         return new PersonnelSyncResult(run.Status, run.PublicId);

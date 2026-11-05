@@ -4393,7 +4393,7 @@ export interface components {
              * @description Bildirimin dis kimligi.
              */
             id: string;
-            /** @description Tur (`correctionRequested`). */
+            /** @description Tur (`correctionRequested`, `syncFailed`, `syncSchemaDrift`). */
             kind: string;
             /**
              * Format: uuid

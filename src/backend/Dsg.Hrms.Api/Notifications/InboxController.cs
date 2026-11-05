@@ -57,7 +57,7 @@ public sealed class InboxController : ControllerBase
 
 /// <summary>Bildirim.</summary>
 /// <param name="Id">Bildirimin dis kimligi.</param>
-/// <param name="Kind">Tur (<c>correctionRequested</c>).</param>
+/// <param name="Kind">Tur (<c>correctionRequested</c>, <c>syncFailed</c>, <c>syncSchemaDrift</c>).</param>
 /// <param name="SubjectId">Ilgili kaydin dis kimligi (ornegin duzeltme talebi).</param>
 /// <param name="CreatedAt">Olusma ani.</param>
 /// <param name="ReadAt">Okunma ani; okunmadiysa bos.</param>
