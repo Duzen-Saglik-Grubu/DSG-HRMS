@@ -1852,6 +1852,143 @@
         }
       }
     },
+    "/api/v1/personnel/sync-runs": {
+      "get": {
+        "tags": [
+          "PersonnelSyncRuns"
+        ],
+        "summary": "Son calismalar, en yeni once (SYG-PERS-008).",
+        "parameters": [
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "Sayfa (1'den baslar).",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "Sayfa boyutu (1–100).",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durum ve sayfalanmis calismalar.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncRunListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz sayfa veya sayfa boyutu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.sync.view`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "PersonnelSyncRuns"
+        ],
+        "summary": "Senkronizasyonu elle baslatir (SYG-PERS-009).",
+        "description": "Calismayi BEKLEMEZ (`202`): sonuc listede gorunur. Calisma surerken istek reddedilir.",
+        "responses": {
+          "202": {
+            "description": "Calisma sira aldi (veya zaten sirada bekliyordu).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncStartResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.sync.create`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Senkronizasyon su anda calisiyor.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Senkronizasyon bu ortamda tanimli degil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/me/photo": {
       "get": {
         "tags": [
@@ -5725,6 +5862,62 @@
         },
         "description": "Sayfalanmis yanit (ADR-0010 §4)."
       },
+      "PagedResponseOfSyncRunItemResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SyncRunItemResponse"
+            },
+            "description": "Bu sayfadaki kayitlar."
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa numarasi.",
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa boyutu.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam kayit sayisi.",
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam sayfa sayisi.",
+            "format": "int32"
+          }
+        },
+        "description": "Sayfalanmis yanit (ADR-0010 §4)."
+      },
       "ParameterKind": {
         "enum": [
           "number",
@@ -6808,6 +7001,146 @@
         },
         "description": "Elle calisma istegi alindi."
       },
+      "SyncRunItemResponse": {
+        "required": [
+          "id",
+          "trigger",
+          "status",
+          "startedAt",
+          "finishedAt",
+          "failureReason",
+          "recordsRead",
+          "personsCreated",
+          "personsUpdated",
+          "employmentsCreated",
+          "employmentsUpdated",
+          "employmentsDeactivated",
+          "warningCount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Calismanin kimligi.",
+            "format": "uuid"
+          },
+          "trigger": {
+            "type": "string",
+            "description": "Tetikleyen: `scheduled` veya `manual`."
+          },
+          "status": {
+            "type": "string",
+            "description": "Sonuc: `running`, `succeeded`, `completedWithWarnings`, `partiallyCompleted`,\n`failed`; uygulama calisma sirasinda durduysa `interrupted`."
+          },
+          "startedAt": {
+            "type": "string",
+            "description": "Baslangic.",
+            "format": "date-time"
+          },
+          "finishedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Bitis; suruyorsa veya yarida kaldiysa bos.",
+            "format": "date-time"
+          },
+          "failureReason": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Basarisizlik nedeni: `sourceUnavailable`, `sourceWritable`, `schemaDrift`,\n`persistenceFailed`, `unexpected`."
+          },
+          "recordsRead": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "LOGO'dan okunan kart.",
+            "format": "int32"
+          },
+          "personsCreated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Eklenen kisi.",
+            "format": "int32"
+          },
+          "personsUpdated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Guncellenen kisi.",
+            "format": "int32"
+          },
+          "employmentsCreated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Eklenen istihdam (sicil).",
+            "format": "int32"
+          },
+          "employmentsUpdated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Guncellenen istihdam.",
+            "format": "int32"
+          },
+          "employmentsDeactivated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Pasiflesen istihdam.",
+            "format": "int32"
+          },
+          "warningCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Uretilen uyari.",
+            "format": "int32"
+          }
+        },
+        "description": "Bir calisma (SYG-PERS-008)."
+      },
+      "SyncRunListResponse": {
+        "required": [
+          "enabled",
+          "running",
+          "runs"
+        ],
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "LOGO baglantisi tanimli mi; degilse senkronizasyon bu ortamda kapalidir."
+          },
+          "running": {
+            "type": "boolean",
+            "description": "Su anda bir calisma suruyor mu."
+          },
+          "runs": {
+            "description": "Calismalar, en yeni once.",
+            "$ref": "#/components/schemas/PagedResponseOfSyncRunItemResponse"
+          }
+        },
+        "description": "\"Senkronizasyon durumu\" ekrani."
+      },
       "SyncRunResponse": {
         "required": [
           "status",
@@ -6855,6 +7188,19 @@
           }
         },
         "description": "Senkronizasyon calismasinin ozeti."
+      },
+      "SyncStartResponse": {
+        "required": [
+          "alreadyQueued"
+        ],
+        "type": "object",
+        "properties": {
+          "alreadyQueued": {
+            "type": "boolean",
+            "description": "Sirada zaten bekleyen bir istek vardi."
+          }
+        },
+        "description": "Elle calisma istegi alindi."
       },
       "SyncStatusResponse": {
         "required": [
@@ -7251,6 +7597,9 @@
     },
     {
       "name": "PersonExport"
+    },
+    {
+      "name": "PersonnelSyncRuns"
     },
     {
       "name": "PersonPhotos"

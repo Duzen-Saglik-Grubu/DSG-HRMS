@@ -201,6 +201,26 @@ test('5. veri kalitesi: yonetici uyarilari turle suzer ve raporu Excel olarak in
   await signOut(page, people.admin.fullName);
 });
 
+test('6. senkronizasyon: yonetici calismalari sonuclariyla gorur (SYG-PERS-008, 009)', async ({
+  page,
+}) => {
+  await signIn(page, people.admin.email, passwords.first);
+  await page.getByRole('link', { name: 'Senkronizasyon', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Senkronizasyon' })).toBeVisible();
+
+  // Bu ortamda LOGO tanimli degil: onceki calismalar gorunur, elle baslatma pasiftir.
+  await expect(page.getByText(/bu ortamda tanımlı değil/)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Şimdi senkronize et' })).toBeDisabled();
+
+  const rows = page.getByRole('row');
+  await expect(rows.nth(1)).toContainText('Başarısız');
+  await expect(rows.nth(1)).toContainText("LOGO'ya bağlanılamadı");
+  await expect(rows.nth(1)).toContainText('Elle');
+  await expect(rows.nth(2)).toContainText('Başarılı');
+  await expect(rows.nth(2)).toContainText('2 kişi · 2 sicil');
+  await signOut(page, people.admin.fullName);
+});
+
 async function readDownload(download: Download): Promise<Buffer> {
   const stream = await download.createReadStream();
   const chunks: Buffer[] = [];

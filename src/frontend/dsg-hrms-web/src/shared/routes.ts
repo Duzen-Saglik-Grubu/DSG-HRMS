@@ -18,6 +18,7 @@ export const routes = {
   personnel: '/personnel',
   corrections: '/personnel/corrections',
   quality: '/personnel/quality',
+  syncRuns: '/personnel/sync',
   profile: '/profile',
 } as const;
 

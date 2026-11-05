@@ -10,6 +10,7 @@
     "personnel": "Personel listesi",
     "corrections": "Düzeltme talepleri",
     "quality": "Veri kalitesi",
+    "syncRuns": "Senkronizasyon",
     "sections": {
       "overview": "Genel Bakış",
       "people": "Personel",
@@ -552,6 +553,55 @@
         "noEmail": "Kurumsal e-postası yok",
         "domainNotAccepted": "E-postası kabul edilen alan adlarında değil",
         "sharedEmail": "E-postası başka bir kişiyle paylaşılıyor"
+      }
+    },
+    "sync": {
+      "title": "Senkronizasyon",
+      "subtitle": "LOGO'dan personel verisinin aktarıldığı çalışmalar ve sonuçları.",
+      "start": "Şimdi senkronize et",
+      "running": "Çalışıyor…",
+      "runningNote": "Senkronizasyon çalışıyor. Bitince sonucu listede görünecek; sayfayı yenilemeniz gerekmez.",
+      "started": "Senkronizasyon başlatıldı. Sonucu birazdan listede görünecek.",
+      "alreadyQueued": "Sırada bekleyen bir senkronizasyon isteği zaten var; aynı çalışma başlayacak.",
+      "startFailed": "Senkronizasyon başlatılamadı.",
+      "disabled": "Senkronizasyon bu ortamda tanımlı değil. Listede önceki çalışmalar görünür.",
+      "caption": "Senkronizasyon çalışmaları",
+      "empty": "Henüz çalışma yok",
+      "emptyText": "İlk senkronizasyon tamamlandığında burada görünecek.",
+      "persons_one": "{{count}} kişi",
+      "persons_other": "{{count}} kişi",
+      "employments_one": "{{count}} sicil",
+      "employments_other": "{{count}} sicil",
+      "durationSeconds": "{{seconds}} sn",
+      "durationMinutes": "{{minutes}} dk {{seconds}} sn",
+      "columns": {
+        "startedAt": "Başlangıç",
+        "duration": "Süre",
+        "status": "Sonuç",
+        "recordsRead": "Okunan",
+        "created": "Eklenen",
+        "updated": "Güncellenen",
+        "deactivated": "Pasifleşen",
+        "warnings": "Uyarı"
+      },
+      "trigger": {
+        "scheduled": "Zamanlanmış",
+        "manual": "Elle"
+      },
+      "status": {
+        "running": "Sürüyor",
+        "succeeded": "Başarılı",
+        "completedWithWarnings": "Uyarılarla tamamlandı",
+        "partiallyCompleted": "Kısmen tamamlandı",
+        "failed": "Başarısız",
+        "interrupted": "Yarıda kaldı"
+      },
+      "reason": {
+        "sourceUnavailable": "LOGO'ya bağlanılamadı",
+        "sourceWritable": "LOGO kullanıcısında yazma yetkisi var; güvenlik gereği çalışılmadı",
+        "schemaDrift": "LOGO tablolarının yapısı beklenenden farklı",
+        "persistenceFailed": "Veriler HRMS'e kaydedilemedi",
+        "unexpected": "Beklenmeyen bir hata oluştu"
       }
     },
     "freshness": {
