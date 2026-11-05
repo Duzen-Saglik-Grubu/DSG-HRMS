@@ -17,6 +17,8 @@ export const permissions = {
   qualityExport: 'personnel.quality.export',
   syncView: 'personnel.sync.view',
   syncCreate: 'personnel.sync.create',
+  referenceView: 'reference.definition.view',
+  referenceUpdate: 'reference.definition.update',
   parameterView: 'system.parameter.view',
   parameterUpdate: 'system.parameter.update',
 } as const;
