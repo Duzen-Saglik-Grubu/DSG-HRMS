@@ -16,6 +16,7 @@ using Dsg.Hrms.Application.Personnel.Corrections;
 using Dsg.Hrms.Application.Personnel.Duties;
 using Dsg.Hrms.Application.Personnel.Export;
 using Dsg.Hrms.Application.Personnel.Listing;
+using Dsg.Hrms.Application.Personnel.Quality;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Application.Reference;
 using Dsg.Hrms.Application.Settings;
@@ -175,6 +176,8 @@ public static class InfrastructureRegistration
         services.AddScoped<PersonListService>();
         services.AddScoped<IPersonFilterOptionsQuery, PersonFilterOptionsQuery>();
         services.AddScoped<PersonExportService>();
+        services.AddScoped<DataQualityService>();
+        services.AddScoped<IDataQualityQuery, DataQualityQuery>();
 
         // Dis aktarma yazicilari (ADR-0014; KR-131): Excel ClosedXML, PDF SkiaSharp.
         services.AddSingleton<IReportWriter, ExcelReportWriter>();

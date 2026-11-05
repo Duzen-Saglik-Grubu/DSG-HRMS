@@ -89,6 +89,29 @@ public sealed class ReportWriterTests
     }
 
     [Fact]
+    public void Excel_writes_additional_sheets_after_the_main_list_and_pdf_refuses_them()
+    {
+        var document = Document() with
+        {
+            DataSheetName = "Uyarılar",
+            AdditionalSheets = [new ReportSheet("Üye olamayacak kişiler", [new ReportColumn("Sicil", ReportColumnKind.Text)], [new ReportRow(["00012"])])],
+        };
+
+        using var stream = new MemoryStream(new ExcelReportWriter().Write(document));
+        using var workbook = new XLWorkbook(stream);
+
+        workbook.Worksheets.Select(w => w.Name).ShouldBe(["Rapor bilgisi", "Uyarılar", "Üye olamayacak kişiler"]);
+        var extra = workbook.Worksheet(3);
+        extra.Cell(1, 1).GetString().ShouldBe("Sicil");
+        extra.Cell(2, 1).GetString().ShouldBe("00012");
+        extra.SheetView.SplitRow.ShouldBe(1);
+        extra.AutoFilter.IsEnabled.ShouldBeTrue();
+
+        // PDF ikinci listeyi sessizce dusurmez.
+        Should.Throw<NotSupportedException>(() => new PdfReportWriter().Write(document));
+    }
+
+    [Fact]
     public void Pdf_embeds_the_font_and_keeps_turkish_characters()
     {
         var bytes = new PdfReportWriter().Write(Document());

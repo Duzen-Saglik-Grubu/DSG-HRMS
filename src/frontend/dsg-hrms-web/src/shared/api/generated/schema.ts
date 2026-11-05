@@ -976,6 +976,204 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/quality": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Son senkronizasyon, uyari turu sayilari ve suzgece uyan uyarilar (SYG-PERS-070). */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Uyari turu; verilmezse hepsi. */
+                    Issue?: components["schemas"]["DataQualityIssueName"];
+                    /** @description Sayfa (1'den baslar). */
+                    Page?: number | string;
+                    /** @description Sayfa boyutu (1–100). */
+                    PageSize?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Rapor. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DataQualityReportResponse"];
+                    };
+                };
+                /** @description Gecersiz sayfa veya sayfa boyutu. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.quality.view`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/quality/ineligible": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Uye olamayacak kisiler: aktif, hesabi yok, uyelik kosulunu karsilamiyor (SYG-PERS-071). */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Sayfa (1'den baslar). */
+                    Page?: number | string;
+                    /** @description Sayfa boyutu (1–100). */
+                    PageSize?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Sayfalanmis liste. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResponseOfIneligiblePersonResponse"];
+                    };
+                };
+                /** @description Gecersiz sayfa veya sayfa boyutu. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.quality.view`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/quality/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Raporu Excel'e aktarir: "Uyarılar" (tur suzgeciyle) ve "Üye olamayacak kişiler" sayfalari.
+         *     Aktarim erisim kaydina yazilir (SYG-PERS-033).
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Uyari turu; verilmezse hepsi. "Üye olamayacak kişiler" sayfasi suzulmez. */
+                    Issue?: components["schemas"]["DataQualityIssueName"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Excel dosyasi. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": components["schemas"]["Stream"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.quality.export`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties": {
         parameters: {
             query?: never;
@@ -3929,6 +4127,57 @@ export interface components {
             /** @description Ad. */
             name: string;
         };
+        /** @description Bir uyari turunun sayisi. */
+        DataQualityCountResponse: {
+            /** @description Tur. */
+            issue: components["schemas"]["DataQualityIssueName"];
+            /**
+             * Format: int32
+             * @description Sayi.
+             */
+            count: number | string;
+        };
+        /**
+         * @description Uyari turu.
+         * @enum {unknown}
+         */
+        DataQualityIssueName: "missingNationalId" | "invalidNationalId" | "missingBirthDate" | "noContact" | "invalidMobilePhone" | "sharedEmail" | "missingTitle" | "missingDuty";
+        /** @description Bir uyari. */
+        DataQualityItemResponse: {
+            /** @description Tur. */
+            issue: components["schemas"]["DataQualityIssueName"];
+            /** @description Sicil kodu. */
+            registryCode: string;
+            /**
+             * Format: uuid
+             * @description Kisinin dis kimligi; kisi olusturulmadiysa bos.
+             */
+            personId: null | string;
+            /** @description Ad. */
+            firstName: null | string;
+            /** @description Soyad. */
+            lastName: null | string;
+            /** @description Firma. */
+            company: null | string;
+            /** @description Sube. */
+            branch: null | string;
+            /** @description Birim. */
+            department: null | string;
+        };
+        /** @description Rapor ekrani. */
+        DataQualityReportResponse: {
+            lastRun: null | components["schemas"]["SyncRunResponse"];
+            warningsRun: null | components["schemas"]["SyncRunResponse"];
+            /** @description Her uyari turunun sayisi (suzgecten bagimsiz). */
+            counts: components["schemas"]["DataQualityCountResponse"][];
+            /**
+             * Format: int32
+             * @description Uye olamayacak kisi sayisi.
+             */
+            ineligibleCount: number | string;
+            /** @description Suzgece uyan uyarilar. */
+            items: components["schemas"]["PagedResponseOfDataQualityItemResponse"];
+        };
         /** @description Gorev kaydi. */
         DutyResponse: {
             /**
@@ -4035,6 +4284,28 @@ export interface components {
              */
             readAt: null | string;
         };
+        /** @description Uye olamayacak kisi. */
+        IneligiblePersonResponse: {
+            /**
+             * Format: uuid
+             * @description Kisinin dis kimligi.
+             */
+            personId: string;
+            /** @description Esas istihdamin sicil kodu. */
+            registryCode: string;
+            /** @description Ad. */
+            firstName: null | string;
+            /** @description Soyad. */
+            lastName: null | string;
+            /** @description Firma. */
+            company: null | string;
+            /** @description Sube. */
+            branch: null | string;
+            /** @description Birim. */
+            department: null | string;
+            /** @description Nedenler. */
+            reasons: components["schemas"]["MembershipBlockerName"][];
+        };
         /** @description Baglanti bilgisi. */
         InvitationInfoResponse: {
             /** @description Kisinin adi (karsilama icin). */
@@ -4070,6 +4341,11 @@ export interface components {
          * @enum {unknown}
          */
         MaritalStatusKind: "married" | "notMarried";
+        /**
+         * @description Uye olamama nedeni.
+         * @enum {unknown}
+         */
+        MembershipBlockerName: "noEmail" | "domainNotAccepted" | "sharedEmail";
         /** @description Kisinin "IK'ya bildir" formu icin durumu. */
         OwnCorrectionStateResponse: {
             /** @description Acik talebi olan alanlar. */
@@ -4106,6 +4382,56 @@ export interface components {
         PagedResponseOfCorrectionResponse: {
             /** @description Bu sayfadaki kayitlar. */
             items: components["schemas"]["CorrectionResponse"][];
+            /**
+             * Format: int32
+             * @description Sayfa numarasi.
+             */
+            page: number | string;
+            /**
+             * Format: int32
+             * @description Sayfa boyutu.
+             */
+            pageSize: number | string;
+            /**
+             * Format: int32
+             * @description Toplam kayit sayisi.
+             */
+            totalCount: number | string;
+            /**
+             * Format: int32
+             * @description Toplam sayfa sayisi.
+             */
+            totalPages: number | string;
+        };
+        /** @description Sayfalanmis yanit (ADR-0010 §4). */
+        PagedResponseOfDataQualityItemResponse: {
+            /** @description Bu sayfadaki kayitlar. */
+            items: components["schemas"]["DataQualityItemResponse"][];
+            /**
+             * Format: int32
+             * @description Sayfa numarasi.
+             */
+            page: number | string;
+            /**
+             * Format: int32
+             * @description Sayfa boyutu.
+             */
+            pageSize: number | string;
+            /**
+             * Format: int32
+             * @description Toplam kayit sayisi.
+             */
+            totalCount: number | string;
+            /**
+             * Format: int32
+             * @description Toplam sayfa sayisi.
+             */
+            totalPages: number | string;
+        };
+        /** @description Sayfalanmis yanit (ADR-0010 §4). */
+        PagedResponseOfIneligiblePersonResponse: {
+            /** @description Bu sayfadaki kayitlar. */
+            items: components["schemas"]["IneligiblePersonResponse"][];
             /**
              * Format: int32
              * @description Sayfa numarasi.
@@ -4577,9 +4903,9 @@ export interface components {
             /** @description Sirada zaten bekleyen bir istek vardi. */
             alreadyQueued: boolean;
         };
-        /** @description Bir calismanin ozeti. */
+        /** @description Senkronizasyon calismasinin ozeti. */
         SyncRunResponse: {
-            /** @description Sonuc (`running`, `succeeded`, `completedWithWarnings`, `failed`). */
+            /** @description Sonuc (`succeeded`, `completedWithWarnings`, `failed`, `partiallyCompleted`). */
             status: string;
             /**
              * Format: date-time
@@ -4588,11 +4914,19 @@ export interface components {
             startedAt: string;
             /**
              * Format: date-time
-             * @description Bitis; suruyorsa bos.
+             * @description Bitis.
              */
             finishedAt: null | string;
-            /** @description Basarisizlik nedeni. */
-            failureReason: null | string;
+            /**
+             * Format: int32
+             * @description Okunan kart sayisi.
+             */
+            recordsRead: number | string;
+            /**
+             * Format: int32
+             * @description Uretilen uyari sayisi.
+             */
+            warningCount: number | string;
         };
         /** @description Senkronizasyon durumu. */
         SyncStatusResponse: {

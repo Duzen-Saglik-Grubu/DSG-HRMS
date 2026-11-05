@@ -119,7 +119,7 @@ public sealed class PersonnelSynchronizer
                 name = string.Create(CultureInfo.InvariantCulture, $"Firma {firm.Key}");
                 foreach (var record in firm)
                 {
-                    context.Warn(SyncWarningCode.UnknownCompany, record.RegistryCode,
+                    context.Warn(SyncWarningCode.UnknownCompany, record,
                         string.Create(CultureInfo.InvariantCulture, $"Firma numarasi {firm.Key} LOGO firma listesinde yok."));
                 }
             }
@@ -148,21 +148,21 @@ public sealed class PersonnelSynchronizer
 
         if (string.IsNullOrEmpty(nationalId))
         {
-            context.Warn(SyncWarningCode.MissingNationalId, record.RegistryCode,
+            context.Warn(SyncWarningCode.MissingNationalId, record,
                 "Kartta TCKN yok; kisi olusturulmadi.");
             return null;
         }
 
         if (!NationalId.IsValid(nationalId))
         {
-            context.Warn(SyncWarningCode.InvalidNationalId, record.RegistryCode,
+            context.Warn(SyncWarningCode.InvalidNationalId, record,
                 "TCKN gecersiz (sagla algoritmasini gecmiyor); kisi olusturulmadi.");
             return null;
         }
 
         if (record.BirthDate is null)
         {
-            context.Warn(SyncWarningCode.MissingBirthDate, record.RegistryCode,
+            context.Warn(SyncWarningCode.MissingBirthDate, record,
                 "Kartta dogum tarihi yok; kisi olusturulmadi.");
             return null;
         }
@@ -187,13 +187,13 @@ public sealed class PersonnelSynchronizer
 
         if (normalized.Exists(e => e is null))
         {
-            context.Warn(SyncWarningCode.InvalidEmail, record.RegistryCode,
+            context.Warn(SyncWarningCode.InvalidEmail, record,
                 "Kartta bicimi gecersiz bir e-posta var; kullanilmadi.");
         }
 
         if (valid.Count > 1)
         {
-            context.Warn(SyncWarningCode.MultipleEmailsOnCard, record.RegistryCode,
+            context.Warn(SyncWarningCode.MultipleEmailsOnCard, record,
                 string.Create(CultureInfo.InvariantCulture, $"Kartta {valid.Count} farkli e-posta var; ilki kullanildi."));
         }
 
@@ -208,7 +208,7 @@ public sealed class PersonnelSynchronizer
             var normalized = ContactNormalizer.NormalizeMobilePhone(raw);
             if (normalized is null)
             {
-                context.Warn(SyncWarningCode.InvalidMobilePhone, record.RegistryCode,
+                context.Warn(SyncWarningCode.InvalidMobilePhone, record,
                     "Cep telefonu gecersiz (10 hane ve 5 ile baslamali); kullanilmadi.");
             }
             else
@@ -477,6 +477,10 @@ public sealed class PersonnelSynchronizer
 
         public void Warn(SyncWarningCode code, string registryCode, string detail) =>
             Warnings.Add(PersonnelSyncWarning.Create(code, registryCode, detail));
+
+        /// <summary>Kart duzeyinde uyari: kartin aktifligi de yazilir (SYG-PERS-070).</summary>
+        public void Warn(SyncWarningCode code, LogoPersonnelRecord record, string detail) =>
+            Warnings.Add(PersonnelSyncWarning.Create(code, record.RegistryCode, detail, Employment.IsActiveOn(record.TerminationDate, Today)));
     }
 }
 

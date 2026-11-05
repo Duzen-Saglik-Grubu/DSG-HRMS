@@ -21,6 +21,10 @@ public sealed class PersonnelSyncWarningConfiguration : IEntityTypeConfiguration
         builder.Property(warning => warning.RegistryCode).IsRequired();
         builder.Property(warning => warning.Detail).IsRequired();
 
+        // Varsayilan deger YALNIZCA migration'da (mevcut satirlar aktif sayilir). Modelde verilirse
+        // EF false degerini "atanmamis" sayar ve veritabaninin true degerini yazar.
+        builder.Property(warning => warning.IsActiveCard).IsRequired();
+
         // Veri kalitesi raporu: "bu sicil icin hangi uyarilar var?"
         builder.HasIndex(warning => new { warning.RunId, warning.RegistryCode });
     }

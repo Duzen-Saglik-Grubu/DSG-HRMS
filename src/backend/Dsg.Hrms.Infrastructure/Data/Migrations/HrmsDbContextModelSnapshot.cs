@@ -2243,6 +2243,10 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("detail");
 
+                    b.Property<bool>("IsActiveCard")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active_card");
+
                     b.Property<string>("RegistryCode")
                         .IsRequired()
                         .HasColumnType("text")

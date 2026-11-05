@@ -35,9 +35,20 @@ public sealed class PersonnelSyncWarning
     [AuditVisible("Uyari aciklamasi kisisel veri icermeyecek bicimde uretilir (PersonnelSynchronizer)")]
     public string Detail { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Kart, calisma gunu itibariyla aktif mi (cikis tarihi yok veya ileride). Veri kalitesi
+    /// raporu yalnizca aktif kartlarin uyarilarini gosterir (SYG-PERS-070); kisi olusturulmayan
+    /// kartin (TCKN yok) aktifligi baska yerde tutulmaz.
+    /// </summary>
+    public bool IsActiveCard { get; private set; } = true;
+
     /// <summary>Yeni uyari olusturur.</summary>
-    public static PersonnelSyncWarning Create(SyncWarningCode code, string registryCode, string detail) =>
-        new() { Code = code, RegistryCode = registryCode, Detail = detail };
+    /// <param name="code">Uyari turu.</param>
+    /// <param name="registryCode">Kartin sicil kodu.</param>
+    /// <param name="detail">Aciklama; kisisel veri icermez.</param>
+    /// <param name="isActiveCard">Kart aktif mi; kart disi uyarilarda (kisi duzeyi) <c>true</c>.</param>
+    public static PersonnelSyncWarning Create(SyncWarningCode code, string registryCode, string detail, bool isActiveCard = true) =>
+        new() { Code = code, RegistryCode = registryCode, Detail = detail, IsActiveCard = isActiveCard };
 }
 
 /// <summary>Veri kalitesi uyari turleri.</summary>
