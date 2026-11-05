@@ -7,19 +7,40 @@ import { emergencyContactsApi, type EmergencyContact } from '../../api/emergency
 import { displayMobilePhone } from '../../display';
 import { EmergencyContacts } from '../EmergencyContacts';
 
-/** Kartin "Acil Durum Kisileri" bolumu (PG-PERS-44; SYG-PERS-043). Veriler SENTETIKTIR. */
+/** Kartin "Acil Durum Kisileri" bolumu (PG-PERS-44; SYG-PERS-043, KR-135). Veriler SENTETIKTIR. */
 const SPOUSE: EmergencyContact = {
   id: 'c-1',
+  relationshipId: 'r-1',
   relationship: 'Eşi',
   firstName: 'Ayşe',
   lastName: 'Deniz',
   mobilePhone: '5321112233',
 };
 
+const OPTIONS = [
+  { id: 'r-1', name: 'Eşi' },
+  { id: 'r-2', name: 'Annesi' },
+];
+
 describe('EmergencyContacts', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.spyOn(emergencyContactsApi, 'relationships').mockResolvedValue(OPTIONS);
   });
+
+  async function openAdd(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(screen.getByRole('button', { name: 'Acil durum kişisi ekle' }));
+    return screen.findByRole('dialog');
+  }
+
+  async function chooseRelationship(
+    user: ReturnType<typeof userEvent.setup>,
+    dialog: HTMLElement,
+    name: string,
+  ) {
+    await user.click(within(dialog).getByRole('combobox', { name: /Yakınlığı/ }));
+    await user.click(await screen.findByRole('option', { name }));
+  }
 
   it('kayitlari yakinlik ve okunur telefonla listeler', () => {
     renderWithProviders(<EmergencyContacts personId="p-1" contacts={[SPOUSE]} editable={false} />);
@@ -46,8 +67,7 @@ describe('EmergencyContacts', () => {
     const user = userEvent.setup();
     renderWithProviders(<EmergencyContacts personId="p-1" contacts={[]} editable />);
 
-    await user.click(screen.getByRole('button', { name: 'Acil durum kişisi ekle' }));
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await openAdd(user);
     await user.type(within(dialog).getByRole('textbox', { name: /^Adı/ }), 'Fatma');
     await user.click(within(dialog).getByRole('button', { name: 'Kaydet' }));
 
@@ -55,7 +75,8 @@ describe('EmergencyContacts', () => {
     expect(within(dialog).getAllByText('Bu alanı doldurun.')).toHaveLength(3);
   });
 
-  it('yeni kaydi gonderir; sunucunun telefon hatasini alanin altinda gosterir', async () => {
+  it('yakinligi listeden secer; sunucunun telefon hatasini alanin altinda gosterir', async () => {
+    // KR-135: yakinlik referans verideki tanimlardan secilir.
     const add = vi.spyOn(emergencyContactsApi, 'add').mockRejectedValue(
       new ApiError({
         message: 'Gönderilen veri geçerli değil.',
@@ -67,16 +88,15 @@ describe('EmergencyContacts', () => {
     const user = userEvent.setup();
     renderWithProviders(<EmergencyContacts personId="p-1" contacts={[]} editable />);
 
-    await user.click(screen.getByRole('button', { name: 'Acil durum kişisi ekle' }));
-    const dialog = await screen.findByRole('dialog');
-    await user.type(within(dialog).getByRole('textbox', { name: /Yakınlığı/ }), 'Annesi');
+    const dialog = await openAdd(user);
+    await chooseRelationship(user, dialog, 'Annesi');
     await user.type(within(dialog).getByRole('textbox', { name: /^Adı/ }), 'Fatma');
     await user.type(within(dialog).getByRole('textbox', { name: /Soyadı/ }), 'Deniz');
     await user.type(within(dialog).getByRole('textbox', { name: /Cep telefonu/ }), '212 111 22 33');
     await user.click(within(dialog).getByRole('button', { name: 'Kaydet' }));
 
     expect(add).toHaveBeenCalledWith('p-1', {
-      relationship: 'Annesi',
+      relationshipId: 'r-2',
       firstName: 'Fatma',
       lastName: 'Deniz',
       mobilePhone: '212 111 22 33',
@@ -93,6 +113,9 @@ describe('EmergencyContacts', () => {
 
     await user.click(screen.getByRole('button', { name: 'Ayşe Deniz kaydını düzenle' }));
     const dialog = await screen.findByRole('dialog');
+    expect(await within(dialog).findByRole('combobox', { name: /Yakınlığı/ })).toHaveTextContent(
+      'Eşi',
+    );
     const phone = within(dialog).getByRole('textbox', { name: /Cep telefonu/ });
     expect(phone).toHaveValue('532 111 22 33');
 
@@ -101,11 +124,25 @@ describe('EmergencyContacts', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Kaydet' }));
 
     expect(change).toHaveBeenCalledWith('p-1', 'c-1', {
-      relationship: 'Eşi',
+      relationshipId: 'r-1',
       firstName: 'Ayşe',
       lastName: 'Deniz',
       mobilePhone: '533 999 88 77',
     });
+  });
+
+  it('pasife alinmis yakinlik duzenlenen kayitta secili gorunur', async () => {
+    // KR-135: pasif tanim yeni secim listesinde yok, ama eski kayitta adiyla kalir.
+    const uncle: EmergencyContact = { ...SPOUSE, relationshipId: 'r-9', relationship: 'Amcası' };
+    const user = userEvent.setup();
+    renderWithProviders(<EmergencyContacts personId="p-1" contacts={[uncle]} editable />);
+
+    await user.click(screen.getByRole('button', { name: 'Ayşe Deniz kaydını düzenle' }));
+    const dialog = await screen.findByRole('dialog');
+
+    expect(await within(dialog).findByRole('combobox', { name: /Yakınlığı/ })).toHaveTextContent(
+      'Amcası',
+    );
   });
 
   it('silme once kimin silinecegini sorar', async () => {

@@ -238,7 +238,9 @@ test('7. acil durum kisisi: yonetici girer, personel kendi profilinde gorur ama 
   await section.getByRole('button', { name: 'Acil durum kişisi ekle' }).click();
 
   const dialog = page.getByRole('dialog', { name: 'Acil durum kişisi ekle' });
-  await dialog.getByRole('textbox', { name: /Yakınlığı/ }).fill('Annesi');
+  // Yakinlik referans verideki ilk tanimlardan secilir (KR-135).
+  await dialog.getByRole('combobox', { name: /Yakınlığı/ }).click();
+  await page.getByRole('option', { name: 'Annesi' }).click();
   await dialog.getByRole('textbox', { name: /^Adı/ }).fill('Fatma');
   await dialog.getByRole('textbox', { name: /Soyadı/ }).fill('Izinsiz');
   // Gecersiz telefon alanin altinda reddedilir (SYG-KMLK-009).

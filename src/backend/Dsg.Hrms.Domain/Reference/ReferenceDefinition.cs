@@ -13,6 +13,9 @@ public enum ReferenceType
 
     /// <summary>Kan grubu: LOGO kodlarinin karsiliklari; sistem tanimi (<c>KR-129</c>).</summary>
     BloodGroup = 3,
+
+    /// <summary>Yakinlik: acil durum kisisinin yakinligi; IK yonetir (PG-PERS-44, <c>KR-135</c>).</summary>
+    Relationship = 4,
 }
 
 /// <summary>

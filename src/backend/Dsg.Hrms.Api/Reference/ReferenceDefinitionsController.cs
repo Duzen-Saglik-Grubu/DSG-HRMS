@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dsg.Hrms.Api.Reference;
 
 /// <summary>
-/// Referans tanimlari (ADR-0022 §1; SYG-PERS-072): unvan, gorev ve kan grubu.
+/// Referans tanimlari (ADR-0022 §1; SYG-PERS-072): unvan, gorev, kan grubu ve yakinlik.
 /// </summary>
 /// <remarks>
 /// Tanimlar kisisel veri degildir; erisim kaydi uretilmez. Degisiklikler denetim izine yazilir.
@@ -42,7 +42,7 @@ public sealed class ReferenceDefinitionsController : ControllerBase
         CancellationToken cancellationToken) =>
         [.. (await _definitions.ListAsync((ReferenceType)type, includeInactive, cancellationToken)).Select(ReferenceDefinitionResponse.From)];
 
-    /// <summary>Yeni tanim ekler. Unvan kodu zorunludur (LOGO kodu); gorev kodu verilmezse uretilir.</summary>
+    /// <summary>Yeni tanim ekler. Unvan kodu zorunludur (LOGO kodu); gorev ve yakinlik kodu verilmezse uretilir.</summary>
     /// <response code="201">Eklenen tanim.</response>
     /// <response code="400">Ad bos.</response>
     /// <response code="403">Yetki yok (<c>reference.definition.update</c>).</response>
@@ -118,6 +118,10 @@ public enum ReferenceTypeKind
     /// <summary>Kan grubu (sistem tanimi).</summary>
     [JsonStringEnumMemberName("bloodGroup")]
     BloodGroup = 3,
+
+    /// <summary>Yakinlik (acil durum kisisi).</summary>
+    [JsonStringEnumMemberName("relationship")]
+    Relationship = 4,
 }
 
 /// <summary>Referans tanimi.</summary>
@@ -146,8 +150,8 @@ public sealed record ReferenceDefinitionResponse(
 }
 
 /// <summary>Yeni tanim istegi.</summary>
-/// <param name="Type">Tur (unvan veya gorev).</param>
-/// <param name="Code">Kod; unvanda zorunlu, gorevde istege bagli.</param>
+/// <param name="Type">Tur (unvan, gorev veya yakinlik).</param>
+/// <param name="Code">Kod; unvanda zorunlu, gorev ve yakinlikta istege bagli.</param>
 /// <param name="Name">Ad.</param>
 public sealed record CreateReferenceDefinitionRequest(ReferenceTypeKind Type, string? Code, string Name);
 

@@ -49,8 +49,8 @@ public sealed class ReferenceDefinitionService
         _store.ListAsync(type, includeInactive, cancellationToken);
 
     /// <summary>
-    /// Yeni tanim ekler. Unvan kodu LOGO kodudur ve zorunludur; gorev kodu verilmezse sirayla
-    /// uretilir (<c>G001</c>, <c>G002</c>…).
+    /// Yeni tanim ekler. Unvan kodu LOGO kodudur ve zorunludur; gorev ve yakinlik kodu verilmezse
+    /// sirayla uretilir (gorev <c>G001</c>…, yakinlik <c>Y001</c>…).
     /// </summary>
     public async Task<ReferenceDefinition> CreateAsync(ReferenceType type, string? code, string name, CancellationToken cancellationToken)
     {
@@ -61,8 +61,8 @@ public sealed class ReferenceDefinitionService
 
         var count = await _store.CountAsync(type, cancellationToken).ConfigureAwait(false);
         var effectiveCode = string.IsNullOrWhiteSpace(code)
-            ? type == ReferenceType.Duty
-                ? await NextDutyCodeAsync(count, cancellationToken).ConfigureAwait(false)
+            ? CodePrefix(type) is { } prefix
+                ? await NextCodeAsync(type, prefix, count, cancellationToken).ConfigureAwait(false)
                 : throw new BusinessRuleException("Ünvan kodu zorunludur (LOGO'daki kod).")
             : code.Trim();
 
@@ -107,14 +107,21 @@ public sealed class ReferenceDefinitionService
             : definition;
     }
 
-    private async Task<string> NextDutyCodeAsync(int count, CancellationToken cancellationToken)
+    private static char? CodePrefix(ReferenceType type) => type switch
+    {
+        ReferenceType.Duty => 'G',
+        ReferenceType.Relationship => 'Y',
+        _ => null,
+    };
+
+    private async Task<string> NextCodeAsync(ReferenceType type, char prefix, int count, CancellationToken cancellationToken)
     {
         // Silinen tanim olmadigi icin sayi + 1 cogunlukla bostur; elle verilmis bir kod
         // cakisirsa bir sonrakine gecilir.
         for (var n = count + 1; ; n++)
         {
-            var candidate = string.Create(CultureInfo.InvariantCulture, $"G{n:000}");
-            if (!await _store.CodeExistsAsync(ReferenceType.Duty, candidate, cancellationToken).ConfigureAwait(false))
+            var candidate = string.Create(CultureInfo.InvariantCulture, $"{prefix}{n:000}");
+            if (!await _store.CodeExistsAsync(type, candidate, cancellationToken).ConfigureAwait(false))
             {
                 return candidate;
             }

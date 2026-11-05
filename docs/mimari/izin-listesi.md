@@ -31,14 +31,14 @@
 | `personnel.person.view` | Tüm personeli görme (kapsam `All`); yoksa yalnızca kendisi | Kişi okumaları (`IPersonnelQuery`) | PERS-050 |
 | `personnel.person.view_national_id` | Tam T.C. kimlik numarasını görme ve TCKN ile arama | Kişi kartı; liste araması (sonraki iş) | PERS-030, 053 |
 | `personnel.person.view_sensitive` | Adres, kan grubu, acil durum kişileri ve evlilik bilgisini görme | Kişi kartı, süzgeç, dışa aktarma (sonraki iş) | PERS-052 |
-| `personnel.person.update` | Görev, evlilik bilgisi ve acil durum kişisini girme | Görev uçları; kişi kartının "Acil Durum Kişileri" bölümü (#346) | PERS-036, 042, 043 |
+| `personnel.person.update` | Görev, evlilik bilgisi ve acil durum kişisini girme; acil durum formunun yakınlık seçeneklerini okuma (`KR-135`) | Görev uçları; kişi kartının "Acil Durum Kişileri" bölümü (#346) | PERS-036, 042, 043 |
 | `personnel.person.export` | Personel listesini dışa aktarma | `GET /personnel/persons/export`, `/export/fields` (#330) | PERS-032 |
 | `personnel.correction.view` | "İK'ya bildir" taleplerini görme | Düzeltme talepleri (sonraki iş) | PERS-048 |
 | `personnel.correction.update` | "İK'ya bildir" taleplerini kapatma | Düzeltme talepleri (sonraki iş) | PERS-048 |
 | `personnel.quality.view` | Veri kalitesi raporunu görme | `GET /personnel/quality`, `/quality/ineligible` (#335) | PERS-070, 071 |
 | `personnel.quality.export` | Veri kalitesi raporunu dışa aktarma | `GET /personnel/quality/export` (#335) | PERS-070 |
-| `reference.definition.view` | Ünvan ve görev tanımlarını görme | Referans veri (sonraki iş) | PERS-072 |
-| `reference.definition.update` | Ünvan ve görev tanımlarını değiştirme | Referans veri (sonraki iş) | PERS-072 |
+| `reference.definition.view` | Ünvan, görev, kan grubu ve yakınlık tanımlarını görme | Referans veri (sonraki iş) | PERS-072 |
+| `reference.definition.update` | Ünvan, görev ve yakınlık tanımlarını değiştirme | Referans veri (sonraki iş) | PERS-072 |
 | `audit.log.view` | Denetim kayıtlarını görme | Denetim kayıtları (sonraki iş) | PERS-069 |
 
 Kişi kartı ve "Profilim" (`GET /api/v1/personnel/persons/{id}`, `/me`) izin değil yalnızca oturum ister; kimin kimi göreceğini kapsam belirler (ADR-0019 §1).
@@ -66,3 +66,4 @@ Kişi kartı ve "Profilim" (`GET /api/v1/personnel/persons/{id}`, `/me`) izin de
 | 2026-11-05 | 0.6 | `personnel.quality.view` ve `.export` uçlara bağlandı (#335) | Bilgi İşlem |
 | 2026-11-05 | 0.7 | `personnel.sync.view` ve `.create` personel uçlarına da bağlandı (#340) | Bilgi İşlem |
 | 2026-11-05 | 0.8 | `personnel.person.update` acil durum kişisi uçlarına ve kişi kartına bağlandı (#346) | Bilgi İşlem |
+| 2026-11-05 | 0.9 | Yakınlık tanımları ve seçenek ucu (`KR-135`, #348) | Bilgi İşlem |

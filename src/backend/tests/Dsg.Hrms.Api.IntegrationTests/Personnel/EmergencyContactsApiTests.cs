@@ -7,6 +7,7 @@ using Dsg.Hrms.Application.Identity.Passwords;
 using Dsg.Hrms.Domain.Audit;
 using Dsg.Hrms.Domain.Identity;
 using Dsg.Hrms.Domain.Personnel;
+using Dsg.Hrms.Domain.Reference;
 using Dsg.Hrms.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,11 @@ public sealed class EmergencyContactsApiTests : IClassFixture<Identity.Registrat
     private const string Password = "Kediler uyur 7";
     private const string UserEmail = "ahmet.yilmaz@duzen.com.tr";
     private const string Phone = "5321112233";
+
+    // Migration'daki ilk yakinlik tanimlari (KR-135).
+    private const long SpouseDefinitionId = 21;
+    private static readonly Guid Spouse = new("0192a3b4-1004-7000-8000-000000000001");
+    private static readonly Guid Mother = new("0192a3b4-1004-7000-8000-000000000002");
 
     private readonly Identity.RegistrationApiFixture _fixture;
 
@@ -49,15 +55,16 @@ public sealed class EmergencyContactsApiTests : IClassFixture<Identity.Registrat
         using (client)
         {
             var person = await PersonIdAsync(3);
-            var (status, spouse) = await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact("  Eşi ", "Ayşe", "Deniz", "0532 111 22 33"));
+            var (status, spouse) = await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact(Spouse, "Ayşe", "Deniz", "0532 111 22 33"));
             status.ShouldBe(HttpStatusCode.Created);
             spouse.GetProperty("mobilePhone").GetString().ShouldBe(Phone);
             spouse.GetProperty("relationship").GetString().ShouldBe("Eşi");
+            spouse.GetProperty("relationshipId").GetGuid().ShouldBe(Spouse);
 
-            var mother = (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact("Annesi", "Fatma", "Deniz", "5334445566"))).Body.GetProperty("id").GetGuid();
+            var mother = (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact(Mother, "Fatma", "Deniz", "5334445566"))).Body.GetProperty("id").GetGuid();
             var spouseId = spouse.GetProperty("id").GetGuid();
 
-            var (changed, body) = await SendAsync(client, HttpMethod.Put, $"{Contacts(person)}/{spouseId}", token, Contact("Eşi", "Ayşe", "Deniz", "5339998877"));
+            var (changed, body) = await SendAsync(client, HttpMethod.Put, $"{Contacts(person)}/{spouseId}", token, Contact(Spouse, "Ayşe", "Deniz", "5339998877"));
             changed.ShouldBe(HttpStatusCode.OK);
             body.GetProperty("mobilePhone").GetString().ShouldBe("5339998877");
 
@@ -75,16 +82,61 @@ public sealed class EmergencyContactsApiTests : IClassFixture<Identity.Registrat
     }
 
     [Fact]
+    public async Task Relationship_options_are_the_active_definitions_and_need_only_the_update_permission()
+    {
+        // KR-135: secenekler referans veriden gelir; referans veri izni olmayan rol de formu kullanir.
+        using var client = _fixture.CreateClient();
+        var token = await SignInAsync(client);
+        (await SendAsync(client, HttpMethod.Get, Relationships, token)).Status.ShouldBe(HttpStatusCode.Forbidden);
+
+        var inactive = await CreateRelationshipAsync("Eski Yakınlık", active: false);
+        await GrantRoleAsync(await CreateRoleAsync(Permissions.PersonUpdate));
+        token = await SignInAsync(client);
+        var (status, options) = await SendAsync(client, HttpMethod.Get, Relationships, token);
+
+        status.ShouldBe(HttpStatusCode.OK);
+        var names = options.EnumerateArray().Select(o => o.GetProperty("name").GetString()).ToList();
+        names.Take(4).ShouldBe(["Eşi", "Annesi", "Babası", "Kardeşi"]);
+        options.EnumerateArray().ShouldNotContain(o => o.GetProperty("id").GetGuid() == inactive);
+    }
+
+    [Fact]
+    public async Task Inactive_relationship_is_refused_for_new_choice_but_existing_record_keeps_and_shows_it()
+    {
+        // KR-135: pasif tanim yeni secimde kullanilamaz; eski kayitta adiyla gorunur ve kayit duzenlenebilir.
+        var (client, token) = await HrAsync();
+        using (client)
+        {
+            var person = await PersonIdAsync(3);
+            var uncle = await CreateRelationshipAsync("Amcası", active: true);
+            var id = (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact(uncle, "Ali", "Deniz", Phone))).Body.GetProperty("id").GetGuid();
+            await DeactivateRelationshipAsync(uncle);
+
+            var (refused, problem) = await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact(uncle, "Veli", "Deniz", Phone));
+            refused.ShouldBe(HttpStatusCode.UnprocessableEntity);
+            problem.GetProperty("detail").GetString().ShouldBe("Yakınlık tanımı bulunamadı veya pasif.");
+
+            (await SendAsync(client, HttpMethod.Put, $"{Contacts(person)}/{id}", token, Contact(uncle, "Ali", "Deniz", "5339998877"))).Status.ShouldBe(HttpStatusCode.OK);
+            var card = (await SendAsync(client, HttpMethod.Get, $"/api/v1/personnel/persons/{person}", token)).Body;
+            card.GetProperty("sensitive").GetProperty("emergencyContacts")[0].GetProperty("relationship").GetString().ShouldBe("Amcası");
+
+            // Baska turdeki tanim (gorev) yakinlik olarak secilemez.
+            var duty = await _fixture.WithDbAsync(context => context.Set<ReferenceDefinition>().Where(d => d.Type == ReferenceType.Title).Select(d => d.PublicId).FirstAsync());
+            (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact(duty, "Veli", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        }
+    }
+
+    [Fact]
     public async Task Missing_or_invalid_fields_come_back_under_their_own_names()
     {
         var (client, token) = await HrAsync();
         using (client)
         {
-            var (status, problem) = await SendAsync(client, HttpMethod.Post, Contacts(await PersonIdAsync(3)), token, Contact("", "Ayşe", "Deniz", "212 111 22 33"));
+            var (status, problem) = await SendAsync(client, HttpMethod.Post, Contacts(await PersonIdAsync(3)), token, Contact(null, "Ayşe", "Deniz", "212 111 22 33"));
 
             status.ShouldBe(HttpStatusCode.BadRequest);
             var errors = problem.GetProperty("errors");
-            errors.TryGetProperty("relationship", out _).ShouldBeTrue();
+            errors.TryGetProperty("relationshipId", out _).ShouldBeTrue();
             errors.GetProperty("mobilePhone")[0].GetString()!.ShouldContain("5 ile başlayan");
             errors.TryGetProperty("firstName", out _).ShouldBeFalse();
         }
@@ -98,8 +150,8 @@ public sealed class EmergencyContactsApiTests : IClassFixture<Identity.Registrat
         using (client)
         {
             var person = await PersonIdAsync(3);
-            var id = (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact("Eşi", "Ayşe", "Deniz", Phone))).Body.GetProperty("id").GetGuid();
-            await SendAsync(client, HttpMethod.Put, $"{Contacts(person)}/{id}", token, Contact("Eşi", "Ayşe", "Deniz", "5339998877"));
+            var id = (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact(Spouse, "Ayşe", "Deniz", Phone))).Body.GetProperty("id").GetGuid();
+            await SendAsync(client, HttpMethod.Put, $"{Contacts(person)}/{id}", token, Contact(Spouse, "Ayşe", "Deniz", "5339998877"));
             await SendAsync(client, HttpMethod.Delete, $"{Contacts(person)}/{id}", token);
 
             var entries = await _fixture.WithDbAsync(context => context.ChangeLog.Where(e => e.EntityName == nameof(EmergencyContact) && e.EntityId == id).ToListAsync());
@@ -122,8 +174,8 @@ public sealed class EmergencyContactsApiTests : IClassFixture<Identity.Registrat
         me.GetProperty("sensitive").GetProperty("emergencyContacts")[0].GetProperty("firstName").GetString().ShouldBe("Ayşe");
 
         var person = await PersonIdAsync(1);
-        (await SendAsync(client, HttpMethod.Put, $"{Contacts(person)}/{self}", token, Contact("Eşi", "Ayşe", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.Forbidden);
-        (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact("Eşi", "Ayşe", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.Forbidden);
+        (await SendAsync(client, HttpMethod.Put, $"{Contacts(person)}/{self}", token, Contact(Spouse, "Ayşe", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.Forbidden);
+        (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact(Spouse, "Ayşe", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.Forbidden);
         (await SendAsync(client, HttpMethod.Delete, $"{Contacts(person)}/{self}", token)).Status.ShouldBe(HttpStatusCode.Forbidden);
     }
 
@@ -150,15 +202,38 @@ public sealed class EmergencyContactsApiTests : IClassFixture<Identity.Registrat
         using var client = _fixture.CreateClient();
         var token = await SignInAsync(client);
         var person = await PersonIdAsync(3);
-        (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact("Eşi", "Ayşe", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.Forbidden);
+        (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact(Spouse, "Ayşe", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.Forbidden);
 
         await GrantRoleAsync(await CreateRoleAsync(Permissions.PersonUpdate));
         token = await SignInAsync(client);
-        (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact("Eşi", "Ayşe", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.NotFound);
+        (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact(Spouse, "Ayşe", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.NotFound);
     }
 
-    private static object Contact(string relationship, string firstName, string lastName, string mobilePhone) =>
-        new { relationship, firstName, lastName, mobilePhone };
+    private static object Contact(Guid? relationshipId, string firstName, string lastName, string mobilePhone) =>
+        new { relationshipId, firstName, lastName, mobilePhone };
+
+    private const string Relationships = "/api/v1/personnel/emergency-contact-relationships";
+
+    private Task<Guid> CreateRelationshipAsync(string name, bool active) =>
+        _fixture.WithDbAsync(async context =>
+        {
+            var definition = ReferenceDefinition.Create(ReferenceType.Relationship, $"T{Guid.NewGuid():N}"[..10], name, 90);
+            if (!active)
+            {
+                definition.Deactivate();
+            }
+
+            context.Add(definition);
+            await context.SaveChangesAsync();
+            return definition.PublicId;
+        });
+
+    private Task<int> DeactivateRelationshipAsync(Guid id) =>
+        _fixture.WithDbAsync(async context =>
+        {
+            (await context.Set<ReferenceDefinition>().SingleAsync(d => d.PublicId == id)).Deactivate();
+            return await context.SaveChangesAsync();
+        });
 
     private static string Contacts(Guid personId) => $"/api/v1/personnel/persons/{personId}/emergency-contacts";
 
@@ -166,7 +241,7 @@ public sealed class EmergencyContactsApiTests : IClassFixture<Identity.Registrat
         _fixture.WithDbAsync(async context =>
         {
             var person = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(index));
-            var contact = EmergencyContact.For(person.Id, new EmergencyContactDetails("Eşi", "Ayşe", "Deniz", Phone));
+            var contact = EmergencyContact.For(person.Id, new EmergencyContactDetails(SpouseDefinitionId, "Ayşe", "Deniz", Phone));
             context.Add(contact);
             await context.SaveChangesAsync();
             return contact.PublicId;

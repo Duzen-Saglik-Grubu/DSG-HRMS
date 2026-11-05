@@ -628,12 +628,12 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
 
     /// <summary>Kisinin silinmemis acil durum kisileri, eklenme sirasiyla (SYG-PERS-043).</summary>
     private async Task<IReadOnlyList<EmergencyContactRecord>> EmergencyContactsAsync(long personId, CancellationToken cancellationToken) =>
-        await context.Set<EmergencyContact>()
-            .AsNoTracking()
-            .Where(c => c.PersonId == personId)
-            .OrderBy(c => c.CreatedAt)
-            .ThenBy(c => c.Id)
-            .Select(c => new EmergencyContactRecord(c.PublicId, c.Relationship, c.FirstName, c.LastName, c.MobilePhone))
+        await (
+            from c in context.Set<EmergencyContact>().AsNoTracking()
+            where c.PersonId == personId
+            join r in context.Set<ReferenceDefinition>() on c.RelationshipDefinitionId equals r.Id
+            orderby c.CreatedAt, c.Id
+            select new EmergencyContactRecord(c.PublicId, r.PublicId, r.Name, c.FirstName, c.LastName, c.MobilePhone))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 

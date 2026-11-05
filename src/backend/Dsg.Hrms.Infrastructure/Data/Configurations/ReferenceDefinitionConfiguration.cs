@@ -6,7 +6,7 @@ namespace Dsg.Hrms.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Referans tanimlari tablosu (ADR-0022 §1). Ilk degerler migration ile yuklenir: unvan 1–4
-/// (PG-PERS-21) ve kan grubu 1–8 (<c>KR-129</c>, sistem tanimi).
+/// (PG-PERS-21), kan grubu 1–8 (<c>KR-129</c>, sistem tanimi) ve yakinlik (<c>KR-135</c>).
 /// </summary>
 public sealed class ReferenceDefinitionConfiguration : IEntityTypeConfiguration<ReferenceDefinition>
 {
@@ -14,6 +14,8 @@ public sealed class ReferenceDefinitionConfiguration : IEntityTypeConfiguration<
     public const string ReferenceSchema = "reference";
 
     private static readonly DateTimeOffset SeededAt = new(2026, 10, 24, 0, 0, 0, TimeSpan.Zero);
+
+    private static readonly DateTimeOffset RelationshipsSeededAt = new(2026, 11, 5, 0, 0, 0, TimeSpan.Zero);
 
     /// <summary>Sabit ilk degerler; kimlikler migration'lar arasinda degismez.</summary>
     private static readonly (long Id, Guid PublicId, ReferenceType Type, string Code, string Name, bool IsSystem)[] Seed =
@@ -30,6 +32,10 @@ public sealed class ReferenceDefinitionConfiguration : IEntityTypeConfiguration<
         (16, new Guid("0192a3b4-1003-7000-8000-000000000006"), ReferenceType.BloodGroup, "6", "B Rh-", true),
         (17, new Guid("0192a3b4-1003-7000-8000-000000000007"), ReferenceType.BloodGroup, "7", "AB Rh+", true),
         (18, new Guid("0192a3b4-1003-7000-8000-000000000008"), ReferenceType.BloodGroup, "8", "AB Rh-", true),
+        (21, new Guid("0192a3b4-1004-7000-8000-000000000001"), ReferenceType.Relationship, "Y001", "Eşi", false),
+        (22, new Guid("0192a3b4-1004-7000-8000-000000000002"), ReferenceType.Relationship, "Y002", "Annesi", false),
+        (23, new Guid("0192a3b4-1004-7000-8000-000000000003"), ReferenceType.Relationship, "Y003", "Babası", false),
+        (24, new Guid("0192a3b4-1004-7000-8000-000000000004"), ReferenceType.Relationship, "Y004", "Kardeşi", false),
     ];
 
     /// <inheritdoc />
@@ -38,7 +44,7 @@ public sealed class ReferenceDefinitionConfiguration : IEntityTypeConfiguration<
         ArgumentNullException.ThrowIfNull(builder);
 
         builder.ToTable("definition", ReferenceSchema, table =>
-            table.HasCheckConstraint("ck_definition_type", "type IN (1, 2, 3)"));
+            table.HasCheckConstraint("ck_definition_type", "type IN (1, 2, 3, 4)"));
 
         builder.HasKey(d => d.Id);
         builder.Property(d => d.Code).IsRequired().HasMaxLength(20);
@@ -59,10 +65,11 @@ public sealed class ReferenceDefinitionConfiguration : IEntityTypeConfiguration<
             row.Type,
             row.Code,
             row.Name,
-            SortOrder = int.Parse(row.Code, System.Globalization.CultureInfo.InvariantCulture),
+            // Sira kodun sayisal kismidir: unvan ve kan grubunda kodun kendisi, yakinlikta Y001 -> 1.
+            SortOrder = int.Parse(row.Code.TrimStart('Y'), System.Globalization.CultureInfo.InvariantCulture),
             IsActive = true,
             row.IsSystem,
-            CreatedAt = SeededAt,
+            CreatedAt = row.Type == ReferenceType.Relationship ? RelationshipsSeededAt : SeededAt,
         }));
     }
 }
