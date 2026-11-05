@@ -459,7 +459,7 @@
         "tags": [
           "ReferenceDefinitions"
         ],
-        "summary": "Yeni tanim ekler. Unvan kodu zorunludur (LOGO kodu); gorev kodu verilmezse uretilir.",
+        "summary": "Yeni tanim ekler. Unvan kodu zorunludur (LOGO kodu); gorev ve yakinlik kodu verilmezse uretilir.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1248,6 +1248,49 @@
         }
       }
     },
+    "/api/v1/personnel/emergency-contact-relationships": {
+      "get": {
+        "tags": [
+          "EmergencyContacts"
+        ],
+        "summary": "Yeni secim icin aktif yakinlik tanimlari (referans veri, `KR-135`). Giris izniyle okunur:\nreferans veri izni olmayan bir rol de formu kullanabilir.",
+        "responses": {
+          "200": {
+            "description": "Tanimlar, siraya gore.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationshipOptionResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.person.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/{personId}/emergency-contacts": {
       "post": {
         "tags": [
@@ -1328,6 +1371,16 @@
           },
           "404": {
             "description": "Kisi yok ya da kapsam disi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Yakinlik tanimi yok veya pasif.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1428,6 +1481,16 @@
           },
           "404": {
             "description": "Kisi veya kayit yok ya da kapsam disi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Yeni secilen yakinlik tanimi yok veya pasif.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5199,7 +5262,7 @@
         "type": "object",
         "properties": {
           "type": {
-            "description": "Tur (unvan veya gorev).",
+            "description": "Tur (unvan, gorev veya yakinlik).",
             "$ref": "#/components/schemas/ReferenceTypeKind"
           },
           "code": {
@@ -5207,7 +5270,7 @@
               "null",
               "string"
             ],
-            "description": "Kod; unvanda zorunlu, gorevde istege bagli."
+            "description": "Kod; unvanda zorunlu, gorev ve yakinlikta istege bagli."
           },
           "name": {
             "type": "string",
@@ -5410,19 +5473,20 @@
       },
       "EmergencyContactRequest": {
         "required": [
-          "relationship",
+          "relationshipId",
           "firstName",
           "lastName",
           "mobilePhone"
         ],
         "type": "object",
         "properties": {
-          "relationship": {
+          "relationshipId": {
             "type": [
               "null",
               "string"
             ],
-            "description": "Yakinligi (en fazla 50 karakter)."
+            "description": "Yakinlik taniminin dis kimligi (aktif tanimlar: `GET /api/v1/personnel/emergency-contact-relationships`).",
+            "format": "uuid"
           },
           "firstName": {
             "type": [
@@ -5451,6 +5515,7 @@
       "EmergencyContactResponse": {
         "required": [
           "id",
+          "relationshipId",
           "relationship",
           "firstName",
           "lastName",
@@ -5463,9 +5528,14 @@
             "description": "Dis kimlik.",
             "format": "uuid"
           },
+          "relationshipId": {
+            "type": "string",
+            "description": "Yakinlik taniminin dis kimligi.",
+            "format": "uuid"
+          },
           "relationship": {
             "type": "string",
-            "description": "Yakinligi."
+            "description": "Yakinlik taniminin adi; tanim pasife alinmis olsa da gorunur."
           },
           "firstName": {
             "type": "string",
@@ -6900,7 +6970,8 @@
         "enum": [
           "title",
           "duty",
-          "bloodGroup"
+          "bloodGroup",
+          "relationship"
         ],
         "description": "Referans tanim turu."
       },
@@ -6931,6 +7002,25 @@
           }
         },
         "description": "Uyelik baslatildi."
+      },
+      "RelationshipOptionResponse": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Tanimin dis kimligi.",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Ad."
+          }
+        },
+        "description": "Yakinlik secenegi."
       },
       "RenameReferenceDefinitionRequest": {
         "required": [

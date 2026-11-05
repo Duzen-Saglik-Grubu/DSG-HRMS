@@ -781,11 +781,12 @@
       "required": "Bu alanı doldurun.",
       "phoneHint": "5 ile başlayan 10 haneli cep telefonu, örneğin 532 123 45 67",
       "fields": {
-        "relationship": "Yakınlığı",
+        "relationshipId": "Yakınlığı",
         "firstName": "Adı",
         "lastName": "Soyadı",
         "mobilePhone": "Cep telefonu"
-      }
+      },
+      "relationshipsFailed": "Yakınlık listesi yüklenemedi; pencereyi kapatıp yeniden açın."
     }
   },
   "home": {

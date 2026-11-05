@@ -1,4 +1,5 @@
 using Dsg.Hrms.Domain.Personnel;
+using Dsg.Hrms.Domain.Reference;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,13 +18,15 @@ public sealed class EmergencyContactConfiguration : IEntityTypeConfiguration<Eme
         builder.ToTable("emergency_contact", PersonConfiguration.PersonnelSchema);
         builder.HasKey(contact => contact.Id);
 
-        builder.Property(contact => contact.Relationship).HasMaxLength(EmergencyContact.MaxRelationshipLength).IsRequired();
         builder.Property(contact => contact.FirstName).HasMaxLength(EmergencyContact.MaxNameLength).IsRequired();
         builder.Property(contact => contact.LastName).HasMaxLength(EmergencyContact.MaxNameLength).IsRequired();
         builder.Property(contact => contact.MobilePhone).HasMaxLength(10).IsRequired();
 
         builder.HasIndex(contact => contact.PersonId);
         builder.HasOne<Person>().WithMany().HasForeignKey(contact => contact.PersonId).OnDelete(DeleteBehavior.Restrict);
+
+        // Yakinlik referans veriden secilir (KR-135); tanim silinmedigi icin kisit kisitlayicidir.
+        builder.HasOne<ReferenceDefinition>().WithMany().HasForeignKey(contact => contact.RelationshipDefinitionId).OnDelete(DeleteBehavior.Restrict);
 
         builder.MapAuditFields();
         builder.MapSoftDeleteFields();

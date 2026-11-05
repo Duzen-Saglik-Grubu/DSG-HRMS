@@ -11,6 +11,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  MenuItem,
   Stack,
   TextField,
   Tooltip,
@@ -19,7 +20,7 @@ import {
 import AddRounded from '@mui/icons-material/AddRounded';
 import DeleteOutlineRounded from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlined from '@mui/icons-material/EditOutlined';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '@/shared/api/problemDetails';
 import { queryKeys } from '@/shared/api/queryKeys';
@@ -31,19 +32,19 @@ import {
 } from '../api/emergencyContactsApi';
 import { displayMobilePhone } from '../display';
 
-const FIELDS = ['relationship', 'firstName', 'lastName', 'mobilePhone'] as const;
+const TEXT_FIELDS = ['firstName', 'lastName', 'mobilePhone'] as const;
+const FIELDS = ['relationshipId', ...TEXT_FIELDS] as const;
 type FieldName = (typeof FIELDS)[number];
 
-/** Alanlarin en buyuk uzunlugu; sunucudaki sinirla aynidir (SYG-PERS-043). */
-const MAX_LENGTH: Record<FieldName, number> = {
-  relationship: 50,
+/** Metin alanlarinin en buyuk uzunlugu; sunucudaki sinirla aynidir (SYG-PERS-043). */
+const MAX_LENGTH: Record<(typeof TEXT_FIELDS)[number], number> = {
   firstName: 100,
   lastName: 100,
   mobilePhone: 20,
 };
 
 const EMPTY: EmergencyContactInput = {
-  relationship: '',
+  relationshipId: '',
   firstName: '',
   lastName: '',
   mobilePhone: '',
@@ -195,13 +196,17 @@ interface DialogProps {
   onSaved: () => void | Promise<void>;
 }
 
-/** Ekleme ve duzenleme formu. Dort alan zorunludur; hata ilgili alanin altinda gorunur. */
+/**
+ * Ekleme ve duzenleme formu. Dort alan zorunludur; hata ilgili alanin altinda gorunur. Yakinlik
+ * referans verideki aktif tanimlardan secilir (KR-135); duzenlenen kaydin tanimi sonradan pasife
+ * alindiysa listede yine gorunur ve secili kalir.
+ */
 function EmergencyContactDialog({ personId, contact, onClose, onSaved }: DialogProps) {
   const { t } = useTranslation();
   const [values, setValues] = useState<EmergencyContactInput>(
     contact
       ? {
-          relationship: contact.relationship,
+          relationshipId: contact.relationshipId,
           firstName: contact.firstName,
           lastName: contact.lastName,
           mobilePhone: displayMobilePhone(contact.mobilePhone),
@@ -209,6 +214,15 @@ function EmergencyContactDialog({ personId, contact, onClose, onSaved }: DialogP
       : EMPTY,
   );
   const [missing, setMissing] = useState<Set<FieldName>>(new Set());
+
+  const relationships = useQuery({
+    queryKey: queryKeys.personnel.emergencyRelationships,
+    queryFn: emergencyContactsApi.relationships,
+  });
+  const options = [...(relationships.data ?? [])];
+  if (contact && !options.some((option) => option.id === contact.relationshipId)) {
+    options.push({ id: contact.relationshipId, name: contact.relationship });
+  }
 
   const save = useMutation({
     mutationFn: () =>
@@ -227,6 +241,17 @@ function EmergencyContactDialog({ personId, contact, onClose, onSaved }: DialogP
         ? save.error.message
         : t('error.generic')
       : null;
+
+  const change = (field: FieldName, value: string) => {
+    setValues((current) => ({ ...current, [field]: value }));
+    if (missing.has(field)) {
+      setMissing((current) => {
+        const next = new Set(current);
+        next.delete(field);
+        return next;
+      });
+    }
+  };
 
   return (
     <Dialog open onClose={onClose} aria-labelledby="emergency-dialog-title" fullWidth maxWidth="sm">
@@ -247,23 +272,33 @@ function EmergencyContactDialog({ personId, contact, onClose, onSaved }: DialogP
         </DialogTitle>
         <DialogContent>
           <Stack spacing={2.5} sx={{ pt: 1 }}>
-            {FIELDS.map((field, index) => (
+            <TextField
+              select
+              label={t('personnel.emergency.fields.relationshipId')}
+              value={relationships.isPending ? '' : values.relationshipId}
+              onChange={(event) => change('relationshipId', event.target.value)}
+              required
+              autoFocus
+              error={Boolean(fieldError('relationshipId')) || relationships.isError}
+              helperText={
+                fieldError('relationshipId') ??
+                (relationships.isError ? t('personnel.emergency.relationshipsFailed') : undefined)
+              }
+            >
+              {options.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            {TEXT_FIELDS.map((field) => (
               <TextField
                 key={field}
                 label={t(`personnel.emergency.fields.${field}`)}
                 value={values[field]}
-                onChange={(event) => {
-                  setValues((current) => ({ ...current, [field]: event.target.value }));
-                  if (missing.has(field)) {
-                    setMissing((current) => {
-                      const next = new Set(current);
-                      next.delete(field);
-                      return next;
-                    });
-                  }
-                }}
+                onChange={(event) => change(field, event.target.value)}
                 required
-                autoFocus={index === 0}
                 type={field === 'mobilePhone' ? 'tel' : 'text'}
                 error={Boolean(fieldError(field))}
                 helperText={

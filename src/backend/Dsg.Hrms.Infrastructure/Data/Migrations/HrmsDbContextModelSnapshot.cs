@@ -1656,11 +1656,9 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("public_id");
 
-                    b.Property<string>("Relationship")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("text")
-                        .HasColumnName("relationship");
+                    b.Property<long>("RelationshipDefinitionId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("relationship_definition_id");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamptz")
@@ -1689,6 +1687,9 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                     b.HasIndex("PublicId")
                         .IsUnique()
                         .HasDatabaseName("ix_emergency_contact_public_id");
+
+                    b.HasIndex("RelationshipDefinitionId")
+                        .HasDatabaseName("ix_emergency_contact_relationship_definition_id");
 
                     b.ToTable("emergency_contact", "personnel");
                 });
@@ -2431,7 +2432,7 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
 
                     b.ToTable("definition", "reference", t =>
                         {
-                            t.HasCheckConstraint("ck_definition_type", "type IN (1, 2, 3)");
+                            t.HasCheckConstraint("ck_definition_type", "type IN (1, 2, 3, 4)");
                         });
 
                     b.HasData(
@@ -2578,6 +2579,54 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                             PublicId = new Guid("0192a3b4-1003-7000-8000-000000000008"),
                             SortOrder = 8,
                             Type = 3
+                        },
+                        new
+                        {
+                            Id = 21L,
+                            Code = "Y001",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = false,
+                            Name = "Eşi",
+                            PublicId = new Guid("0192a3b4-1004-7000-8000-000000000001"),
+                            SortOrder = 1,
+                            Type = 4
+                        },
+                        new
+                        {
+                            Id = 22L,
+                            Code = "Y002",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = false,
+                            Name = "Annesi",
+                            PublicId = new Guid("0192a3b4-1004-7000-8000-000000000002"),
+                            SortOrder = 2,
+                            Type = 4
+                        },
+                        new
+                        {
+                            Id = 23L,
+                            Code = "Y003",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = false,
+                            Name = "Babası",
+                            PublicId = new Guid("0192a3b4-1004-7000-8000-000000000003"),
+                            SortOrder = 3,
+                            Type = 4
+                        },
+                        new
+                        {
+                            Id = 24L,
+                            Code = "Y004",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            IsSystem = false,
+                            Name = "Kardeşi",
+                            PublicId = new Guid("0192a3b4-1004-7000-8000-000000000004"),
+                            SortOrder = 4,
+                            Type = 4
                         });
                 });
 
@@ -2986,6 +3035,13 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_emergency_contact_person_person_id");
+
+                    b.HasOne("Dsg.Hrms.Domain.Reference.ReferenceDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("RelationshipDefinitionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_emergency_contact_reference_definition_relationship_definit");
                 });
 
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.Employment", b =>

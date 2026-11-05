@@ -131,11 +131,12 @@ public sealed record PersonRecord(
 
 /// <summary>Acil durum kisisi (SYG-PERS-043).</summary>
 /// <param name="Id">Kaydin dis kimligi.</param>
-/// <param name="Relationship">Yakinligi.</param>
+/// <param name="RelationshipId">Yakinlik taniminin dis kimligi (referans veri, <c>KR-135</c>).</param>
+/// <param name="Relationship">Yakinlik taniminin adi; tanim pasife alinmis olsa da gorunur.</param>
 /// <param name="FirstName">Ad.</param>
 /// <param name="LastName">Soyad.</param>
 /// <param name="MobilePhone">Cep telefonu, <c>5XXXXXXXXX</c>.</param>
-public sealed record EmergencyContactRecord(Guid Id, string Relationship, string FirstName, string LastName, string MobilePhone);
+public sealed record EmergencyContactRecord(Guid Id, Guid RelationshipId, string Relationship, string FirstName, string LastName, string MobilePhone);
 
 /// <summary>Istihdamin okunan hali.</summary>
 /// <param name="Id">Ic kimlik (disariya verilmez).</param>

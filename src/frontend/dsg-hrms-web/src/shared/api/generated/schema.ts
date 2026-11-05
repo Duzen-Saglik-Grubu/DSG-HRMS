@@ -419,7 +419,7 @@ export interface paths {
             };
         };
         put?: never;
-        /** Yeni tanim ekler. Unvan kodu zorunludur (LOGO kodu); gorev kodu verilmezse uretilir. */
+        /** Yeni tanim ekler. Unvan kodu zorunludur (LOGO kodu); gorev ve yakinlik kodu verilmezse uretilir. */
         post: {
             parameters: {
                 query?: never;
@@ -1174,6 +1174,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/emergency-contact-relationships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Yeni secim icin aktif yakinlik tanimlari (referans veri, `KR-135`). Giris izniyle okunur:
+         *     referans veri izni olmayan bir rol de formu kullanabilir.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Tanimlar, siraya gore. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RelationshipOptionResponse"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.person.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/{personId}/emergency-contacts": {
         parameters: {
             query?: never;
@@ -1239,6 +1296,15 @@ export interface paths {
                 };
                 /** @description Kisi yok ya da kapsam disi. */
                 404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yakinlik tanimi yok veya pasif. */
+                422: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -1319,6 +1385,15 @@ export interface paths {
                 };
                 /** @description Kisi veya kayit yok ya da kapsam disi. */
                 404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yeni secilen yakinlik tanimi yok veya pasif. */
+                422: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -4458,9 +4533,9 @@ export interface components {
         };
         /** @description Yeni tanim istegi. */
         CreateReferenceDefinitionRequest: {
-            /** @description Tur (unvan veya gorev). */
+            /** @description Tur (unvan, gorev veya yakinlik). */
             type: components["schemas"]["ReferenceTypeKind"];
-            /** @description Kod; unvanda zorunlu, gorevde istege bagli. */
+            /** @description Kod; unvanda zorunlu, gorev ve yakinlikta istege bagli. */
             code: null | string;
             /** @description Ad. */
             name: string;
@@ -4538,8 +4613,11 @@ export interface components {
         };
         /** @description Acil durum kisisi ekleme ve degistirme istegi; dort alan da zorunludur. */
         EmergencyContactRequest: {
-            /** @description Yakinligi (en fazla 50 karakter). */
-            relationship: null | string;
+            /**
+             * Format: uuid
+             * @description Yakinlik taniminin dis kimligi (aktif tanimlar: `GET /api/v1/personnel/emergency-contact-relationships`).
+             */
+            relationshipId: null | string;
             /** @description Ad (en fazla 100 karakter). */
             firstName: null | string;
             /** @description Soyad (en fazla 100 karakter). */
@@ -4554,7 +4632,12 @@ export interface components {
              * @description Dis kimlik.
              */
             id: string;
-            /** @description Yakinligi. */
+            /**
+             * Format: uuid
+             * @description Yakinlik taniminin dis kimligi.
+             */
+            relationshipId: string;
+            /** @description Yakinlik taniminin adi; tanim pasife alinmis olsa da gorunur. */
             relationship: string;
             /** @description Ad. */
             firstName: string;
@@ -5126,7 +5209,7 @@ export interface components {
          * @description Referans tanim turu.
          * @enum {unknown}
          */
-        ReferenceTypeKind: "title" | "duty" | "bloodGroup";
+        ReferenceTypeKind: "title" | "duty" | "bloodGroup" | "relationship";
         /** @description Uyelik baslatildi. */
         RegistrationStartedResponse: {
             /**
@@ -5141,6 +5224,16 @@ export interface components {
              * @description Uyelik isleminin gecerlilik sonu.
              */
             expiresAt: string;
+        };
+        /** @description Yakinlik secenegi. */
+        RelationshipOptionResponse: {
+            /**
+             * Format: uuid
+             * @description Tanimin dis kimligi.
+             */
+            id: string;
+            /** @description Ad. */
+            name: string;
         };
         /** @description Ad degistirme istegi. */
         RenameReferenceDefinitionRequest: {
