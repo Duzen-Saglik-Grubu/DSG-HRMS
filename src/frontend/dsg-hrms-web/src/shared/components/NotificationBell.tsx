@@ -66,6 +66,11 @@ export function NotificationBell() {
 
     const target = targetOf(item);
     if (target) {
+      // Bildirim yeni bir kaydi haber verir; liste onbellekte "taze" sayilsa da (staleTime) ya da
+      // ekran zaten aciksa sunucudan yeniden alinmali, yoksa yeni talep gorunmez (#338).
+      if (item.kind === 'correctionRequested') {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.personnel.correctionsAll });
+      }
       void navigate(target);
     }
   };
