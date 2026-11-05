@@ -65,7 +65,7 @@ function person(overrides: Partial<PersonCard> = {}): PersonCard {
     previousSurname: 'KAYA',
     maritalStatus: 'married',
     educationName: 'Lisans',
-    sensitive: { address: 'Kızılay Mah. 1', bloodGroup: 'A Rh+' },
+    sensitive: { address: 'Kızılay Mah. 1', bloodGroup: 'A Rh+', emergencyContacts: [] },
     hasPhoto: false,
     ...overrides,
   };
@@ -147,7 +147,7 @@ describe('PersonCardPage', () => {
 
   it('kan grubu kayitli degilse "Kayitli degil" yazar (SYG-PERS-034)', async () => {
     vi.spyOn(personsApi, 'card').mockResolvedValue(
-      person({ sensitive: { address: 'Kızılay Mah. 1', bloodGroup: null } }),
+      person({ sensitive: { address: 'Kızılay Mah. 1', bloodGroup: null, emergencyContacts: [] } }),
     );
     renderAt('/personnel/p-1');
 

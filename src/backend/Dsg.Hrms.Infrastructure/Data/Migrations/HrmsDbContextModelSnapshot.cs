@@ -1605,6 +1605,94 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.EmergencyContact", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<long?>("DeletedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("text")
+                        .HasColumnName("first_name");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("text")
+                        .HasColumnName("last_name");
+
+                    b.Property<string>("MobilePhone")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("text")
+                        .HasColumnName("mobile_phone");
+
+                    b.Property<long>("PersonId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("person_id");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_id");
+
+                    b.Property<string>("Relationship")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("text")
+                        .HasColumnName("relationship");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("updated_by");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_emergency_contact");
+
+                    b.HasIndex("DeletedAt")
+                        .HasDatabaseName("ix_emergency_contact_deleted_at")
+                        .HasFilter("deleted_at IS NULL");
+
+                    b.HasIndex("PersonId")
+                        .HasDatabaseName("ix_emergency_contact_person_id");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_emergency_contact_public_id");
+
+                    b.ToTable("emergency_contact", "personnel");
+                });
+
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.Employment", b =>
                 {
                     b.Property<long>("Id")
@@ -2888,6 +2976,16 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_correction_request_person_person_id");
+                });
+
+            modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.EmergencyContact", b =>
+                {
+                    b.HasOne("Dsg.Hrms.Domain.Personnel.Person", null)
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_emergency_contact_person_person_id");
                 });
 
             modelBuilder.Entity("Dsg.Hrms.Domain.Personnel.Employment", b =>

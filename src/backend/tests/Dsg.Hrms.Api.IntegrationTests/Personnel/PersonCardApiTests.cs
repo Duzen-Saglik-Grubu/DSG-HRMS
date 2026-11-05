@@ -132,7 +132,7 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
         card.EnumerateObject().Select(p => p.Name).ShouldBe(
             ["personId", "firstName", "lastName", "nationalId", "isNationalIdMasked", "birthDate", "age", "email", "mobilePhone", "isSelf", "employments",
              "gender", "previousSurname", "maritalStatus", "educationName", "sensitive", "hasPhoto"]);
-        card.GetProperty("sensitive").EnumerateObject().Select(p => p.Name).ShouldBe(["address", "bloodGroup"]);
+        card.GetProperty("sensitive").EnumerateObject().Select(p => p.Name).ShouldBe(["address", "bloodGroup", "emergencyContacts"]);
     }
 
     [Fact]

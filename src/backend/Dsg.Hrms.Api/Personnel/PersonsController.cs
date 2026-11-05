@@ -524,7 +524,10 @@ public sealed record PersonCardResponse(
                 _ => null,
             },
             card.EducationName,
-            card.Sensitive is { } sensitive ? new SensitiveResponse(sensitive.Address, sensitive.BloodGroup) : null)
+            card.Sensitive is { } sensitive ? new SensitiveResponse(
+                sensitive.Address,
+                sensitive.BloodGroup,
+                [.. sensitive.EmergencyContacts.Select(EmergencyContactResponse.From)]) : null)
         {
             HasPhoto = card.HasPhoto,
         };
@@ -534,7 +537,8 @@ public sealed record PersonCardResponse(
 /// <summary>Kartin korumali alanlari (ADR-0019 §2).</summary>
 /// <param name="Address">Adres; kayitli degilse bos ("Kayitli degil").</param>
 /// <param name="BloodGroup">Kan grubu (ornek "A Rh+"); kayitli degilse bos ("Kayitli degil"). Gosterilmesi ayrica ozel nitelikli veri goruntulemesi olarak kaydedilir (SYG-PERS-057).</param>
-public sealed record SensitiveResponse(string? Address, string? BloodGroup);
+/// <param name="EmergencyContacts">Acil durum kisileri, eklenme sirasiyla (SYG-PERS-043); kayitli degilse bos liste.</param>
+public sealed record SensitiveResponse(string? Address, string? BloodGroup, IReadOnlyList<EmergencyContactResponse> EmergencyContacts);
 
 /// <summary>Cinsiyet.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<GenderKind>))]
