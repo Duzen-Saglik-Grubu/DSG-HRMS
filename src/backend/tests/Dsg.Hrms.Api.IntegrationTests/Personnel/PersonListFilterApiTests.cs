@@ -21,7 +21,8 @@ namespace Dsg.Hrms.Api.IntegrationTests.Personnel;
 /// <remarks>
 /// Kisi 1 oturum acan kullanicidir. Kisi 2: Merkez (Ankara) / Bilgi Islem, unvan 1, statu A, kadin,
 /// evli, lisans, adres "Kızılay Mah.". Kisi 3: Bornova (Izmir) / Laboratuvar, unvan 2, statu B, erkek,
-/// bekar, lise, adres "Bornova", gorev Biyolog. Kisi 5: Merkez / Laboratuvar, unvan 3.
+/// bekar, lise, adres "Bornova", gorev Biyolog. Kisi 3'un ayrica 2015'te ayrildigi 00007 sicili var:
+/// Merkez / Bilgi Islem, unvan 9, statu C. Kisi 5: Merkez / Laboratuvar, unvan 3.
 /// </remarks>
 [Collection(ApiHostGroup.Name)]
 public sealed class PersonListFilterApiTests : IClassFixture<Identity.RegistrationApiFixture>, IAsyncLifetime
@@ -56,6 +57,28 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
         {
             (await CodesAsync(client, jwt, $"branchId={_seed.Merkez}&branchId={_seed.Bornova}")).ShouldBe(["00002", "00003", "00005"], ignoreOrder: true);
             (await CodesAsync(client, jwt, $"branchId={_seed.Merkez}&departmentId={_seed.Laboratuvar}")).ShouldBe(["00005"]);
+        }
+    }
+
+    [Fact]
+    public async Task Active_status_matches_employment_filters_only_on_active_registries()
+    {
+        // SYG-PERS-022 (ADR-0019 §6, #338): "aktif" suzgeci yalnizca aktif sicillere bakar. Kisi 3
+        // bugun Bornova'da; Merkez'deki eski sicili onu Merkez suzgecine sokmamali.
+        var (client, jwt) = await HrAsync();
+        using (client)
+        {
+            (await CodesAsync(client, jwt, $"branchId={_seed.Merkez}")).ShouldBe(["00002", "00005"], ignoreOrder: true);
+            (await CodesAsync(client, jwt, "city=Ankara")).ShouldBe(["00002", "00005"], ignoreOrder: true);
+            (await CodesAsync(client, jwt, "titleCode=9")).ShouldBeEmpty();
+            (await CodesAsync(client, jwt, "statusCode=C")).ShouldBeEmpty();
+            (await CodesAsync(client, jwt, "registryCode=00007")).ShouldBeEmpty();
+            (await CodesAsync(client, jwt, "hireDateTo=2010-12-31")).ShouldBeEmpty();
+            (await CodesAsync(client, jwt, "seniorityMin=5&seniorityMax=5")).ShouldBeEmpty();
+
+            // "Tumu" seciliyken kisinin herhangi bir sicili eslesir (KR-126); kartta esas sicil gorunur.
+            (await CodesAsync(client, jwt, $"status=all&branchId={_seed.Merkez}")).ShouldBe(["00002", "00003", "00005"], ignoreOrder: true);
+            (await CodesAsync(client, jwt, "status=all&titleCode=9")).ShouldBe(["00003"]);
         }
     }
 
@@ -199,6 +222,14 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
             await Assign("00002", merkez, bilgiIslem, "1", "A", "1111.01");
             await Assign("00003", bornova, laboratuvar, "2", "B", "2222.01");
             await Assign("00005", merkez, laboratuvar, "3", "A", "3333.01");
+
+            // Kisi 3'un ayrilmis eski sicili (#338): bugunku suzgeclere "Aktif" seciliyken girmemeli.
+            var person3Old = await context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(3));
+            var old = Employment.Create(person3Old, company, "00007", new EmploymentDetails(new DateOnly(2010, 1, 1), new DateOnly(2015, 1, 1), 7), Today);
+            context.Add(old);
+            await context.SaveChangesAsync();
+            var (oldAssignment, _) = AssignmentTimeline.Apply(old, [], new AssignmentValues(company.Id, merkez.Id, bilgiIslem.Id, "9", "C", "9999.01", "Meslek 9999.01"), Today);
+            context.Add(oldAssignment!);
 
             var third = await context.Set<Employment>().SingleAsync(e => e.RegistryCode == "00003");
             var (duty, _) = DutyTimeline.Assign(third, [], biologist.Id, third.HireDate);
