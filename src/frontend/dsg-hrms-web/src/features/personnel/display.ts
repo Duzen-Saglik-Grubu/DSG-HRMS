@@ -36,3 +36,9 @@ export function orderEmployments<
       (a.registryCode < b.registryCode ? -1 : a.registryCode > b.registryCode ? 1 : 0),
   );
 }
+
+/** `5321234567` -> `532 123 45 67`; baska bicimdeki deger oldugu gibi kalir. */
+export function displayMobilePhone(value: string): string {
+  const match = /^(\d{3})(\d{3})(\d{2})(\d{2})$/.exec(value);
+  return match ? match.slice(1).join(' ') : value;
+}

@@ -121,7 +121,21 @@ public sealed record PersonRecord(
     /// degilse <c>null</c> (SYG-PERS-052, ADR-0020).
     /// </summary>
     public string? BloodGroup { get; init; }
+
+    /// <summary>
+    /// Acil durum kisileri, eklenme sirasiyla (SYG-PERS-043). Yalnizca korumali alanlari gorebilen
+    /// bakista okunur; digerlerinde bos (SYG-PERS-052).
+    /// </summary>
+    public IReadOnlyList<EmergencyContactRecord> EmergencyContacts { get; init; } = [];
 }
+
+/// <summary>Acil durum kisisi (SYG-PERS-043).</summary>
+/// <param name="Id">Kaydin dis kimligi.</param>
+/// <param name="Relationship">Yakinligi.</param>
+/// <param name="FirstName">Ad.</param>
+/// <param name="LastName">Soyad.</param>
+/// <param name="MobilePhone">Cep telefonu, <c>5XXXXXXXXX</c>.</param>
+public sealed record EmergencyContactRecord(Guid Id, string Relationship, string FirstName, string LastName, string MobilePhone);
 
 /// <summary>Istihdamin okunan hali.</summary>
 /// <param name="Id">Ic kimlik (disariya verilmez).</param>

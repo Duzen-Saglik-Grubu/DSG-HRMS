@@ -221,6 +221,45 @@ test('6. senkronizasyon: yonetici calismalari sonuclariyla gorur (SYG-PERS-008, 
   await signOut(page, people.admin.fullName);
 });
 
+test('7. acil durum kisisi: yonetici girer, personel kendi profilinde gorur ama degistiremez (SYG-PERS-043)', async ({
+  page,
+}) => {
+  await signIn(page, people.admin.email, passwords.first);
+  await page.getByRole('link', { name: 'Personel listesi', exact: true }).click();
+  await page.getByLabel(/Ad, soyad, sicil/).fill('izinsiz');
+  await page.getByRole('button', { name: 'Tablo görünümü' }).click();
+  await page
+    .getByRole('row', { name: /Zeynep/ })
+    .getByRole('link', { name: 'Zeynep' })
+    .click();
+
+  const section = page.getByRole('region', { name: 'Acil Durum Kişileri' });
+  await expect(section).toContainText('Kayıtlı değil');
+  await section.getByRole('button', { name: 'Acil durum kişisi ekle' }).click();
+
+  const dialog = page.getByRole('dialog', { name: 'Acil durum kişisi ekle' });
+  await dialog.getByRole('textbox', { name: /Yakınlığı/ }).fill('Annesi');
+  await dialog.getByRole('textbox', { name: /^Adı/ }).fill('Fatma');
+  await dialog.getByRole('textbox', { name: /Soyadı/ }).fill('Izinsiz');
+  // Gecersiz telefon alanin altinda reddedilir (SYG-KMLK-009).
+  await dialog.getByRole('textbox', { name: /Cep telefonu/ }).fill('212 111 22 33');
+  await dialog.getByRole('button', { name: 'Kaydet' }).click();
+  await expect(dialog.getByText(/5 ile başlayan 10 haneli/)).toBeVisible();
+  await dialog.getByRole('textbox', { name: /Cep telefonu/ }).fill('0532 111 22 33');
+  await dialog.getByRole('button', { name: 'Kaydet' }).click();
+  await expect(section).toContainText('Fatma Izinsiz');
+  await expect(section).toContainText('Annesi · 532 111 22 33');
+  await signOut(page, people.admin.fullName);
+
+  // Kisinin kendisi gorur; ekleme, duzenleme ve silme dugmesi yoktur (PG-PERS-44).
+  await signIn(page, people.unprivileged.email, passwords.first);
+  await page.getByRole('link', { name: 'Profilim' }).click();
+  const own = page.getByRole('region', { name: 'Acil Durum Kişileri' });
+  await expect(own).toContainText('Fatma Izinsiz');
+  await expect(own.getByRole('button')).toHaveCount(0);
+  await signOut(page, people.unprivileged.fullName);
+});
+
 async function readDownload(download: Download): Promise<Buffer> {
   const stream = await download.createReadStream();
   const chunks: Buffer[] = [];

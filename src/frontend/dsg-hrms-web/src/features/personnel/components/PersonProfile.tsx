@@ -5,7 +5,10 @@ import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import type { EmploymentCard, PersonCard } from '../api/personsApi';
 import { displayDate, joinParts, orderEmployments } from '../display';
+import { permissions } from '@/shared/auth/permissions';
+import { usePermission } from '@/shared/auth/usePermission';
 import { PersonAvatar } from '@/shared/components/PersonAvatar';
+import { EmergencyContacts } from './EmergencyContacts';
 import { ReportToHrDialog } from './ReportToHrDialog';
 import { SyncFreshness } from './SyncFreshness';
 
@@ -20,6 +23,8 @@ export function PersonProfile({ person }: { person: PersonCard }) {
   const primary = employments[0];
   const [reporting, setReporting] = useState(false);
   const [sent, setSent] = useState(false);
+  // Kisinin kendisi kendi acil durum kisilerini degistiremez (PG-PERS-44).
+  const canEdit = usePermission(permissions.personUpdate);
 
   return (
     <Stack spacing={2.5}>
@@ -54,6 +59,16 @@ export function PersonProfile({ person }: { person: PersonCard }) {
             <Section title={t('personnel.card.sections.contact')}>
               <ContactInfo person={person} />
             </Section>
+            {/* Acil durum kisileri gorunurluge tabidir; goremeyenin yanitinda yoktur (SYG-PERS-052). */}
+            {person.sensitive ? (
+              <Section title={t('personnel.card.sections.emergency')}>
+                <EmergencyContacts
+                  personId={person.personId}
+                  contacts={person.sensitive.emergencyContacts}
+                  editable={canEdit && !person.isSelf}
+                />
+              </Section>
+            ) : null}
           </Stack>
         </Grid>
         <Grid size={{ xs: 12, md: 7 }}>

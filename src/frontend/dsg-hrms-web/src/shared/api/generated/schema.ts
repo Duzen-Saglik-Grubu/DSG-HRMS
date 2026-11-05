@@ -1174,6 +1174,217 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/persons/{personId}/emergency-contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Kisiye acil durum kisisi ekler. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EmergencyContactRequest"];
+                    "text/json": components["schemas"]["EmergencyContactRequest"];
+                    "application/*+json": components["schemas"]["EmergencyContactRequest"];
+                };
+            };
+            responses: {
+                /** @description Eklenen kayit. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmergencyContactResponse"];
+                    };
+                };
+                /** @description Alan eksik veya gecersiz (telefon SYG-KMLK-009). */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.person.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi yok ya da kapsam disi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/persons/{personId}/emergency-contacts/{contactId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Acil durum kisisinin bilgilerini degistirir. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                    contactId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EmergencyContactRequest"];
+                    "text/json": components["schemas"]["EmergencyContactRequest"];
+                    "application/*+json": components["schemas"]["EmergencyContactRequest"];
+                };
+            };
+            responses: {
+                /** @description Guncel kayit. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmergencyContactResponse"];
+                    };
+                };
+                /** @description Alan eksik veya gecersiz. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.person.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi veya kayit yok ya da kapsam disi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /** Acil durum kisisini siler (kayit yumusak silinir). */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                    contactId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Silindi. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.person.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi veya kayit yok ya da kapsam disi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties": {
         parameters: {
             query?: never;
@@ -4325,6 +4536,33 @@ export interface components {
              */
             validTo: null | string;
         };
+        /** @description Acil durum kisisi ekleme ve degistirme istegi; dort alan da zorunludur. */
+        EmergencyContactRequest: {
+            /** @description Yakinligi (en fazla 50 karakter). */
+            relationship: null | string;
+            /** @description Ad (en fazla 100 karakter). */
+            firstName: null | string;
+            /** @description Soyad (en fazla 100 karakter). */
+            lastName: null | string;
+            /** @description Cep telefonu; 5 ile baslayan 10 hane, bastaki 0 veya 90 kabul edilir (SYG-KMLK-009). */
+            mobilePhone: null | string;
+        };
+        /** @description Acil durum kisisi. */
+        EmergencyContactResponse: {
+            /**
+             * Format: uuid
+             * @description Dis kimlik.
+             */
+            id: string;
+            /** @description Yakinligi. */
+            relationship: string;
+            /** @description Ad. */
+            firstName: string;
+            /** @description Soyad. */
+            lastName: string;
+            /** @description Cep telefonu, `5XXXXXXXXX`. */
+            mobilePhone: string;
+        };
         /** @description Kartta bir istihdam. */
         EmploymentCardResponse: {
             /** @description Sicil numarasi. */
@@ -4945,6 +5183,8 @@ export interface components {
             address: null | string;
             /** @description Kan grubu (ornek "A Rh+"); kayitli degilse bos ("Kayitli degil"). Gosterilmesi ayrica ozel nitelikli veri goruntulemesi olarak kaydedilir (SYG-PERS-057). */
             bloodGroup: null | string;
+            /** @description Acil durum kisileri, eklenme sirasiyla (SYG-PERS-043); kayitli degilse bos liste. */
+            emergencyContacts: components["schemas"]["EmergencyContactResponse"][];
         };
         /** @description Acik oturum. Yenileme jetonu burada DEGIL, HttpOnly cerezdedir. */
         SessionResponse: {

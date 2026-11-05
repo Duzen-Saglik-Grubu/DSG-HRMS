@@ -19,7 +19,7 @@ namespace Dsg.Hrms.Architecture.Tests;
 /// </remarks>
 public sealed class ProtectedPersonnelDataTests
 {
-    private static readonly string[] ProtectedTypes = [typeof(PersonSensitive).FullName!];
+    private static readonly string[] ProtectedTypes = [typeof(PersonSensitive).FullName!, typeof(EmergencyContact).FullName!];
 
     /// <summary>Korumali tiplere bagimli olabilen siniflar (ic ice tipler dis sinifla sayilir).</summary>
     private static readonly string[] Allowed =
@@ -37,6 +37,13 @@ public sealed class ProtectedPersonnelDataTests
         "Dsg.Hrms.Infrastructure.Personnel.PersonnelSyncStore",
         // EF eslemesi.
         "Dsg.Hrms.Infrastructure.Data.Configurations.PersonSensitiveConfiguration",
+        "Dsg.Hrms.Infrastructure.Data.Configurations.EmergencyContactConfiguration",
+        // Acil durum kisisi: alan modeli ve IK girisi (SYG-PERS-043). Kayit once kapsamli sorgudan
+        // okunan kisiye baglanir; okuma yine PersonnelQuery'dedir.
+        "Dsg.Hrms.Domain.Personnel.EmergencyContact",
+        "Dsg.Hrms.Application.Personnel.EmergencyContacts.IEmergencyContactStore",
+        "Dsg.Hrms.Application.Personnel.EmergencyContacts.EmergencyContactService",
+        "Dsg.Hrms.Infrastructure.Personnel.EmergencyContactStore",
     ];
 
     [Fact]

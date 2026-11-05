@@ -526,7 +526,11 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
         // Kan grubu yalnizca gorebilen bakista cozulur; gormeyen icin sifreli deger hic okunmaz.
         if (PersonFieldVisibility.CanSeeSensitive(viewer, record.Id))
         {
-            record = record with { BloodGroup = await BloodGroupAsync(record, cancellationToken).ConfigureAwait(false) };
+            record = record with
+            {
+                BloodGroup = await BloodGroupAsync(record, cancellationToken).ConfigureAwait(false),
+                EmergencyContacts = await EmergencyContactsAsync(record.Id, cancellationToken).ConfigureAwait(false),
+            };
         }
 
         if (record.Employments.Count == 0)
@@ -621,6 +625,17 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
     }
+
+    /// <summary>Kisinin silinmemis acil durum kisileri, eklenme sirasiyla (SYG-PERS-043).</summary>
+    private async Task<IReadOnlyList<EmergencyContactRecord>> EmergencyContactsAsync(long personId, CancellationToken cancellationToken) =>
+        await context.Set<EmergencyContact>()
+            .AsNoTracking()
+            .Where(c => c.PersonId == personId)
+            .OrderBy(c => c.CreatedAt)
+            .ThenBy(c => c.Id)
+            .Select(c => new EmergencyContactRecord(c.PublicId, c.Relationship, c.FirstName, c.LastName, c.MobilePhone))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
 
     private async Task<PersonRecord?> ReadAsync(IQueryable<Person> query, CancellationToken cancellationToken) =>
         await query

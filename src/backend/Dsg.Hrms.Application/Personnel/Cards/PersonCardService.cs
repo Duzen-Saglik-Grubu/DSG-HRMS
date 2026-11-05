@@ -51,7 +51,8 @@ public sealed record PersonCard(
 /// <summary>Kartin korumali alanlari (ADR-0019 §2). Alan bos ise "Kayitli degil".</summary>
 /// <param name="Address">Adres; kayitli degilse <c>null</c>.</param>
 /// <param name="BloodGroup">Kan grubu (ornek "A Rh+"); kayitli degilse <c>null</c> (SYG-PERS-034).</param>
-public sealed record SensitiveCard(string? Address, string? BloodGroup);
+/// <param name="EmergencyContacts">Acil durum kisileri (SYG-PERS-043); kayitli degilse bos.</param>
+public sealed record SensitiveCard(string? Address, string? BloodGroup, IReadOnlyList<EmergencyContactRecord> EmergencyContacts);
 
 /// <summary>Kartta bir istihdam.</summary>
 /// <param name="RegistryCode">Sicil numarasi.</param>
@@ -152,7 +153,7 @@ public sealed class PersonCardService
         await _accessLogger.LogAsync(AccessRecord.View(EntityName, record.PublicId), cancellationToken).ConfigureAwait(false);
 
         var sensitive = PersonFieldVisibility.CanSeeSensitive(viewer, record.Id)
-            ? new SensitiveCard(record.Address, record.BloodGroup)
+            ? new SensitiveCard(record.Address, record.BloodGroup, record.EmergencyContacts)
             : null;
 
         // Yanitta kan grubu yer aldiysa ayrica ozel nitelikli veri goruntulemesi yazilir

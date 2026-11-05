@@ -732,7 +732,8 @@
       "sections": {
         "general": "Genel Bilgiler",
         "contact": "İletişim Bilgileri",
-        "work": "Çalışma Hayatı"
+        "work": "Çalışma Hayatı",
+        "emergency": "Acil Durum Kişileri"
       },
       "fields": {
         "firstName": "Ad",
@@ -765,7 +766,27 @@
       },
       "ageValue": "{{age}} yaş"
     },
-    "photo": "{{name}} fotoğrafı"
+    "photo": "{{name}} fotoğrafı",
+    "emergency": {
+      "add": "Acil durum kişisi ekle",
+      "addTitle": "Acil durum kişisi ekle",
+      "editTitle": "Acil durum kişisini düzenle",
+      "edit": "Düzenle",
+      "editNamed": "{{name}} kaydını düzenle",
+      "delete": "Sil",
+      "deleteNamed": "{{name}} kaydını sil",
+      "deleteTitle": "Acil durum kişisini sil",
+      "deleteText": "{{name}} bu kişinin acil durum kişilerinden çıkarılacak.",
+      "save": "Kaydet",
+      "required": "Bu alanı doldurun.",
+      "phoneHint": "5 ile başlayan 10 haneli cep telefonu, örneğin 532 123 45 67",
+      "fields": {
+        "relationship": "Yakınlığı",
+        "firstName": "Adı",
+        "lastName": "Soyadı",
+        "mobilePhone": "Cep telefonu"
+      }
+    }
   },
   "home": {
     "greeting": {

@@ -1248,6 +1248,261 @@
         }
       }
     },
+    "/api/v1/personnel/persons/{personId}/emergency-contacts": {
+      "post": {
+        "tags": [
+          "EmergencyContacts"
+        ],
+        "summary": "Kisiye acil durum kisisi ekler.",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmergencyContactRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmergencyContactRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmergencyContactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Eklenen kayit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmergencyContactResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Alan eksik veya gecersiz (telefon SYG-KMLK-009).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.person.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi yok ya da kapsam disi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/persons/{personId}/emergency-contacts/{contactId}": {
+      "put": {
+        "tags": [
+          "EmergencyContacts"
+        ],
+        "summary": "Acil durum kisisinin bilgilerini degistirir.",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "contactId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmergencyContactRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmergencyContactRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmergencyContactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Guncel kayit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmergencyContactResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Alan eksik veya gecersiz.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.person.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi veya kayit yok ya da kapsam disi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "EmergencyContacts"
+        ],
+        "summary": "Acil durum kisisini siler (kayit yumusak silinir).",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "contactId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Silindi.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.person.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi veya kayit yok ya da kapsam disi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties": {
       "post": {
         "tags": [
@@ -5153,6 +5408,80 @@
         },
         "description": "Gorev kaydi."
       },
+      "EmergencyContactRequest": {
+        "required": [
+          "relationship",
+          "firstName",
+          "lastName",
+          "mobilePhone"
+        ],
+        "type": "object",
+        "properties": {
+          "relationship": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Yakinligi (en fazla 50 karakter)."
+          },
+          "firstName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Ad (en fazla 100 karakter)."
+          },
+          "lastName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Soyad (en fazla 100 karakter)."
+          },
+          "mobilePhone": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Cep telefonu; 5 ile baslayan 10 hane, bastaki 0 veya 90 kabul edilir (SYG-KMLK-009)."
+          }
+        },
+        "description": "Acil durum kisisi ekleme ve degistirme istegi; dort alan da zorunludur."
+      },
+      "EmergencyContactResponse": {
+        "required": [
+          "id",
+          "relationship",
+          "firstName",
+          "lastName",
+          "mobilePhone"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Dis kimlik.",
+            "format": "uuid"
+          },
+          "relationship": {
+            "type": "string",
+            "description": "Yakinligi."
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Ad."
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Soyad."
+          },
+          "mobilePhone": {
+            "type": "string",
+            "description": "Cep telefonu, `5XXXXXXXXX`."
+          }
+        },
+        "description": "Acil durum kisisi."
+      },
       "EmploymentCardResponse": {
         "required": [
           "registryCode",
@@ -6688,7 +7017,8 @@
       "SensitiveResponse": {
         "required": [
           "address",
-          "bloodGroup"
+          "bloodGroup",
+          "emergencyContacts"
         ],
         "type": "object",
         "properties": {
@@ -6705,6 +7035,13 @@
               "string"
             ],
             "description": "Kan grubu (ornek \"A Rh+\"); kayitli degilse bos (\"Kayitli degil\"). Gosterilmesi ayrica ozel nitelikli veri goruntulemesi olarak kaydedilir (SYG-PERS-057)."
+          },
+          "emergencyContacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmergencyContactResponse"
+            },
+            "description": "Acil durum kisileri, eklenme sirasiyla (SYG-PERS-043); kayitli degilse bos liste."
           }
         },
         "description": "Kartin korumali alanlari (ADR-0019 §2)."
@@ -7591,6 +7928,9 @@
     },
     {
       "name": "DataQuality"
+    },
+    {
+      "name": "EmergencyContacts"
     },
     {
       "name": "EmploymentDuties"
