@@ -1,7 +1,7 @@
 # İzlenebilirlik Matrisi
 
 **Belge kimliği:** 33061-IZM
-**Son güncelleme:** 2026-11-05
+**Son güncelleme:** 2026-11-06
 **Hizmet ettiği süreçler:** TEC.2, TEC.3, TEC.5, TEC.7, TEC.8, TEC.9, TEC.10, TEC.11, TEC.13
 **Sahibi:** Bilgi İşlem
 

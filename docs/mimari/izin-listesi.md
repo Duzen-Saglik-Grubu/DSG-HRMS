@@ -1,7 +1,7 @@
 # İzin Listesi
 
 **Belge kimliği:** MIM-IZIN
-**Son güncelleme:** 2026-11-05
+**Son güncelleme:** 2026-11-06
 **Sahibi:** Bilgi İşlem
 **İlgili:** ADR-0007 §1, ADR-0019 §4, `KR-021`, `KR-089`, `KR-126`, SYG-KMLK-074, SYG-PERS-055
 
