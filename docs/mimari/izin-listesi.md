@@ -39,7 +39,7 @@
 | `personnel.quality.export` | Veri kalitesi raporunu dışa aktarma | `GET /personnel/quality/export` (#335) | PERS-070 |
 | `reference.definition.view` | Ünvan, görev, kan grubu ve yakınlık tanımlarını görme | `GET /reference/definitions`; "Referans veri" ekranı (#350) | PERS-072 |
 | `reference.definition.update` | Ünvan, görev ve yakınlık tanımlarını değiştirme | `POST /reference/definitions`, `PUT …/{id}/name`, `POST …/{id}/deactivation`, `POST …/{id}/reactivation` (`KR-136`); "Referans veri" ekranı (#350) | PERS-072 |
-| `audit.log.view` | Denetim kayıtlarını görme | Denetim kayıtları (sonraki iş) | PERS-069 |
+| `audit.log.view` | Denetim kayıtlarını görme | `GET /api/v1/audit/entries`; Sistem → "Denetim kayıtları" ekranı (#363) | PERS-069 |
 
 Kişi kartı ve "Profilim" (`GET /api/v1/personnel/persons/{id}`, `/me`) izin değil yalnızca oturum ister; kimin kimi göreceğini kapsam belirler (ADR-0019 §1).
 
@@ -70,3 +70,4 @@ Kişi kartı ve "Profilim" (`GET /api/v1/personnel/persons/{id}`, `/me`) izin de
 | 2026-11-06 | 0.10 | `reference.definition.*` ekrana bağlandı; veritabanındaki izin açıklamaları bu listeyle eşitlendi (#350); yeniden aktif etme ucu (`KR-136`, #352) | Bilgi İşlem |
 | 2026-11-06 | 0.11 | `personnel.person.update`: görev seçenek ucu ve kartta görev girişi (#353) | Bilgi İşlem |
 | 2026-11-07 | 0.12 | `personnel.person.update` evlilik uçlarına, `view_sensitive` kartın evlilik bölümüne bağlandı (#361) | Bilgi İşlem |
+| 2026-11-07 | 0.13 | `audit.log.view` denetim kayıtları ucuna ve ekranına bağlandı (#363) | Bilgi İşlem |

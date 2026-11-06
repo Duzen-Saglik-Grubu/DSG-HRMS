@@ -40,6 +40,18 @@ export const queryKeys = {
     syncRuns: (page: number, pageSize: number) =>
       ['personnel', 'sync-runs', page, pageSize] as const,
   },
+  audit: {
+    entries: (
+      from: string | null,
+      to: string | null,
+      type: string | null,
+      actor: string | null,
+      subject: string | null,
+      page: number,
+      pageSize: number,
+    ) => ['audit', 'entries', from, to, type, actor, subject, page, pageSize] as const,
+    people: (term: string) => ['audit', 'people', term] as const,
+  },
   reference: {
     all: ['reference', 'definitions'] as const,
     definitions: (type: string) => ['reference', 'definitions', type] as const,

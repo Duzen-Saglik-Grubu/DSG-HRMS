@@ -39,5 +39,8 @@ public sealed class SecurityEventEntryConfiguration : IEntityTypeConfiguration<S
         builder.HasIndex(entry => new { entry.IpAddress, entry.OccurredAt });
 
         builder.HasIndex(entry => entry.TraceId);
+
+        // Denetim kayitlari ekrani: zamana gore yeniden eskiye (SYG-PERS-069).
+        builder.HasIndex(entry => entry.OccurredAt);
     }
 }

@@ -438,6 +438,33 @@ test('11. evlilik bilgisi: yonetici Evli personele girer; personel kendi profili
   await signOut(page, people.unprivileged.fullName);
 });
 
+test('12. denetim kayitlari: yonetici kayitlari turune gore suzer ve ayrintiyi acar (SYG-PERS-069)', async ({
+  page,
+}) => {
+  await signIn(page, people.admin.email, passwords.first);
+  await page.getByRole('link', { name: 'Denetim kayıtları', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Denetim kayıtları' })).toBeVisible();
+
+  // Girisin kendisi bir guvenlik olayidir; son 7 gunluk varsayilan aralikta gorunur.
+  await page.getByRole('combobox', { name: 'Kayıt türü' }).click();
+  await page.getByRole('option', { name: 'Güvenlik olayı' }).click();
+  const row = page.getByRole('row', { name: /Giriş başarılı/ }).first();
+  await expect(row).toContainText('Güvenlik olayı');
+
+  await row.getByRole('button', { name: 'Ayrıntı' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Kayıt ayrıntısı' });
+  await expect(dialog).toContainText('SignInSucceeded');
+  await dialog.getByRole('button', { name: 'Kapat' }).click();
+
+  // Ekrani goruntulemek de erisim kaydidir (ADR-0022 §2).
+  await page.getByRole('combobox', { name: 'Kayıt türü' }).click();
+  await page.getByRole('option', { name: 'Erişim', exact: true }).click();
+  await expect(page.getByRole('row', { name: /Denetim kayıtları/ }).first()).toContainText(
+    'Listeleme',
+  );
+  await signOut(page, people.admin.fullName);
+});
+
 async function readDownload(download: Download): Promise<Buffer> {
   const stream = await download.createReadStream();
   const chunks: Buffer[] = [];

@@ -4,6 +4,7 @@ import CategoryOutlined from '@mui/icons-material/CategoryOutlined';
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
 import FactCheckOutlined from '@mui/icons-material/FactCheckOutlined';
+import PolicyOutlined from '@mui/icons-material/PolicyOutlined';
 import CloudSyncOutlined from '@mui/icons-material/CloudSyncOutlined';
 import RuleRounded from '@mui/icons-material/RuleRounded';
 import ManageAccountsOutlined from '@mui/icons-material/ManageAccountsOutlined';
@@ -92,6 +93,12 @@ export const navigation: NavSection[] = [
         label: 'nav.referenceData',
         icon: CategoryOutlined,
         permission: permissions.referenceView,
+      },
+      {
+        to: routes.auditLog,
+        label: 'nav.auditLog',
+        icon: PolicyOutlined,
+        permission: permissions.auditLogView,
       },
     ],
   },

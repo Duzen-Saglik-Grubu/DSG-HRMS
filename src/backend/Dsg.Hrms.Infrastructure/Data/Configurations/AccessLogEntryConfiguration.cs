@@ -51,5 +51,8 @@ public sealed class AccessLogEntryConfiguration : IEntityTypeConfiguration<Acces
             .HasFilter("access_type IN ('Export', 'Report')");
 
         builder.HasIndex(entry => entry.TraceId);
+
+        // Denetim kayitlari ekrani: zamana gore yeniden eskiye (SYG-PERS-069).
+        builder.HasIndex(entry => entry.OccurredAt);
     }
 }
