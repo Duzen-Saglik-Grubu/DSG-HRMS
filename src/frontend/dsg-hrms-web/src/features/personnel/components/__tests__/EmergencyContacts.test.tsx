@@ -56,7 +56,7 @@ describe('EmergencyContacts', () => {
   });
 
   it('duzenleme hakki yoksa ekleme, duzenleme ve silme dugmesi yoktur', () => {
-    // Kisinin kendisi gorur ama degistiremez (PG-PERS-44).
+    // Giris izni olmayan kisi gorur ama degistiremez (PG-PERS-44, KR-137).
     renderWithProviders(<EmergencyContacts personId="p-1" contacts={[SPOUSE]} editable={false} />);
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();

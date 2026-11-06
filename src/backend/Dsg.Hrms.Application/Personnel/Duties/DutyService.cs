@@ -45,7 +45,8 @@ public sealed record DutyEntry(Guid Id, string Name, DateOnly ValidFrom, DateOnl
 
 /// <summary>
 /// Kisiye gorev girisi ve silme (PG-PERS-43; SYG-PERS-042). IK ve Sistem Yoneticisi
-/// (<c>personnel.person.update</c>) yapar; degisiklik denetim izine yazilir.
+/// (<c>personnel.person.update</c>) yapar; degisiklik denetim izine yazilir. Izni olan kullanici
+/// kendi siciline de gorev girer (<c>KR-137</c>).
 /// </summary>
 /// <remarks>
 /// Kisi once kapsamli sorgudan okunur: kapsam disi veya olmayan kisi icin kart ile ayni

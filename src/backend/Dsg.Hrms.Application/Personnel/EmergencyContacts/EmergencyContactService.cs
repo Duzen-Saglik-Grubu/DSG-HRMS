@@ -41,8 +41,9 @@ public sealed record RelationshipDefinition(long Id, Guid PublicId, string Name,
 /// <remarks>
 /// <para>
 /// Kisi once kapsamli sorgudan okunur: kapsam disi veya olmayan kisi icin kart ile ayni <c>404</c>
-/// doner (SYG-PERS-051). Kisinin kendisi kartinda gorur ama degistiremez; bu, izin olmadan ucun
-/// <c>403</c> donmesiyle saglanir.
+/// doner (SYG-PERS-051). Giris izni olmayan kisi kendi kartinda gorur ama degistiremez; bu, izin
+/// olmadan ucun <c>403</c> donmesiyle saglanir. Giris izni olan kullanici kendi kaydini da girer
+/// (<c>KR-137</c>).
 /// </para>
 /// <para>
 /// Yakinlik referans verideki aktif bir tanimdan secilir (<c>KR-135</c>). Kaydin mevcut tanimi
