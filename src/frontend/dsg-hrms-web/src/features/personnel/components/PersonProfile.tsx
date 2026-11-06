@@ -24,7 +24,8 @@ export function PersonProfile({ person }: { person: PersonCard }) {
   const primary = employments[0];
   const [reporting, setReporting] = useState(false);
   const [sent, setSent] = useState(false);
-  // Kisinin kendisi kendi acil durum kisilerini degistiremez (PG-PERS-44).
+  // Gorev ve acil durum kisisi girisi izinle yapilir; izni olan kendi kaydini da girer (KR-137).
+  // Izni olmayan kisi kendi kartinda gorur ama degistiremez (PG-PERS-44).
   const canEdit = usePermission(permissions.personUpdate);
 
   return (
@@ -66,7 +67,7 @@ export function PersonProfile({ person }: { person: PersonCard }) {
                 <EmergencyContacts
                   personId={person.personId}
                   contacts={person.sensitive.emergencyContacts}
-                  editable={canEdit && !person.isSelf}
+                  editable={canEdit}
                 />
               </Section>
             ) : null}

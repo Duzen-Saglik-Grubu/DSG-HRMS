@@ -53,13 +53,13 @@ const EMPTY: EmergencyContactInput = {
 interface EmergencyContactsProps {
   personId: string;
   contacts: EmergencyContact[];
-  /** Ekleme, duzenleme ve silme (`personnel.person.update`); kisinin kendi kartinda yoktur. */
+  /** Ekleme, duzenleme ve silme (`personnel.person.update`); izni olan kendi kartinda da yapar (KR-137). */
   editable: boolean;
 }
 
 /**
  * Kartin "Acil Durum Kisileri" bolumu (PG-PERS-44; SYG-PERS-043). Bolum yalnizca gorme hakki
- * olana gelir (SYG-PERS-052). Kisinin kendisi gorur ama degistiremez.
+ * olana gelir (SYG-PERS-052). Giris izni olmayan kisi kendi kartinda gorur ama degistiremez.
  */
 export function EmergencyContacts({ personId, contacts, editable }: EmergencyContactsProps) {
   const { t } = useTranslation();

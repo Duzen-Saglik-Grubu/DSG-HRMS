@@ -123,6 +123,25 @@ public sealed class EmploymentDutiesApiTests : IClassFixture<Identity.Registrati
     }
 
     [Fact]
+    public async Task User_with_the_update_permission_assigns_own_duty_and_it_is_audited()
+    {
+        // KR-137 (#355): giris izni olan kullanici kendi siciline de gorev girer.
+        var (client, token) = await HrAsync();
+        using (client)
+        {
+            var self = $"/api/v1/personnel/persons/{await PersonIdAsync(1)}/employments/00001/duties";
+            var (status, duty) = await SendAsync(client, HttpMethod.Post, self, token, new { definitionId = _biologist, validFrom = "2021-01-01" });
+            status.ShouldBe(HttpStatusCode.Created);
+            var id = duty.GetProperty("id").GetGuid();
+
+            var me = (await SendAsync(client, HttpMethod.Get, "/api/v1/personnel/persons/me", token)).Body;
+            me.GetProperty("employments")[0].GetProperty("duty").GetProperty("name").GetString().ShouldBe("Biyolog");
+            (await _fixture.WithDbAsync(context => context.ChangeLog.CountAsync(e => e.EntityName == nameof(EmploymentDuty) && e.EntityId == id && e.Operation == AuditOperation.Insert)))
+                .ShouldBe(1);
+        }
+    }
+
+    [Fact]
     public async Task Only_the_update_permission_can_assign_and_scope_still_applies()
     {
         // PG-PERS-43: yetkisi olmayan kullanici gorevi degistiremez. Izni olsa da kapsam disi kisi 404 alir.

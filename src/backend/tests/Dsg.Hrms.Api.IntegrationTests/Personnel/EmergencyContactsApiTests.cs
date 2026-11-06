@@ -165,7 +165,7 @@ public sealed class EmergencyContactsApiTests : IClassFixture<Identity.Registrat
     [Fact]
     public async Task The_person_sees_own_contacts_on_profile_but_cannot_change_them()
     {
-        // SYG-PERS-044: kisinin kendisi gorur; PG-PERS-44: degistiremez.
+        // SYG-PERS-044: kisinin kendisi gorur; PG-PERS-44: giris izni olmayan degistiremez (KR-137).
         var self = await AddDirectlyAsync(1);
         using var client = _fixture.CreateClient();
         var token = await SignInAsync(client);
@@ -177,6 +177,27 @@ public sealed class EmergencyContactsApiTests : IClassFixture<Identity.Registrat
         (await SendAsync(client, HttpMethod.Put, $"{Contacts(person)}/{self}", token, Contact(Spouse, "Ayşe", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.Forbidden);
         (await SendAsync(client, HttpMethod.Post, Contacts(person), token, Contact(Spouse, "Ayşe", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.Forbidden);
         (await SendAsync(client, HttpMethod.Delete, $"{Contacts(person)}/{self}", token)).Status.ShouldBe(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task User_with_the_update_permission_enters_own_contacts_and_it_is_audited()
+    {
+        // KR-137 (#355): giris izni olan kullanici kendi acil durum kisilerini de girer.
+        var (client, token) = await HrAsync();
+        using (client)
+        {
+            var self = await PersonIdAsync(1);
+            var (status, added) = await SendAsync(client, HttpMethod.Post, Contacts(self), token, Contact(Spouse, "Ayşe", "Deniz", Phone));
+            status.ShouldBe(HttpStatusCode.Created);
+            var id = added.GetProperty("id").GetGuid();
+
+            (await SendAsync(client, HttpMethod.Put, $"{Contacts(self)}/{id}", token, Contact(Mother, "Fatma", "Deniz", Phone))).Status.ShouldBe(HttpStatusCode.OK);
+            var me = (await SendAsync(client, HttpMethod.Get, "/api/v1/personnel/persons/me", token)).Body;
+            me.GetProperty("sensitive").GetProperty("emergencyContacts")[0].GetProperty("firstName").GetString().ShouldBe("Fatma");
+
+            (await SendAsync(client, HttpMethod.Delete, $"{Contacts(self)}/{id}", token)).Status.ShouldBe(HttpStatusCode.NoContent);
+            (await _fixture.WithDbAsync(context => context.ChangeLog.CountAsync(e => e.EntityName == nameof(EmergencyContact) && e.EntityId == id))).ShouldBe(3);
+        }
     }
 
     [Fact]

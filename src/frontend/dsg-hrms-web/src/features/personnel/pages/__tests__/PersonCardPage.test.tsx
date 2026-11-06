@@ -275,6 +275,31 @@ describe('Profilim', () => {
     expect(screen.queryByRole('button', { name: "İK'ya bildir" })).not.toBeInTheDocument();
   });
 
+  it('giris izni olan kendi gorevini ve acil durum kisilerini girer; izni olmayan yalnizca gorur (KR-137)', async () => {
+    await setSession({ status: 'authenticated' });
+    vi.spyOn(personsApi, 'me').mockResolvedValue(person({ isSelf: true }));
+
+    const plain = renderAt(routes.profile);
+    const emergency = await screen.findByRole('region', { name: 'Acil Durum Kişileri' });
+    expect(within(emergency).queryByRole('button')).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole('region', { name: 'Çalışma Hayatı' })).queryByRole('button', {
+        name: /görev ata/,
+      }),
+    ).not.toBeInTheDocument();
+    plain.unmount();
+
+    await setSession({ status: 'authenticated', permissions: [permissions.personUpdate] });
+    renderAt(routes.profile);
+    const own = await screen.findByRole('region', { name: 'Acil Durum Kişileri' });
+    expect(within(own).getByRole('button', { name: 'Acil durum kişisi ekle' })).toBeVisible();
+    expect(
+      within(screen.getByRole('region', { name: 'Çalışma Hayatı' })).getByRole('button', {
+        name: '00012 siciline görev ata',
+      }),
+    ).toBeVisible();
+  });
+
   it('kendi fotografi "me" ucundan gelir (SYG-PERS-041)', async () => {
     await setSession({ status: 'authenticated' });
     vi.spyOn(personsApi, 'me').mockResolvedValue(person({ isSelf: true, hasPhoto: true }));
