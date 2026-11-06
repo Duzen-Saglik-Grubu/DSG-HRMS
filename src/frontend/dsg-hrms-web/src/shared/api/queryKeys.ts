@@ -15,6 +15,8 @@ export const queryKeys = {
     persons: ['personnel', 'persons'] as const,
     list: (query: string) => ['personnel', 'persons', query] as const,
     filterOptions: ['personnel', 'filter-options'] as const,
+    /** Butun kart sorgulari: kisi karti ve Profilim (#357). */
+    cards: ['personnel', 'card'] as const,
     card: (personId: string) => ['personnel', 'card', personId] as const,
     me: ['personnel', 'card', 'me'] as const,
     photo: (personId: string) => ['personnel', 'photo', personId] as const,

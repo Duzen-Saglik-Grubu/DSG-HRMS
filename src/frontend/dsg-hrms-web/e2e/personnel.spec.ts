@@ -369,6 +369,29 @@ test('9. gorev girisi: yonetici kisinin siciline gorev atar; ise giristen onceki
   await signOut(page, people.admin.fullName);
 });
 
+test('10. Profilim: giris izni olan yonetici kendine acil durum kisisi ekler; sayfa yenilenmeden gorunur (KR-137, #357)', async ({
+  page,
+}) => {
+  await signIn(page, people.admin.email, passwords.first);
+  await page.getByRole('link', { name: 'Profilim' }).click();
+
+  const own = page.getByRole('region', { name: 'Acil Durum Kişileri' });
+  await own.getByRole('button', { name: 'Acil durum kişisi ekle' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Acil durum kişisi ekle' });
+  await dialog.getByRole('combobox', { name: /Yakınlığı/ }).click();
+  await page.getByRole('option', { name: 'Eşi', exact: true }).click();
+  await dialog.getByRole('textbox', { name: /^Adı/ }).fill('Selin');
+  await dialog.getByRole('textbox', { name: /Soyadı/ }).fill('Yonetici');
+  await dialog.getByRole('textbox', { name: /Cep telefonu/ }).fill('532 222 33 44');
+  await dialog.getByRole('button', { name: 'Kaydet' }).click();
+
+  // Kayit sayfa elle yenilenmeden gorunur (#357).
+  await expect(dialog).toHaveCount(0);
+  await expect(own).toContainText('Selin Yonetici');
+  await expect(own).toContainText('Eşi · 532 222 33 44');
+  await signOut(page, people.admin.fullName);
+});
+
 async function readDownload(download: Download): Promise<Buffer> {
   const stream = await download.createReadStream();
   const chunks: Buffer[] = [];
