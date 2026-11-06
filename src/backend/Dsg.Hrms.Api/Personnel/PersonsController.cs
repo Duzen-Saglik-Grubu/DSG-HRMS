@@ -483,10 +483,8 @@ public sealed record PersonCardResponse(
     /// <summary>Fotografi var mi; varsa <c>/persons/{personId}/photo</c> (kendi kartinda <c>/persons/me/photo</c>) ucundan alinir.</summary>
     public required bool HasPhoto { get; init; }
 
-    /// <summary>
-    /// Evlilik bilgisi (SYG-PERS-036); yalnizca <c>view_sensitive</c> izni olana yazilir, kisinin
-    /// kendisi dahil digerlerinin yanitinda alan HIC YOKTUR (ADR-0019 §2).
-    /// </summary>
+    /// <summary>Evlilik bilgisi (SYG-PERS-036); yalnizca <c>view_sensitive</c> izniyle yazilir, digerlerinde alan yoktur (ADR-0019 §2).</summary>
+    /// <remarks>Kisinin kendisi de izni yoksa bu alani almaz.</remarks>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public MarriageResponse? Marriage { get; init; }
 

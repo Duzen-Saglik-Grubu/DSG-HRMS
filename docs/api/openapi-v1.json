@@ -7093,7 +7093,7 @@
                 "type": "null"
               },
               {
-                "description": "Evlilik bilgisi (SYG-PERS-036); yalnizca `view_sensitive` izni olana yazilir, kisinin\r\nkendisi dahil digerlerinin yanitinda alan HIC YOKTUR (ADR-0019 §2).",
+                "description": "Evlilik bilgisi (SYG-PERS-036); yalnizca `view_sensitive` izniyle yazilir, digerlerinde alan yoktur (ADR-0019 §2).",
                 "$ref": "#/components/schemas/MarriageResponse"
               }
             ]
