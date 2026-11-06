@@ -115,6 +115,20 @@ public sealed class ReferenceDefinition : Entity, IAuditable
         return true;
     }
 
+    /// <summary>Pasif tanimi yeniden aktif eder; zaten aktifse <c>false</c> (<c>KR-136</c>).</summary>
+    /// <exception cref="InvalidOperationException">Sistem taniminda.</exception>
+    public bool Reactivate()
+    {
+        EnsureEditable();
+        if (IsActive)
+        {
+            return false;
+        }
+
+        IsActive = true;
+        return true;
+    }
+
     private void EnsureEditable()
     {
         if (IsSystem)

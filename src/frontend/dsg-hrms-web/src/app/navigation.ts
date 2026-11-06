@@ -1,5 +1,6 @@
 import type { SvgIconComponent } from '@mui/icons-material';
 import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
+import CategoryOutlined from '@mui/icons-material/CategoryOutlined';
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
 import FactCheckOutlined from '@mui/icons-material/FactCheckOutlined';
@@ -85,6 +86,12 @@ export const navigation: NavSection[] = [
         label: 'nav.parameters',
         icon: TuneRounded,
         permission: permissions.parameterView,
+      },
+      {
+        to: routes.referenceData,
+        label: 'nav.referenceData',
+        icon: CategoryOutlined,
+        permission: permissions.referenceView,
       },
     ],
   },

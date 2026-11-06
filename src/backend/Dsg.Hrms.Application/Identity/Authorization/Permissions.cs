@@ -96,8 +96,8 @@ public static class Permissions
         [CorrectionUpdate] = "Düzeltme taleplerini kapatma",
         [QualityView] = "Veri kalitesi raporunu görme",
         [QualityExport] = "Veri kalitesi raporunu dışa aktarma",
-        [ReferenceView] = "Ünvan ve görev tanımlarını görme",
-        [ReferenceUpdate] = "Ünvan ve görev tanımlarını değiştirme",
+        [ReferenceView] = "Ünvan, görev, kan grubu ve yakınlık tanımlarını görme",
+        [ReferenceUpdate] = "Ünvan, görev ve yakınlık tanımlarını değiştirme",
         [AuditLogView] = "Denetim kayıtlarını görme",
     };
 

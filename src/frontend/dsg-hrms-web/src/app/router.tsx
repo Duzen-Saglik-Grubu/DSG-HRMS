@@ -58,6 +58,12 @@ const ParametersPage = lazy(async () => {
   return { default: page.ParametersPage };
 });
 
+const ReferenceDataPage = lazy(async () => {
+  const page = await import('@/features/reference/pages/ReferenceDataPage');
+
+  return { default: page.ReferenceDataPage };
+});
+
 const PersonListPage = lazy(async () => {
   const page = await import('@/features/personnel/pages/PersonListPage');
 
@@ -179,6 +185,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<RouteFallback />}>
             <ParametersPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: routes.referenceData,
+        element: (
+          <Suspense fallback={<RouteFallback />}>
+            <ReferenceDataPage />
           </Suspense>
         ),
       },

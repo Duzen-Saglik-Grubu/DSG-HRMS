@@ -15,6 +15,7 @@ export const routes = {
   accounts: '/accounts',
   invite: '/invite',
   parameters: '/system/parameters',
+  referenceData: '/system/reference-data',
   personnel: '/personnel',
   corrections: '/personnel/corrections',
   quality: '/personnel/quality',

@@ -262,6 +262,62 @@ test('7. acil durum kisisi: yonetici girer, personel kendi profilinde gorur ama 
   await signOut(page, people.unprivileged.fullName);
 });
 
+test('8. referans veri: yonetici yakinlik ekler, pasife alir ve yeniden aktif eder; acil durum formu yeni listeyi kullanir (SYG-PERS-072)', async ({
+  page,
+}) => {
+  await signIn(page, people.admin.email, passwords.first);
+  await page.getByRole('link', { name: 'Referans veri', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Referans veri' })).toBeVisible();
+  await page.getByRole('tab', { name: 'Yakınlık' }).click();
+  await expect(page.getByRole('row', { name: /Y001 Eşi/ })).toBeVisible();
+
+  // Yeni tanim: kod bos birakilir, sunucu siradakini verir (KR-135).
+  await page.getByRole('button', { name: 'Yeni yakınlık' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Yeni yakınlık tanımı' });
+  await dialog.getByRole('textbox', { name: /^Ad/ }).fill('Teyzesi');
+  await dialog.getByRole('button', { name: 'Kaydet' }).click();
+  await expect(page.getByText('“Teyzesi” eklendi (kod Y005).')).toBeVisible();
+
+  // Pasife alinan tanim listede kalir ama yeni secimde gorunmez.
+  await page.getByRole('button', { name: 'Kardeşi tanımını pasife al' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Pasife al' }).click();
+  await expect(page.getByRole('row', { name: /Kardeşi/ })).toContainText('Pasif');
+
+  // Kan grubu sistem tanimidir; sekmede degistirme dugmesi yoktur (KR-129).
+  await page.getByRole('tab', { name: 'Kan grubu' }).click();
+  await expect(page.getByText(/ekrandan değiştirilemez/)).toBeVisible();
+  await expect(page.getByRole('tabpanel').getByRole('button')).toHaveCount(0);
+
+  await page.getByRole('link', { name: 'Personel listesi', exact: true }).click();
+  await page.getByLabel(/Ad, soyad, sicil/).fill('izinsiz');
+  await page.getByRole('button', { name: 'Tablo görünümü' }).click();
+  await page
+    .getByRole('row', { name: /Zeynep/ })
+    .getByRole('link', { name: 'Zeynep' })
+    .click();
+  await page
+    .getByRole('region', { name: 'Acil Durum Kişileri' })
+    .getByRole('button', { name: 'Acil durum kişisi ekle' })
+    .click();
+  await page
+    .getByRole('dialog', { name: 'Acil durum kişisi ekle' })
+    .getByRole('combobox', { name: /Yakınlığı/ })
+    .click();
+  await expect(page.getByRole('option', { name: 'Teyzesi' })).toBeVisible();
+  await expect(page.getByRole('option', { name: 'Kardeşi' })).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape');
+
+  // Yanlislikla pasife alinan tanim yeniden aktif edilir (KR-136).
+  await page.getByRole('link', { name: 'Referans veri', exact: true }).click();
+  await page.getByRole('tab', { name: 'Yakınlık' }).click();
+  await page.getByRole('button', { name: 'Kardeşi tanımını yeniden aktif et' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Yeniden aktif et' }).click();
+  await expect(page.getByText('“Kardeşi” yeniden aktif edildi.')).toBeVisible();
+  await expect(page.getByRole('row', { name: /Kardeşi/ })).toContainText('Aktif');
+  await signOut(page, people.admin.fullName);
+});
+
 async function readDownload(download: Download): Promise<Buffer> {
   const stream = await download.createReadStream();
   const chunks: Buffer[] = [];

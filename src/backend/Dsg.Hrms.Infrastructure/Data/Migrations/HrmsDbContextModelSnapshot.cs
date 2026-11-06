@@ -2870,12 +2870,12 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         new
                         {
                             Code = "reference.definition.view",
-                            Description = "Ünvan ve görev tanımlarını görme"
+                            Description = "Ünvan, görev, kan grubu ve yakınlık tanımlarını görme"
                         },
                         new
                         {
                             Code = "reference.definition.update",
-                            Description = "Ünvan ve görev tanımlarını değiştirme"
+                            Description = "Ünvan, görev ve yakınlık tanımlarını değiştirme"
                         },
                         new
                         {

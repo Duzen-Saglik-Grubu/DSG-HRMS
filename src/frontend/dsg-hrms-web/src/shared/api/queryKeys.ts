@@ -34,6 +34,10 @@ export const queryKeys = {
     syncRuns: (page: number, pageSize: number) =>
       ['personnel', 'sync-runs', page, pageSize] as const,
   },
+  reference: {
+    all: ['reference', 'definitions'] as const,
+    definitions: (type: string) => ['reference', 'definitions', type] as const,
+  },
   notifications: {
     all: ['notifications'] as const,
     inbox: ['notifications', 'inbox'] as const,

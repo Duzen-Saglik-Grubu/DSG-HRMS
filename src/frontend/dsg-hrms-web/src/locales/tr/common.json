@@ -18,6 +18,7 @@
     },
     "accounts": "Hesap işlemleri",
     "parameters": "Sistem parametreleri",
+    "referenceData": "Referans veri",
     "collapse": "Menüyü daralt",
     "expand": "Menüyü genişlet",
     "myAccount": "Hesabım",
@@ -399,6 +400,55 @@
       "uploaded": "Logo yüklendi.",
       "removed": "Varsayılan logoya dönüldü."
     }
+  },
+  "reference": {
+    "title": "Referans veri",
+    "subtitle": "Ünvan, görev ve yakınlık listelerini yönetin. Tanım silinmez; pasife alınan tanım yeni girişte seçilemez, geçmiş kayıtlarda adıyla görünür ve yeniden aktif edilebilir. Değişiklikler denetim kaydına yazılır.",
+    "types": "Tanım türleri",
+    "type": {
+      "title": "Ünvan",
+      "duty": "Görev",
+      "relationship": "Yakınlık",
+      "bloodGroup": "Kan grubu"
+    },
+    "hint": {
+      "title": "Ünvan kodu LOGO'daki ünvan kodudur.",
+      "duty": "Personelin görev tanımları.",
+      "relationship": "Acil durum kişisinin yakınlığı."
+    },
+    "systemType": "Kan grubu tanımları LOGO kodlarının karşılıklarıdır ve ekrandan değiştirilemez. Bir adın yanlış düzenlenmesi herkesin sağlık verisini yanlış gösterirdi.",
+    "caption": "{{type}} tanımları",
+    "columns": {
+      "code": "Kod",
+      "name": "Ad",
+      "status": "Durum",
+      "actions": "İşlemler"
+    },
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "empty": "Bu türde tanım yok.",
+    "add": "Yeni {{type}}",
+    "addTitle": "Yeni {{type}} tanımı",
+    "rename": "Adını değiştir",
+    "renameNamed": "{{name}} tanımının adını değiştir",
+    "renameTitle": "Tanımın adını değiştir",
+    "renameText": "Kod ({{code}}) değişmez. Yeni ad, bu tanımı kullanan bütün kayıtlarda görünür.",
+    "deactivate": "Pasife al",
+    "deactivateNamed": "{{name}} tanımını pasife al",
+    "deactivateTitle": "Tanımı pasife al",
+    "deactivateText": "“{{name}}” tanımı pasife alınacak. Yeni girişte seçilemez; geçmiş kayıtlarda adıyla görünmeye devam eder. Daha sonra yeniden aktif edebilirsiniz.",
+    "reactivate": "Yeniden aktif et",
+    "reactivateNamed": "{{name}} tanımını yeniden aktif et",
+    "reactivateTitle": "Tanımı yeniden aktif et",
+    "reactivateText": "“{{name}}” tanımı yeniden aktif edilecek ve yeni girişte seçilebilecek. Kodu ve adı değişmez.",
+    "codeHintTitle": "LOGO'daki ünvan kodu. Sonradan değiştirilemez.",
+    "codeHintAuto": "Boş bırakılırsa otomatik verilir. Sonradan değiştirilemez.",
+    "required": "Bu alanı doldurun.",
+    "save": "Kaydet",
+    "created": "“{{name}}” eklendi (kod {{code}}).",
+    "renamed": "Ad “{{name}}” olarak değiştirildi.",
+    "deactivated": "“{{name}}” pasife alındı.",
+    "reactivated": "“{{name}}” yeniden aktif edildi."
   },
   "notifications": {
     "title": "Bildirimler",
