@@ -150,6 +150,7 @@ function DefinitionList({ type, canUpdate }: DefinitionListProps) {
       queryClient.invalidateQueries({ queryKey: queryKeys.reference.all }),
       queryClient.invalidateQueries({ queryKey: queryKeys.personnel.filterOptions }),
       queryClient.invalidateQueries({ queryKey: queryKeys.personnel.emergencyRelationships }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.personnel.dutyOptions }),
     ]);
   };
 

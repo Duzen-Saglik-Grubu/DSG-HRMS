@@ -172,6 +172,35 @@ describe('PersonCardPage', () => {
     expect(within(work).getByText('1 Yıl 0 Ay 0 Gün')).toBeInTheDocument();
   });
 
+  it('gorev girme izni olan her sicilde gorev atar; izni olmayan dugme gormez (SYG-PERS-042)', async () => {
+    vi.spyOn(personsApi, 'card').mockResolvedValue(person());
+    const view = renderAt('/personnel/p-1');
+
+    const work = await screen.findByRole('region', { name: 'Çalışma Hayatı' });
+    expect(within(work).getByText('Biyolog')).toBeInTheDocument();
+    expect(within(work).queryByRole('button', { name: /görev ata/ })).not.toBeInTheDocument();
+    view.unmount();
+
+    await setSession({
+      status: 'authenticated',
+      permissions: [permissions.personView, permissions.personUpdate],
+    });
+    const user = userEvent.setup();
+    renderAt('/personnel/p-1');
+
+    const editable = await screen.findByRole('region', { name: 'Çalışma Hayatı' });
+    expect(
+      within(editable).getByRole('button', { name: '00012 siciline görev ata' }),
+    ).toBeVisible();
+    expect(within(editable).getByRole('button', { name: 'Biyolog görevini sil' })).toBeVisible();
+
+    // Iki sicilli kiside her sicilin gorevi ayridir.
+    await user.click(screen.getAllByRole('tab')[1]!);
+    expect(
+      within(editable).getByRole('button', { name: '00004 siciline görev ata' }),
+    ).toBeVisible();
+  });
+
   it('tek istihdamda sekme cubugu gosterilmez', async () => {
     vi.spyOn(personsApi, 'card').mockResolvedValue(person({ employments: [ACTIVE] }));
     renderAt('/personnel/p-1');

@@ -8,6 +8,7 @@ import { displayDate, joinParts, orderEmployments } from '../display';
 import { permissions } from '@/shared/auth/permissions';
 import { usePermission } from '@/shared/auth/usePermission';
 import { PersonAvatar } from '@/shared/components/PersonAvatar';
+import { DutyField } from './DutyField';
 import { EmergencyContacts } from './EmergencyContacts';
 import { ReportToHrDialog } from './ReportToHrDialog';
 import { SyncFreshness } from './SyncFreshness';
@@ -72,7 +73,11 @@ export function PersonProfile({ person }: { person: PersonCard }) {
           </Stack>
         </Grid>
         <Grid size={{ xs: 12, md: 7 }}>
-          <Employments employments={employments} />
+          <Employments
+            personId={person.personId}
+            employments={employments}
+            canAssignDuty={canEdit}
+          />
         </Grid>
       </Grid>
     </Stack>
@@ -288,7 +293,16 @@ function ContactInfo({ person }: { person: PersonCard }) {
 /**
  * Her istihdam bir sekmedir; tek istihdamda sekme cubugu gosterilmez (SYG-PERS-017).
  */
-function Employments({ employments }: { employments: EmploymentCard[] }) {
+function Employments({
+  personId,
+  employments,
+  canAssignDuty,
+}: {
+  personId: string;
+  employments: EmploymentCard[];
+  /** Gorev girisi (SYG-PERS-042; `personnel.person.update`). */
+  canAssignDuty: boolean;
+}) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const current = employments[Math.min(index, employments.length - 1)];
@@ -322,14 +336,24 @@ function Employments({ employments }: { employments: EmploymentCard[] }) {
         </Tabs>
       ) : null}
       <Box sx={{ p: 2.5 }} role={employments.length > 1 ? 'tabpanel' : undefined}>
-        {current ? <WorkLife employment={current} /> : null}
+        {current ? (
+          <WorkLife personId={personId} employment={current} canAssignDuty={canAssignDuty} />
+        ) : null}
       </Box>
     </Paper>
   );
 }
 
 /** "Calisma Hayati" (SYG-PERS-038, 039). */
-function WorkLife({ employment }: { employment: EmploymentCard }) {
+function WorkLife({
+  personId,
+  employment,
+  canAssignDuty,
+}: {
+  personId: string;
+  employment: EmploymentCard;
+  canAssignDuty: boolean;
+}) {
   const { t } = useTranslation();
   const field = (name: string) => t(`personnel.card.fields.${name}`);
   const work = employment.workLife;
@@ -342,7 +366,21 @@ function WorkLife({ employment }: { employment: EmploymentCard }) {
       <WorkField label={field('department')} value={work?.departmentName} />
       {/* Unvan referans verideki karsiligiyla; karsiligi olmayan kod bos gorunur (SYG-PERS-038). */}
       <WorkField label={field('title')} value={work?.titleName} />
-      <WorkField label={field('duty')} value={employment.duty?.name} />
+      {/* Gorev HRMS'te girilir; izni olan alandan atar veya yanlis girisi siler (SYG-PERS-042). */}
+      <WorkField
+        label={field('duty')}
+        value={
+          canAssignDuty ? (
+            <DutyField
+              personId={personId}
+              registryCode={employment.registryCode}
+              duty={employment.duty}
+            />
+          ) : (
+            employment.duty?.name
+          )
+        }
+      />
       <WorkField
         label={field('status')}
         value={employment.isActive ? t('personnel.card.active') : t('personnel.card.terminated')}

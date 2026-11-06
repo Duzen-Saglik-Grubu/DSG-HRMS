@@ -27,6 +27,20 @@ public sealed class EmploymentDutiesController : ControllerBase
         _duties = duties;
     }
 
+    /// <summary>
+    /// Yeni secim icin aktif gorev tanimlari (referans veri). Giris izniyle okunur: referans veri
+    /// izni olmayan bir rol de formu kullanabilir (KR-135 ile ayni ilke).
+    /// </summary>
+    /// <response code="200">Tanimlar, siraya gore.</response>
+    /// <response code="403">Yetki yok (<c>personnel.person.update</c>).</response>
+    [HttpGet("/api/v1/personnel/duty-options")]
+    [HasPermission(Permissions.PersonUpdate)]
+    [ProducesResponseType<IReadOnlyList<DutyOptionResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    public async Task<IReadOnlyList<DutyOptionResponse>> ListOptionsAsync(CancellationToken cancellationToken) =>
+        [.. (await _duties.ListOptionsAsync(cancellationToken)).Select(d => new DutyOptionResponse(d.Id, d.Name))];
+
     /// <summary>Istihdama gorev atar; onceki acik gorev yeni baslangicla kapanir.</summary>
     /// <response code="201">Gecerli gorev kaydi.</response>
     /// <response code="400">Gorev tanimi secilmedi.</response>
@@ -69,9 +83,14 @@ public sealed class EmploymentDutiesController : ControllerBase
 }
 
 /// <summary>Gorev atama istegi.</summary>
-/// <param name="DefinitionId">Gorev taniminin dis kimligi (referans veri, tur gorev).</param>
+/// <param name="DefinitionId">Gorev taniminin dis kimligi (aktif tanimlar: <c>GET /api/v1/personnel/duty-options</c>).</param>
 /// <param name="ValidFrom">Baslangic; verilmezse bugun.</param>
 public sealed record AssignDutyRequest(Guid DefinitionId, DateOnly? ValidFrom);
+
+/// <summary>Secilebilir gorev tanimi.</summary>
+/// <param name="Id">Tanimin dis kimligi; atama isteginde <c>definitionId</c> olarak gonderilir.</param>
+/// <param name="Name">Gorev.</param>
+public sealed record DutyOptionResponse(Guid Id, string Name);
 
 /// <summary>Gorev kaydi.</summary>
 /// <param name="Id">Dis kimlik.</param>

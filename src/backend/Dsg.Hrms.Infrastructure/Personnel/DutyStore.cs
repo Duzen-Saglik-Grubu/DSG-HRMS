@@ -24,6 +24,17 @@ public sealed class DutyStore(HrmsDbContext context) : IDutyStore
             .ConfigureAwait(false);
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<DutyOption>> ListActiveDutyDefinitionsAsync(CancellationToken cancellationToken) =>
+        await context.Set<ReferenceDefinition>()
+            .AsNoTracking()
+            .Where(d => d.Type == ReferenceType.Duty && d.IsActive)
+            .OrderBy(d => d.SortOrder)
+            .ThenBy(d => d.Name)
+            .Select(d => new DutyOption(d.PublicId, d.Name))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+    /// <inheritdoc />
     public async Task<(long Id, string Name)?> FindActiveDutyDefinitionAsync(Guid definitionId, CancellationToken cancellationToken)
     {
         var definition = await context.Set<ReferenceDefinition>()

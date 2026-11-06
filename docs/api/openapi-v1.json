@@ -1633,6 +1633,49 @@
         }
       }
     },
+    "/api/v1/personnel/duty-options": {
+      "get": {
+        "tags": [
+          "EmploymentDuties"
+        ],
+        "summary": "Yeni secim icin aktif gorev tanimlari (referans veri). Giris izniyle okunur: referans veri\nizni olmayan bir rol de formu kullanabilir (KR-135 ile ayni ilke).",
+        "responses": {
+          "200": {
+            "description": "Tanimlar, siraya gore.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DutyOptionResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.person.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties": {
       "post": {
         "tags": [
@@ -5147,7 +5190,7 @@
         "properties": {
           "definitionId": {
             "type": "string",
-            "description": "Gorev taniminin dis kimligi (referans veri, tur gorev).",
+            "description": "Gorev taniminin dis kimligi (aktif tanimlar: `GET /api/v1/personnel/duty-options`).",
             "format": "uuid"
           },
           "validFrom": {
@@ -5503,6 +5546,25 @@
           }
         },
         "description": "Rapor ekrani."
+      },
+      "DutyOptionResponse": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Tanimin dis kimligi; atama isteginde `definitionId` olarak gonderilir.",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Gorev."
+          }
+        },
+        "description": "Secilebilir gorev tanimi."
       },
       "DutyResponse": {
         "required": [
