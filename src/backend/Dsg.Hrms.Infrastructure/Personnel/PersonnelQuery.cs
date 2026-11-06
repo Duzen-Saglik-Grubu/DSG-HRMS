@@ -534,6 +534,12 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
             };
         }
 
+        // Evlilik bilgisi yalnizca izinle; kisinin kendisi dahil degil (ADR-0019 §2).
+        if (PersonFieldVisibility.CanSeeMarriage(viewer))
+        {
+            record = record with { Marriage = await MarriageAsync(record.Id, cancellationToken).ConfigureAwait(false) };
+        }
+
         if (record.Employments.Count == 0)
         {
             return record;
@@ -654,6 +660,13 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
     }
 
     /// <summary>Kisinin silinmemis acil durum kisileri, eklenme sirasiyla (SYG-PERS-043).</summary>
+    private Task<MarriageRecord?> MarriageAsync(long personId, CancellationToken cancellationToken) =>
+        context.Set<PersonMarriage>()
+            .AsNoTracking()
+            .Where(m => m.PersonId == personId)
+            .Select(m => new MarriageRecord(m.MarriageDate, m.AllowanceReceived))
+            .SingleOrDefaultAsync(cancellationToken);
+
     private async Task<IReadOnlyList<EmergencyContactRecord>> EmergencyContactsAsync(long personId, CancellationToken cancellationToken) =>
         await (
             from c in context.Set<EmergencyContact>().AsNoTracking()

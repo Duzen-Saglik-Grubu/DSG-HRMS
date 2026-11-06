@@ -19,7 +19,7 @@ namespace Dsg.Hrms.Architecture.Tests;
 /// </remarks>
 public sealed class ProtectedPersonnelDataTests
 {
-    private static readonly string[] ProtectedTypes = [typeof(PersonSensitive).FullName!, typeof(EmergencyContact).FullName!];
+    private static readonly string[] ProtectedTypes = [typeof(PersonSensitive).FullName!, typeof(EmergencyContact).FullName!, typeof(PersonMarriage).FullName!];
 
     /// <summary>Korumali tiplere bagimli olabilen siniflar (ic ice tipler dis sinifla sayilir).</summary>
     private static readonly string[] Allowed =
@@ -44,6 +44,12 @@ public sealed class ProtectedPersonnelDataTests
         "Dsg.Hrms.Application.Personnel.EmergencyContacts.IEmergencyContactStore",
         "Dsg.Hrms.Application.Personnel.EmergencyContacts.EmergencyContactService",
         "Dsg.Hrms.Infrastructure.Personnel.EmergencyContactStore",
+        // Evlilik bilgisi: alan modeli, EF eslemesi ve IK girisi (SYG-PERS-036). Okuma PersonnelQuery'dedir.
+        "Dsg.Hrms.Domain.Personnel.PersonMarriage",
+        "Dsg.Hrms.Infrastructure.Data.Configurations.PersonMarriageConfiguration",
+        "Dsg.Hrms.Application.Personnel.Marriage.IMarriageStore",
+        "Dsg.Hrms.Application.Personnel.Marriage.MarriageService",
+        "Dsg.Hrms.Infrastructure.Personnel.MarriageStore",
     ];
 
     [Fact]

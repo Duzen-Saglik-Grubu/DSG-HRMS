@@ -25,6 +25,10 @@ VALUES
   ('20000000596', 'Zeynep', 'Izinsiz', '1988-03-21', 'e2e.izinsiz@duzen.com.tr', false, null, now(), gen_random_uuid())
 ON CONFLICT (national_id) DO NOTHING;
 
+-- Medeni hal LOGO'dan gelir (SYG-PERS-034). Evlilik bilgisi senaryosu icin Zeynep Izinsiz Evli
+-- (SYG-PERS-036); digerlerinde bos.
+UPDATE personnel.person SET marital_status = 1 WHERE national_id = '20000000596';
+
 -- Arama anahtari: kisiler senkronizasyonla geldiginde uygulama yazar (ADR-0021 §7). Burada kisiler
 -- SQL ile eklendigi icin T1SearchKeyTurkishLowercase migration'indaki kuralla doldurulur.
 UPDATE personnel.person

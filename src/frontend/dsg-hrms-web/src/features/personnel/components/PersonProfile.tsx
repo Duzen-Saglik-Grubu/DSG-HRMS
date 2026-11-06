@@ -11,6 +11,7 @@ import { usePermission } from '@/shared/auth/usePermission';
 import { PersonAvatar } from '@/shared/components/PersonAvatar';
 import { DutyField } from './DutyField';
 import { EmploymentHistoryDialog } from './EmploymentHistoryDialog';
+import { MarriageActions } from './MarriageActions';
 import { EmergencyContacts } from './EmergencyContacts';
 import { ReportToHrDialog } from './ReportToHrDialog';
 import { SyncFreshness } from './SyncFreshness';
@@ -58,7 +59,7 @@ export function PersonProfile({ person }: { person: PersonCard }) {
         <Grid size={{ xs: 12, md: 5 }}>
           <Stack spacing={2.5}>
             <Section title={t('personnel.card.sections.general')}>
-              <GeneralInfo person={person} />
+              <GeneralInfo person={person} canEdit={canEdit} />
             </Section>
             <Section title={t('personnel.card.sections.contact')}>
               <ContactInfo person={person} />
@@ -231,7 +232,7 @@ function Fields({ children }: { children: ReactNode }) {
   );
 }
 
-function GeneralInfo({ person }: { person: PersonCard }) {
+function GeneralInfo({ person, canEdit }: { person: PersonCard; canEdit: boolean }) {
   const { t } = useTranslation();
   const field = (name: string) => t(`personnel.card.fields.${name}`);
 
@@ -273,8 +274,39 @@ function GeneralInfo({ person }: { person: PersonCard }) {
       {person.sensitive ? (
         <Field label={field('bloodGroup')} value={person.sensitive.bloodGroup} />
       ) : null}
+      {/* Evlilik bilgisi yalnizca view_sensitive izniyle gelir; kisinin kendisi dahil degil (SYG-PERS-036). */}
+      {person.marriage ? (
+        <>
+          <Field
+            label={field('marriageDate')}
+            value={displayMarriageDate(person.marriage.marriageDate)}
+          />
+          <Field
+            label={field('marriageAllowance')}
+            value={
+              person.marriage.allowanceReceived === null
+                ? null
+                : t(
+                    person.marriage.allowanceReceived
+                      ? 'personnel.marriage.received'
+                      : 'personnel.marriage.notReceived',
+                  )
+            }
+          />
+          <MarriageActions
+            personId={person.personId}
+            marriage={person.marriage}
+            canEdit={canEdit}
+          />
+        </>
+      ) : null}
     </Fields>
   );
+}
+
+/** Evlilik tarihi; kayitli degilse alan "Kayitli degil" yazar. */
+function displayMarriageDate(value: string | null): string | null {
+  return value ? displayDate(value) : null;
 }
 
 function ContactInfo({ person }: { person: PersonCard }) {

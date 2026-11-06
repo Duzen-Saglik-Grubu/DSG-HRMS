@@ -131,8 +131,10 @@ public sealed class PersonCardApiTests : IClassFixture<Identity.RegistrationApiF
 
         card.EnumerateObject().Select(p => p.Name).ShouldBe(
             ["personId", "firstName", "lastName", "nationalId", "isNationalIdMasked", "birthDate", "age", "email", "mobilePhone", "isSelf", "employments",
-             "gender", "previousSurname", "maritalStatus", "educationName", "sensitive", "hasPhoto"]);
+             "gender", "previousSurname", "maritalStatus", "educationName", "sensitive", "hasPhoto", "marriage"]);
         card.GetProperty("sensitive").EnumerateObject().Select(p => p.Name).ShouldBe(["address", "bloodGroup", "emergencyContacts"]);
+        // SYG-PERS-036: evlilik bolumu yalnizca view_sensitive ile (ADR-0019 §2; MarriageApiTests).
+        card.GetProperty("marriage").EnumerateObject().Select(p => p.Name).ShouldBe(["marriageDate", "allowanceReceived", "editable"]);
     }
 
     [Fact]

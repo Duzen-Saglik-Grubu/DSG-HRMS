@@ -400,6 +400,44 @@ test('10. Profilim: giris izni olan yonetici kendine acil durum kisisi ekler; sa
   await signOut(page, people.admin.fullName);
 });
 
+test('11. evlilik bilgisi: yonetici Evli personele girer; personel kendi profilinde gormez (SYG-PERS-036)', async ({
+  page,
+}) => {
+  await signIn(page, people.admin.email, passwords.first);
+  await page.getByRole('link', { name: 'Personel listesi', exact: true }).click();
+  await page.getByLabel(/Ad, soyad, sicil/).fill('izinsiz');
+  await page.getByRole('button', { name: 'Tablo görünümü' }).click();
+  await page
+    .getByRole('row', { name: /Zeynep/ })
+    .getByRole('link', { name: 'Zeynep' })
+    .click();
+
+  const general = page.getByRole('region', { name: 'Genel Bilgiler' });
+  await general.getByRole('button', { name: 'Evlilik bilgisi gir' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Evlilik bilgisi' });
+  await dialog
+    .getByRole('group', { name: /Evlilik tarihi/ })
+    .getByRole('spinbutton')
+    .first()
+    .click();
+  await page.keyboard.type('20062015');
+  await dialog.getByRole('radio', { name: 'Aldı' }).check();
+  await dialog.getByRole('button', { name: 'Kaydet' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(general).toContainText('20.06.2015');
+  await expect(general).toContainText('Aldı');
+  await signOut(page, people.admin.fullName);
+
+  // Kisinin kendisi evlilik bilgisini gormez (ADR-0019 §2).
+  await signIn(page, people.unprivileged.email, passwords.first);
+  await page.getByRole('link', { name: 'Profilim' }).click();
+  const own = page.getByRole('region', { name: 'Genel Bilgiler' });
+  await expect(own).toContainText('Evli');
+  await expect(own).not.toContainText('Evlilik tarihi');
+  await expect(own).not.toContainText('20.06.2015');
+  await signOut(page, people.unprivileged.fullName);
+});
+
 async function readDownload(download: Download): Promise<Buffer> {
   const stream = await download.createReadStream();
   const chunks: Buffer[] = [];
