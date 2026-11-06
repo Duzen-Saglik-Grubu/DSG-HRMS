@@ -16,6 +16,7 @@ using Dsg.Hrms.Application.Personnel.Corrections;
 using Dsg.Hrms.Application.Personnel.Duties;
 using Dsg.Hrms.Application.Personnel.EmergencyContacts;
 using Dsg.Hrms.Application.Personnel.Export;
+using Dsg.Hrms.Application.Personnel.History;
 using Dsg.Hrms.Application.Personnel.Listing;
 using Dsg.Hrms.Application.Personnel.Quality;
 using Dsg.Hrms.Application.Personnel.Sync;
@@ -187,6 +188,7 @@ public static class InfrastructureRegistration
         // Gorev girisi (SYG-PERS-042).
         services.AddScoped<IDutyStore, DutyStore>();
         services.AddScoped<DutyService>();
+        services.AddScoped<EmploymentHistoryService>();
         services.AddScoped<IEmergencyContactStore, EmergencyContactStore>();
         services.AddScoped<EmergencyContactService>();
 

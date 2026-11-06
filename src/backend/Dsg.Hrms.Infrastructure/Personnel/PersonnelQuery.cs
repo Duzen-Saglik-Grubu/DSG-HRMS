@@ -1,6 +1,7 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Paging;
 using Dsg.Hrms.Application.Personnel.Access;
+using Dsg.Hrms.Application.Personnel.History;
 using Dsg.Hrms.Application.Personnel.Listing;
 using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Organization;
@@ -553,24 +554,7 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
     /// </summary>
     private async Task<Dictionary<long, AssignmentRecord>> CurrentAssignmentsAsync(long[] employmentIds, CancellationToken cancellationToken)
     {
-        var rows = await (
-            from a in context.Set<EmploymentAssignment>().AsNoTracking()
-            where employmentIds.Contains(a.EmploymentId)
-            join c in context.Set<Company>() on a.CompanyId equals c.Id
-            join b in context.Set<Branch>() on a.BranchId equals (long?)b.Id into branches
-            from b in branches.DefaultIfEmpty()
-            join d in context.Set<Department>() on a.DepartmentId equals (long?)d.Id into departments
-            from d in departments.DefaultIfEmpty()
-            join t in context.Set<ReferenceDefinition>().Where(x => x.Type == ReferenceType.Title) on a.TitleCode equals t.Code into titles
-            from t in titles.DefaultIfEmpty()
-                // Sol birlesimde eslesme yoksa EF alanlari SQL NULL olarak dondurur.
-            select new
-            {
-                a.EmploymentId,
-                Record = new AssignmentRecord(
-                    a.ValidFrom, a.ValidTo, c.Name, b.Name, b.City, d.Name,
-                    a.TitleCode, t.Name, a.StatusCode, a.OccupationCode, a.OccupationName),
-            })
+        var rows = await AssignmentRows(context.Set<EmploymentAssignment>().AsNoTracking().Where(a => employmentIds.Contains(a.EmploymentId)))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
@@ -581,14 +565,57 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
                 g => g.OrderByDescending(r => r.Record.ValidTo is null).ThenByDescending(r => r.Record.ValidFrom).First().Record);
     }
 
+    /// <inheritdoc />
+    public async Task<EmploymentHistory> HistoryAsync(long employmentId, DateOnly? asOf, CancellationToken cancellationToken)
+    {
+        var assignments = context.Set<EmploymentAssignment>().AsNoTracking().Where(a => a.EmploymentId == employmentId);
+        var duties = context.Set<EmploymentDuty>().AsNoTracking().Where(d => d.EmploymentId == employmentId);
+        if (asOf is { } day)
+        {
+            // Donem [baslangic, bitis): bitis haric (ADR-0021 §2).
+            assignments = assignments.Where(a => a.ValidFrom <= day && (a.ValidTo == null || day < a.ValidTo));
+            duties = duties.Where(d => d.ValidFrom <= day && (d.ValidTo == null || day < d.ValidTo));
+        }
+
+        var assignmentRows = await AssignmentRows(assignments).ToListAsync(cancellationToken).ConfigureAwait(false);
+        var dutyRows = await DutyRows(duties).ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        return new EmploymentHistory(
+            [.. assignmentRows.Select(r => r.Record).OrderByDescending(r => r.ValidFrom)],
+            [.. dutyRows.Select(r => r.Record).OrderByDescending(r => r.ValidFrom)]);
+    }
+
+    /// <summary>Atama donemlerini adlariyla okur (SYG-PERS-038).</summary>
+    private IQueryable<AssignmentRow> AssignmentRows(IQueryable<EmploymentAssignment> assignments) =>
+            from a in assignments
+            join c in context.Set<Company>() on a.CompanyId equals c.Id
+            join b in context.Set<Branch>() on a.BranchId equals (long?)b.Id into branches
+            from b in branches.DefaultIfEmpty()
+            join d in context.Set<Department>() on a.DepartmentId equals (long?)d.Id into departments
+            from d in departments.DefaultIfEmpty()
+            join t in context.Set<ReferenceDefinition>().Where(x => x.Type == ReferenceType.Title) on a.TitleCode equals t.Code into titles
+            from t in titles.DefaultIfEmpty()
+                // Sol birlesimde eslesme yoksa EF alanlari SQL NULL olarak dondurur.
+            select new AssignmentRow(
+                a.EmploymentId,
+                new AssignmentRecord(
+                    a.ValidFrom, a.ValidTo, c.Name, b.Name, b.City, d.Name,
+                    a.TitleCode, t.Name, a.StatusCode, a.OccupationCode, a.OccupationName));
+
+    /// <summary>Gorev donemlerini adlariyla okur; silinmis kayitlar sorgu suzgeciyle disarida kalir.</summary>
+    private IQueryable<DutyRow> DutyRows(IQueryable<EmploymentDuty> duties) =>
+        from d in duties
+        join r in context.Set<ReferenceDefinition>() on d.DutyDefinitionId equals r.Id
+        select new DutyRow(d.EmploymentId, new DutyRecord(d.PublicId, r.Name, d.ValidFrom, d.ValidTo));
+
+    private sealed record AssignmentRow(long EmploymentId, AssignmentRecord Record);
+
+    private sealed record DutyRow(long EmploymentId, DutyRecord Record);
+
     /// <summary>Her istihdamin guncel gorevi: acik kayit, yoksa en son kayit; silinmisler haric.</summary>
     private async Task<Dictionary<long, DutyRecord>> CurrentDutiesAsync(long[] employmentIds, CancellationToken cancellationToken)
     {
-        var rows = await (
-            from d in context.Set<EmploymentDuty>().AsNoTracking()
-            where employmentIds.Contains(d.EmploymentId)
-            join r in context.Set<ReferenceDefinition>() on d.DutyDefinitionId equals r.Id
-            select new { d.EmploymentId, Record = new DutyRecord(d.PublicId, r.Name, d.ValidFrom, d.ValidTo) })
+        var rows = await DutyRows(context.Set<EmploymentDuty>().AsNoTracking().Where(d => employmentIds.Contains(d.EmploymentId)))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 

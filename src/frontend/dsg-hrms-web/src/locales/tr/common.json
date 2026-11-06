@@ -838,6 +838,29 @@
       },
       "relationshipsFailed": "Yakınlık listesi yüklenemedi; pencereyi kapatıp yeniden açın."
     },
+    "history": {
+      "open": "Tarihçe",
+      "title": "{{registryCode}} sicilinin tarihçesi",
+      "asOf": "Tarihteki durum",
+      "asOfHint": "Bir tarih seçin; o tarihte geçerli bilgiler gösterilir.",
+      "showAll": "Bütün tarihçe",
+      "assignments": "Firma, şube, birim ve ünvan",
+      "duties": "Görev",
+      "columns": {
+        "company": "Firma",
+        "branch": "Şube",
+        "department": "Birim",
+        "title": "Ünvan",
+        "duty": "Görev",
+        "from": "Başlangıç",
+        "to": "Bitiş"
+      },
+      "ongoing": "Devam ediyor",
+      "noPeriod": "Kayıt yok",
+      "noRecord": "Bu sicil için tarihçe kaydı yok.",
+      "noRecordOnDate": "Bu tarih için kayıt yok.",
+      "close": "Kapat"
+    },
     "duty": {
       "assign": "Görev ata",
       "assignNamed": "{{registryCode}} siciline görev ata",

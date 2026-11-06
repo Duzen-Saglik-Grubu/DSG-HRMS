@@ -19,6 +19,9 @@ export const queryKeys = {
     cards: ['personnel', 'card'] as const,
     card: (personId: string) => ['personnel', 'card', personId] as const,
     me: ['personnel', 'card', 'me'] as const,
+    /** Kart onekinin altindadir: gorev girisi kartla birlikte tarihceyi de yeniler (#357). */
+    history: (personId: string, registryCode: string, date: string | null) =>
+      ['personnel', 'card', personId, 'history', registryCode, date ?? 'all'] as const,
     photo: (personId: string) => ['personnel', 'photo', personId] as const,
     syncFreshness: ['personnel', 'sync-freshness'] as const,
     exportFields: ['personnel', 'export-fields'] as const,

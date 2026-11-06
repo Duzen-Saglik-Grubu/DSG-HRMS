@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Alert, Box, Button, Chip, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import FeedbackOutlined from '@mui/icons-material/FeedbackOutlined';
+import HistoryRounded from '@mui/icons-material/HistoryRounded';
 import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import type { EmploymentCard, PersonCard } from '../api/personsApi';
@@ -9,6 +10,7 @@ import { permissions } from '@/shared/auth/permissions';
 import { usePermission } from '@/shared/auth/usePermission';
 import { PersonAvatar } from '@/shared/components/PersonAvatar';
 import { DutyField } from './DutyField';
+import { EmploymentHistoryDialog } from './EmploymentHistoryDialog';
 import { EmergencyContacts } from './EmergencyContacts';
 import { ReportToHrDialog } from './ReportToHrDialog';
 import { SyncFreshness } from './SyncFreshness';
@@ -358,50 +360,69 @@ function WorkLife({
   const { t } = useTranslation();
   const field = (name: string) => t(`personnel.card.fields.${name}`);
   const work = employment.workLife;
+  const [showHistory, setShowHistory] = useState(false);
 
   return (
-    <Fields>
-      <WorkField label={field('city')} value={work?.city} />
-      <WorkField label={field('company')} value={employment.companyName} />
-      <WorkField label={field('branch')} value={work?.branchName} />
-      <WorkField label={field('department')} value={work?.departmentName} />
-      {/* Unvan referans verideki karsiligiyla; karsiligi olmayan kod bos gorunur (SYG-PERS-038). */}
-      <WorkField label={field('title')} value={work?.titleName} />
-      {/* Gorev HRMS'te girilir; izni olan alandan atar veya yanlis girisi siler (SYG-PERS-042). */}
-      <WorkField
-        label={field('duty')}
-        value={
-          canAssignDuty ? (
-            <DutyField
-              personId={personId}
-              registryCode={employment.registryCode}
-              duty={employment.duty}
-            />
-          ) : (
-            employment.duty?.name
-          )
-        }
-      />
-      <WorkField
-        label={field('status')}
-        value={employment.isActive ? t('personnel.card.active') : t('personnel.card.terminated')}
-      />
-      <WorkField label={field('statusCode')} value={work?.statusCode} />
-      <WorkField label={field('registryCode')} value={employment.registryCode} />
-      <WorkField label={field('occupationCode')} value={work?.occupationCode} />
-      <WorkField label={field('occupationName')} value={work?.occupationName} wide />
-      <WorkField label={field('hireDate')} value={displayDate(employment.hireDate)} />
-      <WorkField
-        label={field('terminationDate')}
-        value={employment.terminationDate ? displayDate(employment.terminationDate) : null}
-      />
-      <WorkField
-        label={field('seniority')}
-        // Metin sunucuda kuralla uretilir: sifir olan bas birimler yazilmaz (SYG-PERS-039).
-        value={employment.seniority.text}
-        wide
-      />
-    </Fields>
+    <>
+      <Fields>
+        <WorkField label={field('city')} value={work?.city} />
+        <WorkField label={field('company')} value={employment.companyName} />
+        <WorkField label={field('branch')} value={work?.branchName} />
+        <WorkField label={field('department')} value={work?.departmentName} />
+        {/* Unvan referans verideki karsiligiyla; karsiligi olmayan kod bos gorunur (SYG-PERS-038). */}
+        <WorkField label={field('title')} value={work?.titleName} />
+        {/* Gorev HRMS'te girilir; izni olan alandan atar veya yanlis girisi siler (SYG-PERS-042). */}
+        <WorkField
+          label={field('duty')}
+          value={
+            canAssignDuty ? (
+              <DutyField
+                personId={personId}
+                registryCode={employment.registryCode}
+                duty={employment.duty}
+              />
+            ) : (
+              employment.duty?.name
+            )
+          }
+        />
+        <WorkField
+          label={field('status')}
+          value={employment.isActive ? t('personnel.card.active') : t('personnel.card.terminated')}
+        />
+        <WorkField label={field('statusCode')} value={work?.statusCode} />
+        <WorkField label={field('registryCode')} value={employment.registryCode} />
+        <WorkField label={field('occupationCode')} value={work?.occupationCode} />
+        <WorkField label={field('occupationName')} value={work?.occupationName} wide />
+        <WorkField label={field('hireDate')} value={displayDate(employment.hireDate)} />
+        <WorkField
+          label={field('terminationDate')}
+          value={employment.terminationDate ? displayDate(employment.terminationDate) : null}
+        />
+        <WorkField
+          label={field('seniority')}
+          // Metin sunucuda kuralla uretilir: sifir olan bas birimler yazilmaz (SYG-PERS-039).
+          value={employment.seniority.text}
+          wide
+        />
+      </Fields>
+      {/* Tarihce: firma, sube, birim, unvan ve gorev donemleri (SYG-PERS-020). */}
+      <Button
+        startIcon={<HistoryRounded />}
+        onClick={() => setShowHistory(true)}
+        sx={{ mt: 2 }}
+        size="small"
+      >
+        {t('personnel.history.open')}
+      </Button>
+      {showHistory ? (
+        <EmploymentHistoryDialog
+          personId={personId}
+          registryCode={employment.registryCode}
+          onClose={() => setShowHistory(false)}
+        />
+      ) : null}
+    </>
   );
 }
 
