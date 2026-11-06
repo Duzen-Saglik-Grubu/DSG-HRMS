@@ -20,6 +20,19 @@ public sealed class ReferenceDefinitionTests
     }
 
     [Fact]
+    public void Inactive_definition_can_be_reactivated_once()
+    {
+        // KR-136: yanlislikla pasife alinan tanim ekrandan geri alinir.
+        var relationship = ReferenceDefinition.Create(ReferenceType.Relationship, "Y005", "Teyzesi", 5);
+
+        relationship.Reactivate().ShouldBeFalse();
+        relationship.Deactivate().ShouldBeTrue();
+        relationship.Reactivate().ShouldBeTrue();
+        relationship.IsActive.ShouldBeTrue();
+        relationship.Reactivate().ShouldBeFalse();
+    }
+
+    [Fact]
     public void Blood_group_cannot_be_created_by_a_user()
     {
         // KR-129: kan grubu tanimlari yalnizca migration ile gelir.

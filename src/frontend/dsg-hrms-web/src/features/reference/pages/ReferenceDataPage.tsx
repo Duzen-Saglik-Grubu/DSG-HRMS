@@ -28,6 +28,7 @@ import AddRounded from '@mui/icons-material/AddRounded';
 import BlockRounded from '@mui/icons-material/BlockRounded';
 import CategoryOutlined from '@mui/icons-material/CategoryOutlined';
 import EditOutlined from '@mui/icons-material/EditOutlined';
+import RestoreRounded from '@mui/icons-material/RestoreRounded';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '@/shared/api/problemDetails';
@@ -46,13 +47,16 @@ const TYPES: readonly ReferenceType[] = ['title', 'duty', 'relationship', 'blood
 const MAX_NAME = 200;
 const MAX_CODE = 20;
 
+/** Satirdaki durum degisikligi: pasife alma veya yeniden aktif etme (`KR-136`). */
+type StatusAction = 'deactivate' | 'reactivate';
+
 const asApiError = (error: unknown, fallback: string) =>
   error instanceof ApiError ? error : new ApiError({ message: fallback, isNetworkError: false });
 
 /**
  * Referans veri ekrani (SYG-PERS-072; ADR-0022 §1). Unvan, gorev, yakinlik ve kan grubu tanimlari
  * pasifleriyle listelenir. `reference.definition.update` izni olan kullanici tanim ekler, adini
- * degistirir ve pasife alir; tanim silinmez. Kan grubu sistem tanimidir, ekrandan degistirilemez
+ * degistirir, pasife alir ve pasif tanimi yeniden aktif eder (`KR-136`); tanim silinmez. Kan grubu sistem tanimidir, ekrandan degistirilemez
  * (`KR-129`). Izin yalnizca gosterim icindir; asil denetim sunucudadir (ADR-0007).
  */
 export function ReferenceDataPage() {
@@ -125,7 +129,10 @@ function DefinitionList({ type, canUpdate }: DefinitionListProps) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<ReferenceDefinition | 'new' | null>(null);
-  const [deactivating, setDeactivating] = useState<ReferenceDefinition | null>(null);
+  const [pending, setPending] = useState<{
+    definition: ReferenceDefinition;
+    action: StatusAction;
+  } | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
 
@@ -264,21 +271,14 @@ function DefinitionList({ type, canUpdate }: DefinitionListProps) {
                           <EditOutlined fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      {definition.isActive ? (
-                        <Tooltip title={t('reference.deactivate')}>
-                          <IconButton
-                            size="small"
-                            aria-label={t('reference.deactivateNamed', { name: definition.name })}
-                            onClick={() => {
-                              setNotice(null);
-                              setFailure(null);
-                              setDeactivating(definition);
-                            }}
-                          >
-                            <BlockRounded fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      ) : null}
+                      <StatusButton
+                        definition={definition}
+                        onClick={(action) => {
+                          setNotice(null);
+                          setFailure(null);
+                          setPending({ definition, action });
+                        }}
+                      />
                     </TableCell>
                   ) : null}
                 </TableRow>
@@ -301,26 +301,30 @@ function DefinitionList({ type, canUpdate }: DefinitionListProps) {
         />
       ) : null}
 
+      {/* Pasife alma geri alinabilir (KR-136); bu yuzden "geri alinamaz" uyarisi gosterilmez. */}
       <ConfirmDialog
-        open={deactivating !== null}
-        title={t('reference.deactivateTitle')}
-        description={deactivating ? t('reference.deactivateText', { name: deactivating.name }) : ''}
-        destructive
-        confirmLabel={t('reference.deactivate')}
-        onCancel={() => setDeactivating(null)}
+        open={pending !== null}
+        title={pending ? t(`reference.${pending.action}Title`) : ''}
+        description={
+          pending ? t(`reference.${pending.action}Text`, { name: pending.definition.name }) : ''
+        }
+        confirmLabel={t(`reference.${pending?.action ?? 'deactivate'}`)}
+        onCancel={() => setPending(null)}
         onConfirm={async () => {
-          if (!deactivating) {
+          if (!pending) {
             return;
           }
 
-          const name = deactivating.name;
+          const { definition, action } = pending;
           try {
-            await referenceApi.deactivate(deactivating.id);
-            setDeactivating(null);
-            setNotice(t('reference.deactivated', { name }));
+            await (action === 'deactivate'
+              ? referenceApi.deactivate(definition.id)
+              : referenceApi.reactivate(definition.id));
+            setPending(null);
+            setNotice(t(`reference.${action}d`, { name: definition.name }));
             await refresh();
           } catch (error) {
-            setDeactivating(null);
+            setPending(null);
             setFailure(asApiError(error, t('error.generic')).message);
           }
         }}
@@ -459,5 +463,32 @@ function DefinitionDialog({ type, definition, onClose, onSaved }: DefinitionDial
         </DialogActions>
       </Box>
     </Dialog>
+  );
+}
+
+interface StatusButtonProps {
+  definition: ReferenceDefinition;
+  onClick: (action: StatusAction) => void;
+}
+
+/** Aktif tanimda "Pasife al", pasif tanimda "Yeniden aktif et" (`KR-136`). */
+function StatusButton({ definition, onClick }: StatusButtonProps) {
+  const { t } = useTranslation();
+  const action: StatusAction = definition.isActive ? 'deactivate' : 'reactivate';
+
+  return (
+    <Tooltip title={t(`reference.${action}`)}>
+      <IconButton
+        size="small"
+        aria-label={t(`reference.${action}Named`, { name: definition.name })}
+        onClick={() => onClick(action)}
+      >
+        {action === 'deactivate' ? (
+          <BlockRounded fontSize="small" />
+        ) : (
+          <RestoreRounded fontSize="small" />
+        )}
+      </IconButton>
+    </Tooltip>
   );
 }

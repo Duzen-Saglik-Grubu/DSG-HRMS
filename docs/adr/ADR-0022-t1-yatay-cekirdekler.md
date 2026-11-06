@@ -2,7 +2,7 @@
 
 **Durum:** **Kabul Edildi**
 **Tarih:** 2026-10-22
-**Karar defteri karşılığı:** `KR-124`, `KR-126`; kapsam kararları `KR-115` (Y3), `KR-119` (Y2)
+**Karar defteri karşılığı:** `KR-124`, `KR-126`, `KR-136`; kapsam kararları `KR-115` (Y3), `KR-119` (Y2)
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **Genişlettiği:** ADR-0010 §4 (sayfalama), ADR-0012 §4 (uygulama içi bildirim), ADR-0014 (dışa aktarma), ADR-0016 (modül tablosu)
 **İlgili gereksinimler:** PG-PERS-17, 21, 28, 30, 37, 38, 42, 43, 45
@@ -45,8 +45,10 @@ Onaylanmamış gereksinime dayanan hiçbir şey yazılmaz (`KR-068`).
     seçenekleri giriş izniyle (`personnel.person.update`) ayrı bir uçtan okunur; böylece referans
     veri izni olmayan bir rol de formu kullanabilir.
 - Tanım silinmez, pasife alınır (ADR-0004 §5). Pasif tanım yeni girişte seçilemez, ama
-  geçmiş kayıtlarda adıyla görünür.
-- **Basit yönetim ekranı:** liste, ekleme, ad değiştirme, pasife alma. İzinler
+  geçmiş kayıtlarda adıyla görünür. Pasif tanım yeniden aktif edilebilir; kodu ve adı değişmez
+  (06.11.2026, `KR-136`). Sistem tanımı pasife alınamadığı gibi yeniden aktif de edilemez.
+- **Basit yönetim ekranı:** liste, ekleme, ad değiştirme, pasife alma, yeniden aktif etme.
+  Diğer ayrıntılar Y3 — Referans Veri Yönetimi kapsamındadır. İzinler
   `reference.definition.view` ve `reference.definition.update`; İK ve Sistem Yöneticisi.
   Değişiklikler denetim izine yazılır.
 
@@ -173,3 +175,4 @@ Düşük–orta. Çekirdekler küçüktür ve kendi ad alanlarındadır.
 | 2026-10-23 | 1.4 | §1: üçüncü referans türü kan grubu, değiştirilemez sistem tanımı (`KR-129`, #280) | Bilgi İşlem |
 | 2026-11-05 | 1.5 | §3: senkronizasyon uyarısı e-postayla da gider (`KR-134`); alıcı roller `PRM-BLD-01` (`KR-133`) (#344) | Bilgi İşlem |
 | 2026-11-05 | 1.6 | §1: "Yakınlık" tanım türü (`KR-135`, #348) | Bilgi İşlem |
+| 2026-11-06 | 1.7 | §1: pasif tanım yeniden aktif edilir (`KR-136`, #352) | Bilgi İşlem |

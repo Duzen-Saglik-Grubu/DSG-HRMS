@@ -59,8 +59,11 @@ describe('ReferenceDataPage', () => {
     await openTab(user, 'Yakınlık');
     const amca = (await screen.findByText('Amcası')).closest('tr')!;
     expect(within(amca).getByText('Pasif')).toBeInTheDocument();
-    // Pasif tanim yeniden pasife alinamaz; adi degistirilebilir.
+    // Pasif tanim yeniden pasife alinamaz; yeniden aktif edilir (KR-136), adi degistirilebilir.
     expect(within(amca).queryByRole('button', { name: /pasife al/ })).not.toBeInTheDocument();
+    expect(
+      within(amca).getByRole('button', { name: 'Amcası tanımını yeniden aktif et' }),
+    ).toBeVisible();
     expect(
       within(amca).getByRole('button', { name: 'Amcası tanımının adını değiştir' }),
     ).toBeVisible();
@@ -143,6 +146,25 @@ describe('ReferenceDataPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('pasif tanimi onaydan sonra yeniden aktif eder', async () => {
+    // KR-136: yanlislikla pasife alinan tanim ekrandan geri alinir.
+    const reactivate = vi.spyOn(referenceApi, 'reactivate').mockResolvedValue();
+    const user = userEvent.setup();
+    renderWithProviders(<ReferenceDataPage />);
+
+    await openTab(user, 'Yakınlık');
+    await user.click(
+      await screen.findByRole('button', { name: 'Amcası tanımını yeniden aktif et' }),
+    );
+    const dialog = await screen.findByRole('dialog', { name: 'Tanımı yeniden aktif et' });
+    expect(dialog).toHaveTextContent('“Amcası” tanımı yeniden aktif edilecek');
+
+    await user.click(within(dialog).getByRole('button', { name: 'Yeniden aktif et' }));
+
+    expect(reactivate).toHaveBeenCalledWith('relationship-Y005');
+    expect(await screen.findByText('“Amcası” yeniden aktif edildi.')).toBeInTheDocument();
+  });
+
   it('pasife almadan once neyin etkilenecegini sorar', async () => {
     const deactivate = vi.spyOn(referenceApi, 'deactivate').mockResolvedValue();
     const user = userEvent.setup();
@@ -152,6 +174,8 @@ describe('ReferenceDataPage', () => {
     await user.click(await screen.findByRole('button', { name: 'Eşi tanımını pasife al' }));
     const dialog = await screen.findByRole('dialog');
     expect(dialog).toHaveTextContent('“Eşi” tanımı pasife alınacak.');
+    // Pasife alma geri alinabilir (KR-136); "geri alinamaz" uyarisi yoktur.
+    expect(dialog).not.toHaveTextContent('Bu işlem geri alınamaz.');
 
     await user.click(within(dialog).getByRole('button', { name: 'Pasife al' }));
 

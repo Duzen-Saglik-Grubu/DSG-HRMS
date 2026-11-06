@@ -27,10 +27,11 @@ public interface IReferenceDefinitionStore
 }
 
 /// <summary>
-/// Referans tanimlari (ADR-0022 §1; SYG-PERS-072): listeleme, ekleme, ad degistirme, pasife alma.
+/// Referans tanimlari (ADR-0022 §1; SYG-PERS-072): listeleme, ekleme, ad degistirme, pasife alma ve
+/// yeniden aktif etme (<c>KR-136</c>).
 /// </summary>
 /// <remarks>
-/// Tanim silinmez. Sistem tanimi (kan grubu, <c>KR-129</c>) degistirilemez ve pasife alinamaz;
+/// Tanim silinmez. Sistem tanimi (kan grubu, <c>KR-129</c>) degistirilemez, pasife alinamaz ve yeniden aktif edilemez;
 /// istek is kurali hatasiyla (<c>422</c>) reddedilir. Degisiklikler denetim izine yazilir
 /// (varlik <c>IAuditable</c>).
 /// </remarks>
@@ -92,6 +93,18 @@ public sealed class ReferenceDefinitionService
         if (!definition.Deactivate())
         {
             throw new BusinessRuleException("Tanım zaten pasif.");
+        }
+
+        await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>Pasif tanimi yeniden aktif eder; yeni giriste yeniden secilebilir (<c>KR-136</c>).</summary>
+    public async Task ReactivateAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var definition = await FindEditableAsync(id, cancellationToken).ConfigureAwait(false);
+        if (!definition.Reactivate())
+        {
+            throw new BusinessRuleException("Tanım zaten aktif.");
         }
 
         await _store.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

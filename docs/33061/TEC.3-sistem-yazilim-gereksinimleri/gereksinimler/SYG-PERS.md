@@ -5,7 +5,7 @@
 **Modül:** T1 Personel Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-PERS.md` (19.10.2026'da İK onaylı, 45 gereksinim; değişiklik talebi #270)
 **Tasarım:** ADR-0019…ADR-0022 (`KR-121`…`KR-126`); T1 tasarım gözden geçirmesi (`TEC.5-tasarim-tanimlama/raporlar/2026-10-22-t1-tasarim-gozden-gecirme.md`)
-**Son güncelleme:** 2026-11-05
+**Son güncelleme:** 2026-11-06
 **Sahibi:** Bilgi İşlem
 **Onay durumu:** Bilgi İşlem (RACI TEC.3 A); değişiklikler PR onayıyla (`KR-096`). Baseline, T1'in kabul etiketiyle yazılır (`KR-097`, `KR-111`); o zamana kadar geliştirme sürüyor.
 
@@ -272,7 +272,7 @@ dayanıklılık) · Kısıt (tasarım ve gerçekleştirme kısıtı).
 
 | Kimlik | Gereksinim | Tür | Kaynak | Doğrulama | Parametre |
 |---|---|---|---|---|---|
-| **SYG-PERS-072** | Referans veri ekranı ünvan, görev ve kan grubu tanımlarını listeler; `reference.definition.update` izniyle yeni tanım eklenir, adı değiştirilir veya pasife alınır. Kod, tür içinde tekildir. Tanım silinmez; pasif tanım yeni girişte seçilemez ama geçmiş kayıtlarda adıyla görünür. Ünvan türünün ilk değerleri: 1 Birim Operatörü, 2 Birim Teknik Sorumlusu, 3 Birim Sorumlusu, 4 Yardımcı Hizmetler. **Yakınlık** türünün ilk değerleri: Eşi, Annesi, Babası, Kardeşi; İK yeni yakınlık ekleyebilir (#348, `KR-135`). Yeni görev tanımı kod değişikliği olmadan seçilebilir hâle gelir. **Kan grubu** türünün tanımları LOGO kodlarının karşılıklarıdır (1 0 Rh+, 2 0 Rh−, 3 A Rh+, 4 A Rh−, 5 B Rh+, 6 B Rh−, 7 AB Rh+, 8 AB Rh−; 0 "Belirtilmemiş" değer yok sayılır) ve **ekrandan değiştirilemez**: bir adın yanlış düzenlenmesi herkesin sağlık verisini sessizce yanlış gösterirdi (`KR-129`). Değişiklikler denetim izine yazılır. | İşlevsel | PG-PERS-21, PG-PERS-36, PG-PERS-43 | Test | — |
+| **SYG-PERS-072** | Referans veri ekranı ünvan, görev ve kan grubu tanımlarını listeler; `reference.definition.update` izniyle yeni tanım eklenir, adı değiştirilir, pasife alınır veya pasif tanım yeniden aktif edilir (#352, `KR-136`). Kod, tür içinde tekildir. Tanım silinmez; pasif tanım yeni girişte seçilemez ama geçmiş kayıtlarda adıyla görünür. Yeniden aktif edilen tanımın kodu ve adı değişmez. Ünvan türünün ilk değerleri: 1 Birim Operatörü, 2 Birim Teknik Sorumlusu, 3 Birim Sorumlusu, 4 Yardımcı Hizmetler. **Yakınlık** türünün ilk değerleri: Eşi, Annesi, Babası, Kardeşi; İK yeni yakınlık ekleyebilir (#348, `KR-135`). Yeni görev tanımı kod değişikliği olmadan seçilebilir hâle gelir. **Kan grubu** türünün tanımları LOGO kodlarının karşılıklarıdır (1 0 Rh+, 2 0 Rh−, 3 A Rh+, 4 A Rh−, 5 B Rh+, 6 B Rh−, 7 AB Rh+, 8 AB Rh−; 0 "Belirtilmemiş" değer yok sayılır) ve **ekrandan değiştirilemez**: bir adın yanlış düzenlenmesi herkesin sağlık verisini sessizce yanlış gösterirdi (`KR-129`). Değişiklikler denetim izine yazılır. | İşlevsel | PG-PERS-21, PG-PERS-36, PG-PERS-43 | Test | — |
 
 ### 4.10 Arayüz, API ve parametreler
 
@@ -470,3 +470,4 @@ madde `İptal` notuyla kalır.
 | 2026-11-05 | 0.13 | §6: AN-22, veri kalitesi raporunda uyarıların kaynağı, aktiflik, sicil ve kişisel veri (#335) | Bilgi İşlem |
 | 2026-11-05 | 0.14 | Değişiklik talebi #344: SYG-PERS-012 uyarısı e-postayla da gider; AN-06 revize edildi (`KR-133`, `KR-134`) | Bilgi İşlem |
 | 2026-11-05 | 0.15 | Değişiklik talebi #348: SYG-PERS-043 yakınlığı referans veriden seçilir; SYG-PERS-072'ye "Yakınlık" türü eklendi (`KR-135`) | Bilgi İşlem |
+| 2026-11-06 | 0.16 | Değişiklik talebi #352: SYG-PERS-072'de pasif tanım yeniden aktif edilir (`KR-136`) | Bilgi İşlem |

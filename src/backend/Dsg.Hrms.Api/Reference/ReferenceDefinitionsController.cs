@@ -101,6 +101,24 @@ public sealed class ReferenceDefinitionsController : ControllerBase
         await _definitions.DeactivateAsync(id, cancellationToken);
         return NoContent();
     }
+
+    /// <summary>Pasif tanimi yeniden aktif eder; yeni giriste yeniden secilebilir (<c>KR-136</c>).</summary>
+    /// <response code="204">Tanim aktif.</response>
+    /// <response code="403">Yetki yok (<c>reference.definition.update</c>).</response>
+    /// <response code="404">Tanim yok.</response>
+    /// <response code="422">Sistem tanimi veya zaten aktif.</response>
+    [HttpPost("{id:guid}/reactivation")]
+    [HasPermission(Permissions.ReferenceUpdate)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> ReactivateAsync(Guid id, CancellationToken cancellationToken)
+    {
+        await _definitions.ReactivateAsync(id, cancellationToken);
+        return NoContent();
+    }
 }
 
 /// <summary>Referans tanim turu.</summary>

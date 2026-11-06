@@ -403,7 +403,7 @@
   },
   "reference": {
     "title": "Referans veri",
-    "subtitle": "Ünvan, görev ve yakınlık listelerini yönetin. Tanım silinmez; pasife alınan tanım yeni girişte seçilemez, geçmiş kayıtlarda adıyla görünür. Değişiklikler denetim kaydına yazılır.",
+    "subtitle": "Ünvan, görev ve yakınlık listelerini yönetin. Tanım silinmez; pasife alınan tanım yeni girişte seçilemez, geçmiş kayıtlarda adıyla görünür ve yeniden aktif edilebilir. Değişiklikler denetim kaydına yazılır.",
     "types": "Tanım türleri",
     "type": {
       "title": "Ünvan",
@@ -436,14 +436,19 @@
     "deactivate": "Pasife al",
     "deactivateNamed": "{{name}} tanımını pasife al",
     "deactivateTitle": "Tanımı pasife al",
-    "deactivateText": "“{{name}}” tanımı pasife alınacak. Yeni girişte seçilemez; geçmiş kayıtlarda adıyla görünmeye devam eder.",
+    "deactivateText": "“{{name}}” tanımı pasife alınacak. Yeni girişte seçilemez; geçmiş kayıtlarda adıyla görünmeye devam eder. Daha sonra yeniden aktif edebilirsiniz.",
+    "reactivate": "Yeniden aktif et",
+    "reactivateNamed": "{{name}} tanımını yeniden aktif et",
+    "reactivateTitle": "Tanımı yeniden aktif et",
+    "reactivateText": "“{{name}}” tanımı yeniden aktif edilecek ve yeni girişte seçilebilecek. Kodu ve adı değişmez.",
     "codeHintTitle": "LOGO'daki ünvan kodu. Sonradan değiştirilemez.",
     "codeHintAuto": "Boş bırakılırsa otomatik verilir. Sonradan değiştirilemez.",
     "required": "Bu alanı doldurun.",
     "save": "Kaydet",
     "created": "“{{name}}” eklendi (kod {{code}}).",
     "renamed": "Ad “{{name}}” olarak değiştirildi.",
-    "deactivated": "“{{name}}” pasife alındı."
+    "deactivated": "“{{name}}” pasife alındı.",
+    "reactivated": "“{{name}}” yeniden aktif edildi."
   },
   "notifications": {
     "title": "Bildirimler",

@@ -262,7 +262,7 @@ test('7. acil durum kisisi: yonetici girer, personel kendi profilinde gorur ama 
   await signOut(page, people.unprivileged.fullName);
 });
 
-test('8. referans veri: yonetici yakinlik ekler ve pasife alir; acil durum formu yeni listeyi kullanir (SYG-PERS-072)', async ({
+test('8. referans veri: yonetici yakinlik ekler, pasife alir ve yeniden aktif eder; acil durum formu yeni listeyi kullanir (SYG-PERS-072)', async ({
   page,
 }) => {
   await signIn(page, people.admin.email, passwords.first);
@@ -307,6 +307,14 @@ test('8. referans veri: yonetici yakinlik ekler ve pasife alir; acil durum formu
   await expect(page.getByRole('option', { name: 'Kardeşi' })).toHaveCount(0);
   await page.keyboard.press('Escape');
   await page.keyboard.press('Escape');
+
+  // Yanlislikla pasife alinan tanim yeniden aktif edilir (KR-136).
+  await page.getByRole('link', { name: 'Referans veri', exact: true }).click();
+  await page.getByRole('tab', { name: 'Yakınlık' }).click();
+  await page.getByRole('button', { name: 'Kardeşi tanımını yeniden aktif et' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Yeniden aktif et' }).click();
+  await expect(page.getByText('“Kardeşi” yeniden aktif edildi.')).toBeVisible();
+  await expect(page.getByRole('row', { name: /Kardeşi/ })).toContainText('Aktif');
   await signOut(page, people.admin.fullName);
 });
 

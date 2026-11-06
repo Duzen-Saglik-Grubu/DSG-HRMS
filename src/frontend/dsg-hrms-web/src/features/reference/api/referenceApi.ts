@@ -34,4 +34,9 @@ export const referenceApi = {
   deactivate: async (id: string): Promise<void> => {
     await apiClient.post(`/reference/definitions/${encodeURIComponent(id)}/deactivation`);
   },
+
+  /** Pasif tanimi yeniden aktif eder (`KR-136`). */
+  reactivate: async (id: string): Promise<void> => {
+    await apiClient.post(`/reference/definitions/${encodeURIComponent(id)}/reactivation`);
+  },
 };

@@ -88,6 +88,27 @@ public sealed class ReferenceDefinitionsApiTests : IClassFixture<Identity.Regist
     }
 
     [Fact]
+    public async Task Inactive_definition_is_reactivated_offered_again_and_audited()
+    {
+        // KR-136: pasif tanim yeniden aktif edilir; kodu ve adi degismez.
+        var token = await HrTokenAsync();
+        using var client = _fixture.CreateClient();
+        var id = (await SendAsync(client, HttpMethod.Post, Definitions, token, new { type = "relationship", name = "Teyzesi" })).Body.GetProperty("id").GetGuid();
+        await SendAsync(client, HttpMethod.Post, $"{Definitions}/{id}/deactivation", token);
+
+        (await SendAsync(client, HttpMethod.Post, $"{Definitions}/{id}/reactivation", token)).Status.ShouldBe(HttpStatusCode.NoContent);
+
+        (await SendAsync(client, HttpMethod.Get, "/api/v1/personnel/emergency-contact-relationships", token)).Body.EnumerateArray()
+            .ShouldContain(d => d.GetProperty("id").GetGuid() == id && d.GetProperty("name").GetString() == "Teyzesi");
+        (await _fixture.WithDbAsync(context => context.ChangeLog.CountAsync(e => e.EntityName == nameof(ReferenceDefinition) && e.EntityId == id && e.Operation == AuditOperation.Update)))
+            .ShouldBe(2);
+
+        // Aktif tanim yeniden aktif edilemez; olmayan tanim 404.
+        (await SendAsync(client, HttpMethod.Post, $"{Definitions}/{id}/reactivation", token)).Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        (await SendAsync(client, HttpMethod.Post, $"{Definitions}/{Guid.NewGuid()}/reactivation", token)).Status.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task Blood_group_definitions_cannot_be_renamed_deactivated_or_added()
     {
         // KR-129: bir adin yanlis duzenlenmesi herkesin saglik verisini yanlis gosterirdi.
@@ -98,6 +119,7 @@ public sealed class ReferenceDefinitionsApiTests : IClassFixture<Identity.Regist
 
         (await SendAsync(client, HttpMethod.Put, $"{Definitions}/{aPositive}/name", token, new { name = "B Rh+" })).Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
         (await SendAsync(client, HttpMethod.Post, $"{Definitions}/{aPositive}/deactivation", token)).Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        (await SendAsync(client, HttpMethod.Post, $"{Definitions}/{aPositive}/reactivation", token)).Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
         (await SendAsync(client, HttpMethod.Post, Definitions, token, new { type = "bloodGroup", code = "9", name = "Yeni" })).Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
 
         (await _fixture.WithDbAsync(context => context.Set<ReferenceDefinition>().SingleAsync(d => d.PublicId == aPositive))).Name.ShouldBe("A Rh+");
@@ -137,6 +159,7 @@ public sealed class ReferenceDefinitionsApiTests : IClassFixture<Identity.Regist
 
         (await SendAsync(client, HttpMethod.Get, $"{Definitions}?type=title", token)).Status.ShouldBe(HttpStatusCode.Forbidden);
         (await SendAsync(client, HttpMethod.Post, Definitions, token, new { type = "duty", name = "X" })).Status.ShouldBe(HttpStatusCode.Forbidden);
+        (await SendAsync(client, HttpMethod.Post, $"{Definitions}/{Guid.NewGuid()}/reactivation", token)).Status.ShouldBe(HttpStatusCode.Forbidden);
     }
 
     /// <summary>Kisi 4'un istihdamina tek bir kapali donem yazar; unvan kodu verilir.</summary>
