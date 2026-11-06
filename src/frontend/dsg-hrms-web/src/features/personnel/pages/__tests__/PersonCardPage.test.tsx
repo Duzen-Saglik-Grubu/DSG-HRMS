@@ -9,6 +9,8 @@ import { ApiError } from '@/shared/api/problemDetails';
 import { permissions } from '@/shared/auth/permissions';
 import { routes } from '@/shared/routes';
 import { setSession } from '@/test/session';
+import { dutiesApi } from '../../api/dutiesApi';
+import { emergencyContactsApi } from '../../api/emergencyContactsApi';
 import { personsApi, type EmploymentCard, type PersonCard } from '../../api/personsApi';
 import { personPhotosApi } from '@/shared/api/personPhotos';
 import { orderEmployments } from '../../display';
@@ -298,6 +300,77 @@ describe('Profilim', () => {
         name: '00012 siciline görev ata',
       }),
     ).toBeVisible();
+  });
+
+  it('kendine acil durum kisisi girilince Profilim yenilenir (#357)', async () => {
+    await setSession({ status: 'authenticated', permissions: [permissions.personUpdate] });
+    const before = person({ isSelf: true, employments: [{ ...ACTIVE, duty: null }] });
+    const after = person({
+      isSelf: true,
+      employments: [ACTIVE],
+      sensitive: {
+        address: 'Kızılay Mah. 1',
+        bloodGroup: 'A Rh+',
+        emergencyContacts: [
+          {
+            id: 'c-1',
+            relationshipId: 'r-1',
+            relationship: 'Eşi',
+            firstName: 'Ali',
+            lastName: 'Demir',
+            mobilePhone: '5321112233',
+          },
+        ],
+      },
+    });
+    const me = vi.spyOn(personsApi, 'me').mockResolvedValue(before);
+    vi.spyOn(emergencyContactsApi, 'relationships').mockResolvedValue([{ id: 'r-1', name: 'Eşi' }]);
+    vi.spyOn(emergencyContactsApi, 'add').mockImplementation(() => {
+      me.mockResolvedValue(after);
+      return Promise.resolve(after.sensitive!.emergencyContacts[0]!);
+    });
+    const user = userEvent.setup();
+    renderAt(routes.profile);
+
+    const emergency = await screen.findByRole('region', { name: 'Acil Durum Kişileri' });
+    await user.click(within(emergency).getByRole('button', { name: 'Acil durum kişisi ekle' }));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('combobox', { name: /Yakınlığı/ }));
+    await user.click(await screen.findByRole('option', { name: 'Eşi' }));
+    await user.type(within(dialog).getByRole('textbox', { name: /^Adı/ }), 'Ali');
+    await user.type(within(dialog).getByRole('textbox', { name: /Soyadı/ }), 'Demir');
+    await user.type(within(dialog).getByRole('textbox', { name: /Cep telefonu/ }), '5321112233');
+    await user.click(within(dialog).getByRole('button', { name: 'Kaydet' }));
+
+    // Yeni kayit sayfa elle yenilenmeden gorunur; gorev de ayni yenilemeyle gelir.
+    expect(await within(emergency).findByText('Ali Demir')).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('region', { name: 'Çalışma Hayatı' })).getByText('Biyolog'),
+    ).toBeInTheDocument();
+  });
+
+  it('kendine gorev girilince Profilim yenilenir (#357)', async () => {
+    await setSession({ status: 'authenticated', permissions: [permissions.personUpdate] });
+    const me = vi
+      .spyOn(personsApi, 'me')
+      .mockResolvedValue(person({ isSelf: true, employments: [{ ...ACTIVE, duty: null }] }));
+    vi.spyOn(dutiesApi, 'options').mockResolvedValue([{ id: 'g-1', name: 'Biyolog' }]);
+    vi.spyOn(dutiesApi, 'assign').mockImplementation(() => {
+      me.mockResolvedValue(person({ isSelf: true, employments: [ACTIVE] }));
+      return Promise.resolve(ACTIVE.duty!);
+    });
+    const user = userEvent.setup();
+    renderAt(routes.profile);
+
+    const work = await screen.findByRole('region', { name: 'Çalışma Hayatı' });
+    expect(within(work).queryByText('Biyolog')).not.toBeInTheDocument();
+    await user.click(within(work).getByRole('button', { name: '00012 siciline görev ata' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Görev ata' });
+    await user.click(within(dialog).getByRole('combobox', { name: /Görevi/ }));
+    await user.click(await screen.findByRole('option', { name: 'Biyolog' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Kaydet' }));
+
+    expect(await within(work).findByText('Biyolog')).toBeInTheDocument();
   });
 
   it('kendi fotografi "me" ucundan gelir (SYG-PERS-041)', async () => {

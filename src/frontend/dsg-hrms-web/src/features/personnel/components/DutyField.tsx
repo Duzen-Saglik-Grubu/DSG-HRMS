@@ -48,7 +48,8 @@ export function DutyField({ personId, registryCode, duty }: DutyFieldProps) {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const refresh = () =>
-    queryClient.invalidateQueries({ queryKey: queryKeys.personnel.card(personId) });
+    // Kart iki anahtarla okunur: kisi karti (kimlikle) ve Profilim ('me'). Ikisi de yenilenir (#357).
+    queryClient.invalidateQueries({ queryKey: queryKeys.personnel.cards });
 
   return (
     <Box component="span" sx={{ display: 'block' }}>
