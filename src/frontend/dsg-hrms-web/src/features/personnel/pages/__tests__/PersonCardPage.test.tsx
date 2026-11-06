@@ -11,6 +11,7 @@ import { routes } from '@/shared/routes';
 import { setSession } from '@/test/session';
 import { dutiesApi } from '../../api/dutiesApi';
 import { emergencyContactsApi } from '../../api/emergencyContactsApi';
+import { historyApi } from '../../api/historyApi';
 import { personsApi, type EmploymentCard, type PersonCard } from '../../api/personsApi';
 import { personPhotosApi } from '@/shared/api/personPhotos';
 import { orderEmployments } from '../../display';
@@ -201,6 +202,28 @@ describe('PersonCardPage', () => {
     expect(
       within(editable).getByRole('button', { name: '00004 siciline görev ata' }),
     ).toBeVisible();
+  });
+
+  it('her sicilin tarihcesi kendi sekmesinden acilir (SYG-PERS-020)', async () => {
+    vi.spyOn(personsApi, 'card').mockResolvedValue(person());
+    const get = vi
+      .spyOn(historyApi, 'get')
+      .mockResolvedValue({ date: null, assignments: [], duties: [] });
+    const user = userEvent.setup();
+    renderAt('/personnel/p-1');
+
+    await user.click(await screen.findByRole('button', { name: 'Tarihçe' }));
+    expect(
+      await screen.findByRole('dialog', { name: '00012 sicilinin tarihçesi' }),
+    ).toBeInTheDocument();
+    expect(get).toHaveBeenCalledWith('p-1', '00012', null);
+    await user.click(screen.getByRole('button', { name: 'Kapat' }));
+
+    await user.click(screen.getAllByRole('tab')[1]!);
+    await user.click(screen.getByRole('button', { name: 'Tarihçe' }));
+    expect(
+      await screen.findByRole('dialog', { name: '00004 sicilinin tarihçesi' }),
+    ).toBeInTheDocument();
   });
 
   it('tek istihdamda sekme cubugu gosterilmez', async () => {

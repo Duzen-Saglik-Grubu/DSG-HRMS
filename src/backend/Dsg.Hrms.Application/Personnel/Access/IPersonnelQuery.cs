@@ -28,6 +28,12 @@ public interface IPersonnelQuery
     Task<PersonRecord?> FindOwnAsync(PersonnelViewer viewer, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Istihdamin atama ve gorev donemleri, yeniden eskiye (SYG-PERS-020). <paramref name="asOf"/>
+    /// verilirse yalnizca o tarihi kapsayan donemler. Kapsam denetimi cagirandadir.
+    /// </summary>
+    Task<History.EmploymentHistory> HistoryAsync(long employmentId, DateOnly? asOf, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Kapsamdaki kisileri suzer, siralar ve sayfalar (SYG-PERS-022, 027, 028, 030, 031). Gorunur kalma
     /// suresi dolmus ayrilan kisi listede yoktur.
     /// </summary>

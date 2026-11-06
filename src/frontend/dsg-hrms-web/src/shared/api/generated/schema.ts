@@ -1757,6 +1757,81 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/persons/{personId}/employments/{registryCode}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Istihdamin atama (firma, sube, birim, unvan) ve gorev donemleri, yeniden eskiye. Tarih
+         *     verilirse yalnizca o tarihte gecerli donemler doner; T1 oncesi bir tarih icin listeler
+         *     bostur ("kayit yok").
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Tarihli sorgu (YYYY-AA-GG); verilmezse butun tarihce. */
+                    date?: string;
+                };
+                header?: never;
+                path: {
+                    /** @description Kisinin dis kimligi. */
+                    personId: string;
+                    /** @description Sicil numarasi. */
+                    registryCode: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Tarihce. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmploymentHistoryResponse"];
+                    };
+                };
+                /** @description Tarih gecersiz. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi veya istihdam yok ya da kapsam disi (ayirt edilemez). */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/export/fields": {
         parameters: {
             query?: never;
@@ -4584,6 +4659,27 @@ export interface components {
              */
             validFrom: null | string;
         };
+        /** @description Bir atama donemi. */
+        AssignmentPeriodResponse: {
+            /**
+             * Format: date
+             * @description Baslangic.
+             */
+            validFrom: string;
+            /**
+             * Format: date
+             * @description Bitis (haric); acikse bos.
+             */
+            validTo: null | string;
+            /** @description Firma. */
+            companyName: string;
+            /** @description Sube. */
+            branchName: null | string;
+            /** @description Birim. */
+            departmentName: null | string;
+            /** @description Unvan (referans veri); karsiligi yoksa bos. */
+            titleName: null | string;
+        };
         /** @description Oturum icinde parola degisikligi istegi (SYG-KMLK-048). */
         ChangePasswordRequest: {
             /** @description Mevcut parola. */
@@ -4809,6 +4905,18 @@ export interface components {
             seniority: components["schemas"]["SeniorityResponse"];
             workLife: null | components["schemas"]["WorkLifeResponse"];
             duty: null | components["schemas"]["DutyResponse"];
+        };
+        /** @description Istihdam tarihcesi. */
+        EmploymentHistoryResponse: {
+            /**
+             * Format: date
+             * @description Tarihli sorguda istenen tarih; butun tarihcede bos.
+             */
+            date: null | string;
+            /** @description Atama donemleri, yeniden eskiye. */
+            assignments: components["schemas"]["AssignmentPeriodResponse"][];
+            /** @description Gorev donemleri, yeniden eskiye; silinmis kayitlar yoktur. */
+            duties: components["schemas"]["DutyResponse"][];
         };
         /**
          * @description Calisma durumu suzgeci.

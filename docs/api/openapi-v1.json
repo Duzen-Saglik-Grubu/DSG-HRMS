@@ -1869,6 +1869,86 @@
         }
       }
     },
+    "/api/v1/personnel/persons/{personId}/employments/{registryCode}/history": {
+      "get": {
+        "tags": [
+          "EmploymentHistory"
+        ],
+        "summary": "Istihdamin atama (firma, sube, birim, unvan) ve gorev donemleri, yeniden eskiye. Tarih\nverilirse yalnizca o tarihte gecerli donemler doner; T1 oncesi bir tarih icin listeler\nbostur (\"kayit yok\").",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "description": "Kisinin dis kimligi.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "registryCode",
+            "in": "path",
+            "description": "Sicil numarasi.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Tarihli sorgu (YYYY-AA-GG); verilmezse butun tarihce.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tarihce.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmploymentHistoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tarih gecersiz.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi veya istihdam yok ya da kapsam disi (ayirt edilemez).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/export/fields": {
       "get": {
         "tags": [
@@ -5204,6 +5284,58 @@
         },
         "description": "Gorev atama istegi."
       },
+      "AssignmentPeriodResponse": {
+        "required": [
+          "validFrom",
+          "validTo",
+          "companyName",
+          "branchName",
+          "departmentName",
+          "titleName"
+        ],
+        "type": "object",
+        "properties": {
+          "validFrom": {
+            "type": "string",
+            "description": "Baslangic.",
+            "format": "date"
+          },
+          "validTo": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Bitis (haric); acikse bos.",
+            "format": "date"
+          },
+          "companyName": {
+            "type": "string",
+            "description": "Firma."
+          },
+          "branchName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Sube."
+          },
+          "departmentName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Birim."
+          },
+          "titleName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Unvan (referans veri); karsiligi yoksa bos."
+          }
+        },
+        "description": "Bir atama donemi."
+      },
       "ChangePasswordRequest": {
         "required": [
           "currentPassword",
@@ -5747,6 +5879,39 @@
           }
         },
         "description": "Kartta bir istihdam."
+      },
+      "EmploymentHistoryResponse": {
+        "required": [
+          "date",
+          "assignments",
+          "duties"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Tarihli sorguda istenen tarih; butun tarihcede bos.",
+            "format": "date"
+          },
+          "assignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssignmentPeriodResponse"
+            },
+            "description": "Atama donemleri, yeniden eskiye."
+          },
+          "duties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DutyResponse"
+            },
+            "description": "Gorev donemleri, yeniden eskiye; silinmis kayitlar yoktur."
+          }
+        },
+        "description": "Istihdam tarihcesi."
       },
       "EmploymentStatusKind": {
         "enum": [
@@ -8153,6 +8318,9 @@
     },
     {
       "name": "EmploymentDuties"
+    },
+    {
+      "name": "EmploymentHistory"
     },
     {
       "name": "PersonExport"

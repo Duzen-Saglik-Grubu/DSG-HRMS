@@ -361,6 +361,14 @@ test('9. gorev girisi: yonetici kisinin siciline gorev atar; ise giristen onceki
   await expect(dialog).toHaveCount(0);
   await expect(work).toContainText('Biyolog');
 
+  // Tarihce: gorev donemi baslangiciyla, acik donem "Devam ediyor" (SYG-PERS-020).
+  await work.getByRole('button', { name: 'Tarihçe' }).click();
+  const history = page.getByRole('dialog', { name: 'E2E596 sicilinin tarihçesi' });
+  const duties = history.getByRole('table', { name: 'Görev' });
+  await expect(duties.getByRole('row', { name: /Biyolog/ })).toContainText('01.02.2020');
+  await expect(duties.getByRole('row', { name: /Biyolog/ })).toContainText('Devam ediyor');
+  await history.getByRole('button', { name: 'Kapat' }).click();
+
   // Yanlis giris onaydan sonra silinir; kayit yumusak silinir ve alan bos kalir.
   await work.getByRole('button', { name: 'Biyolog görevini sil' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Görevi sil' }).click();
