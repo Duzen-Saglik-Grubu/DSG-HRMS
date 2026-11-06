@@ -15,6 +15,9 @@ public interface IDutyStore
     /// <summary>Istihdamin silinmemis gorev kayitlari (izlenen).</summary>
     Task<IReadOnlyList<EmploymentDuty>> ListAsync(long employmentId, CancellationToken cancellationToken);
 
+    /// <summary>Yeni secim icin aktif gorev tanimlari, siraya gore.</summary>
+    Task<IReadOnlyList<DutyOption>> ListActiveDutyDefinitionsAsync(CancellationToken cancellationToken);
+
     /// <summary>Aktif gorev taniminin ic kimligi ve adi; tanim yoksa, pasifse veya gorev turunde degilse <c>null</c>.</summary>
     Task<(long Id, string Name)?> FindActiveDutyDefinitionAsync(Guid definitionId, CancellationToken cancellationToken);
 
@@ -27,6 +30,11 @@ public interface IDutyStore
     /// <summary>Kaydeder. Veritabaninin cakisma kisiti <see cref="ConflictException"/> olarak doner (SYG-PERS-019).</summary>
     Task SaveChangesAsync(CancellationToken cancellationToken);
 }
+
+/// <summary>Secilebilir gorev tanimi.</summary>
+/// <param name="Id">Tanimin dis kimligi.</param>
+/// <param name="Name">Gorev.</param>
+public sealed record DutyOption(Guid Id, string Name);
 
 /// <summary>Girilen gorev.</summary>
 /// <param name="Id">Gorev kaydinin dis kimligi.</param>
@@ -58,6 +66,13 @@ public sealed class DutyService
         _store = store;
         _clock = clock;
     }
+
+    /// <summary>
+    /// Yeni secim icin aktif gorev tanimlari (referans veri). Giris izniyle okunur; referans veri
+    /// izni olmayan rol de formu kullanabilir (KR-135 ile ayni ilke).
+    /// </summary>
+    public Task<IReadOnlyList<DutyOption>> ListOptionsAsync(CancellationToken cancellationToken) =>
+        _store.ListActiveDutyDefinitionsAsync(cancellationToken);
 
     /// <summary>
     /// Istihdama gorev atar. Baslangic verilmezse bugundur. Onceki acik gorev yeni gorevin

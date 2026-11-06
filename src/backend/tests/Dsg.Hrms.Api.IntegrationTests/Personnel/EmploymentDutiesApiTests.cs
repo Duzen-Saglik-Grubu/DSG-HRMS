@@ -135,6 +135,31 @@ public sealed class EmploymentDutiesApiTests : IClassFixture<Identity.Registrati
         (await AssignAsync(client, token, _biologist, "2021-01-01")).Status.ShouldBe(HttpStatusCode.NotFound);
     }
 
+    [Fact]
+    public async Task Duty_options_are_the_active_definitions_and_need_only_the_update_permission()
+    {
+        // SYG-PERS-042: yeni secimde yalnizca aktif tanim; referans veri izni olmayan rol de formu kullanir.
+        const string options = "/api/v1/personnel/duty-options";
+        using var client = _fixture.CreateClient();
+        var token = await SignInAsync(client);
+        (await SendAsync(client, HttpMethod.Get, options, token)).Status.ShouldBe(HttpStatusCode.Forbidden);
+
+        await _fixture.WithDbAsync(async context =>
+        {
+            (await context.Set<ReferenceDefinition>().SingleAsync(d => d.PublicId == _engineer)).Deactivate();
+            return await context.SaveChangesAsync();
+        });
+        await GrantRoleAsync(await CreateRoleAsync(Permissions.PersonUpdate));
+        token = await SignInAsync(client);
+        var (status, body) = await SendAsync(client, HttpMethod.Get, options, token);
+
+        status.ShouldBe(HttpStatusCode.OK);
+        var ids = body.EnumerateArray().Select(o => o.GetProperty("id").GetGuid()).ToList();
+        ids.ShouldContain(_biologist);
+        ids.ShouldNotContain(_engineer);
+        body.EnumerateArray().Single(o => o.GetProperty("id").GetGuid() == _biologist).GetProperty("name").GetString().ShouldBe("Biyolog");
+    }
+
     private async Task<(HttpClient Client, string Token)> HrAsync()
     {
         await GrantRoleAsync(Role.HrIdentityOperationsCode);

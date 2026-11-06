@@ -318,6 +318,57 @@ test('8. referans veri: yonetici yakinlik ekler, pasife alir ve yeniden aktif ed
   await signOut(page, people.admin.fullName);
 });
 
+test('9. gorev girisi: yonetici kisinin siciline gorev atar; ise giristen onceki tarih reddedilir, yanlis giris silinir (SYG-PERS-042)', async ({
+  page,
+}) => {
+  await signIn(page, people.admin.email, passwords.first);
+
+  // Gorev referans verideki aktif tanimlardan secilir (SYG-PERS-072).
+  await page.getByRole('link', { name: 'Referans veri', exact: true }).click();
+  await page.getByRole('tab', { name: 'Görev' }).click();
+  await page.getByRole('button', { name: 'Yeni görev' }).click();
+  const definition = page.getByRole('dialog', { name: 'Yeni görev tanımı' });
+  await definition.getByRole('textbox', { name: /^Ad/ }).fill('Biyolog');
+  await definition.getByRole('button', { name: 'Kaydet' }).click();
+  await expect(page.getByText(/“Biyolog” eklendi/)).toBeVisible();
+
+  await page.getByRole('link', { name: 'Personel listesi', exact: true }).click();
+  await page.getByLabel(/Ad, soyad, sicil/).fill('izinsiz');
+  await page.getByRole('button', { name: 'Tablo görünümü' }).click();
+  await page
+    .getByRole('row', { name: /Zeynep/ })
+    .getByRole('link', { name: 'Zeynep' })
+    .click();
+
+  const work = page.getByRole('region', { name: 'Çalışma Hayatı' });
+  await work.getByRole('button', { name: 'E2E596 siciline görev ata' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Görev ata' });
+  await dialog.getByRole('combobox', { name: /Görevi/ }).click();
+  await page.getByRole('option', { name: 'Biyolog' }).click();
+
+  // Ise giris 01.01.2020; onceki baslangic reddedilir (AN-16).
+  const date = dialog.getByRole('group', { name: /Başlangıç tarihi/ });
+  await date.getByRole('spinbutton').first().click();
+  await page.keyboard.type('01012019');
+  await dialog.getByRole('button', { name: 'Kaydet' }).click();
+  await expect(
+    dialog.getByText('Görev başlangıcı işe giriş tarihinden önce olamaz.'),
+  ).toBeVisible();
+
+  await date.getByRole('spinbutton').first().click();
+  await page.keyboard.type('01022020');
+  await dialog.getByRole('button', { name: 'Kaydet' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(work).toContainText('Biyolog');
+
+  // Yanlis giris onaydan sonra silinir; kayit yumusak silinir ve alan bos kalir.
+  await work.getByRole('button', { name: 'Biyolog görevini sil' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Görevi sil' }).click();
+  await expect(work.getByRole('button', { name: 'Biyolog görevini sil' })).toHaveCount(0);
+  await expect(work).not.toContainText('Biyolog');
+  await signOut(page, people.admin.fullName);
+});
+
 async function readDownload(download: Download): Promise<Buffer> {
   const stream = await download.createReadStream();
   const chunks: Buffer[] = [];

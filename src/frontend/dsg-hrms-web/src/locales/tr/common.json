@@ -837,6 +837,24 @@
         "mobilePhone": "Cep telefonu"
       },
       "relationshipsFailed": "Yakınlık listesi yüklenemedi; pencereyi kapatıp yeniden açın."
+    },
+    "duty": {
+      "assign": "Görev ata",
+      "assignNamed": "{{registryCode}} siciline görev ata",
+      "assignTitle": "Görev ata",
+      "assignText": "{{registryCode}} sicilinin görevi. Önceki açık görev, yeni görevin başlangıç tarihiyle kapanır ve tarihçede kalır.",
+      "delete": "Görevi sil",
+      "deleteNamed": "{{name}} görevini sil",
+      "deleteTitle": "Görevi sil",
+      "deleteText": "“{{name}}” görevi ({{validFrom}} başlangıçlı) silinecek. Silme, yanlış girişi düzeltmek içindir; önceki görev yeniden açılmaz.",
+      "save": "Kaydet",
+      "required": "Bu alanı doldurun.",
+      "validFromHint": "İşe giriş tarihinden önce veya çıkış tarihinden sonra olamaz.",
+      "fields": {
+        "definitionId": "Görevi",
+        "validFrom": "Başlangıç tarihi"
+      },
+      "optionsFailed": "Görev listesi yüklenemedi; pencereyi kapatıp yeniden açın."
     }
   },
   "home": {

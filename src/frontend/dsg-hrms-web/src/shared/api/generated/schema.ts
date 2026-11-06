@@ -1534,6 +1534,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/duty-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Yeni secim icin aktif gorev tanimlari (referans veri). Giris izniyle okunur: referans veri
+         *     izni olmayan bir rol de formu kullanabilir (KR-135 ile ayni ilke).
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Tanimlar, siraya gore. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DutyOptionResponse"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.person.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/{personId}/employments/{registryCode}/duties": {
         parameters: {
             query?: never;
@@ -4518,7 +4575,7 @@ export interface components {
         AssignDutyRequest: {
             /**
              * Format: uuid
-             * @description Gorev taniminin dis kimligi (referans veri, tur gorev).
+             * @description Gorev taniminin dis kimligi (aktif tanimlar: `GET /api/v1/personnel/duty-options`).
              */
             definitionId: string;
             /**
@@ -4664,6 +4721,16 @@ export interface components {
             ineligibleCount: number | string;
             /** @description Suzgece uyan uyarilar. */
             items: components["schemas"]["PagedResponseOfDataQualityItemResponse"];
+        };
+        /** @description Secilebilir gorev tanimi. */
+        DutyOptionResponse: {
+            /**
+             * Format: uuid
+             * @description Tanimin dis kimligi; atama isteginde `definitionId` olarak gonderilir.
+             */
+            id: string;
+            /** @description Gorev. */
+            name: string;
         };
         /** @description Gorev kaydi. */
         DutyResponse: {

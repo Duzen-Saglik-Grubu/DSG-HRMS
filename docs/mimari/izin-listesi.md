@@ -31,7 +31,7 @@
 | `personnel.person.view` | Tüm personeli görme (kapsam `All`); yoksa yalnızca kendisi | Kişi okumaları (`IPersonnelQuery`) | PERS-050 |
 | `personnel.person.view_national_id` | Tam T.C. kimlik numarasını görme ve TCKN ile arama | Kişi kartı; liste araması (sonraki iş) | PERS-030, 053 |
 | `personnel.person.view_sensitive` | Adres, kan grubu, acil durum kişileri ve evlilik bilgisini görme | Kişi kartı, süzgeç, dışa aktarma (sonraki iş) | PERS-052 |
-| `personnel.person.update` | Görev, evlilik bilgisi ve acil durum kişisini girme; acil durum formunun yakınlık seçeneklerini okuma (`KR-135`) | Görev uçları; kişi kartının "Acil Durum Kişileri" bölümü (#346) | PERS-036, 042, 043 |
+| `personnel.person.update` | Görev, evlilik bilgisi ve acil durum kişisini girme; acil durum formunun yakınlık seçeneklerini (`KR-135`) ve görev formunun görev seçeneklerini okuma | Görev uçları ve `GET /api/v1/personnel/duty-options`; kişi kartının "Acil Durum Kişileri" bölümü (#346) ve "Çalışma Hayatı" bölümündeki "Görevi" alanı (#353) | PERS-036, 042, 043 |
 | `personnel.person.export` | Personel listesini dışa aktarma | `GET /personnel/persons/export`, `/export/fields` (#330) | PERS-032 |
 | `personnel.correction.view` | "İK'ya bildir" taleplerini görme | Düzeltme talepleri (sonraki iş) | PERS-048 |
 | `personnel.correction.update` | "İK'ya bildir" taleplerini kapatma | Düzeltme talepleri (sonraki iş) | PERS-048 |
@@ -68,3 +68,4 @@ Kişi kartı ve "Profilim" (`GET /api/v1/personnel/persons/{id}`, `/me`) izin de
 | 2026-11-05 | 0.8 | `personnel.person.update` acil durum kişisi uçlarına ve kişi kartına bağlandı (#346) | Bilgi İşlem |
 | 2026-11-05 | 0.9 | Yakınlık tanımları ve seçenek ucu (`KR-135`, #348) | Bilgi İşlem |
 | 2026-11-06 | 0.10 | `reference.definition.*` ekrana bağlandı; veritabanındaki izin açıklamaları bu listeyle eşitlendi (#350); yeniden aktif etme ucu (`KR-136`, #352) | Bilgi İşlem |
+| 2026-11-06 | 0.11 | `personnel.person.update`: görev seçenek ucu ve kartta görev girişi (#353) | Bilgi İşlem |
