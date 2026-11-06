@@ -795,6 +795,8 @@
         "age": "Yaş",
         "education": "Eğitim",
         "maritalStatus": "Medeni hâl",
+        "marriageDate": "Evlilik tarihi",
+        "marriageAllowance": "Evlilik yardımı",
         "bloodGroup": "Kan grubu",
         "email": "E-posta",
         "phone": "Telefon",
@@ -837,6 +839,23 @@
         "mobilePhone": "Cep telefonu"
       },
       "relationshipsFailed": "Yakınlık listesi yüklenemedi; pencereyi kapatıp yeniden açın."
+    },
+    "marriage": {
+      "add": "Evlilik bilgisi gir",
+      "edit": "Evlilik bilgisini düzenle",
+      "delete": "Evlilik bilgisini sil",
+      "title": "Evlilik bilgisi",
+      "deleteTitle": "Evlilik bilgisini sil",
+      "deleteText": "{{date}} tarihli evlilik bilgisi silinecek.",
+      "save": "Kaydet",
+      "required": "Bu alanı doldurun.",
+      "received": "Aldı",
+      "notReceived": "Almadı",
+      "notMarried": "Medeni hâl Evli olmadığı için evlilik bilgisi değiştirilemez. Girilmiş bilgi korunur.",
+      "fields": {
+        "marriageDate": "Evlilik tarihi",
+        "allowanceReceived": "Evlilik yardımı"
+      }
     },
     "history": {
       "open": "Tarihçe",

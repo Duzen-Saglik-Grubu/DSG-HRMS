@@ -483,6 +483,11 @@ public sealed record PersonCardResponse(
     /// <summary>Fotografi var mi; varsa <c>/persons/{personId}/photo</c> (kendi kartinda <c>/persons/me/photo</c>) ucundan alinir.</summary>
     public required bool HasPhoto { get; init; }
 
+    /// <summary>Evlilik bilgisi (SYG-PERS-036); yalnizca <c>view_sensitive</c> izniyle yazilir, digerlerinde alan yoktur (ADR-0019 §2).</summary>
+    /// <remarks>Kisinin kendisi de izni yoksa bu alani almaz.</remarks>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public MarriageResponse? Marriage { get; init; }
+
     /// <summary>Uygulama katmanindaki karttan yanit kurar.</summary>
     public static PersonCardResponse From(PersonCard card)
     {
@@ -530,6 +535,7 @@ public sealed record PersonCardResponse(
                 [.. sensitive.EmergencyContacts.Select(EmergencyContactResponse.From)]) : null)
         {
             HasPhoto = card.HasPhoto,
+            Marriage = card.Marriage is { } marriage ? MarriageResponse.From(marriage) : null,
         };
     }
 }

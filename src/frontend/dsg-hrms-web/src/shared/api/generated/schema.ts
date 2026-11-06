@@ -1832,6 +1832,153 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/persons/{personId}/marriage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Evlilik bilgisini girer veya degistirir. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MarriageRequest"];
+                    "text/json": components["schemas"]["MarriageRequest"];
+                    "application/*+json": components["schemas"]["MarriageRequest"];
+                };
+            };
+            responses: {
+                /** @description Guncel bilgi. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MarriageResponse"];
+                    };
+                };
+                /** @description Alan eksik. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.person.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi yok ya da kapsam disi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Medeni hal Evli degil; tarih bugunden sonra veya dogum tarihinden once. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /** Evlilik bilgisini siler (kayit yumusak silinir). */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Silindi. */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`personnel.person.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Kisi veya evlilik bilgisi yok ya da kapsam disi. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Medeni hal Evli degil. */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/export/fields": {
         parameters: {
             query?: never;
@@ -5038,6 +5185,28 @@ export interface components {
          * @enum {unknown}
          */
         MaritalStatusKind: "married" | "notMarried";
+        /** @description Evlilik bilgisi istegi. */
+        MarriageRequest: {
+            /**
+             * Format: date
+             * @description Evlilik tarihi.
+             */
+            marriageDate: null | string;
+            /** @description Evlilik yardimi alindi mi. */
+            allowanceReceived: null | boolean;
+        };
+        /** @description Evlilik bilgisi (karttaki bolum). */
+        MarriageResponse: {
+            /**
+             * Format: date
+             * @description Evlilik tarihi; kayitli degilse bos ("Kayitli degil").
+             */
+            marriageDate: null | string;
+            /** @description Evlilik yardimi alindi mi; kayitli degilse bos. */
+            allowanceReceived: null | boolean;
+            /** @description Kullanici bu bilgiyi girebilir mi: giris izni ve medeni hal Evli. */
+            editable: boolean;
+        };
         /**
          * @description Uye olamama nedeni.
          * @enum {unknown}
@@ -5319,6 +5488,7 @@ export interface components {
             sensitive: null | components["schemas"]["SensitiveResponse"];
             /** @description Fotografi var mi; varsa `/persons/{personId}/photo` (kendi kartinda `/persons/me/photo`) ucundan alinir. */
             hasPhoto: boolean;
+            marriage?: null | components["schemas"]["MarriageResponse"];
         };
         /**
          * @description Disa aktarilabilen alan; degerler uygulama katmanindaki PersonExportField ile aynidir.

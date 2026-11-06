@@ -1,6 +1,7 @@
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Exceptions;
 using Dsg.Hrms.Application.Common.Security;
+using Dsg.Hrms.Application.Identity.Authorization;
 using Dsg.Hrms.Application.Personnel.Access;
 using Dsg.Hrms.Domain.Personnel;
 
@@ -46,7 +47,18 @@ public sealed record PersonCard(
 {
     /// <summary>Kisinin fotografi var mi; yoksa bas harfler gosterilir (SYG-PERS-040).</summary>
     public bool HasPhoto { get; init; }
+
+    /// <summary>
+    /// Evlilik bolumu; yalnizca <c>view_sensitive</c> izni olana, kisinin kendisi dahil degil
+    /// (ADR-0019 §2). Goremeyende <c>null</c> ve yanitta bolum yoktur.
+    /// </summary>
+    public MarriageCard? Marriage { get; init; }
 }
+
+/// <summary>Kartin evlilik bolumu (SYG-PERS-036).</summary>
+/// <param name="Record">Girilmis bilgi; kayitli degilse <c>null</c> ("Kayitli degil").</param>
+/// <param name="Editable">Giris izni var ve medeni hal Evli; Bekar'a donmusse bilgi korunur ama duzenlenemez.</param>
+public sealed record MarriageCard(MarriageRecord? Record, bool Editable);
 
 /// <summary>Kartin korumali alanlari (ADR-0019 §2). Alan bos ise "Kayitli degil".</summary>
 /// <param name="Address">Adres; kayitli degilse <c>null</c>.</param>
@@ -194,6 +206,9 @@ public sealed class PersonCardService
             sensitive)
         {
             HasPhoto = record.HasPhoto,
+            Marriage = PersonFieldVisibility.CanSeeMarriage(viewer)
+                ? new MarriageCard(record.Marriage, viewer.Has(Permissions.PersonUpdate) && record.Profile.MaritalStatus == MaritalStatus.Married)
+                : null,
         };
     }
 }

@@ -226,6 +226,29 @@ describe('PersonCardPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('evlilik bilgisi yalnizca yanitta varsa gorunur (SYG-PERS-036)', async () => {
+    // Bolum yalnizca view_sensitive izni olanin yanitinda bulunur (ADR-0019 §2).
+    vi.spyOn(personsApi, 'card').mockResolvedValueOnce(person());
+    const view = renderAt('/personnel/p-1');
+    const plain = await screen.findByRole('region', { name: 'Genel Bilgiler' });
+    expect(within(plain).queryByText('Evlilik tarihi')).not.toBeInTheDocument();
+    view.unmount();
+
+    vi.spyOn(personsApi, 'card').mockResolvedValue(
+      person({ marriage: { marriageDate: null, allowanceReceived: null, editable: false } }),
+    );
+    renderAt('/personnel/p-1');
+    const general = await screen.findByRole('region', { name: 'Genel Bilgiler' });
+    expect(within(general).getByText('Evlilik tarihi').nextSibling).toHaveTextContent(
+      'Kayıtlı değil',
+    );
+    expect(within(general).getByText('Evlilik yardımı').nextSibling).toHaveTextContent(
+      'Kayıtlı değil',
+    );
+    // Giris izni yok: duzenleme dugmesi ve neden yazilmaz.
+    expect(within(general).queryByRole('button')).not.toBeInTheDocument();
+  });
+
   it('tek istihdamda sekme cubugu gosterilmez', async () => {
     vi.spyOn(personsApi, 'card').mockResolvedValue(person({ employments: [ACTIVE] }));
     renderAt('/personnel/p-1');

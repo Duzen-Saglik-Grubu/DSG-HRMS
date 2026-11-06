@@ -1949,6 +1949,172 @@
         }
       }
     },
+    "/api/v1/personnel/persons/{personId}/marriage": {
+      "put": {
+        "tags": [
+          "Marriage"
+        ],
+        "summary": "Evlilik bilgisini girer veya degistirir.",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarriageRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarriageRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarriageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Guncel bilgi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarriageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Alan eksik.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.person.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi yok ya da kapsam disi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Medeni hal Evli degil; tarih bugunden sonra veya dogum tarihinden once.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Marriage"
+        ],
+        "summary": "Evlilik bilgisini siler (kayit yumusak silinir).",
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Silindi.",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`personnel.person.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kisi veya evlilik bilgisi yok ya da kapsam disi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Medeni hal Evli degil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/export/fields": {
       "get": {
         "tags": [
@@ -6187,6 +6353,61 @@
         ],
         "description": "Medeni hal."
       },
+      "MarriageRequest": {
+        "required": [
+          "marriageDate",
+          "allowanceReceived"
+        ],
+        "type": "object",
+        "properties": {
+          "marriageDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Evlilik tarihi.",
+            "format": "date"
+          },
+          "allowanceReceived": {
+            "type": [
+              "null",
+              "boolean"
+            ],
+            "description": "Evlilik yardimi alindi mi."
+          }
+        },
+        "description": "Evlilik bilgisi istegi."
+      },
+      "MarriageResponse": {
+        "required": [
+          "marriageDate",
+          "allowanceReceived",
+          "editable"
+        ],
+        "type": "object",
+        "properties": {
+          "marriageDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Evlilik tarihi; kayitli degilse bos (\"Kayitli degil\").",
+            "format": "date"
+          },
+          "allowanceReceived": {
+            "type": [
+              "null",
+              "boolean"
+            ],
+            "description": "Evlilik yardimi alindi mi; kayitli degilse bos."
+          },
+          "editable": {
+            "type": "boolean",
+            "description": "Kullanici bu bilgiyi girebilir mi: giris izni ve medeni hal Evli."
+          }
+        },
+        "description": "Evlilik bilgisi (karttaki bolum)."
+      },
       "MembershipBlockerName": {
         "enum": [
           "noEmail",
@@ -6865,6 +7086,17 @@
           "hasPhoto": {
             "type": "boolean",
             "description": "Fotografi var mi; varsa `/persons/{personId}/photo` (kendi kartinda `/persons/me/photo`) ucundan alinir."
+          },
+          "marriage": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Evlilik bilgisi (SYG-PERS-036); yalnizca `view_sensitive` izniyle yazilir, digerlerinde alan yoktur (ADR-0019 §2).",
+                "$ref": "#/components/schemas/MarriageResponse"
+              }
+            ]
           }
         },
         "description": "Kisi karti."
@@ -8321,6 +8553,9 @@
     },
     {
       "name": "EmploymentHistory"
+    },
+    {
+      "name": "Marriage"
     },
     {
       "name": "PersonExport"

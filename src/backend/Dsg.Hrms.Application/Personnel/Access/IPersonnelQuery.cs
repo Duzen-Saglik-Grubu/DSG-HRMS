@@ -133,7 +133,18 @@ public sealed record PersonRecord(
     /// bakista okunur; digerlerinde bos (SYG-PERS-052).
     /// </summary>
     public IReadOnlyList<EmergencyContactRecord> EmergencyContacts { get; init; } = [];
+
+    /// <summary>
+    /// Evlilik bilgisi (SYG-PERS-036). Yalnizca <c>view_sensitive</c> izni olan bakista okunur;
+    /// digerlerinde ve kayitli degilse <c>null</c> (ADR-0019 §2).
+    /// </summary>
+    public MarriageRecord? Marriage { get; init; }
 }
+
+/// <summary>Evlilik bilgisi (SYG-PERS-036).</summary>
+/// <param name="MarriageDate">Evlilik tarihi.</param>
+/// <param name="AllowanceReceived">Evlilik yardimi alindi mi.</param>
+public sealed record MarriageRecord(DateOnly MarriageDate, bool AllowanceReceived);
 
 /// <summary>Acil durum kisisi (SYG-PERS-043).</summary>
 /// <param name="Id">Kaydin dis kimligi.</param>

@@ -18,6 +18,7 @@ using Dsg.Hrms.Application.Personnel.EmergencyContacts;
 using Dsg.Hrms.Application.Personnel.Export;
 using Dsg.Hrms.Application.Personnel.History;
 using Dsg.Hrms.Application.Personnel.Listing;
+using Dsg.Hrms.Application.Personnel.Marriage;
 using Dsg.Hrms.Application.Personnel.Quality;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Application.Reference;
@@ -191,6 +192,8 @@ public static class InfrastructureRegistration
         services.AddScoped<EmploymentHistoryService>();
         services.AddScoped<IEmergencyContactStore, EmergencyContactStore>();
         services.AddScoped<EmergencyContactService>();
+        services.AddScoped<IMarriageStore, MarriageStore>();
+        services.AddScoped<MarriageService>();
 
         // "IK'ya bildir" ve uygulama ici bildirim kutusu (ADR-0022 §3, SYG-PERS-045…049).
         services.AddScoped<ICorrectionStore, CorrectionStore>();
