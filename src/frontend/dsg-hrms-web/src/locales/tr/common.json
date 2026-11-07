@@ -318,12 +318,13 @@
   "system": {
     "parameters": {
       "title": "Sistem parametreleri",
-      "subtitle": "Kimlik yönetiminin çalışma kurallarını değiştirin. Değişiklik en geç 1 dakika içinde etkili olur ve denetim kaydına yazılır.",
+      "subtitle": "Kimlik yönetiminin ve personel modülünün çalışma kurallarını değiştirin. Değişiklik en geç 1 dakika içinde etkili olur ve denetim kaydına yazılır.",
       "groups": {
         "GRN": "Genel",
         "KML": "Kimlik ve oturum",
         "HSP": "Hesap işlemleri",
         "PRS": "Personel",
+        "KVK": "KVKK",
         "ENT": "Entegrasyonlar",
         "BLD": "Bildirim"
       },
@@ -379,6 +380,7 @@
         "PRM-GRN-04": "Destek iletişim bilgisi (üyelik ve giriş ekranları)",
         "PRM-PRS-01": "Ayrılan personelin görünür kalma süresi (yıl; boş = süresiz)",
         "PRM-PRS-02": "İK'ya bildir e-posta adresi (boş = e-posta gönderilmez)",
+        "PRM-KVK-03": "Personel verisinin saklama süresi (yıl; boş = karar bekliyor)",
         "PRM-BLD-01": "Sistem uyarılarının (senkronizasyon hatası, şema sapması) bildirildiği roller",
         "PRM-BLD-03": "Bildirim istisnasının işlemsel iletileri kapsamaması"
       },

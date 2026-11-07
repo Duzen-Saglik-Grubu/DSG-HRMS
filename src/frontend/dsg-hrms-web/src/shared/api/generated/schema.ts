@@ -162,7 +162,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * T3 parametrelerini katalog sirasiyla, gecerli degerleriyle listeler.
+         * T3 ve T1 parametrelerini katalog sirasiyla, gecerli degerleriyle listeler.
          * @description Tum listeleme uclari gibi sayfalidir (ADR-0010 §4); katalog tek sayfaya sigar.
          */
         get: {
@@ -294,7 +294,7 @@ export interface paths {
                         "application/json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Deger turune veya araligina uymuyor ya da 2FA etki onayi verilmedi; hicbir sey kaydedilmedi. */
+                /** @description Deger turune veya araligina uymuyor, en buyuk sayfa boyutu varsayilandan kucuk kaliyor ya da 2FA etki onayi verilmedi; hicbir sey kaydedilmedi. */
                 422: {
                     headers: {
                         [name: string]: unknown;

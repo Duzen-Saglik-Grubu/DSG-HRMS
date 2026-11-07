@@ -33,7 +33,7 @@ const TWO_FACTOR_KEY = 'PRM-KML-08';
  * de sonda kendi grubunda gosterilir; yeni bir bolumun parametreleri ekrandan dusmez
  * (PRM-PRS-01 bu yuzden gorunmuyordu).
  */
-const GROUPS = ['GRN', 'KML', 'HSP', 'PRS', 'ENT', 'BLD'] as const;
+const GROUPS = ['GRN', 'KML', 'HSP', 'PRS', 'KVK', 'ENT', 'BLD'] as const;
 
 const groupOf = (key: string) => key.split('-')[1] ?? 'GRN';
 
@@ -47,9 +47,10 @@ function groupsOf(items: readonly Parameter[]): string[] {
 }
 
 /**
- * En kucuk parametre ekrani (SYG-KMLK-076): yalnizca T3 parametreleri ve kurumsal logo.
+ * Parametre ekrani (SYG-KMLK-076, SYG-PERS-075): T3 ve T1 parametreleri ve kurumsal logo.
  *
- * Deger turune gore duzenlenir ve sunucuda dogrulanir; gecersiz deger kaydedilmez. Sir
+ * Deger turune gore duzenlenir ve sunucuda dogrulanir; gecersiz deger kaydedilmez. Bos degerin
+ * anlamli oldugu parametrelerde (or. "suresiz") deger silinip kaydedilebilir. Sir
  * niteligindeki parametrelerin degeri gosterilmez, yalnizca yeni deger yazilir (`KR-071`).
  * Parametre ekraninin tamami Y4 kapsamindadir ve bu ekrani genisletir.
  */

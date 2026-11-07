@@ -8,7 +8,7 @@ import { setSession } from '@/test/session';
 import { parametersApi, type Parameter } from '../../api/parametersApi';
 import { ParametersPage } from '../ParametersPage';
 
-/** En kucuk parametre ekrani (SYG-KMLK-076) ve kurumsal logo (PRM-GRN-01). Veriler SENTETIKTIR. */
+/** Parametre ekrani (SYG-KMLK-076, SYG-PERS-075) ve kurumsal logo (PRM-GRN-01). Veriler SENTETIKTIR. */
 const PARAMETERS: Parameter[] = [
   {
     key: 'PRM-KML-03',
@@ -110,6 +110,35 @@ describe('ParametersPage', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'YNI' })).toBeInTheDocument();
     expect(screen.getByText('Yeni bolumun parametresi')).toBeInTheDocument();
+  });
+
+  it('KVKK grubunda saklama suresini gosterir; bos birakilabilen deger silinip kaydedilir (SYG-PERS-075)', async () => {
+    vi.spyOn(parametersApi, 'list').mockResolvedValue([
+      ...PARAMETERS,
+      {
+        key: 'PRM-KVK-03',
+        description: 'Personel verisinin saklama suresi',
+        type: 'number',
+        min: 1,
+        max: 100,
+        value: '10',
+        isSet: true,
+        source: 'database',
+      },
+    ]);
+    const update = vi.spyOn(parametersApi, 'update').mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    renderWithProviders(<ParametersPage />);
+
+    expect(await screen.findByRole('heading', { name: 'KVKK' })).toBeInTheDocument();
+    const label = 'Personel verisinin saklama süresi (yıl; boş = karar bekliyor)';
+    expect(within(rowOf(label)).getByText('1 ile 100 arasında')).toBeInTheDocument();
+
+    // Bos = karar bekliyor: deger silinip kaydedilebilir.
+    await user.clear(screen.getByLabelText(label));
+    await user.click(within(rowOf(label)).getByRole('button', { name: 'Kaydet' }));
+
+    expect(update).toHaveBeenCalledWith('PRM-KVK-03', '');
   });
 
   it('gizli degeri gostermez; yalnizca tanimli oldugunu soyler ve yeni degeri yazdirir', async () => {

@@ -52,13 +52,44 @@ public sealed class ParameterCatalogScopeTests
             $"{key} ({name}) hicbir SYG maddesinin Parametre sutununda yok. Parametre ya onayli bir gereksinime baglanir ya da katalogdan cikarilir (#198).");
     }
 
+    /// <summary>
+    /// Onayli gereksinimin bu asamada bilerek hicbir davranisa BAGLAMADIGI parametreler; anahtar
+    /// kimlik, deger dayanagi. Yalnizca gereksinim "tanimlanir ama uygulanmaz" diyorsa eklenir.
+    /// </summary>
+    private static readonly Dictionary<string, string> StoredButNotYetApplied = new(StringComparer.Ordinal)
+    {
+        // Saklama suresi parametrede tanimlanir; T1'de hicbir kayit silinmez, imha Y2'dedir.
+        ["PRM-KVK-03"] = "SYG-PERS-068 (PG-PERS-45, KR-116)",
+    };
+
+    [Fact]
+    public void Exemptions_are_in_the_catalog_and_backed_by_their_requirement()
+    {
+        var requirements = SystemRequirementParameterCells();
+        foreach (var (key, basis) in StoredButNotYetApplied)
+        {
+            ParameterCatalog.Find(key).ShouldNotBeNull($"{key} katalogda yok; istisna kaldirilmali.");
+            requirements.ShouldContain(cell => cell.Contains(key, StringComparison.Ordinal), $"{key} ({basis}) bir SYG maddesinde yok.");
+        }
+    }
+
     [Theory]
     [MemberData(nameof(CatalogEntries))]
     public void Every_parameter_is_read_by_the_code(string key, string name)
     {
         var usage = $"ParameterCatalog.{name}";
+        var sources = ProductionSources();
 
-        ProductionSources().ShouldContain(
+        if (StoredButNotYetApplied.ContainsKey(key))
+        {
+            // Istisna sessizce kalici olmasin: parametre okunmaya baslayinca listeden cikarilir.
+            sources.ShouldNotContain(
+                source => source.Contains(usage, StringComparison.Ordinal),
+                $"{key} ({name}) artik kodda okunuyor; StoredButNotYetApplied listesinden cikarin.");
+            return;
+        }
+
+        sources.ShouldContain(
             source => source.Contains(usage, StringComparison.Ordinal),
             $"{key} ({name}) katalog disinda hicbir yerde okunmuyor; ekranda gorunur ama hicbir davranisi degistirmez (#198).");
     }

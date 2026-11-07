@@ -1,3 +1,4 @@
+using System.Globalization;
 using Dsg.Hrms.Application.Common.Exceptions;
 using Dsg.Hrms.Application.Settings;
 using Dsg.Hrms.Domain.Settings;
@@ -91,6 +92,8 @@ public sealed class SystemParameterEditor : ISystemParameterEditor
                 throw new BusinessRuleException(validation.Error!);
             }
 
+            await EnsurePageSizesAreConsistentAsync(parameter, validation.CanonicalValue!, cancellationToken).ConfigureAwait(false);
+
             if (!row.SetValue(validation.CanonicalValue!))
             {
                 return;
@@ -99,5 +102,40 @@ public sealed class SystemParameterEditor : ISystemParameterEditor
 
         await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         _parameters.Invalidate();
+    }
+
+    /// <summary>
+    /// En buyuk sayfa boyutu varsayilan sayfa boyutundan kucuk olamaz (SYG-PERS-075). Kural iki
+    /// yonde uygulanir: varsayilani en buyugun ustune cikaran veya en buyugu varsayilanin altina
+    /// indiren degisiklik kaydedilmez.
+    /// </summary>
+    private async Task EnsurePageSizesAreConsistentAsync(ParameterDefinition parameter, string value, CancellationToken cancellationToken)
+    {
+        var isDefault = ReferenceEquals(parameter, ParameterCatalog.DefaultPageSize);
+        if (!isDefault && !ReferenceEquals(parameter, ParameterCatalog.MaxPageSize))
+        {
+            return;
+        }
+
+        var other = isDefault ? ParameterCatalog.MaxPageSize : ParameterCatalog.DefaultPageSize;
+        var rows = await SystemParameters.LoadRowsAsync(_context, cancellationToken).ConfigureAwait(false);
+        var otherValue = _parameters.Resolve(other, rows, revealSecret: false).Value;
+        if (!int.TryParse(otherValue, NumberStyles.None, CultureInfo.InvariantCulture, out var current))
+        {
+            return;
+        }
+
+        var number = int.Parse(value, CultureInfo.InvariantCulture);
+        if (isDefault && number > current)
+        {
+            throw new BusinessRuleException(
+                string.Create(CultureInfo.InvariantCulture, $"Varsayılan sayfa boyutu en büyük sayfa boyutunu ({current}) aşamaz."));
+        }
+
+        if (!isDefault && number < current)
+        {
+            throw new BusinessRuleException(
+                string.Create(CultureInfo.InvariantCulture, $"En büyük sayfa boyutu varsayılan sayfa boyutundan ({current}) küçük olamaz."));
+        }
     }
 }

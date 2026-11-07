@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Dsg.Hrms.Application.Settings;
 
 /// <summary>
-/// T3'un kullandigi parametrelerin katalogu (SYG-KMLK-075).
+/// T3 ve T1'in kullandigi parametrelerin katalogu (SYG-KMLK-075, SYG-PERS-075).
 /// </summary>
 /// <remarks>
 /// <para>
@@ -219,6 +219,21 @@ public static partial class ParameterCatalog
     public static readonly ParameterDefinition TransactionalMessagesBypassExemption = Boolean(
         "PRM-BLD-03", "TransactionalMessagesBypassExemption", "Bildirim istisnasinin islemsel iletileri kapsamamasi", true);
 
+    // ------------------------------------------------------------------ KVKK
+
+    /// <summary>
+    /// HRMS'teki personel verisinin saklama suresi, yil (PG-PERS-45, KR-116; SYG-PERS-068). Bos =
+    /// karar bekliyor. T1'de hicbir kod bu parametreye gore kayit SILMEZ; imha Y2'dedir.
+    /// </summary>
+    /// <remarks>
+    /// <c>PRM-KVK-01</c> ve <c>02</c> (denetim izi ve erisim kaydi) Y2 Denetim ve Erisim Kayitlari
+    /// modulu kapsamindadir; islevleri gelene kadar katalogda yer almaz.
+    /// </remarks>
+    public static readonly ParameterDefinition PersonnelRetentionYears = new(
+        "PRM-KVK-03", $"{Section}:PersonnelRetentionYears", ParameterType.Number,
+        "Personel verisinin saklama suresi (yil; bos = karar bekliyor)",
+        DefaultValue: null, Min: 1, Max: 100, AllowEmpty: true);
+
     /// <summary>Katalogdaki tum parametreler, kimlige gore sirali.</summary>
     public static IReadOnlyList<ParameterDefinition> All { get; } =
     [
@@ -232,7 +247,7 @@ public static partial class ParameterCatalog
             RegistrationLimitPerNationalId, RegistrationLimitPerIp, RequirePasswordChangeOnFirstLogin, PasswordMaxAgeDays,
             HrInviteEnabled, AutoDeactivateOnEmploymentEnd, InviteLinkLifetimeHours,
             SupportContact, AlertRecipientRoles, TransactionalMessagesBypassExemption,
-            DefaultPageSize, MaxPageSize, TerminatedVisibilityYears, CorrectionNoticeEmail,
+            DefaultPageSize, MaxPageSize, TerminatedVisibilityYears, CorrectionNoticeEmail, PersonnelRetentionYears,
         }.OrderBy(p => p.Key, StringComparer.Ordinal),
     ];
 
