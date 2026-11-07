@@ -64,6 +64,12 @@ const ReferenceDataPage = lazy(async () => {
   return { default: page.ReferenceDataPage };
 });
 
+const AuditLogPage = lazy(async () => {
+  const page = await import('@/features/audit/pages/AuditLogPage');
+
+  return { default: page.AuditLogPage };
+});
+
 const PersonListPage = lazy(async () => {
   const page = await import('@/features/personnel/pages/PersonListPage');
 
@@ -193,6 +199,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<RouteFallback />}>
             <ReferenceDataPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: routes.auditLog,
+        element: (
+          <Suspense fallback={<RouteFallback />}>
+            <AuditLogPage />
           </Suspense>
         ),
       },

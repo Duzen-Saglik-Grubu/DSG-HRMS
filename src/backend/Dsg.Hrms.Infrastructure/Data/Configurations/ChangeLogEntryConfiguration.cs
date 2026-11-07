@@ -48,5 +48,8 @@ public sealed class ChangeLogEntryConfiguration : IEntityTypeConfiguration<Chang
         // Ucuncu soru: "bu istekte neler degisti?" — uygulama gunlugundeki
         // CorrelationId ile denetim izini birlestirir.
         builder.HasIndex(entry => entry.TraceId);
+
+        // Denetim kayitlari ekrani: zamana gore yeniden eskiye (SYG-PERS-069).
+        builder.HasIndex(entry => entry.OccurredAt);
     }
 }

@@ -265,6 +265,12 @@ public sealed class LayerDependencyTests
         ["Infrastructure: Personnel -> Reference"] = "kartta unvan adi referans veriden (SYG-PERS-038)",
         ["Api: Reference -> Identity"] = "referans veri uclarinda yetki ozniteligi ve izin kodlari (SYG-PERS-072)",
         ["Api: Personnel -> Identity"] = "gorev girisi ucunda yetki ozniteligi ve izin kodlari (SYG-PERS-042)",
+
+        // Denetim kayitlari ekrani (SYG-PERS-069): islemi yapan hesap ve verisi goruntulenen kisi
+        // adlariyla gosterilir; kisi suzgeci hesap kimligine cevrilir. Yalnizca okuma.
+        ["Infrastructure: Audit -> Identity"] = "denetim ekraninda islemi yapan hesabin kisisi",
+        ["Infrastructure: Audit -> Personnel"] = "denetim ekraninda kisi adlari ve kisi suzgeci",
+        ["Api: Audit -> Identity"] = "denetim ucunda yetki ozniteligi ve izin kodlari",
     };
 
     [Fact]

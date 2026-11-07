@@ -5286,6 +5286,121 @@
           }
         }
       }
+    },
+    "/api/v1/audit/entries": {
+      "get": {
+        "tags": [
+          "AuditEntries"
+        ],
+        "summary": "Degisiklik, erisim, disa aktarma ve guvenlik olayi kayitlarini yeniden eskiye, sayfali\nlisteler. Maskeli degerler maskeli kalir.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AuditEntryKind"
+            }
+          },
+          {
+            "name": "actorId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "subjectId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kayitlar.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResponseOfAuditEntryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Sayfa, tarih araligi veya derinlik gecersiz.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`audit.log.view`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5501,6 +5616,146 @@
           }
         },
         "description": "Bir atama donemi."
+      },
+      "AuditEntryKind": {
+        "enum": [
+          "change",
+          "access",
+          "export",
+          "security"
+        ],
+        "description": "Denetim kaydi turu."
+      },
+      "AuditEntryResponse": {
+        "required": [
+          "id",
+          "type",
+          "occurredAt",
+          "action",
+          "actor",
+          "entityName",
+          "entityId",
+          "subject",
+          "recordCount",
+          "subjectCount",
+          "details",
+          "traceId",
+          "ipAddress"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Satir kimligi (ornek `change-42`)."
+          },
+          "type": {
+            "description": "Tur.",
+            "$ref": "#/components/schemas/AuditEntryKind"
+          },
+          "occurredAt": {
+            "type": "string",
+            "description": "Zaman (UTC).",
+            "format": "date-time"
+          },
+          "action": {
+            "type": "string",
+            "description": "Islem kodu: `Insert`/`Update`/`Delete`; erisim turu (`View`, `List`, `Export` ...); guvenlik olayi turu (`SignInSucceeded` ...)."
+          },
+          "actor": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Islemi yapan; arka plan isleminde bos (\"Sistem\").",
+                "$ref": "#/components/schemas/AuditPersonResponse"
+              }
+            ]
+          },
+          "entityName": {
+            "type": "string",
+            "description": "Kayit turu."
+          },
+          "entityId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Kaydin dis kimligi; yoksa bos.",
+            "format": "uuid"
+          },
+          "subject": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Verisi goruntulenen veya olayin konusu olan kisi; yoksa bos.",
+                "$ref": "#/components/schemas/AuditPersonResponse"
+              }
+            ]
+          },
+          "recordCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "description": "Erisilen kayit sayisi (erisim ve disa aktarma).",
+            "format": "int32"
+          },
+          "subjectCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Verisi gosterilen kisi sayisi (liste ve disa aktarma).",
+            "format": "int32"
+          },
+          "details": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Kayittaki ayrinti; maskeli degerler maskeli kalir."
+          },
+          "traceId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Uygulama gunlugu ile iliskilendirme kimligi."
+          },
+          "ipAddress": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Istegin geldigi IP adresi."
+          }
+        },
+        "description": "Bir denetim kaydi."
+      },
+      "AuditPersonResponse": {
+        "required": [
+          "personId",
+          "fullName"
+        ],
+        "type": "object",
+        "properties": {
+          "personId": {
+            "type": "string",
+            "description": "Kisinin dis kimligi.",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Ad soyad."
+          }
+        },
+        "description": "Kayitta adiyla gosterilen kisi."
       },
       "ChangePasswordRequest": {
         "required": [
@@ -6454,6 +6709,62 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AccountSummaryResponse"
+            },
+            "description": "Bu sayfadaki kayitlar."
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa numarasi.",
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Sayfa boyutu.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam kayit sayisi.",
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Toplam sayfa sayisi.",
+            "format": "int32"
+          }
+        },
+        "description": "Sayfalanmis yanit (ADR-0010 §4)."
+      },
+      "PagedResponseOfAuditEntryResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditEntryResponse"
             },
             "description": "Bu sayfadaki kayitlar."
           },
@@ -8598,6 +8909,9 @@
     },
     {
       "name": "SyncRuns"
+    },
+    {
+      "name": "AuditEntries"
     }
   ]
 }

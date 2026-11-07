@@ -19,6 +19,7 @@ export const permissions = {
   syncCreate: 'personnel.sync.create',
   referenceView: 'reference.definition.view',
   referenceUpdate: 'reference.definition.update',
+  auditLogView: 'audit.log.view',
   parameterView: 'system.parameter.view',
   parameterUpdate: 'system.parameter.update',
 } as const;

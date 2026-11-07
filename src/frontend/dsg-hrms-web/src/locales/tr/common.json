@@ -19,6 +19,7 @@
     "accounts": "Hesap işlemleri",
     "parameters": "Sistem parametreleri",
     "referenceData": "Referans veri",
+    "auditLog": "Denetim kayıtları",
     "collapse": "Menüyü daralt",
     "expand": "Menüyü genişlet",
     "myAccount": "Hesabım",
@@ -926,5 +927,90 @@
       }
     },
     "open": "Aç"
+  },
+  "audit": {
+    "title": "Denetim kayıtları",
+    "subtitle": "Değişiklik, erişim, dışa aktarma ve güvenlik olayı kayıtları. Kayıtlar salt okunurdur; maskeli değerler maskeli kalır. Bu ekranı görüntülemek de kayda geçer.",
+    "caption": "Denetim kayıtları",
+    "empty": "Bu süzgeçlere uyan kayıt yok.",
+    "emptyText": "Tarih aralığını genişletin veya süzgeçleri kaldırın.",
+    "system": "Sistem",
+    "subjectCount": "{{count}} kişi",
+    "detail": "Ayrıntı",
+    "detailTitle": "Kayıt ayrıntısı",
+    "close": "Kapat",
+    "filters": {
+      "type": "Kayıt türü",
+      "allTypes": "Tümü",
+      "actor": "İşlemi yapan",
+      "subject": "Verisi görüntülenen kişi",
+      "typeToSearch": "Aramak için en az 2 harf yazın",
+      "noPerson": "Kişi bulunamadı"
+    },
+    "columns": {
+      "occurredAt": "Zaman",
+      "type": "Tür",
+      "action": "İşlem",
+      "actor": "İşlemi yapan",
+      "entity": "Kayıt",
+      "subject": "Kişi"
+    },
+    "fields": {
+      "entityId": "Kayıt kimliği",
+      "recordCount": "Kayıt sayısı",
+      "subjectCount": "Verisi gösterilen kişi sayısı",
+      "traceId": "İzleme kimliği",
+      "ipAddress": "IP adresi",
+      "details": "Kayıttaki ayrıntı"
+    },
+    "types": {
+      "change": "Değişiklik",
+      "access": "Erişim",
+      "export": "Dışa aktarma",
+      "security": "Güvenlik olayı"
+    },
+    "actions": {
+      "Insert": "Ekleme",
+      "Update": "Güncelleme",
+      "Delete": "Silme",
+      "View": "Görüntüleme",
+      "SpecialCategoryView": "Özel nitelikli veri görüntüleme",
+      "List": "Listeleme",
+      "Export": "Dışa aktarma",
+      "Report": "Rapor",
+      "FileDownload": "Dosya indirme",
+      "RegistrationStarted": "Üyelik başladı",
+      "VerificationCodeSent": "Doğrulama kodu gönderildi",
+      "VerificationSucceeded": "Doğrulama başarılı",
+      "VerificationFailed": "Doğrulama başarısız",
+      "AccountCreated": "Hesap oluşturuldu",
+      "SignInSucceeded": "Giriş başarılı",
+      "SignInFailed": "Giriş başarısız",
+      "AccountLocked": "Hesap kilitlendi",
+      "PasswordChanged": "Parola değiştirildi",
+      "PasswordChangeFailed": "Parola değişikliği reddedildi",
+      "PasswordReset": "Parola sıfırlandı",
+      "SessionEnded": "Oturum kapandı",
+      "TokenReuseDetected": "Yenileme jetonu tekrar kullanıldı",
+      "InvitationSent": "Davet gönderildi",
+      "InvitationAccepted": "Davet kullanıldı",
+      "TwoFactorEnabled": "İki adımlı doğrulama açıldı",
+      "TwoFactorDisabled": "İki adımlı doğrulama kapatıldı",
+      "TwoFactorChangeFailed": "İki adımlı doğrulama değişikliği reddedildi"
+    },
+    "entities": {
+      "Person": "Kişi",
+      "UserAccount": "Hesap",
+      "EmergencyContact": "Acil durum kişisi",
+      "PersonMarriage": "Evlilik bilgisi",
+      "EmploymentDuty": "Görev",
+      "EmploymentAssignment": "Atama",
+      "Employment": "İstihdam",
+      "ReferenceDefinition": "Referans tanımı",
+      "CorrectionRequest": "Düzeltme talebi",
+      "PersonDataQuality": "Veri kalitesi raporu",
+      "AuditLog": "Denetim kayıtları",
+      "SystemParameter": "Sistem parametresi"
+    }
   }
 }

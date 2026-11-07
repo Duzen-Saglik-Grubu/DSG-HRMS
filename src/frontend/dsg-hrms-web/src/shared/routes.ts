@@ -16,6 +16,7 @@ export const routes = {
   invite: '/invite',
   parameters: '/system/parameters',
   referenceData: '/system/reference-data',
+  auditLog: '/system/audit-log',
   personnel: '/personnel',
   corrections: '/personnel/corrections',
   quality: '/personnel/quality',

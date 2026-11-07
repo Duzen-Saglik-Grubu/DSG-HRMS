@@ -1,3 +1,4 @@
+using Dsg.Hrms.Application.Audit;
 using Dsg.Hrms.Application.Common.Abstractions;
 using Dsg.Hrms.Application.Common.Configuration;
 using Dsg.Hrms.Application.Common.Reports;
@@ -194,6 +195,8 @@ public static class InfrastructureRegistration
         services.AddScoped<EmergencyContactService>();
         services.AddScoped<IMarriageStore, MarriageStore>();
         services.AddScoped<MarriageService>();
+        services.AddScoped<IAuditLogQuery, AuditLogQuery>();
+        services.AddScoped<AuditLogService>();
 
         // "IK'ya bildir" ve uygulama ici bildirim kutusu (ADR-0022 §3, SYG-PERS-045…049).
         services.AddScoped<ICorrectionStore, CorrectionStore>();

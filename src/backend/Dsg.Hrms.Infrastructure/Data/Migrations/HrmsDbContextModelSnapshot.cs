@@ -82,6 +82,9 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_access_log");
 
+                    b.HasIndex("OccurredAt")
+                        .HasDatabaseName("ix_access_log_occurred_at");
+
                     b.HasIndex("SubjectIds")
                         .HasDatabaseName("ix_access_log_subject_ids");
 
@@ -154,6 +157,9 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_change_log");
 
+                    b.HasIndex("OccurredAt")
+                        .HasDatabaseName("ix_change_log_occurred_at");
+
                     b.HasIndex("TraceId")
                         .HasDatabaseName("ix_change_log_trace_id");
 
@@ -214,6 +220,9 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_security_event");
+
+                    b.HasIndex("OccurredAt")
+                        .HasDatabaseName("ix_security_event_occurred_at");
 
                     b.HasIndex("TraceId")
                         .HasDatabaseName("ix_security_event_trace_id");
