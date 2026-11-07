@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.6-BKD
 **Süreç:** MAN.6 — Bilgi Yönetimi (`MAN.6.BP1`–`BP4`)
-**Son güncelleme:** 2026-11-03 · **Sahibi:** Bilgi İşlem
+**Son güncelleme:** 2026-11-07 · **Sahibi:** Bilgi İşlem
 **Kaynak:** T3 süreç denetimi, bulgu BULGU-06 (#131)
 
 > Proje boyunca üretilen veya kullanılan her bilgi kümesinin **nerede durduğu, kimin
@@ -43,7 +43,7 @@ süreler yazılı bir karara dayanmıyor; KVKK Sorumlusu'nun onayını bekliyor.
 |---|---|---|---|---|---|---|
 | BK-10 | UAT veritabanı: personel, hesaplar, denetim izi, güvenlik olayları | UAT sunucusu, Docker volume `dsg-hrms-uat_uat-postgres-data` | Bilgi İşlem | **Gizli**: gerçek personel verisi (R-25) | UAT kullanıldıkça tutulur; düzenli yedeklenmez (`KR-098`) | Üretime geçişten sonra veya UAT kapatıldığında volume silinir (`docker compose down -v`); silme kayda geçer |
 | BK-19 | Denetim izi, erişim kaydı ve güvenlik olayları (uygulama veritabanında; UAT'de BK-10 içinde, üretimde üretim veritabanında) | `audit` şeması: `change_log`, erişim kaydı, `security_event` | Bilgi İşlem | **Gizli**: kim, neyi, ne zaman; IP | **10 yıl** (KVKK Sorumlusu kararı, 14.10.2026, `KR-109`). Kayıtlar değiştirilemez (`KR-060`, `KR-094`) | Süre dolunca silinir veya anonimleştirilir; imha işi Y2 Denetim ve KVKK modülünde geliştirilir, imha kayda geçer (ADR-0009 §6) |
-| BK-29 | HRMS personel verisi: kişi ve istihdam kayıtları, LOGO'dan senkronize alanlar, HRMS'te tutulan bilgiler (evlilik bilgisi, görev, acil durum kişisi; `KR-112`) ve kan grubu | Uygulama veritabanı (UAT'de BK-10, yerelde BK-15 içinde; üretimde üretim veritabanında). Kan grubu şifreli tutulur; veri anahtarı veritabanında değil sır dosyasındadır (BK-12, BK-16; ADR-0020) | Bilgi İşlem; verinin kaynağı LOGO ve İK | **Gizli**: kişisel veri; kan grubu özel nitelikli (§3.1) | Sistem Yönetimi parametresinde tanımlanan süre (KVKK Sorumlusu kararı, 20.10.2026, `KR-116`; PG-PERS-45) | Süresi dolan kaydın imhası Y2'de geliştirilir; o zamana kadar silinmez |
+| BK-29 | HRMS personel verisi: kişi ve istihdam kayıtları, LOGO'dan senkronize alanlar, HRMS'te tutulan bilgiler (evlilik bilgisi, görev, acil durum kişisi; `KR-112`) ve kan grubu | Uygulama veritabanı (UAT'de BK-10, yerelde BK-15 içinde; üretimde üretim veritabanında). Kan grubu şifreli tutulur; veri anahtarı veritabanında değil sır dosyasındadır (BK-12, BK-16; ADR-0020) | Bilgi İşlem; verinin kaynağı LOGO ve İK | **Gizli**: kişisel veri; kan grubu özel nitelikli (§3.1) | Sistem Yönetimi parametresinde (`PRM-KVK-03`, yıl; boş = karar bekliyor) tanımlanan süre (KVKK Sorumlusu kararı, 20.10.2026, `KR-116`; PG-PERS-45) | Süresi dolan kaydın imhası Y2'de geliştirilir; o zamana kadar silinmez |
 | BK-11 | UAT uygulama günlükleri | UAT, volume `dsg-hrms-uat_uat-api-logs` | Bilgi İşlem | Kurum içi: kişisel veri maskelenir (#119) | **90 dosya (gün)**: `RetainedFileCountLimit`, ADR-0009 | Otomatik: eski dosya silinir |
 | BK-12 | UAT sır dosyası ve TLS özel anahtarı | `/opt/dsg-hrms/secrets/.env.uat` (21.10.2026'dan beri uygulamanın veritabanı çalışma rolü parolası `HRMS_APP_DB_PASSWORD` dahil, `KR-118`; kan grubunu içeren sürümden itibaren özel nitelikli veri anahtarı `PERSONAL_DATA_KEY_K1`, ADR-0020); TLS sertifikası ve özel anahtarı `/opt/dsg-hrms/tls/` (KÖ-31) | Bilgi İşlem | **Gizli** | UAT kullanıldıkça | UAT kapatıldığında silinir. Bir sır değiştirildiğinde eski değer dosyada tutulmaz. Dosyanın yedek kopyası bırakılmaz; 27.09 tarihli kopya 13.10.2026'da silindi (#207) |
 | BK-13 | UAT geçici veritabanı kopyaları | `/opt/dsg-hrms/yedek-*.sql.gz` | Bilgi İşlem | **Gizli** | Yalnızca riskli işlem sürince (`KR-098`) | İşlem doğrulanınca silinir |
@@ -106,3 +106,4 @@ md. 6, sağlık; `KR-113`). HRMS'te yalnızca aşağıdaki koşullarla işlenir:
 | 2026-10-20 | 1.8 | BK-29: HRMS personel verisi, saklama süresi parametresi; §3.1 kan grubu işleme koşulları (KVKK Sorumlusu kararı, `KR-116`, #241) | Bilgi İşlem |
 | 2026-10-21 | 1.9 | BK-12, BK-16: uygulamanın veritabanı çalışma rolü parolası (`KR-118`, #244) | Bilgi İşlem |
 | 2026-11-03 | 1.10 | BK-12, BK-16, BK-29: özel nitelikli veri anahtarının yeri (ADR-0020, #317) | Bilgi İşlem |
+| 2026-11-07 | 1.11 | BK-29: saklama süresi parametresinin kimliği `PRM-KVK-03` (#365) | Bilgi İşlem |

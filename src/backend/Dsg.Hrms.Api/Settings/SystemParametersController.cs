@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dsg.Hrms.Api.Settings;
 
 /// <summary>
-/// En kucuk parametre ekrani: yalnizca T3 parametreleri (SYG-KMLK-076).
+/// Parametre ekrani: T3 ve T1 parametreleri (SYG-KMLK-076, SYG-PERS-075).
 /// </summary>
 /// <remarks>
 /// <para>
@@ -38,7 +38,7 @@ public sealed class SystemParametersController : ControllerBase
         _twoFactorImpact = twoFactorImpact;
     }
 
-    /// <summary>T3 parametrelerini katalog sirasiyla, gecerli degerleriyle listeler.</summary>
+    /// <summary>T3 ve T1 parametrelerini katalog sirasiyla, gecerli degerleriyle listeler.</summary>
     /// <remarks>Tum listeleme uclari gibi sayfalidir (ADR-0010 §4); katalog tek sayfaya sigar.</remarks>
     /// <response code="200">Parametreler.</response>
     /// <response code="400">Gecersiz sayfa.</response>
@@ -64,7 +64,7 @@ public sealed class SystemParametersController : ControllerBase
     /// <response code="400">Deger bos.</response>
     /// <response code="403">Yetki yok (<c>system.parameter.update</c>).</response>
     /// <response code="404">Parametre katalogda yok.</response>
-    /// <response code="422">Deger turune veya araligina uymuyor ya da 2FA etki onayi verilmedi; hicbir sey kaydedilmedi.</response>
+    /// <response code="422">Deger turune veya araligina uymuyor, en buyuk sayfa boyutu varsayilandan kucuk kaliyor ya da 2FA etki onayi verilmedi; hicbir sey kaydedilmedi.</response>
     [HttpPut("{key}")]
     [HasPermission(Permissions.ParameterUpdate)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

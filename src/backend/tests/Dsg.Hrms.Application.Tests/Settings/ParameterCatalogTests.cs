@@ -86,6 +86,31 @@ public sealed partial class ParameterCatalogTests
     }
 
     [Fact]
+    public void T1_parameters_match_the_system_requirement()
+    {
+        // SYG-PERS-075: tur, aralik ve varsayilan; bos deger anlamli olanlarda gecerlidir.
+        ParameterCatalog.DefaultPageSize.ShouldSatisfyAllConditions(
+            p => p.DefaultValue.ShouldBe("24"), p => p.Min.ShouldBe(6), p => p.Max.ShouldBe(100));
+        ParameterCatalog.MaxPageSize.ShouldSatisfyAllConditions(
+            p => p.DefaultValue.ShouldBe("100"), p => p.Min.ShouldBe(24), p => p.Max.ShouldBe(100));
+        ParameterCatalog.TerminatedVisibilityYears.ShouldSatisfyAllConditions(
+            p => p.DefaultValue.ShouldBeNull(), p => p.Min.ShouldBe(1), p => p.Max.ShouldBe(50), p => p.AllowEmpty.ShouldBeTrue());
+        ParameterCatalog.CorrectionNoticeEmail.ShouldSatisfyAllConditions(
+            p => p.DefaultValue.ShouldBeNull(), p => p.AllowEmpty.ShouldBeTrue());
+
+        // PG-PERS-45, KR-116: bos = karar bekliyor; koda bir sure gomulmez (SYG-PERS-068).
+        var retention = ParameterCatalog.PersonnelRetentionYears;
+        retention.Key.ShouldBe("PRM-KVK-03");
+        retention.Type.ShouldBe(ParameterType.Number);
+        retention.DefaultValue.ShouldBeNull();
+        retention.Min.ShouldBe(1);
+        retention.Max.ShouldBe(100);
+        retention.Validate(string.Empty).IsValid.ShouldBeTrue();
+        retention.Validate("0").IsValid.ShouldBeFalse();
+        ParameterCatalog.Find("PRM-KVK-03").ShouldBeSameAs(retention);
+    }
+
+    [Fact]
     public void Find_returns_null_for_unknown_key()
     {
         ParameterCatalog.Find("PRM-XXX-99").ShouldBeNull();

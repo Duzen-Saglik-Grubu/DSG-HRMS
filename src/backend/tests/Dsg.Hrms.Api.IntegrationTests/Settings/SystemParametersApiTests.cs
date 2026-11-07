@@ -92,6 +92,72 @@ public sealed class SystemParametersApiTests : IClassFixture<RegistrationApiFixt
         (await PutJsonAsync(client, $"{Parameters}/PRM-YOK-01", admin, new { value = "1" })).Status.ShouldBe(HttpStatusCode.NotFound);
     }
 
+    // ------------------------------------------------------------------ T1 parametreleri (SYG-PERS-075)
+
+    [Fact]
+    public async Task Retention_period_is_listed_set_audited_cleared_and_deletes_nothing()
+    {
+        using var client = _fixture.CreateClient();
+        var admin = await SignInAsync(client, "mehmet.kaya@duzen.com.tr");
+
+        // Varsayilan bos: karar bekliyor (SYG-PERS-068).
+        var retention = await ParameterAsync(client, admin, "PRM-KVK-03");
+        retention.GetProperty("type").GetString().ShouldBe("number");
+        retention.GetProperty("min").GetInt32().ShouldBe(1);
+        retention.GetProperty("max").GetInt32().ShouldBe(100);
+        retention.GetProperty("isSet").GetBoolean().ShouldBeFalse();
+
+        var persons = await _fixture.WithDbAsync(context => context.Set<Person>().CountAsync());
+
+        var invalid = await PutJsonAsync(client, $"{Parameters}/PRM-KVK-03", admin, new { value = "101" });
+        invalid.Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        invalid.Body.GetProperty("detail").GetString().ShouldBe("Değer 1–100 aralığında olmalıdır.");
+
+        (await PutJsonAsync(client, $"{Parameters}/PRM-KVK-03", admin, new { value = "1" })).Status.ShouldBe(HttpStatusCode.NoContent);
+        (await ParameterAsync(client, admin, "PRM-KVK-03")).GetProperty("value").GetString().ShouldBe("1");
+
+        var entry = await _fixture.WithDbAsync(context => context.ChangeLog
+            .Where(e => e.EntityName == nameof(SystemParameter) && e.Operation == AuditOperation.Insert)
+            .OrderByDescending(e => e.Id)
+            .FirstAsync());
+        using (var changes = JsonDocument.Parse(entry.Changes))
+        {
+            changes.RootElement.GetProperty("Key").GetProperty("new").GetString().ShouldBe("PRM-KVK-03");
+            changes.RootElement.GetProperty("Value").GetProperty("new").GetString().ShouldBe("1");
+        }
+
+        // Bos deger gecerlidir ve kaydedilebilir (karar bekliyor).
+        (await PutJsonAsync(client, $"{Parameters}/PRM-KVK-03", admin, new { value = "" })).Status.ShouldBe(HttpStatusCode.NoContent);
+        (await ParameterAsync(client, admin, "PRM-KVK-03")).GetProperty("value").GetString().ShouldBe(string.Empty);
+
+        // T1'de bu parametreye gore hicbir kayit silinmez; imha Y2'dedir.
+        (await _fixture.WithDbAsync(context => context.Set<Person>().CountAsync())).ShouldBe(persons);
+    }
+
+    [Fact]
+    public async Task Max_page_size_cannot_be_smaller_than_the_default_page_size()
+    {
+        using var client = _fixture.CreateClient();
+        var admin = await SignInAsync(client, "mehmet.kaya@duzen.com.tr");
+
+        (await PutJsonAsync(client, $"{Parameters}/PRM-GRN-02", admin, new { value = "48" })).Status.ShouldBe(HttpStatusCode.NoContent);
+
+        var smallMax = await PutJsonAsync(client, $"{Parameters}/PRM-GRN-03", admin, new { value = "36" });
+        smallMax.Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        smallMax.Body.GetProperty("detail").GetString().ShouldBe("En büyük sayfa boyutu varsayılan sayfa boyutundan (48) küçük olamaz.");
+        (await ParameterAsync(client, admin, "PRM-GRN-03")).GetProperty("value").GetString().ShouldBe("100");
+
+        // Esit olabilir.
+        (await PutJsonAsync(client, $"{Parameters}/PRM-GRN-03", admin, new { value = "48" })).Status.ShouldBe(HttpStatusCode.NoContent);
+
+        var largeDefault = await PutJsonAsync(client, $"{Parameters}/PRM-GRN-02", admin, new { value = "60" });
+        largeDefault.Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        largeDefault.Body.GetProperty("detail").GetString().ShouldBe("Varsayılan sayfa boyutu en büyük sayfa boyutunu (48) aşamaz.");
+        (await ParameterAsync(client, admin, "PRM-GRN-02")).GetProperty("value").GetString().ShouldBe("48");
+
+        (await PutJsonAsync(client, $"{Parameters}/PRM-GRN-02", admin, new { value = "24" })).Status.ShouldBe(HttpStatusCode.NoContent);
+    }
+
     [Fact]
     public async Task Parameters_require_permission()
     {
@@ -273,6 +339,10 @@ public sealed class SystemParametersApiTests : IClassFixture<RegistrationApiFixt
         using var response = await client.SendAsync(request);
         return response.StatusCode;
     }
+
+    private static async Task<JsonElement> ParameterAsync(HttpClient client, string token, string key) =>
+        (await GetAsync(client, Parameters, token)).Body.GetProperty("items").EnumerateArray()
+            .Single(p => p.GetProperty("key").GetString() == key);
 
     private static Task<(HttpStatusCode Status, JsonElement Body)> GetAsync(HttpClient client, string path, string? token) =>
         SendAsync(client, new HttpRequestMessage(HttpMethod.Get, new Uri(path, UriKind.Relative)), token);
