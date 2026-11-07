@@ -138,6 +138,16 @@ describe('PersonCardPage', () => {
     expect(personsApi.card).toHaveBeenCalledWith('p-1');
   });
 
+  it('TCKN sunucudan nasil gelirse oyle gosterilir; ekran maske uygulamaz (SYG-PERS-053)', async () => {
+    // Tam TCKN'yi goren kullanici (view_national_id): sunucu tam degeri dondurur.
+    vi.spyOn(personsApi, 'card').mockResolvedValue(person({ nationalId: '12345678901' }));
+    renderAt('/personnel/p-1');
+
+    const general = await screen.findByRole('region', { name: 'Genel Bilgiler' });
+    expect(within(general).getByText('12345678901')).toBeInTheDocument();
+    expect(within(general).queryByText(/\*/)).not.toBeInTheDocument();
+  });
+
   it('korumali alanlari goremeyen kullanicida adres ve kan grubu alani hic yoktur', async () => {
     vi.spyOn(personsApi, 'card').mockResolvedValue(person({ sensitive: null }));
     renderAt('/personnel/p-1');
