@@ -14,6 +14,7 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  useMediaQuery,
 } from '@mui/material';
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import FileDownloadOutlined from '@mui/icons-material/FileDownloadOutlined';
@@ -135,7 +136,10 @@ export function PersonListPage() {
     staleTime: 5 * 60_000,
   });
 
-  const view = viewOf(params);
+  // Telefonda tablo 360 piksele sigmaz; liste kart gorunumuyle acilir, gorunum secimi
+  // gosterilmez (SYG-PERS-073, AN-28). Adresteki secim korunur, genis ekranda geri gelir.
+  const phone = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'), { noSsr: true });
+  const view = phone ? 'grid' : viewOf(params);
   const status = statusOf(params);
   const sort: SortField = params.get('sort') === 'lastName' ? 'lastName' : 'firstName';
   const order: SortOrder = params.get('order') === 'desc' ? 'desc' : 'asc';
@@ -322,34 +326,36 @@ export function PersonListPage() {
           </TextField>
         ) : null}
 
-        <ToggleButtonGroup
-          exclusive
-          size="small"
-          value={view}
-          aria-label={t('personnel.list.view.label')}
-          sx={selectedFilled}
-          onChange={(_, value: ListView | null) => {
-            if (value) {
-              // Gorunum suzgec degildir: sayfa korunur.
-              setParams((current) => {
-                const next = new URLSearchParams(current);
-                if (value === 'grid') {
-                  next.delete('view');
-                } else {
-                  next.set('view', value);
-                }
-                return next;
-              });
-            }
-          }}
-        >
-          <ToggleButton value="grid" aria-label={t('personnel.list.view.grid')}>
-            <GridViewRounded fontSize="small" />
-          </ToggleButton>
-          <ToggleButton value="table" aria-label={t('personnel.list.view.table')}>
-            <TableRowsRounded fontSize="small" />
-          </ToggleButton>
-        </ToggleButtonGroup>
+        {phone ? null : (
+          <ToggleButtonGroup
+            exclusive
+            size="small"
+            value={view}
+            aria-label={t('personnel.list.view.label')}
+            sx={selectedFilled}
+            onChange={(_, value: ListView | null) => {
+              if (value) {
+                // Gorunum suzgec degildir: sayfa korunur.
+                setParams((current) => {
+                  const next = new URLSearchParams(current);
+                  if (value === 'grid') {
+                    next.delete('view');
+                  } else {
+                    next.set('view', value);
+                  }
+                  return next;
+                });
+              }
+            }}
+          >
+            <ToggleButton value="grid" aria-label={t('personnel.list.view.grid')}>
+              <GridViewRounded fontSize="small" />
+            </ToggleButton>
+            <ToggleButton value="table" aria-label={t('personnel.list.view.table')}>
+              <TableRowsRounded fontSize="small" />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        )}
       </Paper>
 
       <FilterChips

@@ -32,6 +32,13 @@ declare module '@mui/material/styles' {
 }
 
 /**
+ * Dokunmatik ekran (telefon, tablet). Dokunma hedefleri burada en az 44 x 44 CSS pikseldir
+ * (SYG-PERS-073); fareyle kullanilan ekranda boyutlar degismez.
+ */
+const TOUCH = '@media (pointer: coarse)';
+const TOUCH_TARGET = 44;
+
+/**
  * Kurumsal tema (ADR-0015 §10).
  *
  * Renkler, tipografi ve bilesen varsayilanlari YALNIZCA burada tanimlanir.
@@ -82,6 +89,75 @@ export const theme = createTheme(
       },
       MuiButton: {
         defaultProps: { disableElevation: true },
+        styleOverrides: { root: { [TOUCH]: { minHeight: TOUCH_TARGET } } },
+      },
+      MuiIconButton: {
+        styleOverrides: { root: { [TOUCH]: { minWidth: TOUCH_TARGET, minHeight: TOUCH_TARGET } } },
+      },
+      MuiToggleButton: {
+        styleOverrides: { root: { [TOUCH]: { minWidth: TOUCH_TARGET, minHeight: TOUCH_TARGET } } },
+      },
+      MuiChip: {
+        styleOverrides: {
+          // Kaldirilabilen veya tiklanabilen etiket parmakla secilir; yalnizca bilgi veren etiket
+          // (durum, anahtar turu) kucuk kalir.
+          root: {
+            [TOUCH]: {
+              '&.MuiChip-deletable, &.MuiChip-clickable': {
+                height: TOUCH_TARGET,
+                borderRadius: TOUCH_TARGET / 2,
+              },
+            },
+          },
+          deleteIcon: { [TOUCH]: { fontSize: 24 } },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          // Kucuk alan 40 piksel; dokunmatik ekranda ic bosluk buyutulerek 44'e cikar.
+          root: {
+            [TOUCH]: {
+              '&.MuiInputBase-sizeSmall:not(.MuiAutocomplete-inputRoot) .MuiOutlinedInput-input': {
+                paddingTop: 10.5,
+                paddingBottom: 10.5,
+              },
+            },
+          },
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          sizeSmall: {
+            [TOUCH]: {
+              '&:not(.MuiInputLabel-shrink)': { transform: 'translate(14px, 11px) scale(1)' },
+            },
+          },
+        },
+      },
+      MuiAutocomplete: {
+        styleOverrides: {
+          inputRoot: {
+            [TOUCH]: { '&.MuiInputBase-sizeSmall': { paddingTop: 8, paddingBottom: 8 } },
+          },
+        },
+      },
+      MuiTablePagination: {
+        styleOverrides: {
+          // Telefonda "sayfa basina kayit", aralik ve sayfa dugmeleri tek satira sigmaz;
+          // satir kirilir, dugmeler ekran disina tasmaz (SYG-PERS-073).
+          toolbar: { flexWrap: 'wrap', rowGap: 4 },
+          spacer: ({ theme }) => ({ [theme.breakpoints.down('sm')]: { display: 'none' } }),
+          input: {
+            [TOUCH]: {
+              '& .MuiSelect-select.MuiInputBase-input': {
+                height: TOUCH_TARGET,
+                boxSizing: 'border-box',
+                display: 'flex',
+                alignItems: 'center',
+              },
+            },
+          },
+        },
       },
       MuiPaper: {
         styleOverrides: {
