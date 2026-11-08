@@ -1,5 +1,6 @@
 import { expect, test, type Download, type Locator } from '@playwright/test';
 import { signIn, signOut } from './support/flows';
+import { expectPhoneLayout, phone } from './support/layout';
 import { passwords, people } from './support/people';
 
 /**
@@ -526,6 +527,60 @@ test('14. kalan suzgecler: yonetici fotografi olanlari suzer, etiketi kaldirir (
   await expect(tags).toHaveCount(0);
   await expect(page.getByRole('article', { name: 'Yusuf Yonetici' })).toBeVisible();
   await signOut(page, people.admin.fullName);
+});
+
+test.describe('telefon', () => {
+  test.use(phone);
+
+  test('15. telefon: liste, suzgec paneli, kart, Profilim ve IK-ya bildir 360 pikselde kaymadan, 44 piksel hedeflerle kullanilir (SYG-PERS-073)', async ({
+    page,
+  }) => {
+    await signIn(page, people.admin.email, passwords.first);
+    await page.getByRole('button', { name: 'Menüyü aç' }).click();
+    await expectPhoneLayout(page, 'menü');
+    await page.getByRole('link', { name: 'Personel listesi', exact: true }).click();
+    await expect(page.getByRole('article', { name: 'Yusuf Yonetici' })).toBeVisible();
+    // Telefonda liste kart gorunumundedir; tablo secimi sunulmaz (AN-28).
+    await expect(page.getByRole('button', { name: 'Tablo görünümü' })).toHaveCount(0);
+    await expectPhoneLayout(page, 'personel listesi');
+    const next = page.getByRole('button', { name: 'Sonraki sayfaya git' });
+    await next.scrollIntoViewIfNeeded();
+    await expect(next).toBeInViewport();
+
+    // Suzgec cubugu telefonda acilir paneldir.
+    await page.getByRole('button', { name: /Süzgeçler/ }).click();
+    const panel = page.getByRole('dialog', { name: 'Süzgeçler' });
+    await expect(panel.getByLabel('Fotoğraf')).toBeVisible();
+    await expectPhoneLayout(page, 'süzgeç paneli');
+    await panel.getByLabel('Fotoğraf').click();
+    await page.getByRole('option', { name: 'Var' }).click();
+    await panel.getByRole('button', { name: 'Uygula' }).click();
+    await expect(panel).toBeHidden();
+    const tags = page.getByRole('group', { name: 'Seçili süzgeçler' });
+    await expect(tags).toContainText('Fotoğraf: Var');
+    await expectPhoneLayout(page, 'seçili süzgeçler');
+
+    await page.getByRole('article', { name: 'Deniz Davetli' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Deniz Davetli' })).toBeVisible();
+    await expectPhoneLayout(page, 'kişi kartı');
+    // Telefonda kullanici bolumu acilir menudedir.
+    await page.getByRole('button', { name: 'Menüyü aç' }).click();
+    await signOut(page, people.admin.fullName);
+
+    await signIn(page, people.unprivileged.email, passwords.first);
+    await page.getByRole('button', { name: 'Menüyü aç' }).click();
+    await page.getByRole('link', { name: 'Profilim' }).click();
+    await expect(page.getByRole('region', { name: 'Genel Bilgiler' })).toBeVisible();
+    await expectPhoneLayout(page, 'Profilim');
+
+    await page.getByRole('button', { name: "İK'ya bildir" }).click();
+    const dialog = page.getByRole('dialog', { name: "İK'ya bildir" });
+    await expect(dialog.getByRole('combobox', { name: /Düzeltilecek bilgi/ })).toBeVisible();
+    await expectPhoneLayout(page, "İK'ya bildir");
+    await dialog.getByRole('button', { name: 'Vazgeç' }).click();
+    await page.getByRole('button', { name: 'Menüyü aç' }).click();
+    await signOut(page, people.unprivileged.fullName);
+  });
 });
 
 async function readDownload(download: Download): Promise<Buffer> {

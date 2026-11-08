@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useNavigate } from 'react-router';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { permissions } from '@/shared/auth/permissions';
 import { renderWithProviders } from '@/test/render';
 import { setSession } from '@/test/session';
@@ -68,6 +68,10 @@ function lastQuery(): URLSearchParams {
 }
 
 describe('PersonListPage', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   beforeEach(async () => {
     vi.restoreAllMocks();
     vi.spyOn(personsApi, 'syncFreshness').mockResolvedValue({
@@ -152,6 +156,41 @@ describe('PersonListPage', () => {
     await user.click(screen.getByRole('button', { name: 'Kart görünümü' }));
     expect(await screen.findByRole('article', { name: 'AYŞE DEMİR' })).toBeInTheDocument();
     expect(lastQuery().get('status')).toBe('terminated');
+  });
+
+  it('telefonda tablo adresi de kart izgarasiyla acilir; gorunum secimi sunulmaz (SYG-PERS-073)', async () => {
+    // Telefon genisligi: MUI'nin `down('sm')` sorgusu (max-width) eslesir.
+    vi.stubGlobal(
+      'matchMedia',
+      (query: string) =>
+        ({
+          matches: query.includes('max-width'),
+          media: query,
+          onchange: null,
+          addEventListener: () => undefined,
+          removeEventListener: () => undefined,
+          addListener: () => undefined,
+          removeListener: () => undefined,
+          dispatchEvent: () => false,
+        }) as MediaQueryList,
+    );
+    function TableLink() {
+      const navigate = useNavigate();
+      return <button onClick={() => void navigate('/?view=table')}>Tablo adresi</button>;
+    }
+    renderWithProviders(
+      <>
+        <TableLink />
+        <PersonListPage />
+      </>,
+    );
+    await screen.findByRole('article', { name: 'AYŞE DEMİR' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Tablo adresi' }));
+
+    expect(await screen.findByRole('article', { name: 'MEHMET KAYA' })).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Tablo görünümü' })).not.toBeInTheDocument();
   });
 
   it('disa aktarma dugmesi yalnizca izni olana gorunur ve diyalogu acar (SYG-PERS-032)', async () => {

@@ -132,6 +132,12 @@ Aşağıdakiler bir kez yazılır ve her modülde yeniden kullanılır:
 **okunabilir ve kullanılabilir** olmalıdır. Özellikle izin talebi ve onay ekranları
 telefonda çalışmalıdır — yönetici sahada olabilir.
 
+**Uygulama notu (08.11.2026, #377).** Dokunmatik ekranda (`pointer: coarse`) dokunma
+hedefleri en az 44 × 44 CSS pikseldir; kural temada tek yerdedir ve fareyle kullanılan
+ekranda boyutları değiştirmez. Sayfalama satırı dar ekranda kırılır. Sığmayan bir görünüm
+(ör. personel listesinin tablosu) telefonda sunulmaz; ekran 360 piksel genişlikte yatay
+kaymaz. Doğrulama uçtan uca senaryoda ölçümledir (SYG-PERS-073, AN-28).
+
 ### 9. Çoklu dil
 
 - **i18next** baştan kurulur; arayüzde **sabit metin (hardcoded string) yazılmaz**.
@@ -202,3 +208,4 @@ tüm modülleri etkiler. Bileşen ve tema kararları düşük maliyetle değişt
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
+| 2026-11-08 | 0.2 | §8: uygulama notu, dokunmatik ekranda 44 piksel kuralı ve telefonda sığmayan görünüm (#377) | Bilgi İşlem |
