@@ -737,6 +737,8 @@
         "education": "Eğitim",
         "gender": "Cinsiyet",
         "maritalStatus": "Medeni hâl",
+        "bloodGroup": "Kan grubu",
+        "marriageAllowance": "Evlilik yardımı",
         "firstName": "Ad",
         "lastName": "Soyad",
         "previousSurname": "Önceki soyadı",
@@ -745,9 +747,12 @@
         "email": "E-posta",
         "phone": "Telefon",
         "address": "Adres",
+        "hasPhoto": "Fotoğraf",
+        "hasEmergencyContact": "Acil durum kişisi",
         "birthDate": "Doğum tarihi",
         "hireDate": "İşe giriş tarihi",
         "terminationDate": "Çıkış tarihi",
+        "marriageDate": "Evlilik tarihi",
         "age": "Yaş",
         "seniority": "Kıdem"
       },
@@ -759,7 +764,16 @@
         "maritalStatus": {
           "married": "Evli",
           "notMarried": "Bekâr"
+        },
+        "marriageAllowance": {
+          "received": "Aldı",
+          "notReceived": "Almadı"
         }
+      },
+      "presence": {
+        "any": "Tümü",
+        "true": "Var",
+        "false": "Yok"
       },
       "range": {
         "between": "{{from}} – {{to}}",

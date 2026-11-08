@@ -2085,6 +2085,12 @@ export interface paths {
                     ageMax?: number | string;
                     seniorityMin?: number | string;
                     seniorityMax?: number | string;
+                    bloodGroup?: string[];
+                    marriageAllowance?: components["schemas"]["MarriageAllowanceKind"][];
+                    marriageDateFrom?: string;
+                    marriageDateTo?: string;
+                    hasPhoto?: boolean;
+                    hasEmergencyContact?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -2439,6 +2445,12 @@ export interface paths {
                     ageMax?: number | string;
                     seniorityMin?: number | string;
                     seniorityMax?: number | string;
+                    bloodGroup?: string[];
+                    marriageAllowance?: components["schemas"]["MarriageAllowanceKind"][];
+                    marriageDateFrom?: string;
+                    marriageDateTo?: string;
+                    hasPhoto?: boolean;
+                    hasEmergencyContact?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -5313,6 +5325,11 @@ export interface components {
          * @enum {unknown}
          */
         MaritalStatusKind: "married" | "notMarried";
+        /**
+         * @description Evlilik yardimi suzgeci.
+         * @enum {unknown}
+         */
+        MarriageAllowanceKind: "received" | "notReceived";
         /** @description Evlilik bilgisi istegi. */
         MarriageRequest: {
             /**
@@ -5679,7 +5696,7 @@ export interface components {
             educations: components["schemas"]["FilterOptionResponse"][];
             /** @description TCKN suzgeci sunulur mu. */
             canFilterByNationalId: boolean;
-            /** @description Adres suzgeci sunulur mu. */
+            /** @description Korumali alan suzgecleri (adres, kan grubu, evlilik bilgisi, acil durum kisisi) sunulur mu. */
             canFilterBySensitive: boolean;
             /**
              * Format: int32
@@ -5691,6 +5708,8 @@ export interface components {
              * @description En buyuk sayfa boyutu (PRM-GRN-03); sayfa boyutu secenekleri bunu asmaz (SYG-PERS-029).
              */
             maxPageSize: number | string;
+            /** @description Kan grubu secenekleri; suzgec yalnizca izni olana sunulur. */
+            bloodGroups?: components["schemas"]["FilterOptionResponse"][];
         };
         /** @description Listedeki kisi karti (SYG-PERS-023). */
         PersonListItemResponse: {

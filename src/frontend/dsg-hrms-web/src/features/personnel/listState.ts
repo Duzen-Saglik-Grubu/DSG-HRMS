@@ -30,6 +30,8 @@ export const MULTI_FILTERS = [
   'education',
   'gender',
   'maritalStatus',
+  'bloodGroup',
+  'marriageAllowance',
 ] as const;
 export type MultiFilter = (typeof MULTI_FILTERS)[number];
 
@@ -47,8 +49,24 @@ export const TEXT_FILTERS = [
 export type TextFilter = (typeof TEXT_FILTERS)[number];
 
 /** Tarih araligi suzgecleri; adreste `<ad>From` ve `<ad>To` olarak durur. */
-export const DATE_FILTERS = ['birthDate', 'hireDate', 'terminationDate'] as const;
+export const DATE_FILTERS = ['birthDate', 'hireDate', 'terminationDate', 'marriageDate'] as const;
 export type DateFilter = (typeof DATE_FILTERS)[number];
+
+/** Var / yok suzgecleri; adreste `true` veya `false` olarak durur (SYG-PERS-024). */
+export const PRESENCE_FILTERS = ['hasPhoto', 'hasEmergencyContact'] as const;
+export type PresenceFilter = (typeof PRESENCE_FILTERS)[number];
+
+/**
+ * Korumali alanlarin suzgecleri: yalnizca `canFilterBySensitive` olan kullaniciya sunulur; sunucu
+ * izinsiz istegi reddeder (SYG-PERS-026). Kume isleminde "kisinin kendisi" kurali yoktur.
+ */
+export const SENSITIVE_FILTERS: ReadonlySet<string> = new Set([
+  'address',
+  'bloodGroup',
+  'marriageAllowance',
+  'marriageDate',
+  'hasEmergencyContact',
+]);
 
 /** Yil araligi suzgecleri; adreste `<ad>Min` ve `<ad>Max` olarak durur. */
 export const RANGE_FILTERS = ['age', 'seniority'] as const;
@@ -56,7 +74,7 @@ export type RangeFilter = (typeof RANGE_FILTERS)[number];
 
 /** Secim listesi seceneklerin `filter-options` yanitindaki alani. */
 export const OPTION_SOURCE: Record<
-  Exclude<MultiFilter, 'gender' | 'maritalStatus'>,
+  Exclude<MultiFilter, FixedFilter>,
   keyof Pick<
     PersonFilterOptions,
     | 'companies'
@@ -68,6 +86,7 @@ export const OPTION_SOURCE: Record<
     | 'statuses'
     | 'occupations'
     | 'educations'
+    | 'bloodGroups'
   >
 > = {
   companyId: 'companies',
@@ -79,13 +98,21 @@ export const OPTION_SOURCE: Record<
   statusCode: 'statuses',
   occupationCode: 'occupations',
   education: 'educations',
+  bloodGroup: 'bloodGroups',
 };
 
 /** Sabit secenekli suzgeclerin degerleri. */
 export const FIXED_VALUES = {
   gender: ['female', 'male'],
   maritalStatus: ['married', 'notMarried'],
+  marriageAllowance: ['received', 'notReceived'],
 } as const;
+export type FixedFilter = keyof typeof FIXED_VALUES;
+
+/** Secenekleri sabit olan suzgec mi. */
+export function isFixed(name: MultiFilter): name is FixedFilter {
+  return name in FIXED_VALUES;
+}
 
 /** Liste durumunu tasiyan, suzgec OLMAYAN parametreler. */
 const CONTROL_PARAMS = ['q', 'status', 'sort', 'order', 'page', 'pageSize', 'view'] as const;
@@ -96,6 +123,7 @@ export function filterParamNames(): string[] {
     ...MULTI_FILTERS,
     ...TEXT_FILTERS,
     ...DATE_FILTERS.flatMap((name) => [`${name}From`, `${name}To`]),
+    ...PRESENCE_FILTERS,
     ...RANGE_FILTERS.flatMap((name) => [`${name}Min`, `${name}Max`]),
   ];
 }

@@ -364,10 +364,12 @@ public sealed class PersonExportService
             AccessRecord.Export(PersonListService.EntityName, result.Rows.Count, logged) with { SubjectIds = subjects },
             cancellationToken).ConfigureAwait(false);
 
-        // Kan grubu ozel nitelikli veridir: degeri dosyaya giren her kisi icin ayri kayit (SYG-PERS-059).
-        if (columns.Any(d => d.Field == PersonExportField.BloodGroup))
+        // Kan grubu ozel nitelikli veridir: degeri dosyaya giren veya kan grubu suzgeciyle dosyaya
+        // giren her kisi icin ayri kayit; kisi basina bir kez (SYG-PERS-059).
+        var bloodGroupFiltered = request.Filters.BloodGroupCodes.Count > 0;
+        if (bloodGroupFiltered || columns.Any(d => d.Field == PersonExportField.BloodGroup))
         {
-            foreach (var row in result.Rows.Where(r => r.Person.BloodGroup is not null))
+            foreach (var row in result.Rows.Where(r => bloodGroupFiltered || r.Person.BloodGroup is not null))
             {
                 await _accessLogger.LogAsync(
                     AccessRecord.SpecialCategoryView(PersonListService.EntityName, row.Person.PublicId),

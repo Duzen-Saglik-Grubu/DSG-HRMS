@@ -59,7 +59,7 @@ public sealed record FilterOption(string Value, string Label);
 /// <param name="Occupations">SGK meslekleri.</param>
 /// <param name="Educations">Egitim durumlari.</param>
 /// <param name="CanFilterByNationalId">TCKN suzgeci sunulur mu.</param>
-/// <param name="CanFilterBySensitive">Adres (ve sonra kan grubu, acil durum) suzgeci sunulur mu.</param>
+/// <param name="CanFilterBySensitive">Korumali alan suzgecleri (adres, kan grubu, evlilik bilgisi, acil durum kisisi) sunulur mu.</param>
 public sealed record PersonFilterOptions(
     IReadOnlyList<FilterOption> Companies,
     IReadOnlyList<FilterOption> Cities,
@@ -81,6 +81,12 @@ public sealed record PersonFilterOptions(
     /// sekilde sunar (SYG-PERS-029).
     /// </summary>
     public int MaxPageSize { get; init; }
+
+    /// <summary>
+    /// Kan grubu secenekleri (referans veri; pasif tanimlar dahil: eski kayitlar da suzulebilsin).
+    /// Secenek listesi kisisel veri degildir; suzgec yalnizca izni olana sunulur.
+    /// </summary>
+    public IReadOnlyList<FilterOption> BloodGroups { get; init; } = [];
 }
 
 /// <summary>Suzgec seceneklerinin veritabani tarafi.</summary>
@@ -250,6 +256,16 @@ public sealed class PersonListService
         await _accessLogger.LogAsync(
             AccessRecord.List(EntityName, result.TotalCount, logged) with { SubjectIds = [.. result.Items.Select(i => i.PersonId)] },
             cancellationToken).ConfigureAwait(false);
+
+        // Kan grubu suzgeciyle listelenen kisinin kan grubu dolayli olarak gorulmus olur: ekrandaki her
+        // kisi icin ayri ozel nitelikli veri kaydi (SYG-PERS-059).
+        if (filters.BloodGroupCodes.Count > 0)
+        {
+            foreach (var item in result.Items)
+            {
+                await _accessLogger.LogAsync(AccessRecord.SpecialCategoryView(EntityName, item.PersonId), cancellationToken).ConfigureAwait(false);
+            }
+        }
 
         return result;
     }

@@ -7,6 +7,7 @@ import {
   Divider,
   Drawer,
   IconButton,
+  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -19,12 +20,16 @@ import {
   DATE_FILTERS,
   FIXED_VALUES,
   OPTION_SOURCE,
+  PRESENCE_FILTERS,
   RANGE_FILTERS,
+  SENSITIVE_FILTERS,
   TEXT_FILTERS,
   formatDate,
+  isFixed,
   parseDate,
   withChanges,
   type MultiFilter,
+  type PresenceFilter,
   type RangeFilter,
   type TextFilter,
 } from '../listState';
@@ -39,7 +44,13 @@ const ORGANIZATION: MultiFilter[] = [
   'statusCode',
   'occupationCode',
 ];
-const PERSONAL: MultiFilter[] = ['gender', 'maritalStatus', 'education'];
+const PERSONAL: MultiFilter[] = [
+  'gender',
+  'maritalStatus',
+  'education',
+  'bloodGroup',
+  'marriageAllowance',
+];
 
 /** Metin suzgeclerinin girdi siniri; sunucu da 100 karakterde keser. */
 const TEXT_MAX_LENGTH = 100;
@@ -54,8 +65,9 @@ interface FilterPanelProps {
 
 /**
  * Suzgec paneli (SYG-PERS-024). Degisiklikler "Uygula" ile listeye gecer; her tusta istek gitmez.
- * Adres ve TCKN suzgeci yalnizca bu alanlari gorebilen kullaniciya sunulur (SYG-PERS-026): sunucu
- * secenekler yanitinda bunu soyler, izinsiz istegi de reddeder.
+ * TCKN ve korumali alanlarin suzgecleri (adres, kan grubu, evlilik bilgisi, acil durum kisisi)
+ * yalnizca bu alanlari gorebilen kullaniciya sunulur (SYG-PERS-026): sunucu secenekler yanitinda
+ * bunu soyler, izinsiz istegi de reddeder.
  */
 export function FilterPanel({ open, params, options, onClose, onApply }: FilterPanelProps) {
   return (
@@ -74,10 +86,10 @@ function PanelBody({ params, options, onClose, onApply }: Omit<FilterPanelProps,
   const change = (changes: Record<string, string | string[] | null>) =>
     setDraft((current) => withChanges(current, changes));
 
+  const offered = (name: string) =>
+    !SENSITIVE_FILTERS.has(name) || options?.canFilterBySensitive === true;
   const visibleText = TEXT_FILTERS.filter(
-    (name) =>
-      (name !== 'nationalId' || options?.canFilterByNationalId === true) &&
-      (name !== 'address' || options?.canFilterBySensitive === true),
+    (name) => (name !== 'nationalId' || options?.canFilterByNationalId === true) && offered(name),
   );
   const rangeInvalid = RANGE_FILTERS.some((name) => {
     const min = draft.get(`${name}Min`);
@@ -122,8 +134,11 @@ function PanelBody({ params, options, onClose, onApply }: Omit<FilterPanelProps,
         </Section>
 
         <Section title={t('personnel.list.panel.groups.personal')}>
-          {PERSONAL.map((name) => (
+          {PERSONAL.filter(offered).map((name) => (
             <MultiSelect key={name} name={name} draft={draft} options={options} onChange={change} />
+          ))}
+          {PRESENCE_FILTERS.filter(offered).map((name) => (
+            <PresenceField key={name} name={name} draft={draft} onChange={change} />
           ))}
         </Section>
 
@@ -134,7 +149,7 @@ function PanelBody({ params, options, onClose, onApply }: Omit<FilterPanelProps,
         </Section>
 
         <Section title={t('personnel.list.panel.groups.dates')}>
-          {DATE_FILTERS.map((name) => (
+          {DATE_FILTERS.filter(offered).map((name) => (
             <Stack key={name} spacing={1}>
               <Typography variant="body2">{t(`personnel.list.fields.${name}`)}</Typography>
               <DateRangeField
@@ -196,13 +211,12 @@ function MultiSelect({
   onChange,
 }: FieldProps<MultiFilter> & { options: PersonFilterOptions | undefined }) {
   const { t } = useTranslation();
-  const choices: FilterOption[] =
-    name === 'gender' || name === 'maritalStatus'
-      ? FIXED_VALUES[name].map((value) => ({
-          value,
-          label: t(`personnel.list.values.${name}.${value}`),
-        }))
-      : (options?.[OPTION_SOURCE[name]] ?? []);
+  const choices: FilterOption[] = isFixed(name)
+    ? FIXED_VALUES[name].map((value) => ({
+        value,
+        label: t(`personnel.list.values.${name}.${value}`),
+      }))
+    : (options?.[OPTION_SOURCE[name]] ?? []);
   // Adresteki deger seceneklerde yoksa (ornegin tanim pasife alindi) yine de gorunur ve kaldirilabilir.
   const selected = draft
     .getAll(name)
@@ -244,6 +258,27 @@ function TextFilterField({ name, draft, onChange }: FieldProps<TextFilter>) {
       onChange={(event) => onChange({ [name]: event.target.value })}
       slotProps={{ htmlInput: { maxLength: TEXT_MAX_LENGTH } }}
     />
+  );
+}
+
+/** Var / yok secimi; "Tumu" suzgeci kaldirir. */
+function PresenceField({ name, draft, onChange }: FieldProps<PresenceFilter>) {
+  const { t } = useTranslation();
+  const value = draft.get(name);
+
+  return (
+    <TextField
+      select
+      size="small"
+      label={t(`personnel.list.fields.${name}`)}
+      value={value === 'true' || value === 'false' ? value : ''}
+      onChange={(event) => onChange({ [name]: event.target.value || null })}
+      slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }}
+    >
+      <MenuItem value="">{t('personnel.list.presence.any')}</MenuItem>
+      <MenuItem value="true">{t('personnel.list.presence.true')}</MenuItem>
+      <MenuItem value="false">{t('personnel.list.presence.false')}</MenuItem>
+    </TextField>
   );
 }
 

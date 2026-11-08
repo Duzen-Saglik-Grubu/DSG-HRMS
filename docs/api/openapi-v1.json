@@ -2475,6 +2475,56 @@
               ],
               "format": "int32"
             }
+          },
+          {
+            "name": "bloodGroup",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "marriageAllowance",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/MarriageAllowanceKind"
+              }
+            }
+          },
+          {
+            "name": "marriageDateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "marriageDateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "hasPhoto",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "hasEmergencyContact",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -3083,6 +3133,56 @@
                 "string"
               ],
               "format": "int32"
+            }
+          },
+          {
+            "name": "bloodGroup",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "marriageAllowance",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/MarriageAllowanceKind"
+              }
+            }
+          },
+          {
+            "name": "marriageDateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "marriageDateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "hasPhoto",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "hasEmergencyContact",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
             }
           }
         ],
@@ -6608,6 +6708,13 @@
         ],
         "description": "Medeni hal."
       },
+      "MarriageAllowanceKind": {
+        "enum": [
+          "received",
+          "notReceived"
+        ],
+        "description": "Evlilik yardimi suzgeci."
+      },
       "MarriageRequest": {
         "required": [
           "marriageDate",
@@ -7553,7 +7660,7 @@
           },
           "canFilterBySensitive": {
             "type": "boolean",
-            "description": "Adres suzgeci sunulur mu."
+            "description": "Korumali alan suzgecleri (adres, kan grubu, evlilik bilgisi, acil durum kisisi) sunulur mu."
           },
           "defaultPageSize": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -7572,6 +7679,13 @@
             ],
             "description": "En buyuk sayfa boyutu (PRM-GRN-03); sayfa boyutu secenekleri bunu asmaz (SYG-PERS-029).",
             "format": "int32"
+          },
+          "bloodGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionResponse"
+            },
+            "description": "Kan grubu secenekleri; suzgec yalnizca izni olana sunulur."
           }
         },
         "description": "Suzgec secenekleri (SYG-PERS-024, 026)."
