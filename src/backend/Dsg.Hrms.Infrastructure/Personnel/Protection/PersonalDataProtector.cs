@@ -36,12 +36,15 @@ public sealed class PersonalDataProtector
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        _keys = options.Keys.ToDictionary(k => k.Key, k => Convert.FromBase64String(k.Value), StringComparer.Ordinal);
+        _keys = options.ActiveKeys.ToDictionary(k => k.Key, k => Convert.FromBase64String(k.Value), StringComparer.Ordinal);
         _currentKeyId = options.CurrentKeyId;
     }
 
     /// <summary>Yeni yazimlarda kullanilan anahtarin kimligi.</summary>
     public string CurrentKeyId => _currentKeyId;
+
+    /// <summary>Tanimli anahtarlarin kimlikleri (degerleri degil).</summary>
+    public IReadOnlyCollection<string> KeyIds => _keys.Keys;
 
     /// <summary>Degeri guncel anahtarla sifreler.</summary>
     public string Protect(string plaintext, ProtectedField field)

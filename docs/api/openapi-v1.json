@@ -2115,6 +2115,86 @@
         }
       }
     },
+    "/api/v1/personnel/encryption": {
+      "get": {
+        "tags": [
+          "PersonalDataEncryption"
+        ],
+        "summary": "Sifreli degerlerin anahtara gore sayilari.",
+        "responses": {
+          "200": {
+            "description": "Durum.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EncryptionStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`system.encryption.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personnel/encryption/re-encryption": {
+      "post": {
+        "tags": [
+          "PersonalDataEncryption"
+        ],
+        "summary": "Guncel anahtar disindaki degerleri guncel anahtarla yeniden yazar. Denetim izine \"degisti\"\nyazilmaz; is tek bir guvenlik olayidir. Tekrar calistirmak guvenlidir.",
+        "responses": {
+          "200": {
+            "description": "Sonuc.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReEncryptionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki yok (`system.encryption.update`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/personnel/persons/export/fields": {
       "get": {
         "tags": [
@@ -6442,6 +6522,60 @@
         ],
         "description": "Calisma durumu suzgeci."
       },
+      "EncryptionKeyResponse": {
+        "required": [
+          "keyId",
+          "count",
+          "isCurrent",
+          "isConfigured"
+        ],
+        "type": "object",
+        "properties": {
+          "keyId": {
+            "type": "string",
+            "description": "Kimlik."
+          },
+          "count": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Bu anahtarla sifreli deger sayisi.",
+            "format": "int32"
+          },
+          "isCurrent": {
+            "type": "boolean",
+            "description": "Guncel anahtar mi."
+          },
+          "isConfigured": {
+            "type": "boolean",
+            "description": "Yapilandirmada tanimli mi; degilse degerler cozulemez."
+          }
+        },
+        "description": "Bir anahtar."
+      },
+      "EncryptionStatusResponse": {
+        "required": [
+          "currentKeyId",
+          "keys"
+        ],
+        "type": "object",
+        "properties": {
+          "currentKeyId": {
+            "type": "string",
+            "description": "Yeni yazimlarda kullanilan anahtar."
+          },
+          "keys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EncryptionKeyResponse"
+            },
+            "description": "Anahtarlar ve sayilari."
+          }
+        },
+        "description": "Anahtar durumu."
+      },
       "EntityTagHeaderValue": {
         "type": "object",
         "properties": {
@@ -7868,6 +8002,57 @@
         },
         "description": "Giris ve uyelik ekranlarinin ayarlari."
       },
+      "ReEncryptionResponse": {
+        "required": [
+          "targetKeyId",
+          "sourceKeyIds",
+          "reEncrypted",
+          "undecryptable",
+          "remainingOnOldKeys"
+        ],
+        "type": "object",
+        "properties": {
+          "targetKeyId": {
+            "type": "string",
+            "description": "Hedef anahtar."
+          },
+          "sourceKeyIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Yeniden yazilan degerlerin onceki anahtarlari."
+          },
+          "reEncrypted": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Yeniden yazilan deger sayisi.",
+            "format": "int32"
+          },
+          "undecryptable": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Cozulemeyen deger sayisi.",
+            "format": "int32"
+          },
+          "remainingOnOldKeys": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Guncel anahtar disinda kalan deger sayisi; eski anahtar ancak 0 iken cikarilir.",
+            "format": "int32"
+          }
+        },
+        "description": "Yeniden sifreleme sonucu."
+      },
       "ReferenceDefinitionResponse": {
         "required": [
           "id",
@@ -8981,6 +9166,9 @@
     },
     {
       "name": "Marriage"
+    },
+    {
+      "name": "PersonalDataEncryption"
     },
     {
       "name": "PersonExport"

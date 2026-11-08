@@ -10,6 +10,7 @@ export const queryKeys = {
   saglik: ['saglik'] as const,
   system: {
     parameters: ['system', 'parameters'] as const,
+    encryption: ['system', 'encryption'] as const,
   },
   personnel: {
     persons: ['personnel', 'persons'] as const,

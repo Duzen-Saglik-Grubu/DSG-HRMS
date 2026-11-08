@@ -78,7 +78,14 @@ services:
       # tanimli degilse uygulama ACILMAZ. Sir parametre anahtarindan ayridir. Deger sir
       # dosyasinda durur; veritabaninda ve depoda DEGIL. Kaybolursa kan grubu LOGO'dan
       # yeniden senkronize edilir (ADR-0020 §3).
-      PersonalDataProtection__Keys__k1: ${PERSONAL_DATA_KEY_K1:?docker/.env icinde PERSONAL_DATA_KEY_K1 tanimlayin (openssl rand -base64 32)}
+      # Anahtar dondurme (SYG-PERS-062; ADR-0020 §3): yeni anahtar bir sonraki bos yuvaya
+      # (k2, k3) eklenir; yeni yazimlar en buyuk numarali anahtarla yapilir. Eski degerler
+      # Parametreler ekranindaki "Yeniden sifrele" isiyle tasinir; onunla kayit kalmayan eski
+      # anahtar bosaltilir. Bos yuva tanimsiz sayilir; en az bir anahtar ZORUNLUDUR (uygulama
+      # acilista denetler). Runbook §5.1.
+      PersonalDataProtection__Keys__k1: ${PERSONAL_DATA_KEY_K1:-}
+      PersonalDataProtection__Keys__k2: ${PERSONAL_DATA_KEY_K2:-}
+      PersonalDataProtection__Keys__k3: ${PERSONAL_DATA_KEY_K3:-}
       # Kan grubu UAT'de kabul testi icin LOGO'dan okunur; KVKK Sorumlusu onayladi
       # (22.10.2026, KR-125; ADR-0020 §6).
       Logo__SyncSpecialCategoryData: 'true'

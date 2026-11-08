@@ -50,6 +50,9 @@ public sealed class ProtectedPersonnelDataTests
         "Dsg.Hrms.Application.Personnel.Marriage.IMarriageStore",
         "Dsg.Hrms.Application.Personnel.Marriage.MarriageService",
         "Dsg.Hrms.Infrastructure.Personnel.MarriageStore",
+        // Yeniden sifreleme isi: yalnizca sifreli metni anahtar degistirerek yeniden yazar; duz degeri
+        // disari vermez, yalnizca sayilari doner (SYG-PERS-062; ADR-0020 §3).
+        "Dsg.Hrms.Infrastructure.Personnel.PersonalDataKeyStore",
     ];
 
     [Fact]

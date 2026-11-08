@@ -1979,6 +1979,117 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personnel/encryption": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sifreli degerlerin anahtara gore sayilari. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Durum. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EncryptionStatusResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`system.encryption.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personnel/encryption/re-encryption": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Guncel anahtar disindaki degerleri guncel anahtarla yeniden yazar. Denetim izine "degisti"
+         *     yazilmaz; is tek bir guvenlik olayidir. Tekrar calistirmak guvenlidir.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Sonuc. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReEncryptionResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Yetki yok (`system.encryption.update`). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personnel/persons/export/fields": {
         parameters: {
             query?: never;
@@ -5210,6 +5321,27 @@ export interface components {
          * @enum {unknown}
          */
         EmploymentStatusKind: "active" | "terminated" | "all";
+        /** @description Bir anahtar. */
+        EncryptionKeyResponse: {
+            /** @description Kimlik. */
+            keyId: string;
+            /**
+             * Format: int32
+             * @description Bu anahtarla sifreli deger sayisi.
+             */
+            count: number | string;
+            /** @description Guncel anahtar mi. */
+            isCurrent: boolean;
+            /** @description Yapilandirmada tanimli mi; degilse degerler cozulemez. */
+            isConfigured: boolean;
+        };
+        /** @description Anahtar durumu. */
+        EncryptionStatusResponse: {
+            /** @description Yeni yazimlarda kullanilan anahtar. */
+            currentKeyId: string;
+            /** @description Anahtarlar ve sayilari. */
+            keys: components["schemas"]["EncryptionKeyResponse"][];
+        };
         EntityTagHeaderValue: {
             tag?: components["schemas"]["StringSegment"];
             isWeak?: boolean;
@@ -5772,6 +5904,28 @@ export interface components {
             logoVersion: null | string;
             /** @description Iki adimli dogrulama sistemde kullaniliyor mu (PRM-KML-08); kullanici menusundeki hesap guvenligi sayfasi buna gore gosterilir (SYG-KMLK-080). */
             twoFactorAvailable: boolean;
+        };
+        /** @description Yeniden sifreleme sonucu. */
+        ReEncryptionResponse: {
+            /** @description Hedef anahtar. */
+            targetKeyId: string;
+            /** @description Yeniden yazilan degerlerin onceki anahtarlari. */
+            sourceKeyIds: string[];
+            /**
+             * Format: int32
+             * @description Yeniden yazilan deger sayisi.
+             */
+            reEncrypted: number | string;
+            /**
+             * Format: int32
+             * @description Cozulemeyen deger sayisi.
+             */
+            undecryptable: number | string;
+            /**
+             * Format: int32
+             * @description Guncel anahtar disinda kalan deger sayisi; eski anahtar ancak 0 iken cikarilir.
+             */
+            remainingOnOldKeys: number | string;
         };
         /** @description Referans tanimi. */
         ReferenceDefinitionResponse: {

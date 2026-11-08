@@ -76,6 +76,13 @@ altyapısı yoktur:
   kaybolur; personel talebi yeniden gönderir. Bu kabul edilen bir ödündür: değer kısa ömürlüdür
   ve yalnızca LOGO düzeltmesi için tutulur.
 
+> **Gerçekleştirme notu (#375, 08.11.2026):**
+>
+> - **Yetki:** `system.encryption.update`, yalnızca Sistem Yöneticisi (`KR-138`).
+> - **Uç ve ekran:** `GET /api/v1/personnel/encryption` anahtara göre sayıları, `POST …/re-encryption` işi çalıştırır. Ekran: Sistem → Parametreler, "Özel nitelikli veri şifrelemesi".
+> - **Yazım:** değişiklik izleyicisi dışında, eski şifreli metin koşuluyla; yazımlar ve güvenlik olayı (`PersonalDataReEncrypted`) tek işlemde. Silinmiş satırlar dahildir.
+> - **Anahtar yuvaları:** compose dosyaları `k1`–`k3` yuvalarını aktarır (`PERSONAL_DATA_KEY_K1…K3`); boş yuva tanımsızdır. Yordam: UAT runbook §5.1.
+
 ### 4. Arama ve filtre
 
 - Şifreli alanda **veritabanı araması ve dizin yoktur.** Değerin deterministik özeti
@@ -194,3 +201,4 @@ yeniden senkronizasyonla uygulanabilir.
 | 2026-10-22 | 1.2 | Revizyon (#267, #268): şifreleme depo katmanında ve ayrı tabloda, AAD tablo + alan + kimlik (B-02); açık yeniden şifreleme işi, önerilen kan grubu talep kapanınca silinir (B-03); ayar ortam yapılandırması, kapalıyken mevcut değer temizlenir (B-04); bellek içi filtrede sıra (B-10) | Bilgi İşlem |
 | 2026-10-23 | 1.3 | §1: şifrelenen değer kan grubu kodudur; ad referans veriden (`KR-129`, #280) | Bilgi İşlem |
 | 2026-11-03 | 1.4 | §6 sonuna gerçekleştirme notu: kaynak kolon, anahtar yapılandırması, biçim ve AAD, çözülemeyen değer, ortamlar (#317) | Bilgi İşlem |
+| 2026-11-08 | 1.5 | §3 sonuna gerçekleştirme notu: yeniden şifreleme işi, yetki (`KR-138`), anahtar yuvaları (#375) | Bilgi İşlem |

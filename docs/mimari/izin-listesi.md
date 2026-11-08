@@ -40,6 +40,7 @@
 | `reference.definition.view` | Ünvan, görev, kan grubu ve yakınlık tanımlarını görme | `GET /reference/definitions`; "Referans veri" ekranı (#350) | PERS-072 |
 | `reference.definition.update` | Ünvan, görev ve yakınlık tanımlarını değiştirme | `POST /reference/definitions`, `PUT …/{id}/name`, `POST …/{id}/deactivation`, `POST …/{id}/reactivation` (`KR-136`); "Referans veri" ekranı (#350) | PERS-072 |
 | `audit.log.view` | Denetim kayıtlarını görme | `GET /api/v1/audit/entries`; Sistem → "Denetim kayıtları" ekranı (#363) | PERS-069 |
+| `system.encryption.update` | Özel nitelikli veri şifrelemesini yönetme (yeniden şifreleme) | `GET /api/v1/personnel/encryption`, `POST /api/v1/personnel/encryption/re-encryption`; Sistem → Parametreler, "Özel nitelikli veri şifrelemesi" (#375). **Yalnızca Sistem Yöneticisi**; İK rolünde yok (`KR-138`) | PERS-062 |
 
 Kişi kartı ve "Profilim" (`GET /api/v1/personnel/persons/{id}`, `/me`) izin değil yalnızca oturum ister; kimin kimi göreceğini kapsam belirler (ADR-0019 §1).
 
@@ -72,3 +73,4 @@ Kişi kartı ve "Profilim" (`GET /api/v1/personnel/persons/{id}`, `/me`) izin de
 | 2026-11-07 | 0.12 | `personnel.person.update` evlilik uçlarına, `view_sensitive` kartın evlilik bölümüne bağlandı (#361) | Bilgi İşlem |
 | 2026-11-07 | 0.13 | `audit.log.view` denetim kayıtları ucuna ve ekranına bağlandı (#363) | Bilgi İşlem |
 | 2026-11-08 | 0.14 | `view_sensitive` kan grubu, evlilik ve acil durum kişisi süzgeçlerine bağlandı (#371) | Bilgi İşlem |
+| 2026-11-08 | 0.15 | `system.encryption.update` eklendi; yalnızca Sistem Yöneticisi (`KR-138`, #374, #375) | Bilgi İşlem |
