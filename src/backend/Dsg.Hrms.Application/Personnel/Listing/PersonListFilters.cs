@@ -100,12 +100,31 @@ public sealed record PersonListFilters
     public NumberRange? SeniorityYears { get; init; }
 
     /// <summary>
+    /// Kan grubu kodlari (referans veri); <see cref="FilterProtection.Sensitive"/>. Deger sifreli
+    /// oldugu icin uygulama belleginde suzulur (SYG-PERS-063).
+    /// </summary>
+    public IReadOnlyList<string> BloodGroupCodes { get; init; } = [];
+
+    /// <summary>Evlilik yardimi (coklu: aldi, almadi); <see cref="FilterProtection.Sensitive"/>. Evlilik bilgisi olmayan kisi hicbirine uymaz.</summary>
+    public IReadOnlyList<bool> MarriageAllowances { get; init; } = [];
+
+    /// <summary>Evlilik tarihi araligi (dahil); <see cref="FilterProtection.Sensitive"/>.</summary>
+    public DateRange? MarriageDate { get; init; }
+
+    /// <summary>Fotografi var / yok.</summary>
+    public bool? HasPhoto { get; init; }
+
+    /// <summary>Acil durum kisisi var / yok; <see cref="FilterProtection.Sensitive"/>.</summary>
+    public bool? HasEmergencyContact { get; init; }
+
+    /// <summary>
     /// Kullanilan suzgeclerin adlari ve korumalari. Erisim kaydi ve gorunurluk denetimi bu listeden
     /// beslenir; korumali bir suzgec yeni eklendiginde korumasi burada yazilir.
     /// </summary>
     public IEnumerable<(string Name, FilterProtection Protection, string? Value)> Used()
     {
         static string? Join<T>(IReadOnlyList<T> items) => items.Count == 0 ? null : string.Join(',', items);
+        static string Flag(bool value) => value ? "true" : "false";
 
         (string, FilterProtection, string?)[] all =
         [
@@ -133,6 +152,11 @@ public sealed record PersonListFilters
             ("terminationDate", FilterProtection.None, TerminationDate?.ToString()),
             ("age", FilterProtection.None, Age?.ToString()),
             ("seniorityYears", FilterProtection.None, SeniorityYears?.ToString()),
+            ("bloodGroup", FilterProtection.Sensitive, Join(BloodGroupCodes)),
+            ("marriageAllowance", FilterProtection.Sensitive, MarriageAllowances.Count == 0 ? null : string.Join(',', MarriageAllowances.Select(Flag))),
+            ("marriageDate", FilterProtection.Sensitive, MarriageDate?.ToString()),
+            ("hasPhoto", FilterProtection.None, HasPhoto is { } photo ? Flag(photo) : null),
+            ("hasEmergencyContact", FilterProtection.Sensitive, HasEmergencyContact is { } contact ? Flag(contact) : null),
         ];
 
         return all.Where(f => !string.IsNullOrWhiteSpace(f.Item3));

@@ -103,7 +103,14 @@ export function PersonListPage() {
   }
 
   // Yazma durunca aranir; her tusta istek gitmez. Yeni arama ilk sayfadan baslar.
+  // Terim adrestekiyle ayniysa hicbir sey yazilmaz (#373): React Router yeni adresi tarayiciya
+  // hemen yazar ama cizimi gecis olarak erteler. Bu arada calisan bir zamanlayici, eski adresi
+  // "degismedi" diye yeniden yazar ve az once yapilan degisikligi (or. "Temizle") geri alirdi.
   useEffect(() => {
+    if (term.trim() === urlTerm) {
+      return undefined;
+    }
+
     const timer = setTimeout(() => {
       setParams(
         (current) =>
@@ -114,7 +121,7 @@ export function PersonListPage() {
       );
     }, SEARCH_DELAY_MS);
     return () => clearTimeout(timer);
-  }, [term, setParams]);
+  }, [term, urlTerm, setParams]);
 
   const apiParams = toApiParams(params);
   const list = useQuery({

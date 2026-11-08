@@ -6,8 +6,10 @@ import {
   FIXED_VALUES,
   MULTI_FILTERS,
   OPTION_SOURCE,
+  PRESENCE_FILTERS,
   RANGE_FILTERS,
   TEXT_FILTERS,
+  isFixed,
   parseDate,
   statusOf,
   withChanges,
@@ -26,14 +28,14 @@ function optionLabel(
   options: PersonFilterOptions | undefined,
   t: TFunction,
 ): string {
-  if (name === 'gender' || name === 'maritalStatus') {
+  if (isFixed(name)) {
     return (FIXED_VALUES[name] as readonly string[]).includes(value)
       ? t(`personnel.list.values.${name}.${value}`)
       : value;
   }
 
   // Secenekler henuz gelmediyse ya da deger artik yoksa degerin kendisi gosterilir.
-  return options?.[OPTION_SOURCE[name]].find((option) => option.value === value)?.label ?? value;
+  return options?.[OPTION_SOURCE[name]]?.find((option) => option.value === value)?.label ?? value;
 }
 
 function displayDate(value: string | null): string | null {
@@ -101,6 +103,17 @@ export function filterTags(
         key: name,
         label: `${field(name)}: ${rangeText(from, to, t)}`,
         remove: (current) => withChanges(current, { [`${name}From`]: null, [`${name}To`]: null }),
+      });
+    }
+  }
+
+  for (const name of PRESENCE_FILTERS) {
+    const value = params.get(name);
+    if (value === 'true' || value === 'false') {
+      tags.push({
+        key: name,
+        label: `${field(name)}: ${t(`personnel.list.presence.${value}`)}`,
+        remove: (current) => withChanges(current, { [name]: null }),
       });
     }
   }

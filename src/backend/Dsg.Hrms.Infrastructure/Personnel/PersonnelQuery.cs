@@ -225,7 +225,12 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
             persons = Search(persons, term, PersonFieldVisibility.CanSearchByNationalId(viewer));
         }
 
-        return ApplyFilters(persons, criteria.Filters, activeOnly: criteria.Status == EmploymentStatusFilter.Active);
+        persons = ApplyFilters(persons, criteria.Filters, activeOnly: criteria.Status == EmploymentStatusFilter.Active);
+
+        // Kan grubu en son, kalan kume uzerinde (SYG-PERS-063).
+        return criteria.Filters.BloodGroupCodes.Count > 0
+            ? await WithBloodGroupAsync(persons, criteria.Filters.BloodGroupCodes, cancellationToken).ConfigureAwait(false)
+            : persons;
     }
 
     /// <summary>Liste siralamasi (SYG-PERS-031); esitlikte ic kimlik, sayfalar kararli kalir.</summary>
@@ -421,7 +426,61 @@ public sealed class PersonnelQuery(HrmsDbContext context, ISystemParameters para
                 (max == null || e.HireDate.AddYears(max.Value + 1) > (e.TerminationDate == null ? today : e.TerminationDate.Value.AddDays(1)))));
         }
 
+        // Evlilik bilgisi (SYG-PERS-036): silinmis kayit genel suzgecle disarida kalir.
+        var marriages = context.Set<PersonMarriage>();
+        if (f.MarriageAllowances.Count > 0)
+        {
+            var allowances = f.MarriageAllowances;
+            persons = persons.Where(p => marriages.Any(m => m.PersonId == p.Id && allowances.Contains(m.AllowanceReceived)));
+        }
+
+        if (f.MarriageDate is { } marriage)
+        {
+            var from = marriage.From;
+            var to = marriage.To;
+            persons = persons.Where(p => marriages.Any(m => m.PersonId == p.Id &&
+                (from == null || m.MarriageDate >= from) && (to == null || m.MarriageDate <= to)));
+        }
+
+        if (f.HasPhoto is { } hasPhoto)
+        {
+            var photos = context.Set<PersonPhoto>();
+            persons = persons.Where(p => photos.Any(photo => photo.PersonId == p.Id) == hasPhoto);
+        }
+
+        if (f.HasEmergencyContact is { } hasContact)
+        {
+            var contacts = context.Set<EmergencyContact>();
+            persons = persons.Where(p => contacts.Any(c => c.PersonId == p.Id) == hasContact);
+        }
+
         return persons;
+    }
+
+    /// <summary>
+    /// Kan grubu suzgeci (SYG-PERS-063). Kan grubu sifreli tutulur ve deterministik ozeti yoktur; bu
+    /// yuzden kapsam ve diger suzgeclerden kalan kisilerin degeri cozulur ve bellekte suzulur. Sonuc
+    /// kimlik kumesi olarak sorguya geri doner: sayim, siralama ve sayfalama veritabaninda, suzgecin
+    /// veritabaninda uygulandigi esdeger sonucla ayni sekilde yapilir. Cozulemeyen deger hicbir
+    /// secenege uymaz.
+    /// </summary>
+    private async Task<IQueryable<Person>> WithBloodGroupAsync(IQueryable<Person> persons, IReadOnlyList<string> codes, CancellationToken cancellationToken)
+    {
+        var candidates = await persons
+            .Join(context.Set<PersonSensitive>().Where(s => s.BloodGroup != null), p => p.Id, s => s.PersonId,
+                (p, s) => new { p.Id, p.PublicId, Cipher = s.BloodGroup! })
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        var wanted = codes.ToHashSet(StringComparer.Ordinal);
+        long[] matching =
+        [
+            .. candidates
+                .Where(c => protector.TryUnprotect(c.Cipher, ProtectedField.BloodGroup(c.PublicId)) is { } code && wanted.Contains(code))
+                .Select(c => c.Id),
+        ];
+
+        return persons.Where(p => matching.Contains(p.Id));
     }
 
     private static string? Trimmed(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();

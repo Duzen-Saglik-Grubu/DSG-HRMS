@@ -194,6 +194,173 @@ public sealed class PersonListFilterApiTests : IClassFixture<Identity.Registrati
         }
     }
 
+    // ------------------------------------------------------------------ karta sonradan eklenen alanlar (#371)
+
+    [Fact]
+    public async Task Blood_group_marriage_photo_and_emergency_contact_have_filters()
+    {
+        await SeedCardExtrasAsync();
+        var (client, jwt) = await HrAsync();
+        using (client)
+        {
+            // Kan grubu: kisi 2 "1", kisi 3 "3"; kisi 5'te yok.
+            (await CodesAsync(client, jwt, "bloodGroup=1")).ShouldBe(["00002"]);
+            (await CodesAsync(client, jwt, "bloodGroup=1&bloodGroup=3")).ShouldBe(["00002", "00003"], ignoreOrder: true);
+            (await CodesAsync(client, jwt, "bloodGroup=8")).ShouldBeEmpty();
+
+            // Evlilik: kisi 2 (2015, aldi), kisi 5 (2020, almadi).
+            (await CodesAsync(client, jwt, "marriageAllowance=received")).ShouldBe(["00002"]);
+            (await CodesAsync(client, jwt, "marriageAllowance=received&marriageAllowance=notReceived")).ShouldBe(["00002", "00005"], ignoreOrder: true);
+            (await CodesAsync(client, jwt, "marriageDateFrom=2016-01-01")).ShouldBe(["00005"]);
+            (await CodesAsync(client, jwt, "marriageDateFrom=2015-06-20&marriageDateTo=2015-06-20")).ShouldBe(["00002"]);
+
+            // Fotograf yalnizca kisi 3'te; acil durum kisisi yalnizca kisi 5'te.
+            (await CodesAsync(client, jwt, "hasPhoto=true")).ShouldBe(["00003"]);
+            (await CodesAsync(client, jwt, "hasPhoto=false")).ShouldNotContain("00003");
+            (await CodesAsync(client, jwt, "hasEmergencyContact=true")).ShouldBe(["00005"]);
+            (await CodesAsync(client, jwt, "hasEmergencyContact=false")).ShouldNotContain("00005");
+
+            // Farkli suzgecler birlikte (VE).
+            (await CodesAsync(client, jwt, "bloodGroup=1&bloodGroup=3&city=Ankara")).ShouldBe(["00002"]);
+
+            // Secenek listesi referans veriden.
+            var options = (await SendAsync(client, $"{Persons}/filter-options", jwt)).Body;
+            options.GetProperty("bloodGroups").EnumerateArray().Select(o => o.GetProperty("label").GetString()).ShouldContain("A Rh+");
+        }
+    }
+
+    [Fact]
+    public async Task Blood_group_filter_counts_and_pages_like_the_equivalent_database_filter()
+    {
+        // SYG-PERS-063: bellekte suzulen kume; toplam ve sayfa, ayni kumenin veritabaninda suzulmus
+        // halinden farkli olmamali. Esdeger: kan grubu bilinen kisilerin sicilleri (kisi 2 ve 3).
+        await SeedCardExtrasAsync();
+        var (client, jwt) = await HrAsync();
+        using (client)
+        {
+            var expected = (await CodesAsync(client, jwt, "registryCode=0000&sort=lastName&pageSize=100"))
+                .Where(code => code is "00002" or "00003")
+                .ToList();
+            expected.Count.ShouldBe(2);
+
+            for (var page = 1; page <= 2; page++)
+            {
+                var (status, body) = await SendAsync(client, $"{Persons}?bloodGroup=1&bloodGroup=3&sort=lastName&pageSize=1&page={page}", jwt);
+                status.ShouldBe(HttpStatusCode.OK);
+                body.GetProperty("totalCount").GetInt32().ShouldBe(2);
+                body.GetProperty("items").EnumerateArray().Single().GetProperty("registryCode").GetString().ShouldBe(expected[page - 1]);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task Protected_card_extra_filters_are_refused_without_the_sensitive_permission()
+    {
+        // SYG-PERS-026: kan grubu, evlilik ve acil durum view_sensitive ister; fotograf istemez.
+        await GrantRoleAsync(await CreateRoleAsync(Permissions.PersonView));
+        using var client = _fixture.CreateClient();
+        var jwt = await SignInAsync(client);
+
+        foreach (var query in new[] { "bloodGroup=1", "marriageAllowance=received", "marriageDateFrom=2015-01-01", "hasEmergencyContact=true" })
+        {
+            (await SendAsync(client, $"{Persons}?{query}", jwt)).Status.ShouldBe(HttpStatusCode.BadRequest, query);
+        }
+
+        (await SendAsync(client, $"{Persons}?hasPhoto=true", jwt)).Status.ShouldBe(HttpStatusCode.OK);
+        (await SendAsync(client, $"{Persons}?marriageAllowance=maybe", jwt)).Status.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Blood_group_filter_value_is_hidden_and_each_listed_or_exported_person_gets_a_special_category_record()
+    {
+        // SYG-PERS-059: deger yazilmaz; kan grubu suzgeciyle listelenen her kisi icin SpecialCategoryView.
+        await SeedCardExtrasAsync();
+        var (client, jwt) = await HrAsync();
+        using (client)
+        {
+            var person2 = await _fixture.WithDbAsync(context => context.Set<Person>().Where(p => p.NationalId == NationalId(2)).Select(p => p.PublicId).SingleAsync());
+            var before = await _fixture.WithDbAsync(context => context.AccessLog.MaxAsync(e => (long?)e.Id)) ?? 0;
+
+            await CodesAsync(client, jwt, "bloodGroup=1&marriageAllowance=received&hasEmergencyContact=false&hasPhoto=false");
+
+            var entries = await _fixture.WithDbAsync(context => context.AccessLog.Where(e => e.Id > before).ToListAsync());
+            var list = entries.Single(e => e.AccessType == Domain.Audit.AccessType.List);
+            list.Filters.ShouldContain("\"bloodGroup\": \"(kullanıldı)\"");
+            list.Filters.ShouldContain("\"marriageAllowance\": \"(kullanıldı)\"");
+            list.Filters.ShouldContain("\"hasEmergencyContact\": \"(kullanıldı)\"");
+            list.Filters.ShouldContain("\"hasPhoto\": \"false\"");
+            entries.Where(e => e.AccessType == Domain.Audit.AccessType.SpecialCategoryView).Select(e => e.EntityId).ShouldBe([person2]);
+
+            // Disa aktarma: kan grubu sutunu secilmese de suzgecle dosyaya giren kisi kaydedilir.
+            before = entries.Max(e => e.Id);
+            using (var request = new HttpRequestMessage(HttpMethod.Get, new Uri($"{Persons}/export?format=excel&field=registryCode&bloodGroup=1&bloodGroup=3", UriKind.Relative)))
+            {
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+                using var response = await client.SendAsync(request);
+                response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            }
+
+            var exported = await _fixture.WithDbAsync(context => context.AccessLog.Where(e => e.Id > before).ToListAsync());
+            var export = exported.Single(e => e.AccessType == Domain.Audit.AccessType.Export);
+            export.Filters.ShouldContain("\"bloodGroup\": \"(kullanıldı)\"");
+            exported.Count(e => e.AccessType == Domain.Audit.AccessType.SpecialCategoryView).ShouldBe(2);
+        }
+    }
+
+    /// <summary>
+    /// Kan grubu (sifreli), evlilik bilgisi, fotograf ve acil durum kisisi. Kisi 2: kan grubu "1",
+    /// evlilik 20.06.2015 aldi. Kisi 3: kan grubu "3", fotograf. Kisi 5: evlilik 2020 almadi, acil durum kisisi.
+    /// </summary>
+    private Task<int> SeedCardExtrasAsync() =>
+        _fixture.WithServicesAsync(async services =>
+        {
+            var protector = services.GetRequiredService<Infrastructure.Personnel.Protection.PersonalDataProtector>();
+            var context = services.GetRequiredService<HrmsDbContext>();
+            Task<Person> PersonAsync(int index) => context.Set<Person>().SingleAsync(p => p.NationalId == NationalId(index));
+
+            async Task BloodGroup(int index, string code)
+            {
+                var person = await PersonAsync(index);
+                var row = await context.Set<PersonSensitive>().SingleOrDefaultAsync(r => r.PersonId == person.Id);
+                if (row is null)
+                {
+                    row = PersonSensitive.For(person.Id);
+                    context.Add(row);
+                }
+
+                row.SetProtectedBloodGroup(protector.Protect(code, Infrastructure.Personnel.Protection.ProtectedField.BloodGroup(person.PublicId)));
+            }
+
+            async Task Marriage(int index, DateOnly date, bool allowance)
+            {
+                var person = await PersonAsync(index);
+                if (!await context.Set<PersonMarriage>().AnyAsync(m => m.PersonId == person.Id))
+                {
+                    context.Add(PersonMarriage.For(person.Id, new MarriageDetails(date, allowance)));
+                }
+            }
+
+            await BloodGroup(2, "1");
+            await BloodGroup(3, "3");
+            await Marriage(2, new DateOnly(2015, 6, 20), allowance: true);
+            await Marriage(5, new DateOnly(2020, 1, 1), allowance: false);
+
+            var person3 = await PersonAsync(3);
+            if (!await context.Set<PersonPhoto>().AnyAsync(p => p.PersonId == person3.Id))
+            {
+                context.Add(PersonPhoto.For(person3.Id, new string('a', 64), [0xFF, 0xD8, 0xFF], 1));
+            }
+
+            var person5 = await PersonAsync(5);
+            if (!await context.Set<EmergencyContact>().AnyAsync(c => c.PersonId == person5.Id))
+            {
+                var relationship = await context.Set<ReferenceDefinition>().Where(d => d.Type == ReferenceType.Relationship).Select(d => d.Id).FirstAsync();
+                context.Add(EmergencyContact.For(person5.Id, new EmergencyContactDetails(relationship, "Ayşe", "Deniz", "5321234567")));
+            }
+
+            return await context.SaveChangesAsync();
+        });
+
     private async Task<Seed> SeedAsync(HrmsDbContext context)
     {
         var company = await context.Set<Company>().FirstAsync();

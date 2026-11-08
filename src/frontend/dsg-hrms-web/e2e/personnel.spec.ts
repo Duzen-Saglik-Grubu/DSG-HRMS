@@ -499,6 +499,35 @@ test('13. TCKN ve gecis kurali: yonetici tam TCKN gorur; rolu olmayan personel b
   await signOut(page, people.unprivileged.fullName);
 });
 
+test('14. kalan suzgecler: yonetici fotografi olanlari suzer, etiketi kaldirir (SYG-PERS-024, #371)', async ({
+  page,
+}) => {
+  await signIn(page, people.admin.email, passwords.first);
+  await page.getByRole('link', { name: 'Personel listesi', exact: true }).click();
+  await expect(page.getByRole('article', { name: 'Yusuf Yonetici' })).toBeVisible();
+
+  await page.getByRole('button', { name: /Süzgeçler/ }).click();
+  const panel = page.getByRole('dialog', { name: 'Süzgeçler' });
+  // Yonetici korumali suzgecleri de gorur.
+  await expect(panel.getByLabel('Kan grubu')).toBeVisible();
+  await panel.getByLabel('Fotoğraf').click();
+  await page.getByRole('option', { name: 'Var' }).click();
+  await panel.getByRole('button', { name: 'Uygula' }).click();
+  // Panel kapanmadan listeye dokunulmaz: kapanis gecisi tiklamayi yutabiliyor (CI).
+  await expect(panel).toBeHidden();
+
+  // Tohumda yalnizca Deniz'in fotografi var.
+  const tags = page.getByRole('group', { name: 'Seçili süzgeçler' });
+  await expect(tags).toContainText('Fotoğraf: Var');
+  await expect(page.getByRole('article')).toHaveCount(1);
+  await expect(page.getByRole('article', { name: 'Deniz Davetli' })).toBeVisible();
+
+  await tags.getByRole('button', { name: 'Temizle' }).click();
+  await expect(tags).toHaveCount(0);
+  await expect(page.getByRole('article', { name: 'Yusuf Yonetici' })).toBeVisible();
+  await signOut(page, people.admin.fullName);
+});
+
 async function readDownload(download: Download): Promise<Buffer> {
   const stream = await download.createReadStream();
   const chunks: Buffer[] = [];

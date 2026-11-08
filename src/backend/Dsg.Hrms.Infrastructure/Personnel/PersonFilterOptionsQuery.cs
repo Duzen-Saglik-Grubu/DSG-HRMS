@@ -38,6 +38,8 @@ public sealed class PersonFilterOptionsQuery(HrmsDbContext context) : IPersonFil
             .Select(d => new FilterOption(d.Code, d.Name)).ToListAsync(cancellationToken).ConfigureAwait(false);
         var duties = await context.Set<ReferenceDefinition>().AsNoTracking().Where(d => d.Type == ReferenceType.Duty).OrderBy(d => d.Name)
             .Select(d => new FilterOption(d.PublicId.ToString(), d.Name)).ToListAsync(cancellationToken).ConfigureAwait(false);
+        var bloodGroups = await context.Set<ReferenceDefinition>().AsNoTracking().Where(d => d.Type == ReferenceType.BloodGroup).OrderBy(d => d.SortOrder)
+            .Select(d => new FilterOption(d.Code, d.Name)).ToListAsync(cancellationToken).ConfigureAwait(false);
         var statuses = await context.Set<EmploymentAssignment>().AsNoTracking().Where(a => a.StatusCode != null).Select(a => a.StatusCode!).Distinct().OrderBy(s => s)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
         var occupations = await context.Set<EmploymentAssignment>().AsNoTracking().Where(a => a.OccupationCode != null)
@@ -57,6 +59,9 @@ public sealed class PersonFilterOptionsQuery(HrmsDbContext context) : IPersonFil
             [.. occupations.GroupBy(o => o.Code).Select(g => new FilterOption(g.Key, g.Select(o => o.OccupationName).FirstOrDefault(n => n != null) ?? g.Key)).OrderBy(o => o.Label, StringComparer.Create(new System.Globalization.CultureInfo("tr-TR"), false))],
             [.. educations.Select(e => new FilterOption(e, e))],
             CanFilterByNationalId: false,
-            CanFilterBySensitive: false);
+            CanFilterBySensitive: false)
+        {
+            BloodGroups = bloodGroups,
+        };
     }
 }

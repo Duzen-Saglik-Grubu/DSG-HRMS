@@ -94,4 +94,29 @@ describe('listState', () => {
     const merkez = tags.find((tag) => tag.key === 'branchId=b-1');
     expect(merkez?.remove(params).getAll('branchId')).toEqual(['b-2']);
   });
+
+  it('kan grubu, evlilik, fotograf ve acil durum suzgecleri etiketlenir ve istege gider (#371)', () => {
+    const params = new URLSearchParams(
+      'bloodGroup=3&marriageAllowance=notReceived&marriageDateFrom=2015-06-20&hasPhoto=true&hasEmergencyContact=false',
+    );
+
+    expect(
+      filterTags(params, { ...OPTIONS, bloodGroups: [{ value: '3', label: 'A Rh+' }] }, i18n.t).map(
+        (tag) => tag.label,
+      ),
+    ).toEqual([
+      'Kan grubu: A Rh+',
+      'Evlilik yardımı: Almadı',
+      'Evlilik tarihi: 20.06.2015 ve sonrası',
+      'Fotoğraf: Var',
+      'Acil durum kişisi: Yok',
+    ]);
+    // Secenekler gelmeden de etiket kurulur; deger kendisiyle gorunur.
+    expect(filterTags(new URLSearchParams('bloodGroup=3'), undefined, i18n.t)[0]?.label).toBe(
+      'Kan grubu: 3',
+    );
+    expect(toApiParams(params).toString()).toBe(params.toString());
+    expect(hasFilters(new URLSearchParams('hasPhoto=false'))).toBe(true);
+    expect(cleared(params).toString()).toBe('');
+  });
 });

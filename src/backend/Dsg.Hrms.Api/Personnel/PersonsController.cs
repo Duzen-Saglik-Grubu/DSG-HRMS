@@ -235,6 +235,30 @@ public abstract class PersonFilterRequest
     [FromQuery(Name = "seniorityMax")]
     public int? SeniorityMax { get; init; }
 
+    /// <summary>Kan grubu kodlari (coklu; yalnizca view_sensitive).</summary>
+    [FromQuery(Name = "bloodGroup")]
+    public string[] BloodGroups { get; init; } = [];
+
+    /// <summary>Evlilik yardimi (coklu: received, notReceived; yalnizca view_sensitive).</summary>
+    [FromQuery(Name = "marriageAllowance")]
+    public MarriageAllowanceKind[] MarriageAllowances { get; init; } = [];
+
+    /// <summary>Evlilik tarihi en erken (dahil; yalnizca view_sensitive).</summary>
+    [FromQuery(Name = "marriageDateFrom")]
+    public DateOnly? MarriageDateFrom { get; init; }
+
+    /// <summary>Evlilik tarihi en gec (dahil; yalnizca view_sensitive).</summary>
+    [FromQuery(Name = "marriageDateTo")]
+    public DateOnly? MarriageDateTo { get; init; }
+
+    /// <summary>Fotografi var (true) / yok (false).</summary>
+    [FromQuery(Name = "hasPhoto")]
+    public bool? HasPhoto { get; init; }
+
+    /// <summary>Acil durum kisisi var (true) / yok (false; yalnizca view_sensitive).</summary>
+    [FromQuery(Name = "hasEmergencyContact")]
+    public bool? HasEmergencyContact { get; init; }
+
     /// <summary>Istegi uygulama katmaninin suzgec kumesine cevirir.</summary>
     public PersonListFilters ToFilters() => new()
     {
@@ -262,6 +286,11 @@ public abstract class PersonFilterRequest
         TerminationDate = TerminationDateFrom is null && TerminationDateTo is null ? null : new DateRange(TerminationDateFrom, TerminationDateTo),
         Age = AgeMin is null && AgeMax is null ? null : new NumberRange(AgeMin, AgeMax),
         SeniorityYears = SeniorityMin is null && SeniorityMax is null ? null : new NumberRange(SeniorityMin, SeniorityMax),
+        BloodGroupCodes = BloodGroups,
+        MarriageAllowances = [.. MarriageAllowances.Select(a => a == MarriageAllowanceKind.Received)],
+        MarriageDate = MarriageDateFrom is null && MarriageDateTo is null ? null : new DateRange(MarriageDateFrom, MarriageDateTo),
+        HasPhoto = HasPhoto,
+        HasEmergencyContact = HasEmergencyContact,
     };
 
     /// <summary>Calisma durumu (uygulama katmani).</summary>
@@ -301,7 +330,7 @@ public sealed class PersonListRequest : PersonFilterRequest
 /// <param name="Occupations">SGK meslekleri.</param>
 /// <param name="Educations">Egitim durumlari.</param>
 /// <param name="CanFilterByNationalId">TCKN suzgeci sunulur mu.</param>
-/// <param name="CanFilterBySensitive">Adres suzgeci sunulur mu.</param>
+/// <param name="CanFilterBySensitive">Korumali alan suzgecleri (adres, kan grubu, evlilik bilgisi, acil durum kisisi) sunulur mu.</param>
 /// <param name="DefaultPageSize">Varsayilan sayfa boyutu (PRM-GRN-02).</param>
 /// <param name="MaxPageSize">En buyuk sayfa boyutu (PRM-GRN-03); sayfa boyutu secenekleri bunu asmaz (SYG-PERS-029).</param>
 public sealed record PersonFilterOptionsResponse(
@@ -319,6 +348,9 @@ public sealed record PersonFilterOptionsResponse(
     int DefaultPageSize,
     int MaxPageSize)
 {
+    /// <summary>Kan grubu secenekleri; suzgec yalnizca izni olana sunulur.</summary>
+    public IReadOnlyList<FilterOptionResponse> BloodGroups { get; init; } = [];
+
     /// <summary>Uygulama katmanindan yanit kurar.</summary>
     public static PersonFilterOptionsResponse From(PersonFilterOptions options)
     {
@@ -326,7 +358,10 @@ public sealed record PersonFilterOptionsResponse(
         static IReadOnlyList<FilterOptionResponse> Map(IReadOnlyList<FilterOption> items) => [.. items.Select(i => new FilterOptionResponse(i.Value, i.Label))];
         return new(Map(options.Companies), Map(options.Cities), Map(options.Branches), Map(options.Departments), Map(options.Titles),
             Map(options.Duties), Map(options.Statuses), Map(options.Occupations), Map(options.Educations),
-            options.CanFilterByNationalId, options.CanFilterBySensitive, options.DefaultPageSize, options.MaxPageSize);
+            options.CanFilterByNationalId, options.CanFilterBySensitive, options.DefaultPageSize, options.MaxPageSize)
+        {
+            BloodGroups = Map(options.BloodGroups),
+        };
     }
 }
 
@@ -334,6 +369,19 @@ public sealed record PersonFilterOptionsResponse(
 /// <param name="Value">Suzgece gonderilen deger.</param>
 /// <param name="Label">Ad.</param>
 public sealed record FilterOptionResponse(string Value, string Label);
+
+/// <summary>Evlilik yardimi suzgeci.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<MarriageAllowanceKind>))]
+public enum MarriageAllowanceKind
+{
+    /// <summary>Evlilik yardimi aldi.</summary>
+    [JsonStringEnumMemberName("received")]
+    Received = 1,
+
+    /// <summary>Evlilik yardimi almadi.</summary>
+    [JsonStringEnumMemberName("notReceived")]
+    NotReceived = 2,
+}
 
 /// <summary>Calisma durumu suzgeci.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<EmploymentStatusKind>))]
@@ -379,6 +427,8 @@ public abstract class PersonFilterRequestValidator<T> : AbstractValidator<T>
         RuleFor(r => r.Order).IsInEnum().WithMessage("Geçersiz sıralama yönü.");
         RuleForEach(r => r.MaritalStatuses).IsInEnum().WithMessage("Geçersiz medeni hâl.");
         RuleForEach(r => r.Genders).IsInEnum().WithMessage("Geçersiz cinsiyet.");
+        RuleForEach(r => r.MarriageAllowances).IsInEnum().WithMessage("Geçersiz evlilik yardımı değeri.");
+        RuleForEach(r => r.BloodGroups).NotEmpty().MaximumLength(20).WithMessage("Geçersiz kan grubu.");
         RuleFor(r => r.AgeMin).InclusiveBetween(0, 120).When(r => r.AgeMin is not null).WithMessage("Yaş 0 ile 120 arasında olmalıdır.");
         RuleFor(r => r.AgeMax).InclusiveBetween(0, 120).When(r => r.AgeMax is not null).WithMessage("Yaş 0 ile 120 arasında olmalıdır.");
         RuleFor(r => r.SeniorityMin).InclusiveBetween(0, 80).When(r => r.SeniorityMin is not null).WithMessage("Kıdem 0 ile 80 yıl arasında olmalıdır.");
