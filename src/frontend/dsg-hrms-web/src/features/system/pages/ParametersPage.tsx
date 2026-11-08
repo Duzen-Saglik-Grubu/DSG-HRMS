@@ -24,6 +24,7 @@ import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { PageHeader } from '@/shared/components/PageHeader';
 import { parametersApi, type Parameter } from '../api/parametersApi';
+import { EncryptionSection } from '../components/EncryptionSection';
 
 /** Iki adimli dogrulama parametresi; acilmadan once etki onayi istenir (SYG-KMLK-035). */
 const TWO_FACTOR_KEY = 'PRM-KML-08';
@@ -58,6 +59,8 @@ export function ParametersPage() {
   const { t, i18n } = useTranslation();
   const canView = usePermission(permissions.parameterView);
   const canUpdate = usePermission(permissions.parameterUpdate);
+  // Sifreleme yonetimi yalnizca Sistem Yoneticisinde (KR-138).
+  const canManageEncryption = usePermission(permissions.encryptionUpdate);
 
   const parameters = useQuery({
     queryKey: queryKeys.system.parameters,
@@ -83,6 +86,8 @@ export function ParametersPage() {
       />
 
       <LogoSection canUpdate={canUpdate} />
+
+      {canManageEncryption ? <EncryptionSection /> : null}
 
       {parameters.error ? (
         <ErrorState

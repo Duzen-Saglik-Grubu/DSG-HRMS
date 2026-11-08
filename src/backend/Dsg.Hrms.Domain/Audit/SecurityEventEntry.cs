@@ -114,4 +114,11 @@ public enum SecurityEventType
     /// (SYG-KMLK-080; ayrinti: acma veya kapatma).
     /// </summary>
     TwoFactorChangeFailed = 18,
+
+    /// <summary>
+    /// Ozel nitelikli veri guncel anahtarla yeniden sifrelendi (SYG-PERS-062; ADR-0020 §3).
+    /// Ayrinti: kaynak ve hedef anahtar, yeniden yazilan, eski anahtarla kalan ve cozulemeyen
+    /// kayit sayisi. Konu hesap ve kisi yoktur; baslatan aktordur.
+    /// </summary>
+    PersonalDataReEncrypted = 19,
 }

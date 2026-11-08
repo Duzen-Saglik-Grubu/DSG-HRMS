@@ -269,19 +269,22 @@ describe('PersonListPage', () => {
     expect(within(panel).getByLabelText('TCKN')).toBeInTheDocument();
   });
 
-  it('kan grubu, evlilik ve acil durum suzgecleri yalnizca izni olana; fotograf herkese (SYG-PERS-024, 026)', async () => {
+  it('kan grubu, evlilik ve acil durum suzgecleri izni olmayana sunulmaz; fotograf herkese (SYG-PERS-026)', async () => {
     const user = userEvent.setup();
     renderWithProviders(<PersonListPage />);
     await screen.findByRole('article', { name: 'AYŞE DEMİR' });
 
     await user.click(screen.getByRole('button', { name: /Süzgeçler/ }));
-    let panel = await screen.findByRole('dialog', { name: 'Süzgeçler' });
+    const panel = await screen.findByRole('dialog', { name: 'Süzgeçler' });
     expect(within(panel).getByLabelText('Fotoğraf')).toBeInTheDocument();
     for (const label of ['Kan grubu', 'Evlilik yardımı', 'Acil durum kişisi']) {
       expect(within(panel).queryByLabelText(label)).not.toBeInTheDocument();
     }
     expect(within(panel).queryByText('Evlilik tarihi')).not.toBeInTheDocument();
-    await user.click(within(panel).getAllByRole('button', { name: 'Kapat' })[0]!);
+  });
+
+  it('izni olan kan grubu, evlilik yardimi ve acil durum kisisiyle suzer; secimler etiket olur (SYG-PERS-024)', async () => {
+    const user = userEvent.setup();
 
     vi.mocked(personsApi.filterOptions).mockResolvedValue(
       options({
@@ -293,9 +296,10 @@ describe('PersonListPage', () => {
       }),
     );
     renderWithProviders(<PersonListPage />);
-    await waitFor(() => expect(personsApi.filterOptions).toHaveBeenCalledTimes(2));
-    await user.click(screen.getAllByRole('button', { name: /Süzgeçler/ }).at(-1)!);
-    panel = await screen.findByRole('dialog', { name: 'Süzgeçler' });
+    await screen.findByRole('article', { name: 'AYŞE DEMİR' });
+    await waitFor(() => expect(personsApi.filterOptions).toHaveBeenCalled());
+    await user.click(screen.getByRole('button', { name: /Süzgeçler/ }));
+    const panel = await screen.findByRole('dialog', { name: 'Süzgeçler' });
     expect(within(panel).getByText('Evlilik tarihi')).toBeInTheDocument();
 
     await user.click(within(panel).getByLabelText('Kan grubu'));
@@ -314,7 +318,8 @@ describe('PersonListPage', () => {
     const tags = await screen.findByRole('group', { name: 'Seçili süzgeçler' });
     expect(within(tags).getByText('Kan grubu: A Rh+')).toBeInTheDocument();
     expect(within(tags).getByText('Acil durum kişisi: Yok')).toBeInTheDocument();
-  });
+    // Uc acilir menuden secim yapar; CI kapsam olcumuyle yerelin birkac kati yavas (#376).
+  }, 30_000);
 
   it('suzgec uygulandiktan hemen sonra Temizle kalici olur (#373)', async () => {
     const user = userEvent.setup();

@@ -35,15 +35,22 @@ public sealed partial class PersonalDataProtectionOptions : IValidatableObject
     /// <summary>Anahtar kimligi -> Base64 anahtar. Kimlik <c>k&lt;n&gt;</c> bicimindedir.</summary>
     public Dictionary<string, string> Keys { get; init; } = [];
 
+    /// <summary>
+    /// Degeri bos olmayan anahtarlar. Bos deger tanimsiz sayilir: compose dosyalari ikinci anahtari
+    /// (`k2`) her zaman aktarir, sir dosyasinda deger yoksa bos gelir (SYG-PERS-062, anahtar dondurme).
+    /// </summary>
+    public IReadOnlyDictionary<string, string> ActiveKeys =>
+        Keys.Where(k => !string.IsNullOrWhiteSpace(k.Value)).ToDictionary(k => k.Key, k => k.Value, StringComparer.Ordinal);
+
     /// <summary>Yeni yazimlarda kullanilan anahtarin kimligi: en buyuk numarali anahtar.</summary>
     public string CurrentKeyId =>
-        Keys.Keys.Where(id => KeyIdPattern().IsMatch(id)).MaxBy(Number)
+        ActiveKeys.Keys.Where(id => KeyIdPattern().IsMatch(id)).MaxBy(Number)
         ?? throw new InvalidOperationException($"{SectionName}:Keys tanimli degil.");
 
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (Keys.Count == 0)
+        if (ActiveKeys.Count == 0)
         {
             yield return new ValidationResult(
                 $"{SectionName}:Keys tanimli degil. Ozel nitelikli veri (kan grubu) anahtarsiz yazilamaz ve okunamaz; " +
@@ -53,7 +60,7 @@ public sealed partial class PersonalDataProtectionOptions : IValidatableObject
         }
 
         // Iletilerde yalnizca anahtar KIMLIGI yer alir; deger hicbir iletiye yazilmaz.
-        foreach (var (id, value) in Keys)
+        foreach (var (id, value) in ActiveKeys)
         {
             if (!KeyIdPattern().IsMatch(id))
             {

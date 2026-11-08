@@ -5,6 +5,7 @@ import { ApiError } from '@/shared/api/problemDetails';
 import { permissions } from '@/shared/auth/permissions';
 import { renderWithProviders } from '@/test/render';
 import { setSession } from '@/test/session';
+import { encryptionApi } from '../../api/encryptionApi';
 import { parametersApi, type Parameter } from '../../api/parametersApi';
 import { ParametersPage } from '../ParametersPage';
 
@@ -241,6 +242,62 @@ describe('ParametersPage', () => {
     ).toBeDisabled();
     expect(screen.queryByRole('button', { name: 'Kaydet' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Logo yükle' })).not.toBeInTheDocument();
+  });
+
+  it('sifreleme bolumu yalnizca system.encryption.update izniyle gorunur (KR-138)', async () => {
+    const status = vi.spyOn(encryptionApi, 'status');
+    renderWithProviders(<ParametersPage />);
+
+    await screen.findByText('Hesap kilitlenmeden önceki başarısız giriş sayısı');
+    expect(
+      screen.queryByRole('heading', { name: 'Özel nitelikli veri şifrelemesi' }),
+    ).not.toBeInTheDocument();
+    expect(status).not.toHaveBeenCalled();
+  });
+
+  it('anahtar sayilarini gosterir; onayla yeniden sifreler ve sonucu bildirir (SYG-PERS-062)', async () => {
+    await setSession({
+      status: 'authenticated',
+      permissions: [
+        permissions.parameterView,
+        permissions.parameterUpdate,
+        permissions.encryptionUpdate,
+      ],
+    });
+    vi.spyOn(encryptionApi, 'status').mockResolvedValue({
+      currentKeyId: 'k2',
+      keys: [
+        { keyId: 'k1', count: 186, isCurrent: false, isConfigured: true },
+        { keyId: 'k2', count: 4, isCurrent: true, isConfigured: true },
+      ],
+    });
+    const reEncrypt = vi.spyOn(encryptionApi, 'reEncrypt').mockResolvedValue({
+      targetKeyId: 'k2',
+      sourceKeyIds: ['k1'],
+      reEncrypted: 186,
+      undecryptable: 0,
+      remainingOnOldKeys: 0,
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<ParametersPage />);
+
+    const section = (
+      await screen.findByRole('heading', { name: 'Özel nitelikli veri şifrelemesi' })
+    ).closest('section')!;
+    const k1 = (await within(section).findByText('k1')).closest('tr')!;
+    expect(within(k1).getByText('186')).toBeInTheDocument();
+    expect(within(k1).getByText('Eski')).toBeInTheDocument();
+
+    await user.click(within(section).getByRole('button', { name: 'Yeniden şifrele' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Yeniden şifreleme' });
+    expect(dialog).toHaveTextContent('Eski anahtarla şifreli 186 kayıt k2 anahtarıyla');
+    expect(reEncrypt).not.toHaveBeenCalled();
+    await user.click(within(dialog).getByRole('button', { name: 'Yeniden şifrele' }));
+
+    expect(await within(section).findByRole('status')).toHaveTextContent(
+      '186 kayıt k2 anahtarıyla yeniden şifrelendi. Eski anahtarla kalan: 0; çözülemeyen: 0.',
+    );
+    expect(reEncrypt).toHaveBeenCalledTimes(1);
   });
 
   it('goruntuleme izni yoksa listeyi istemez', async () => {

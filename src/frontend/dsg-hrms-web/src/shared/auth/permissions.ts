@@ -22,6 +22,7 @@ export const permissions = {
   auditLogView: 'audit.log.view',
   parameterView: 'system.parameter.view',
   parameterUpdate: 'system.parameter.update',
+  encryptionUpdate: 'system.encryption.update',
 } as const;
 
 export type Permission = (typeof permissions)[keyof typeof permissions];

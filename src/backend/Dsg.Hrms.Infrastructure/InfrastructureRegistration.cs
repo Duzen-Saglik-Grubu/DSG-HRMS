@@ -20,6 +20,7 @@ using Dsg.Hrms.Application.Personnel.Export;
 using Dsg.Hrms.Application.Personnel.History;
 using Dsg.Hrms.Application.Personnel.Listing;
 using Dsg.Hrms.Application.Personnel.Marriage;
+using Dsg.Hrms.Application.Personnel.Protection;
 using Dsg.Hrms.Application.Personnel.Quality;
 using Dsg.Hrms.Application.Personnel.Sync;
 using Dsg.Hrms.Application.Reference;
@@ -195,6 +196,8 @@ public static class InfrastructureRegistration
         services.AddScoped<EmergencyContactService>();
         services.AddScoped<IMarriageStore, MarriageStore>();
         services.AddScoped<MarriageService>();
+        services.AddScoped<IPersonalDataKeyStore, PersonalDataKeyStore>();
+        services.AddScoped<PersonalDataKeyService>();
         services.AddScoped<IAuditLogQuery, AuditLogQuery>();
         services.AddScoped<AuditLogService>();
 

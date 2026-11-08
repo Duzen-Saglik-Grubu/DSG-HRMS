@@ -392,6 +392,22 @@
         "confirm": "Aç"
       }
     },
+    "encryption": {
+      "title": "Özel nitelikli veri şifrelemesi",
+      "description": "Kan grubu ve düzeltme taleplerindeki önerilen kan grubu şifreli saklanır. Yeni bir anahtar eklendiğinde eski anahtarla şifreli değerler bu işle güncel anahtarla yeniden yazılır; değerler değişmez. Eski anahtar, onunla şifreli kayıt kalmayınca yapılandırmadan çıkarılabilir.",
+      "keys": "Anahtarlar",
+      "key": "Anahtar",
+      "count": "Kayıt",
+      "state": "Durum",
+      "current": "Güncel",
+      "old": "Eski",
+      "missing": "Tanımlı değil",
+      "run": "Yeniden şifrele",
+      "upToDate": "Bütün kayıtlar güncel anahtarla şifreli.",
+      "confirmTitle": "Yeniden şifreleme",
+      "confirmText": "Eski anahtarla şifreli {{count}} kayıt {{target}} anahtarıyla yeniden yazılacak. Değerler değişmez; iş güvenlik olayı olarak kaydedilir.",
+      "result": "{{count}} kayıt {{target}} anahtarıyla yeniden şifrelendi. Eski anahtarla kalan: {{remaining}}; çözülemeyen: {{undecryptable}}."
+    },
     "logo": {
       "title": "Kurumsal logo",
       "hint": "Giriş, üyelik ve parola ekranlarında görünür. PNG veya JPEG, en fazla 512 KB. Yüklenmemişse varsayılan Düzen Sağlık Grubu logosu kullanılır.",
@@ -1012,7 +1028,8 @@
       "InvitationAccepted": "Davet kullanıldı",
       "TwoFactorEnabled": "İki adımlı doğrulama açıldı",
       "TwoFactorDisabled": "İki adımlı doğrulama kapatıldı",
-      "TwoFactorChangeFailed": "İki adımlı doğrulama değişikliği reddedildi"
+      "TwoFactorChangeFailed": "İki adımlı doğrulama değişikliği reddedildi",
+      "PersonalDataReEncrypted": "Özel nitelikli veri yeniden şifrelendi"
     },
     "entities": {
       "Person": "Kişi",

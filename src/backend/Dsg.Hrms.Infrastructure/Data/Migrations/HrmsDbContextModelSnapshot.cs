@@ -797,6 +797,11 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         },
                         new
                         {
+                            RoleId = 1L,
+                            Permission = "system.encryption.update"
+                        },
+                        new
+                        {
                             RoleId = 2L,
                             Permission = "identity.account.view"
                         },
@@ -2964,6 +2969,11 @@ namespace Dsg.Hrms.Infrastructure.Data.Migrations
                         {
                             Code = "audit.log.view",
                             Description = "Denetim kayıtlarını görme"
+                        },
+                        new
+                        {
+                            Code = "system.encryption.update",
+                            Description = "Özel nitelikli veri şifrelemesini yönetme (yeniden şifreleme)"
                         });
                 });
 

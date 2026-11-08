@@ -77,6 +77,12 @@ public static class Permissions
     /// <summary>Sistem parametrelerini degistirme (SYG-KMLK-076).</summary>
     public const string ParameterUpdate = "system.parameter.update";
 
+    /// <summary>
+    /// Ozel nitelikli veri sifrelemesini yonetme: anahtar durumunu gorme ve yeniden sifreleme isini
+    /// baslatma (SYG-PERS-062; KR-138). YALNIZCA Sistem Yoneticisi; IK'ya verilmez.
+    /// </summary>
+    public const string EncryptionUpdate = "system.encryption.update";
+
     /// <summary>Tum izinler ve aciklamalari.</summary>
     public static readonly IReadOnlyDictionary<string, string> All = new Dictionary<string, string>(StringComparer.Ordinal)
     {
@@ -99,6 +105,7 @@ public static class Permissions
         [ReferenceView] = "Ünvan, görev, kan grubu ve yakınlık tanımlarını görme",
         [ReferenceUpdate] = "Ünvan, görev ve yakınlık tanımlarını değiştirme",
         [AuditLogView] = "Denetim kayıtlarını görme",
+        [EncryptionUpdate] = "Özel nitelikli veri şifrelemesini yönetme (yeniden şifreleme)",
     };
 
     /// <summary>Hazir rollerin izinleri (SYG-KMLK-074).</summary>
@@ -109,6 +116,7 @@ public static class Permissions
         // Kapsam T4'e kadar tum personeldir. Elle senkronizasyon (KR-126), denetim kayitlari ve
         // parametreler (KR-128) IK'da da vardir (SYG-PERS-055). Liste bilincli olarak acik
         // yazilir: yeni bir izin IK'ya kendiliginden gecmez. Rol ve izin atama ekrani T4'tedir.
+        // Sifreleme yonetimi (EncryptionUpdate) bilincli olarak YOKTUR (KR-138).
         [Role.HrIdentityOperationsCode] =
         [
             AccountView, AccountUpdate, InviteCreate, SyncView, SyncCreate, ParameterView, ParameterUpdate,

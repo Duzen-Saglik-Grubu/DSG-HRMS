@@ -107,6 +107,19 @@ public sealed class PersonalDataProtectorTests
     }
 
     [Fact]
+    public void Empty_key_slots_are_treated_as_undefined()
+    {
+        // Compose dosyalari k1-k3 yuvalarini her zaman aktarir; bos yuva tanimsizdir (SYG-PERS-062).
+        var rotated = new PersonalDataProtectionOptions { Keys = new() { ["k1"] = "", ["k2"] = Key2, ["k3"] = " " } };
+        Validate(rotated).ShouldBeEmpty();
+        rotated.CurrentKeyId.ShouldBe("k2");
+        new PersonalDataProtector(rotated).KeyIds.ShouldBe(["k2"]);
+
+        var allEmpty = new PersonalDataProtectionOptions { Keys = new() { ["k1"] = "", ["k2"] = "" } };
+        Validate(allEmpty).ShouldHaveSingleItem().ShouldContain("PersonalDataProtection:Keys tanimli degil");
+    }
+
+    [Fact]
     public void Valid_keys_pass_validation() =>
         Validate(new PersonalDataProtectionOptions { Keys = new() { ["k1"] = Key1, ["k2"] = Key2 } }).ShouldBeEmpty();
 

@@ -55,10 +55,11 @@ public sealed class AccessControlApiTests : IClassFixture<RegistrationApiFixture
     }
 
     [Fact]
-    public async Task Hr_role_has_every_permission_and_is_named_human_resources()
+    public async Task Hr_role_has_every_permission_but_encryption_and_is_named_human_resources()
     {
         // SYG-PERS-055 (KR-126, KR-128): T1 izinleri, denetim kayitlari ve parametreler IK'da da
-        // var; bugun IK ve Sistem Yoneticisi ayni izinlere sahip. Rolun gorunen adi "Insan Kaynaklari".
+        // var. Tek istisna sifreleme yonetimidir: yalnizca Sistem Yoneticisi (KR-138). Rolun gorunen
+        // adi "Insan Kaynaklari".
         var (name, grants) = await _fixture.WithDbAsync(async context =>
         {
             var role = await context.Set<Role>().SingleAsync(r => r.Code == Role.HrIdentityOperationsCode);
@@ -66,7 +67,8 @@ public sealed class AccessControlApiTests : IClassFixture<RegistrationApiFixture
         });
 
         name.ShouldBe("İnsan Kaynakları");
-        grants.ShouldBe(Permissions.All.Keys, ignoreOrder: true);
+        grants.ShouldBe(Permissions.All.Keys.Where(p => p != Permissions.EncryptionUpdate), ignoreOrder: true);
+        grants.ShouldNotContain(Permissions.EncryptionUpdate);
         grants.ShouldNotContain("identity.sync.view");
     }
 

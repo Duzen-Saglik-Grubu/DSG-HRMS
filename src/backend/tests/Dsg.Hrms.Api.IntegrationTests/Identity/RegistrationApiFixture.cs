@@ -134,6 +134,7 @@ public class RegistrationApiFixture : IAsyncLifetime
                 builder.UseSetting("AccessControl:BootstrapAdministrators", BootstrapAdministratorEmail);
                 builder.UseSetting("ParameterProtection:Key", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
                 builder.UseSetting("PersonalDataProtection:Keys:k1", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
+                ConfigureHost(builder);
 
                 builder.ConfigureServices(services =>
                 {
@@ -147,6 +148,11 @@ public class RegistrationApiFixture : IAsyncLifetime
                 });
             });
         }
+    }
+
+    /// <summary>Alt fixture'larin ek ayari (orn. ikinci sifreleme anahtari); ortak ayarlardan sonra uygulanir.</summary>
+    protected virtual void ConfigureHost(IWebHostBuilder builder)
+    {
     }
 
     private static async Task SeedAsync(HrmsDbContext context)

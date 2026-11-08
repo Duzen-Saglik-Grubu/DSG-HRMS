@@ -1,7 +1,7 @@
 # UAT Ortamı — Kurulum ve Dağıtım Runbook'u
 
 **Belge kimliği:** TEC.10-RB-001
-**Son güncelleme:** 2026-10-21
+**Son güncelleme:** 2026-11-08
 **İlgili süreçler:** TEC.10 (Geçiş), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-024`, `KR-038`, `KR-065`, `KR-097`
 
@@ -290,6 +290,31 @@ chmod 600 /opt/dsg-hrms/yedek-*.sql.gz
 # Islem dogrulandiktan sonra:
 rm /opt/dsg-hrms/yedek-*.sql.gz
 ```
+
+### 5.1 Özel nitelikli veri anahtarının döndürülmesi (ADR-0020 §3; SYG-PERS-062)
+
+Yeni yazımlar en büyük numaralı anahtarla yapılır. Eski anahtarla şifreli değerler kendiliğinden
+değişmez; onları **Yeniden şifrele** işi taşır. İşi yalnızca Sistem Yöneticisi başlatır (`KR-138`).
+
+1. Yeni anahtarı üretin ve sır dosyasında bir sonraki **boş** yuvaya yazın (`PERSONAL_DATA_KEY_K2`,
+   o doluysa `K3`). Değer ekrana yazılmaz:
+
+   ```bash
+   # Sunucuda; anahtar dosyaya dogrudan yazilir, ekrana basilmaz:
+   echo "PERSONAL_DATA_KEY_K2=$(openssl rand -base64 32)" >> /opt/dsg-hrms/secrets/.env.uat
+   ```
+
+2. Yığını yeniden başlatın (§5, "Yeniden başlat"). Yeni yazımlar artık yeni anahtarla yapılır.
+3. Sistem Yöneticisi olarak **Sistem → Parametreler → Özel nitelikli veri şifrelemesi**
+   bölümünde **Yeniden şifrele**'ye basın. Sonuçta "Eski anahtarla kalan: 0" görülmelidir.
+   Çözülemeyen kayıt varsa eski anahtar **çıkarılmaz**; kan grubu bir sonraki senkronizasyonda
+   LOGO'dan güncel anahtarla yeniden yazılır (ADR-0020 §3 anahtar kaybı yolu), sonra iş
+   yeniden çalıştırılır.
+4. Bölümde eski anahtarın kayıt sayısı 0 iken eski yuvayı sır dosyasında **boşaltın**
+   (`PERSONAL_DATA_KEY_K1=`) ve yığını yeniden başlatın. Eski değer dosyada tutulmaz (BK-12).
+5. İş, denetim kayıtlarında "Özel nitelikli veri yeniden şifrelendi" güvenlik olayı olarak görünür.
+
+Üç yuva da dolduğunda bir sonraki döndürme için compose dosyasına yeni yuva bir PR ile eklenir.
 
 ---
 
@@ -673,3 +698,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-10-06 | 1.10 | §6: Webmin kaldırıldı, açık portlar; §10.5: SMTP sertifikasının güncel durumu (#179) | Bilgi İşlem |
 | 2026-10-13 | 1.11 | §6: Avahi ve CUPS kapatıldı, eski sır kopyası silindi; UDP dinleyiciler, işletim sistemi güncellemeleri ve yeniden başlatma (#207) | Bilgi İşlem |
 | 2026-10-21 | 1.12 | §2.2.1 ve §3.3a: uygulamanın çalışma rolü `hrms_app`; şemadan önce yalnızca veritabanı başlatılır (`KR-118`, #244) | Bilgi İşlem |
+| 2026-11-08 | 1.13 | §5.1: özel nitelikli veri anahtarının döndürülmesi ve yeniden şifreleme işi (#375) | Bilgi İşlem |
