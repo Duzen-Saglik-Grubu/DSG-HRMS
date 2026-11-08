@@ -465,6 +465,40 @@ test('12. denetim kayitlari: yonetici kayitlari turune gore suzer ve ayrintiyi a
   await signOut(page, people.admin.fullName);
 });
 
+test('13. TCKN ve gecis kurali: yonetici tam TCKN gorur; rolu olmayan personel baskasinin kartini acamaz, kendi TCKN-sini maskeli gorur (PG-PERS-31, 35)', async ({
+  page,
+}) => {
+  await signIn(page, people.admin.email, passwords.first);
+  await page.getByRole('link', { name: 'Personel listesi', exact: true }).click();
+  await page.getByLabel(/Ad, soyad, sicil/).fill('davetli');
+  await page.getByRole('button', { name: 'Tablo görünümü' }).click();
+  await page.getByRole('row', { name: /Deniz/ }).getByRole('link', { name: 'Deniz' }).click();
+
+  // Yonetici tam TCKN'yi gorur (view_national_id; SYG-PERS-052).
+  await expect(page.getByRole('heading', { level: 1, name: 'Deniz Davetli' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Genel Bilgiler' })).toContainText(
+    people.invitee.nationalId,
+  );
+  const cardUrl = page.url();
+  await signOut(page, people.admin.fullName);
+
+  // Rolu olmayan personel baskasinin kart adresini acar: sunucu 404, ekranda bilgi yok (SYG-PERS-050).
+  await signIn(page, people.unprivileged.email, passwords.first);
+  await expect(page.getByRole('button', { name: people.unprivileged.fullName })).toBeVisible();
+  await page.goto(cardUrl);
+  await expect(page.getByText('Kişi bulunamadı')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Deniz Davetli' })).toHaveCount(0);
+  await expect(page.getByText(people.invitee.nationalId)).toHaveCount(0);
+
+  // Kendi TCKN'si maskeli: ilk 3 ve son 2 hane acik, arada 6 yildiz (SYG-PERS-053).
+  await page.getByRole('link', { name: 'Profilim' }).click();
+  const own = page.getByRole('region', { name: 'Genel Bilgiler' });
+  const id = people.unprivileged.nationalId;
+  await expect(own).toContainText(`${id.slice(0, 3)}******${id.slice(-2)}`);
+  await expect(own).not.toContainText(id);
+  await signOut(page, people.unprivileged.fullName);
+});
+
 async function readDownload(download: Download): Promise<Buffer> {
   const stream = await download.createReadStream();
   const chunks: Buffer[] = [];
