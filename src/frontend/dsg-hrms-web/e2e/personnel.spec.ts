@@ -513,6 +513,8 @@ test('14. kalan suzgecler: yonetici fotografi olanlari suzer, etiketi kaldirir (
   await panel.getByLabel('Fotoğraf').click();
   await page.getByRole('option', { name: 'Var' }).click();
   await panel.getByRole('button', { name: 'Uygula' }).click();
+  // Panel kapanmadan listeye dokunulmaz: kapanis gecisi tiklamayi yutabiliyor (CI).
+  await expect(panel).toBeHidden();
 
   // Tohumda yalnizca Deniz'in fotografi var.
   const tags = page.getByRole('group', { name: 'Seçili süzgeçler' });
@@ -520,7 +522,8 @@ test('14. kalan suzgecler: yonetici fotografi olanlari suzer, etiketi kaldirir (
   await expect(page.getByRole('article')).toHaveCount(1);
   await expect(page.getByRole('article', { name: 'Deniz Davetli' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Temizle' }).click();
+  await tags.getByRole('button', { name: 'Temizle' }).click();
+  await expect(tags).toHaveCount(0);
   await expect(page.getByRole('article', { name: 'Yusuf Yonetici' })).toBeVisible();
   await signOut(page, people.admin.fullName);
 });

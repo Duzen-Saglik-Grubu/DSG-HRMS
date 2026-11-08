@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useNavigate } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -314,6 +314,28 @@ describe('PersonListPage', () => {
     const tags = await screen.findByRole('group', { name: 'Seçili süzgeçler' });
     expect(within(tags).getByText('Kan grubu: A Rh+')).toBeInTheDocument();
     expect(within(tags).getByText('Acil durum kişisi: Yok')).toBeInTheDocument();
+  });
+
+  it('suzgec uygulandiktan hemen sonra Temizle kalici olur (#373)', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<PersonListPage />);
+    await screen.findByRole('article', { name: 'AYŞE DEMİR' });
+
+    await user.click(screen.getByRole('button', { name: /Süzgeçler/ }));
+    const panel = await screen.findByRole('dialog', { name: 'Süzgeçler' });
+    await user.click(within(panel).getByLabelText('Fotoğraf'));
+    await user.click(await screen.findByRole('option', { name: 'Var' }));
+    // Uygula ve Temizle beklemesiz art arda: kullanici arama beklemesi (300 ms) dolmadan temizler.
+    // Not: hatanin kendisi React Router'in tarayicida cizimi ertelemesine bagli; bellekteki yonlendiricide
+    // yeniden uretilemez. Asil kanit e2e senaryo 14; bu test davranisin kendisini korur.
+    fireEvent.click(within(panel).getByRole('button', { name: 'Uygula' }));
+    const tags = await screen.findByRole('group', { name: 'Seçili süzgeçler' }, { interval: 10 });
+    fireEvent.click(within(tags).getByRole('button', { name: 'Temizle' }));
+
+    // Arama kutusunun beklemesi (300 ms) gectikten sonra da suzgec geri gelmez.
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    expect(screen.queryByRole('group', { name: 'Seçili süzgeçler' })).not.toBeInTheDocument();
+    expect(lastQuery().has('hasPhoto')).toBe(false);
   });
 
   it('sayfa boyutu secenekleri parametredeki en buyugu asmaz', async () => {
