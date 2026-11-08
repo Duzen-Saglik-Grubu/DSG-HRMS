@@ -80,7 +80,7 @@ public sealed partial class ParameterCatalogTests
         ParameterCatalog.IdleTimeoutMinutes.DefaultValue.ShouldBe("30");    // REQ-KMLK-026
         ParameterCatalog.InviteLinkLifetimeHours.DefaultValue.ShouldBe("3"); // REQ-KMLK-011
         ParameterCatalog.AutoDeactivateOnEmploymentEnd.DefaultValue.ShouldBe("true"); // REQ-KMLK-034
-        ParameterCatalog.SyncIntervalMinutes.DefaultValue.ShouldBe("15");   // KR-007
+        ParameterCatalog.SyncIntervalMinutes.DefaultValue.ShouldBe("15");   // KR-007, SYG-PERS-007
         ParameterCatalog.SmsSenderTitle.DefaultValue.ShouldBe("DUZEN");     // REQ-KMLK-021
         ParameterCatalog.AcceptedEmailDomains.DefaultValue.ShouldBe("duzen.com.tr,zeytinim.com,labpt.com.tr");
     }

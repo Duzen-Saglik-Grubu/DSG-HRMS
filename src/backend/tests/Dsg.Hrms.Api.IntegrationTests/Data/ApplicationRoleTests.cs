@@ -68,6 +68,7 @@ public sealed class ApplicationRoleTests : IAsyncLifetime
     [Fact]
     public async Task Audit_tables_allow_only_select_and_insert()
     {
+        // SYG-PERS-064 (KR-118): erisim kaydi (audit.access_log) dahil, calisma rolu kayitlari degistiremez ve silemez.
         foreach (var table in new[] { "audit.change_log", "audit.access_log", "audit.security_event" })
         {
             var privileges = await QueryAsOwnerAsync<string>($"""

@@ -160,7 +160,7 @@ public sealed class LayerDependencyTests
     [Fact]
     public void Logo_access_stays_inside_the_logo_folder()
     {
-        // LOGO'ya erisen tum kod tek klasorde toplanir; baska bir sinif LOGO baglamini
+        // LOGO'ya erisen tum kod tek klasorde toplanir (SYG-KMLK-002, SYG-PERS-002); baska bir sinif LOGO baglamini
         // dogrudan kullanirsa salt-okunur kilitler (yetki denetimi, sema denetimi)
         // atlanabilirdi. Kayit noktasi (InfrastructureRegistration) istisnadir.
         var result = Types.InAssembly(InfrastructureAssembly)
@@ -187,6 +187,7 @@ public sealed class LayerDependencyTests
     [Fact]
     public void Api_does_not_touch_logo()
     {
+        // SYG-PERS-001: personel uclari istek sirasinda LOGO'ya baglanmaz; yalnizca HRMS veritabanindan okur.
         var result = Types.InAssembly(typeof(Program).Assembly)
             .ShouldNot().HaveDependencyOnAny([LogoNamespace, "Microsoft.Data.SqlClient"])
             .GetResult();

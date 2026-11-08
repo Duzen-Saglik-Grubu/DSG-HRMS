@@ -17,7 +17,7 @@ using static Dsg.Hrms.Api.IntegrationTests.Identity.RegistrationApiFixture;
 namespace Dsg.Hrms.Api.IntegrationTests.Personnel;
 
 /// <summary>
-/// Personel listesi uctan uca (SYG-PERS-022, 027, 028, 029, 030, 031, 058). Veriler SENTETIKTIR.
+/// Personel listesi uctan uca (SYG-PERS-015, 022, 027, 028, 029, 030, 031, 058). Veriler SENTETIKTIR.
 /// </summary>
 /// <remarks>
 /// Kisi 1 oturum acan kullanicidir. Kisi 3'un adi IŞIK ÇAĞLAR'dir; kisi 4 ayrilmistir; kisi 2'nin
@@ -183,6 +183,27 @@ public sealed class PersonListApiTests : IClassFixture<Identity.RegistrationApiF
             item.GetProperty("registryCode").GetString().ShouldBe("00002");
             item.GetProperty("employmentCount").GetInt32().ShouldBe(2);
             (await ListAsync(client, token, "?q=00002")).GetProperty("totalCount").GetInt32().ShouldBe(1);
+        }
+    }
+
+    [Fact]
+    public async Task Person_with_two_registrations_has_one_card_with_each_registration_as_its_own_employment()
+    {
+        // SYG-PERS-015 (SYG-KMLK-001): ayni TCKN'li iki sicil tek kisiye baglidir; kisi listede bir
+        // kez, kartinda her sicil ayri bir istihdam olarak yer alir.
+        var (client, token) = await HrAsync();
+        using (client)
+        {
+            var person = (await ListAsync(client, token, "?q=00006")).GetProperty("items").EnumerateArray().Single();
+            person.GetProperty("personId").GetString().ShouldBe((await PersonIdAsync(2)).ToString());
+
+            var (status, card) = await SendAsync(client, $"{Persons}/{person.GetProperty("personId").GetString()}", token);
+
+            status.ShouldBe(HttpStatusCode.OK);
+            card.GetProperty("employments").EnumerateArray()
+                .Select(e => e.GetProperty("registryCode").GetString())
+                .Order(StringComparer.Ordinal)
+                .ShouldBe(["00002", "00006"]);
         }
     }
 

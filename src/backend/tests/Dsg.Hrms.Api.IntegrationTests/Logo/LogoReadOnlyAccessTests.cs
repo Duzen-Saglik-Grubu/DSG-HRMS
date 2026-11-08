@@ -223,6 +223,7 @@ public sealed class LogoReadOnlyAccessTests : IAsyncLifetime
     public async Task Details_are_read_and_mapped()
     {
         // SYG-PERS-003: kart basina genel bilgiler ve adres; sube ve birim tanimlari.
+        // SYG-PERS-002: T1 sorgusu da ILogoPersonnelSource uzerinden, T3'un salt okunur oturumuyla calisir.
         // SYG-PERS-004: din tablosunda olsa da okunmaz (model eslemez). SYG-PERS-005: ozel
         // nitelikli senkronizasyon kapaliyken kan grubu da okunmaz.
         var commands = new List<string>();
