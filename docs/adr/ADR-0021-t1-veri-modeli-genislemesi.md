@@ -178,6 +178,12 @@ gerçekleştirme notu düşülür.
 >   çalışma 2 sn sürdü; görüntü okunmadı ve denetim izine kayıt düşmedi. LOGO sunucusundaki
 >   okuma yükü (okunan sayfa sayısı) UAT'de ayrıca ölçülür (B-13); şimdilik §5'teki iki
 >   iyileştirmeye gerek görülmedi.
+> - **UAT ölçümü (KPÖ-PERS-4; 10.11.2026, #381):** Özet sorgusu LOGO'da `hrms_logo_reader` ile,
+>   mesai dışında bir kez ölçüldü: 988 fotoğraflı kart, sunucu süresi 361 ms (işlemci 360 ms).
+>   Tablo sayfası 28 mantıksal okuma; LOB sayfası 144.732 mantıksal okuma ve 35.914 ileri okuma
+>   (≈281 MB). Hedef (< 10 sn) karşılanıyor; §5'teki iki yedek yönteme gerek yok. UAT'deki ilk
+>   aktarım 40,4 sn, fotoğrafı değişmeyen çalışma 1,2 sn sürdü (873 fotoğraf, ortalama 14,5 KB).
+>   Ayrıntı: `TEC.9-dogrulama/raporlar/2026-11-10-t1-performans-olcumu.md`.
 
 ### 6. Veritabanı kuralları (#246'dan)
 
@@ -278,3 +284,4 @@ yeniden üretilebilir.
 | 2026-10-24 | 1.3 | §1: atamaya firma (değişiklik talebi #284); §2: bitmiş istihdamın ilk kaydı, geriye dönük çıkış, atamada silme yok (SYG-PERS AN-19, #285) | Bilgi İşlem |
 | 2026-11-02 | 1.4 | §5 gerçekleştirme notu: fotoğrafın kaynağı esas istihdam, parçalı okuma, EXIF, önbellek ve ilk yerel ölçüm (#313) | Bilgi İşlem |
 | 2026-11-02 | 1.5 | §5 gerçekleştirme notu: EXIF yönü uygulanmaz, küçültme sürümü, ETag'de küçültme sürümü (#315) | Bilgi İşlem |
+| 2026-11-10 | 1.6 | §5: fotoğraf özeti sorgusunun UAT ölçümü (KPÖ-PERS-4, B-13) ve UAT'deki ilk aktarım (#381) | Bilgi İşlem |
