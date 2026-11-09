@@ -162,7 +162,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
     [Fact]
     public async Task Details_step_persists_profile_address_and_organization_units_after_the_core_step()
     {
-        // SYG-PERS-003, 013: T1 adimi ilk adim kaydedildikten sonra ayri islemde calisir. Genel
+        // SYG-PERS-003, 007, 013: T1 adimi T3 ile ayni calismada, ilk adim kaydedildikten sonra ayri islemde calisir. Genel
         // bilgiler kisinin esas istihdaminin kartindan alinir (KR-126). Veriler SENTETIKTIR.
         _source.GetDetailsAsync(Arg.Any<CancellationToken>()).Returns(new LogoPersonnelDetails(
             [
