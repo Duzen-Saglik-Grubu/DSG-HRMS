@@ -3,7 +3,7 @@
 **Belge kimliği:** TEC.9-RPR-2026-11-10-PERF
 **Süreç:** TEC.9 — Doğrulama (gereksinim doğrulama yöntemi: Analiz)
 **Ortam:** UAT sunucusu (`insankaynaklaritest.duzen.com.tr`): 2 çekirdek, 7,4 GB bellek, Docker yığını; sürüm `v0.2.0-89-g6dbe9d5` (09.11.2026 21:26 UTC'de kuruldu, #381)
-**Ölçüm tarihi:** 2026-11-10 (00:20–01:05, Türkiye saati; mesai dışı)
+**Ölçüm tarihi:** 2026-11-10 (00:20–01:05, Türkiye saati; mesai dışı); KPÖ-PERS-3 iş günü boyunca (08:00–18:00)
 **Ölçen:** Bilgi İşlem (Claude, Doğuş Uçanok onayıyla)
 
 > Bu rapor SYG-PERS-076, 077, 078 ve 079'un (KPÖ-PERS-1…5) UAT'de ölçülen sonuçlarını
@@ -18,7 +18,7 @@
 |---|---|---|---|---|
 | KPÖ-PERS-1 — liste sayfası (24 kart ve küçük fotoğrafları) | SYG-PERS-076 | p95 < 2 sn | **0,178 sn** (2.351 ölçüm) | ✅ Karşılanıyor |
 | KPÖ-PERS-2 — kişi kartı ve fotoğrafı | SYG-PERS-077 | p95 < 2 sn | **0,045 sn** (2.386 ölçüm) | ✅ Karşılanıyor |
-| KPÖ-PERS-3 — fotoğrafı değişmeyen senkronizasyon | SYG-PERS-078, 013 | < 2 dk; kişi ve istihdam adımı < 60 sn | **1,2 sn** (ön sonuç, gece) | ⏳ İş günü ölçümü §4.3 |
+| KPÖ-PERS-3 — fotoğrafı değişmeyen senkronizasyon | SYG-PERS-078, 013 | < 2 dk; kişi ve istihdam adımı < 60 sn | p95 **1,16 sn**, en kötü 1,20 sn (iş günü, 40 çalışma) | ✅ Karşılanıyor |
 | KPÖ-PERS-4 — fotoğraf özeti sorgusunun LOGO'daki maliyeti | SYG-PERS-014, 078 | < 10 sn; okunan sayfa kaydedilir | **0,36 sn**; 144.732 LOB mantıksal okuma | ✅ Karşılanıyor |
 | KPÖ-PERS-5 — kan grubu süzgeçli liste | SYG-PERS-079 | p95 < 2 sn | **0,249 sn** (2.336 ölçüm) | ✅ Karşılanıyor |
 
@@ -116,7 +116,7 @@ Kan grubu UAT'de LOGO'dan şifreli okunur (`KR-125`, KVKK Sorumlusu onayı 22.10
   - Kişi ve istihdam adımı (SYG-PERS-013) çalışmanın bir parçasıdır. Bu yüzden toplam süre 60 sn'nin altındaysa iki hedef birlikte karşılanır.
   - Toplam süre 60 sn'yi aşarsa adım süresi ayrıca ölçülmelidir.
 
-### 4.2 Ön sonuç (gece, 09.11.2026)
+### 4.2 Kurulum gecesi (09.11.2026)
 
 | Çalışma (UTC) | Durum | Süre | Not |
 |---|---|---|---|
@@ -126,10 +126,28 @@ Kan grubu UAT'de LOGO'dan şifreli okunur (`KR-125`, KVKK Sorumlusu onayı 22.10
 
 Karşılaştırma: T1 öncesi sürümde (yalnızca kişi ve istihdam adımı) çalışma 0,27–0,31 sn sürüyordu.
 
-### 4.3 İş günü ölçümü
+### 4.3 İş günü ölçümü (10.11.2026, 08:00–18:00 Türkiye saati)
 
-KPÖ-PERS-3 bir iş günü boyunca, yani LOGO yoğunken ölçülür. 10.11.2026 iş gününün çalışmaları
-bu bölüme eklenecektir (çalışma sayısı, p50, p95, en kötü).
+KPÖ-PERS-3 bir iş günü boyunca, yani LOGO yoğunken ölçülür. Ölçüm, o aralıkta başlayan bütün
+zamanlanmış çalışmaları kapsar.
+
+| Ölçü | Değer |
+|---|---|
+| Çalışma sayısı | 40 (tümü `CompletedWithWarnings`) |
+| p50 | 1,00 sn |
+| p95 | **1,16 sn** |
+| En kötü | 1,20 sn (08:26) |
+| En iyi | 0,89 sn |
+
+- Kurulumdan 10.11.2026 akşamına kadar 89 çalışmanın hepsi uyarılarla tamamlandı; başarısız veya "kısmen" çalışma olmadı.
+- En kötü çalışma 1,2 sn sürdü. Gün içinde fotoğrafı değişen bir kart olduysa bile çalışma süresini belirgin biçimde uzatmadı.
+
+### 4.4 Değerlendirme
+
+✅ SYG-PERS-078 ve 013 karşılanıyor. Fotoğrafı değişmeyen çalışma iş günü yükünde p95 1,16 sn
+sürdü; hedef 2 dk. Toplam süre 60 sn'nin çok altında olduğu için kişi ve istihdam adımının
+hedefi de (< 60 sn) karşılanıyor (§4.1). T1 adımları çalışma süresini 0,3 sn'den ≈1,0 sn'ye
+çıkardı; T3'ün hesap kapanma güvencesi (en geç periyot + birkaç saniye) etkilenmedi.
 
 ---
 
@@ -167,7 +185,7 @@ ORDER BY PERREF, LREF;
 ✅ KPÖ-PERS-4 karşılanıyor: sorgu LOGO'da 0,36 sn sürdü (hedef < 10 sn).
 - Fotoğrafların LOB sayfaları her çalışmada okunur (≈144 bin sayfa); maliyetin tamamı budur. Süre buna rağmen 15 dakikalık periyodun çok küçük bir kesridir.
 - ADR-0021 §5'teki iki yedek yöntemin (LOGO'da hesaplanmış sütun ve değişiklik tarihi) uygulanmasına gerek görülmedi.
-- İş günü yükünde süre artabilir; KPÖ-PERS-3'ün iş günü ölçümü (§4.3) toplam çalışma süresinde bunu gösterecektir.
+- İş günü yükünde de sorgunun dahil olduğu bütün çalışma en çok 1,2 sn sürdü (§4.3).
 
 ---
 
@@ -185,3 +203,4 @@ ORDER BY PERREF, LREF;
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-11-10 | 0.1 | İlk ölçüm: KPÖ-PERS-1, 2, 4, 5; KPÖ-PERS-3 ön sonucu (#381) | Bilgi İşlem |
+| 2026-11-10 | 0.2 | §4.3–4.4: KPÖ-PERS-3 iş günü ölçümü (40 çalışma, p95 1,16 sn) (#381) | Bilgi İşlem |
