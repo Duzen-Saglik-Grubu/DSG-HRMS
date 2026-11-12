@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-11-01
+**Son güncelleme:** 2026-11-12
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -128,7 +128,7 @@ raporunda ayrıca ele alınır.
 | **Puan gerekçesi** | **Olasılık 3:** PostgreSQL 14 desteği Kasım 2026'da bitiyor. Üretim altyapısı için kaynak ayrıldı ama hedef tarih belirlenmedi (`KR-103` karar 4); kesimin destek bitişinden sonraya kalması artık neredeyse kesindir. **Etki 2:** Eski sistem yalnızca veri kaynağı olarak kalır ve yeni geliştirme yapılmaz; desteksiz sürümde güvenlik yaması alınamaz. |
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | (1) **Karar (2026-09-04):** Yeni sistem, **ayrı bir sunucuda kurulacak güncel PostgreSQL sürümü** üzerinde çalışacaktır; mevcut sunucu ve sürüm yükseltilmeyecektir. (2) Geçiş tamamlanana kadar mevcut sistem yerinde kalacağı için, kesim tarihi Kasım 2026 sonrasına sarkarsa eski sistem desteksiz sürümde çalışmaya devam eder. Bu süre boyunca eski sistem yalnızca veri kaynağı olarak kullanılacak, yeni geliştirme yapılmayacaktır. (3) Kesim sonrası eski veritabanı salt-okunur arşive alınacaktır. **Güncelleme (2026-10-13):** Puan 6'ya çıktığı için risk aktif takibe alındı ve durum raporlarında ayrıca ele alınır (§1). |
-| **Durum** | Açık — kesimin destek bitişinden sonraya kalması kesinleşiyor; Üst Yönetim durum raporu 2'de bilgilendirilir |
+| **Durum** | Açık — **gerçekleşti (12.11.2026):** PostgreSQL 14'ün üretici desteği bitti; mevcut sistem desteksiz sürümde çalışıyor. Üretim altyapısı için hedef tarih hâlâ yok; karar talebi durum raporu 3'te yinelendi |
 
 ### R-10 — Değerlendirme (rating) çerçevesinin elde bulunmaması
 | | |
@@ -220,7 +220,7 @@ raporunda ayrıca ele alınır.
 | **O / E / Puan** | 3 / 3 / **9** |
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | (1) **Sistem içi uyarı** (asıl önlem): Y4 Sistem Yönetimi modülünde sertifikanın kalan geçerlilik günü izlenir; eşiğin (varsayılan 10 gün) altına düştüğünde sistem yöneticisine **e-posta ve SMS** gönderilir — bkz. gereksinim #42. Uyarı, **sunulan** sertifikadan okunur; böylece "dosya yenilendi ama nginx yeniden yüklenmedi" durumu da yakalanır. (2) Alıcı tek kişi değil, **sistem yöneticisi rolüdür**; tek kişinin izinli olması uyarıyı kör etmez. (3) **Ara dönem** (Y4 hazır olana kadar): sertifikanın bitiş tarihi UAT runbook'una yazılır ve Bilgi İşlem takvim hatırlatmasıyla takip eder. (4) **HSTS bilinçli olarak kapalı tutulur**: sertifika kaçırılırsa kullanıcı uyarıyı atlayarak sisteme erişebilir; HSTS bunu imkânsız kılardı. HSTS ancak yenileme otomatikleştiğinde açılacaktır. |
-| **Durum** | Açık — ara dönem önlemi yürürlükte; asıl önlem A3 aşamasında (#42) |
+| **Durum** | Açık — ara dönem önlemi yürürlükte; asıl önlem A3 aşamasında (#42). **12.11.2026:** sunulan sertifika 16.12.2026'da bitiyor (Let's Encrypt); yenileme 16.11'den sonra #386 ile |
 
 ### R-19 — Üyelikte bilgilerin eşleştiğinin dolaylı olarak anlaşılması (`KR-078`)
 | | |
@@ -281,7 +281,7 @@ raporunda ayrıca ele alınır.
 | **Açıklama** | UAT sunucusu 2 çekirdeklidir. Giriş başına ≈180 ms işlemci süresi parola özetine harcanır. Aynı anda 50 girişte p95 4,42 sn ölçüldü; üst sınır 5 sn (SYG-KMLK-077, `KR-095`). Sınıra yakındır: üretim sunucusu aynı boyutta kurulursa veya eş zamanlı giriş sayısı artarsa sınır aşılır. |
 | **O / E / Puan** | 2 / 2 / **4** |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) UAT'nin çekirdek sayısı azaltılmayacak. (2) Üretim sunucusu boyutlandırılırken performans raporu (`TEC.9-dogrulama/raporlar/2026-10-02-t3-performans-olcumu.md`) esas alınacak ve ölçüm üretimde tekrarlanacak. (3) Kurumun eş zamanlı giriş profili değişirse ölçüm yenilenecek. |
+| **Önlem** | (1) UAT'nin çekirdek sayısı azaltılmayacak. (2) Üretim sunucusu boyutlandırılırken performans raporu (`TEC.9-dogrulama/raporlar/2026-10-02-t3-performans-olcumu.md`) esas alınacak ve ölçüm üretimde tekrarlanacak. (3) Kurumun eş zamanlı giriş profili değişirse ölçüm yenilenecek. (4) **T1 ölçümü (10.11.2026):** 20 sanal kullanıcıda liste p95 0,18 sn, kart 0,045 sn; liste senaryolarında 1 dakikalık yük ≈3 (2 çekirdek dolu ama doymamış). Hedeflere geniş pay var; çekirdek sayısı azaltılmamalı (`TEC.9-dogrulama/raporlar/2026-11-10-t1-performans-olcumu.md`) |
 | **Durum** | İzleniyor |
 
 ### R-25 — UAT'nin gerçek kişisel veriyle ve gerçek ileti gönderimiyle çalışması
@@ -345,7 +345,7 @@ raporunda ayrıca ele alınır.
 | **O / E / Puan** | 3 / 2 / **6** |
 | **Puan gerekçesi** | **Olasılık 3:** Gerçekleşti; dört küme kayıt dışıydı. **Etki 2:** Kümeler geliştirici makinesinde ve yalnızca kurum içinden erişilebilen UAT sunucusunda duruyor; ifşa için ayrıca erişim gerekir. Temizlik ve kayıt sonrasında yeniden puanlanır. |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) **Uygulandı (13.10.2026, #207):** UAT'deki eski sır kopyası karşılaştırıldı ve silindi; döndürme gerekmedi (R-25 önlem 7). (2) Kayıt dışı kümeler bilgi kayıt defterine eklenir; `src_old/` için imha ve parola kararı verilir (#215). (3) Her modül sonu denetiminde bilgi kayıt defteri depo dışı konumlarla karşılaştırılır (`KR-101`). |
+| **Önlem** | (1) **Uygulandı (13.10.2026, #207):** UAT'deki eski sır kopyası karşılaştırıldı ve silindi; döndürme gerekmedi (R-25 önlem 7). (2) Kayıt dışı kümeler bilgi kayıt defterine eklenir; `src_old/` için imha ve parola kararı verilir (#215). (3) Her modül sonu denetiminde bilgi kayıt defteri depo dışı konumlarla karşılaştırılır (`KR-101`). **Yeniden gerçekleşti (12.11.2026, T1 denetimi A-01):** `/opt/dsg-hrms/secrets/.env.uat.bak-20261103` (03.11; 21.10 içeriği) kayıt dışı; önlem 3 bunu yakaladı. (4) Karşılaştırma ve silme #386; dağıtım betiği `secrets/` dizininde beklenmeyen dosyayı uyarır (#391) |
 | **Durum** | Açık |
 
 ### R-31 — Denetim kayıtlarının değiştirilemezliğinin veritabanı süper kullanıcısına karşı korunmaması
@@ -353,11 +353,22 @@ raporunda ayrıca ele alınır.
 |---|---|
 | **Kategori** | KVKK / Güvenlik |
 | **Açıklama** | Denetim izi, erişim kaydı ve güvenlik olaylarının değiştirilemezliği (`KR-060`, `KR-094`) veritabanı tetikleyicisine dayanıyor. Uygulama UAT'de veritabanına süper kullanıcıyla bağlanıyor (`docker/compose.uat.yml`). Süper kullanıcı tetikleyiciyi kapatabilir veya silebilir; uygulamayı ele geçiren biri veya hatalı bir migration kayıtları değiştirebilir. Kan grubu işleme koşulu 3 ("erişim kayıtları değiştirilemez", `KR-116`) bu yüzden bugün tam sağlanmıyor. Kaynak: tasarım gözden geçirmesi B-01 (20.10.2026) |
-| **O / E / Puan** | 2 / 3 / **6** |
-| **Puan gerekçesi** | **Olasılık 2:** İstismar için uygulamanın veya veritabanı bağlantı bilgisinin ele geçirilmesi gerekir; sistem yalnızca kurum içinden erişilebilir (`KR-067`). **Etki 3:** KVKK kayıtlarının bütünlüğü kaybolur; "kim, kimin verisini gördü" sorusu güvenilir biçimde cevaplanamaz |
+| **O / E / Puan** | **1** / 3 / **3** *(2026-11-12'de 2/3/6'dan düşürüldü)* |
+| **Puan gerekçesi** | **Güncelleme (2026-11-12):** Önlem 1 ve 2 UAT'de etkin: 09.11 kurulumunda dağıtım betiği API'nin `hrms_app` ile bağlandığını ve rolün süper kullanıcı olmadığını doğruladı; kan grubu bundan sonra senkronize edildi. Kalan yol, süper kullanıcı parolasının ele geçirilmesidir. **İlk gerekçe — Olasılık 2:** İstismar için uygulamanın veya veritabanı bağlantı bilgisinin ele geçirilmesi gerekir; sistem yalnızca kurum içinden erişilebilir (`KR-067`). **Etki 3:** KVKK kayıtlarının bütünlüğü kaybolur; "kim, kimin verisini gördü" sorusu güvenilir biçimde cevaplanamaz |
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | (1) **Uygulandı (21.10.2026, `KR-118`):** Migration rolü ile çalışma rolü ayrıldı; çalışma rolü `hrms_app` tabloların sahibi değil, `audit` şemasında yalnızca INSERT ve SELECT yetkisi taşıyor. Yetkileri `ApplicationRoleTests` sınıyor; dağıtım betiği API'nin bu rolle bağlandığını ve rolün süper kullanıcı olmadığını doğruluyor. UAT'de etkin olması dağıtımla gerçekleşir (#244). (2) Kan grubu T1'de senkronize edilmeden önce önlem 1 tamamlanır. (3) Üretim veritabanı aynı rol ayrımıyla kurulur |
-| **Durum** | Açık |
+| **Durum** | İzleniyor — önlem 1 ve 2 UAT'de etkin (09.11.2026); önlem 3 üretim kurulumunda |
+
+### R-32 — Özel nitelikli veri anahtarının kaybı veya sızması
+| | |
+|---|---|
+| **Kategori** | KVKK / Güvenlik |
+| **Açıklama** | Kan grubu ve önerilen kan grubu AES-256-GCM ile şifreli tutulur (ADR-0020); anahtarlar sır dosyasındadır (`PERSONAL_DATA_KEY_K1`–`K3`). Anahtar kaybolursa şifreli değerler çözülemez; anahtar veritabanı kopyasıyla birlikte sızarsa kan grubu okunur. Kaynak: T1 geliştirme sonu denetimi (12.11.2026) |
+| **O / E / Puan** | 1 / 3 / **3** |
+| **Puan gerekçesi** | **Olasılık 1:** Anahtar yalnızca sunucudaki sır dosyasındadır (yalnızca root okur); ekrana yazdırılmadan üretilir. 12.11'de bulunan kayıt dışı sır kopyası (R-30) anahtar eklenmeden önceki sürümdür. **Etki 3:** Sızıntı özel nitelikli veri ihlalidir. Kayıpta değerler LOGO'dan yeniden senkronize edilir; yalnızca açık düzeltme taleplerindeki önerilen kan grubu kaybolur |
+| **Sahibi** | Bilgi İşlem (KVKK Sorumlusu bilgilendirilir) |
+| **Önlem** | (1) Anahtar yalnızca sır dosyasında; kopyaları R-30 ile izlenir. (2) Döndürme ve yeniden şifreleme işi (SYG-PERS-062, runbook §5.1, `KR-138`). (3) Kayıpta LOGO'dan yeniden senkronizasyon. (4) Üretim kurulumunda anahtarın kurum içinde ikinci, çevrimdışı kopyası için karar alınır |
+| **Durum** | İzleniyor |
 
 ---
 
@@ -366,18 +377,20 @@ raporunda ayrıca ele alınır.
 | Puan | Risk sayısı | Riskler |
 |---|---:|---|
 | 9 | 1 | R-18 |
-| 6 | 10 | R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-25, R-30, R-31 |
+| 6 | 9 | R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-25, R-30 |
 | 4 | 6 | R-08, R-14, R-16, R-23, R-24, R-28 |
-| 3 | 3 | R-02, R-20, R-29 |
+| 3 | 5 | R-02, R-20, R-29, R-31, R-32 |
 | 2 | 5 | R-19, R-21, R-22, R-26, R-27 |
 | Kapandı | 6 | R-07, R-10, R-11, R-12, R-13, R-17 |
-| **Toplam** | **31** | Açık 11 · İzleniyor 11 · Kabul edildi 3 · Kapandı 6 |
+| **Toplam** | **32** | Açık 10 · İzleniyor 13 · Kabul edildi 3 · Kapandı 6 |
 
-**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-18, R-25, R-30, R-31
+**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-18, R-25, R-30
 
 **Kabul edilen riskler:** R-25 (Üst Yönetim, 09.10.2026, puan 6; `KR-103`), R-16 (Bilgi İşlem, puan 4; `KR-055`), R-19 (Bilgi İşlem, puan 2; `KR-078`). İkisinin de puanı 6'nın altında olduğu için kabul yetkisi Bilgi İşlem'dedir. 04.10.2026'daki özet R-16 için yanlışlıkla "Üst Yönetim kararı" yazıyordu (#177).
 
-**Son gözden geçirme:** 2026-10-13 — T3 modül kapanışı (T3 kabul edildi, `KR-105`; modül sonu denetimi MAN.8 Ek A §8.1). **R-09** 4 → 6'ya yükseldi ve aktif takibe girdi (PostgreSQL 14 desteği Kasım 2026'da bitiyor, üretim için hedef tarih yok). **R-20** 6 → 3'e düştü (sertifika 27.03.2027'ye kadar geçerli) ve aktif takipten çıktı. R-08, R-19, R-21, R-23, R-25, R-26, R-27 güncellendi. Yeni riskler: **R-28** (otomatik kontrollerin sessizce etkisiz kalması, #208), **R-29** (tekrarlayan bağımlılık açıkları), **R-30** (kayıt dışı gizli bilgi kopyaları, #207, #215). Bölüm sırası düzeltildi: R-11 yerine, R-17…R-30 §2'ye taşındı; içerik taşıma sırasında değişmedi.
+**Son gözden geçirme:** 2026-11-12 — T1 geliştirme sonu (süreç denetimi `MAN.8-kalite-guvence/raporlar/2026-11-12-t1-gelistirme-sonu-denetimi.md`, #385). **R-09 gerçekleşti:** PostgreSQL 14 desteği 12.11.2026'da bitti; üretim için hedef tarih yok. **R-30 yeniden gerçekleşti:** UAT'de kayıt dışı sır kopyası (#386). **R-31** 6 → 3 (önlemler UAT'de etkin). **R-18:** sertifika 16.12.2026'da bitiyor (#386). R-24'e T1 ölçümü işlendi. Yeni risk: **R-32** (özel nitelikli veri anahtarı). T1 döneminde R-29 beş kez gerçekleşti (#223, #250, #255, #288, #305); Dependabot'un orta önemli uyarısı (#5) kayıtsız kaldı (#393).
+
+Önceki: 2026-10-13 — T3 modül kapanışı (T3 kabul edildi, `KR-105`; modül sonu denetimi MAN.8 Ek A §8.1). **R-09** 4 → 6'ya yükseldi ve aktif takibe girdi (PostgreSQL 14 desteği Kasım 2026'da bitiyor, üretim için hedef tarih yok). **R-20** 6 → 3'e düştü (sertifika 27.03.2027'ye kadar geçerli) ve aktif takipten çıktı. R-08, R-19, R-21, R-23, R-25, R-26, R-27 güncellendi. Yeni riskler: **R-28** (otomatik kontrollerin sessizce etkisiz kalması, #208), **R-29** (tekrarlayan bağımlılık açıkları), **R-30** (kayıt dışı gizli bilgi kopyaları, #207, #215). Bölüm sırası düzeltildi: R-11 yerine, R-17…R-30 §2'ye taşındı; içerik taşıma sırasında değişmedi.
 
 Önceki: 2026-10-04 — T3 sonu risk gözden geçirmesi (#126, denetim bulgusu T3-05). **R-01'in özet tablosundaki puanı düzeltildi:** kayıt 2×3 = 6 diyordu, özet 9 sayıyordu. R-03, R-08, R-14 güncellendi. T3 döneminde yaşanan veya ortaya çıkan riskler eklendi: R-19 (`KR-078` kalan riski), R-20 (SMTP sertifikası), R-21 (sunucu saati), R-22 (güvenilen vekil ağı), R-23 (bağımsız olmayan inceleme), R-24 (UAT kapasitesi), R-25 (UAT'de gerçek veri ve gerçek gönderim), R-26 (yerel çalışma kaybı). T3 boyunca deftere risk eklenmemişti; olayların da gözden geçirmeyi tetiklemesi §1'e yazıldı.
 
@@ -420,3 +433,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-22 | 1.13 | R-25: UAT'de kan grubu kapsamı (`KR-125`, #265) | Bilgi İşlem |
 | 2026-10-24 | 1.14 | R-29: yedinci olay (`zod`, `vitest`; #288, #286, #290) | Bilgi İşlem |
 | 2026-11-01 | 1.15 | R-29: sekizinci olay (`follow-redirects`; #305) | Bilgi İşlem |
+| 2026-11-12 | 1.16 | T1 geliştirme sonu gözden geçirmesi (#385): R-09 gerçekleşti; R-18 bitiş tarihi ve #386; R-24 T1 ölçümü; R-30 yeniden gerçekleşti, önlem 4; R-31 2/3/6 → 1/3/3, İzleniyor; R-32 eklendi; özet güncellendi | Bilgi İşlem |

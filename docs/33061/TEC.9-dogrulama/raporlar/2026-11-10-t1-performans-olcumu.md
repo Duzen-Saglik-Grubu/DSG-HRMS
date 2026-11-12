@@ -194,7 +194,10 @@ ORDER BY PERREF, LREF;
 - **UAT kurulumu:** UAT artık T1'i çalıştırıyor (`v0.2.0-89-g6dbe9d5`). Senkronizasyon 15 dakikada bir T1 alanlarını, fotoğraf özetlerini ve (`KR-125`) şifreli kan grubunu okuyor.
 - **Veritabanı kopyası:** Kurulum öncesi alınan kopya (`yedek-2026-11-10.sql.gz`, yalnızca root okur) kurulum doğrulandıktan sonra silindi.
 - **LOGO:** Fotoğraf özeti sorgusu bir kez elle çalıştırıldı (§5). Kurulumdan sonraki ilk senkronizasyon bütün fotoğrafları bir kez okudu (40,4 sn).
-- **Sentetik yığın:** Kapsayıcılar, veritabanı birimi, ağ ve geçici imajlar (`node:24-alpine`, `axllent/mailpit`, `mssql-tools`) ölçümden sonra silindi. Sunucuda yalnızca UAT'nin üç kapsayıcısı çalışıyor.
+- **Sentetik yığın:** Kapsayıcılar, ağ ve geçici imajlar (`node:24-alpine`, `axllent/mailpit`, `mssql-tools`) ölçümden sonra silindi.
+  - **Düzeltme (12.11.2026):** Sürüm 0.1–0.2 "veritabanı birimi de silindi" diyordu; bu yanlıştı. Temizlik proje etiketiyle yapıldığı için PostgreSQL'in etiketsiz anonim birimi (135 MB, yalnızca sentetik veri, 10.11 00:29) kaldı.
+  - T1 geliştirme sonu denetimi bunu buldu (A-05); birim 12.11.2026'da silindi. Kök neden ve önlem (`down -v`) #391'de.
+  - Sunucuda yalnızca UAT'nin üç kapsayıcısı ve iki birimi var.
 - **UAT kayıtları:** Yük testi UAT'nin veritabanına bağlanmadı. UAT'de ölçüm kaynaklı erişim kaydı, hesap veya güvenlik olayı yoktur.
 - **Betikler:** `personnel-load.mjs` ve `seed-gen.mjs` depoya alınmadı. Yeniden ölçüm gerekirse bu raporun yöntemiyle yeniden yazılabilir; ikisi de yalnızca sentetik yığına bağlanır.
 
@@ -204,3 +207,4 @@ ORDER BY PERREF, LREF;
 |---|---|---|---|
 | 2026-11-10 | 0.1 | İlk ölçüm: KPÖ-PERS-1, 2, 4, 5; KPÖ-PERS-3 ön sonucu (#381) | Bilgi İşlem |
 | 2026-11-10 | 0.2 | §4.3–4.4: KPÖ-PERS-3 iş günü ölçümü (40 çalışma, p95 1,16 sn) (#381) | Bilgi İşlem |
+| 2026-11-12 | 0.3 | §6: sentetik yığının kalan anonim birimi; düzeltme ve silme (T1 denetimi A-05, #385) | Bilgi İşlem |
