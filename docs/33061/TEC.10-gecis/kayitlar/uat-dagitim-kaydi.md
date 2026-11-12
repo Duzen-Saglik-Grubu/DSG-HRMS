@@ -27,3 +27,4 @@ doğrulama geçtikten sonra ekler; satır PR ile commit edilir. Aynı bilgi sunu
 > kurulumu geçerlidir (`KR-097`, `KR-105`). Dağıtım betiği satırı yeniden kurulumda yazar;
 > bu not elle eklendi (#218).
 | 2026-10-21T11:33:58Z | v0.2.0-27-ge488898 | `e488898` | Doğuş Uçanok |
+| 2026-11-09T21:26:10Z | v0.2.0-89-g6dbe9d5 | `6dbe9d5` | Claude (Doğuş Uçanok onayıyla) |
