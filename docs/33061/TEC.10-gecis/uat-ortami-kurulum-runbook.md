@@ -1,7 +1,7 @@
 # UAT Ortamı — Kurulum ve Dağıtım Runbook'u
 
 **Belge kimliği:** TEC.10-RB-001
-**Son güncelleme:** 2026-11-08
+**Son güncelleme:** 2026-11-10
 **İlgili süreçler:** TEC.10 (Geçiş), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-024`, `KR-038`, `KR-065`, `KR-097`
 
@@ -628,6 +628,29 @@ Doğrulama: yönetici hesabıyla girişte oturum yanıtındaki `user.permissions
 
 İK'nin gönderdiği parola oluşturma bağlantısı `Identity__PublicBaseUrl` + `/invite` adresini taşır. UAT'de varsayılan `https://insankaynaklaritest.duzen.com.tr` olduğundan ayrıca bir şey yapılmaz. Başka bir adres için sır dosyasına `IDENTITY_PUBLIC_BASE_URL='https://…'` yazılır.
 
+### 11.2 İK rolünün atanması (T4'e kadar; #383)
+
+Rol yönetimi ekranı T4'te gelir (`KR-128`). O zamana kadar İnsan Kaynakları birimindeki aktif
+personele "İK Kimlik İşlemleri" rolü `docker/uat-ik-rolu-ata.sh` ile atanır. Betik depo kökünden,
+`deploy-uat.sh` gibi SSH ile çalışır:
+
+```bash
+# 1. Rapor: hesabı olan, olmayan ve rolü olan kişiler. Hiçbir şey yazılmaz.
+./docker/uat-ik-rolu-ata.sh
+# Ad yazdırmadan yalnızca sayılar:
+./docker/uat-ik-rolu-ata.sh --yalniz-sayi
+
+# 2. Atama: hesabı aktif olup rolü olmayanlara.
+./docker/uat-ik-rolu-ata.sh --uygula --taahhut-alindi
+```
+
+- **Kimler:** Aktif istihdamı olan ve açık ataması "İNSAN KAYNAKLARI" biriminde (DÜZEN A.Ş., DÜZEN LTD) olan kişiler. Birim ve firmalar betiğin başındadır.
+- **Hesabı olmayan:** Raporda "hesap yok" görünür. Kişi üye olduktan sonra betik yeniden çalıştırılır; tekrar çalıştırmak güvenlidir.
+- **Gizlilik taahhüdü (SYG-PERS-065):** İK rolü kan grubunu görme iznini de içerir. Rol atanmadan önce kişinin gizlilik taahhüdü alınmış ve kaydı tutuluyor olmalıdır (BK-29). `--taahhut-alindi` bunun onayıdır; onsuz `--uygula` çalışmaz.
+- **Denetim izi:** Atama, uygulamanın yazdığıyla aynı biçimde (`audit.change_log`, varlık `UserRole`, işlem `Insert`) aynı veritabanı işleminde yazılır. İzleme kimliği `uat-ik-rolu-ata.sh`, işlemi yapan hesap boştur.
+- **Geçerlilik:** İzinler her istekte okunur; rol hemen geçerli olur. Kullanıcı menüyü görmek için sayfayı yeniler.
+- **Doğrulama:** `./docker/uat-ik-rolu-ata.sh --yalniz-sayi` çıktısında `atanacak` 0, `rolu_var` hesabı olan kişi sayısına eşit.
+
 ## 12. Sunucu saati (#103)
 
 Sunucunun saati **eşitlenmiş olmalıdır**. Bu gereklilik üç yerden doğar:
@@ -699,3 +722,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-10-13 | 1.11 | §6: Avahi ve CUPS kapatıldı, eski sır kopyası silindi; UDP dinleyiciler, işletim sistemi güncellemeleri ve yeniden başlatma (#207) | Bilgi İşlem |
 | 2026-10-21 | 1.12 | §2.2.1 ve §3.3a: uygulamanın çalışma rolü `hrms_app`; şemadan önce yalnızca veritabanı başlatılır (`KR-118`, #244) | Bilgi İşlem |
 | 2026-11-08 | 1.13 | §5.1: özel nitelikli veri anahtarının döndürülmesi ve yeniden şifreleme işi (#375) | Bilgi İşlem |
+| 2026-11-10 | 1.14 | §11.2: İK rolünün betikle atanması (T4'e kadar), gizlilik taahhüdü onayı ve denetim izi (#383) | Bilgi İşlem |
