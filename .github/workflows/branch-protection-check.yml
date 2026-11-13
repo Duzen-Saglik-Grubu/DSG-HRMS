@@ -24,6 +24,9 @@ jobs:
     name: main dalina gelen commit'leri denetle
     runs-on: ubuntu-latest
     steps:
+      # Buyuk PR inceleme notu kurali PR kurallari modulunden okunur (#390).
+      - uses: actions/checkout@v4
+
       - name: Commit'in bir Pull Request ile geldigini dogrula
         id: audit
         uses: actions/github-script@v7
@@ -74,6 +77,46 @@ jobs:
 
               if (approval) {
                 core.info(`UYGUN: #${pr.number} onay yorumu ${approval.created_at} (${approval.user.login}).`);
+
+                // Buyuk PR'da inceleme notu (#390, KR-140). Boyut gerekcesi gereken PR'in onayi,
+                // neyin incelendigini "Incelenen:" satiriyla yazar. T1'de 1.500 satiri asan 7 PR'in
+                // hicbirinde yoktu; kural yaziliydi, denetlenmiyordu.
+                const rules = require(process.env.GITHUB_WORKSPACE + '/.github/scripts/pr-rules.cjs');
+                const files = await github.paginate(github.rest.pulls.listFiles, {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  per_page: 100,
+                });
+                if (!rules.needsReviewNote(files)) return;
+                const note = comments.find(c =>
+                  c.user.login === approval.user.login && rules.hasReviewNote(c.body) &&
+                  new Date(c.created_at) <= mergedAt);
+                if (note) {
+                  core.info(`UYGUN: #${pr.number} buyuk PR; inceleme notu ${note.created_at}.`);
+                  return;
+                }
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `[DÜZELTİCİ] #${pr.number} büyük PR inceleme notu olmadan birleştirildi`,
+                  body: [
+                    '## Tespit edilen uygunsuzluk',
+                    '',
+                    `#${pr.number} ${rules.reviewableLines(files)} satır değiştiriyor (üretilen dosyalar hariç; sınır ${rules.SIZE_LIMIT}). ` +
+                      'Onay yorumunda neyin incelendiği yazılmamış (`KR-140`, CONTRIBUTING §5).',
+                    '',
+                    'Beklenen: onay yorumunda ayrı bir satır — `İncelenen: <ne satır satır, ne örneklemeyle incelendi>`',
+                    '',
+                    '## Yapılması gerekenler',
+                    '',
+                    '- [ ] İnceleyen, neyin incelendiğini bu issue\'ya yazdı',
+                    '- [ ] Neden atlandığı yazıldı',
+                  ].join('\n'),
+                  labels: ['tur:duzeltici-faaliyet', 'surec:MAN.8', 'oncelik:orta'],
+                });
+                core.setOutput('issue_opened', 'true');
+                core.setFailed(`#${pr.number} büyük PR inceleme notu olmadan birleştirildi. Düzeltici faaliyet issue'su açıldı.`);
                 return;
               }
 

@@ -1,6 +1,6 @@
 # Katkı Rehberi
 
-**Son güncelleme:** 2026-10-15
+**Son güncelleme:** 2026-11-14
 **İlgili süreçler:** TEC.7 (Gerçekleştirme), TEC.9 (Doğrulama), MAN.5 (Konfigürasyon Yönetimi), MAN.8 (Kalite Güvence)
 
 Bu belge, depoda çalışma kurallarını tanımlar. Kurallar aynı zamanda
@@ -341,9 +341,9 @@ Refs: #42
 | Milestone | **Zorunlu** — PR ve issue aynı aşamaya (A0/A1/A2/A3/AS) bağlanır |
 | Değişiklik talebi | Onaylı bir gereksinimi değiştiren PR, `tur:degisiklik-talebi` issue'sunda **tarihli paydaş onayı** (`Paydaş onayı: GG.AA.YYYY — <rol> — <kanal>`) kayda geçmeden birleştirilemez; CI denetler. Yordam: TEC.2 YAKLAŞIM §4.1 (#210) |
 | Etiket | **Zorunlu** — PR'da en az bir `tur:` ve bir `surec:` etiketi; kapatılan issue'da `tur:` etiketi. CI denetler (#216) |
-| Boyut | Hedef **< 400 satır** değişiklik; büyükse bölünür. Üretilen dosyalar (OpenAPI belgesi, üretilen tipler, migration tasarım dosyaları, `package-lock.json`) hariç **1.500 satırı aşan** PR, gövdede `Boyut gerekçesi:` ile neden bölünmediğini yazar; CI denetler (#216) |
+| Boyut | Hedef **< 400 satır** değişiklik; büyükse bölünür. Üretilen dosyalar (OpenAPI belgesi, üretilen tipler, migration tasarım dosyaları, `package-lock.json`) hariç **1.500 satırı aşan** PR, gövdede kendi satırında bir paragrafla (`**Boyut gerekçesi:** <neden bölünmedi>`, en az 20 karakter) neden bölünmediğini yazar; CI denetler (#216). Tamamlanma tanımındaki satır gerekçe sayılmaz: eski denetim bu satırla her zaman geçiyordu (#390) |
 | CI | Tüm kalite kapıları geçmeli (tanım ve liste: ADR-0011 §6) |
-| İnceleme | En az **1 onay**. Tek kişilik düzende onay, **birleştirmeden önce** PR'a "İnceledim ve onaylıyorum." yorumu olarak yazılır; CI bunu `main`'de denetler (`KR-096`). Onay yorumunu yalnızca inceleyen yazar. Boyut gerekçesi gereken büyük PR'larda onay yorumuna neyin incelendiği kısaca eklenir (ör. "backend ve testler satır satır; üretilen tipler örneklemeyle") |
+| İnceleme | En az **1 onay**. Tek kişilik düzende onay, **birleştirmeden önce** PR'a "İnceledim ve onaylıyorum." yorumu olarak yazılır; CI bunu `main`'de denetler (`KR-096`). Onay yorumunu yalnızca inceleyen yazar. Boyut gerekçesi gereken büyük PR'larda onay yorumuna neyin incelendiği ayrı bir satırla eklenir: `İncelenen: <ne satır satır, ne örneklemeyle>` (ör. "İncelenen: backend ve testler satır satır; üretilen tipler örneklemeyle"). CI bunu da `main`'de denetler; satır yoksa düzeltici faaliyet açılır (`KR-140`, #390) |
 | Birleştirme | **Squash merge** — `main` geçmişi okunabilir kalır |
 | Dal | Birleştirme sonrası **silinir** |
 
@@ -410,6 +410,14 @@ kopya ayrışmıştı; onay maddesi şablonda yoktu (02.10 denetimi MAN.8-4, `KR
 > gerekçesi yazılır (`- [ ] ~~Maskeleme testi~~ — kod değişikliği yok`). Uygulanmayan diğer
 > maddeler de aynı biçimde yazılır; madde sessizce silinmez, gerekçe "Notlar" bölümüne
 > değil maddenin satırına yazılır.
+>
+> **Gövdenin şablona uygunluğu CI'da denetlenir (#390):** şablonun bütün `##` başlıkları
+> aynı sırada; "Ne değişti?", "Neden?" ve "Nasıl doğrulandı?" dolu; şablondaki **her** madde
+> metni kısaltılmadan gövdede (ardından `:` veya ` — ` ile açıklama gelebilir; çok satırlı
+> madde de tam yazılır); üstü çizili her maddenin gerekçesi var; 33061 izlenebilirlik tablosu
+> dolu. T1'de 91 PR'ın 86'sı bu kurallardan en az birine uymuyordu (T1 geliştirme sonu
+> denetimi M-05). Kurallar `.github/scripts/pr-rules.cjs`'tedir ve şablonun boş hâliyle de
+> sınanır (`pr-discipline-test.mjs`).
 
 ---
 
@@ -537,3 +545,4 @@ kayıt PR'ı, kabul ve modül kapanışı) tek bir kontrol listesindedir:
 | 2026-10-14 | 1.6 | §5: etiket ve boyut kuralları CI'da; büyük PR'da onay yorumu; §6: atlanamaz maddelerin denetimi (#216) | Bilgi İşlem |
 | 2026-10-15 | 1.7 | §9: sürüm kontrol listesine bağlantı (#218) | Bilgi İşlem |
 | 2026-10-15 | 1.8 | §6: Tamamlanma Tanımının tek kaynağı PR şablonu; liste şablona taşındı, onay maddesi şablona eklendi (`KR-111`, #217) | Bilgi İşlem |
+| 2026-11-14 | 1.9 | §5: boyut gerekçesi kendi paragrafı; büyük PR'da `İncelenen:` satırı CI'da (`KR-140`); §6: gövdenin şablona uygunluğu CI'da (#390) | Bilgi İşlem |

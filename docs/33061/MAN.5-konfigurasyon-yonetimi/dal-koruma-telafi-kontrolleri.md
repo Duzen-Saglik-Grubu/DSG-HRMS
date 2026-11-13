@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.5-DK
 **Süreç:** MAN.5 — Konfigürasyon Yönetimi
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-11-14
 **İlgili risk:** `R-16`
 **İlgili kararlar:** `KR-054`, `KR-055`
 
@@ -114,6 +114,7 @@ PR'ı açan ve birleştiren aynı hesap olduğu için GitHub "Approve" kaydı ol
 - **Kural:** İnceleyen, birleştirmeden önce PR'a "İnceledim ve onaylıyorum." yorumunu yazar.
 - **Denetim:** `branch-protection-check.yml`, `main`'e gelen her commit'te birleştirilen PR'da birleştirmeden önce yazılmış bir onay yorumu arar. Bulamazsa `[DÜZELTİCİ]` issue'su açar.
 - **Geçmiş:** 04.10.2026'ya kadarki onaylar `MAN.8-kalite-guvence/kayitlar/2026-10-04-pr-onay-kaydi.md`'de kayıtlıdır.
+- **Büyük PR (`KR-140`, #390):** Üretilen dosyalar hariç 1.500 satırı aşan PR'da aynı denetim, inceleyenin birleştirmeden önce yazdığı bir `İncelenen:` satırını da arar; yoksa `[DÜZELTİCİ]` issue'su açar. 13.10–13.11.2026 arasındaki dokuz büyük PR'ın hiçbirinde bu satır yoktu (`MAN.8-kalite-guvence/kayitlar/2026-11-14-t1-buyuk-pr-kaydi.md`).
 
 ---
 
@@ -211,3 +212,4 @@ denetimde sorulduğunda bu belge gösterilecektir.
 | 2026-10-04 | 0.3 | §3.5 inceleme onayı denetimi (`KR-096`, #128) | Bilgi İşlem |
 | 2026-10-04 | 0.4 | §3.3: yeniden deneme ve "denetim yapılamadı" kaydı (#129) | Bilgi İşlem |
 | 2026-10-14 | 0.5 | §6 iş 3: ilk örnekleme (13.10.2026 konfigürasyon denetimi D-19); başlıktaki "Son güncelleme" 09.09'da kalmıştı, geçmişle eşitlendi (#214) | Bilgi İşlem |
+| 2026-11-14 | 0.6 | §3.5: büyük PR'da `İncelenen:` satırı denetimi (`KR-140`, #390) | Bilgi İşlem |

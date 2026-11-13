@@ -32,6 +32,20 @@ body:
     validations:
       required: true
 
+  # #390: T1'deki 5 hata kaydinin yalnizca birinde "neden yakalanmadi" kismen yanitliydi; yanit
+  # olmadan kacan hatanin hangi kapidan gectigi (test, inceleme, kabul) ogrenilemez (K6, #395).
+  - type: textarea
+    id: why_missed
+    attributes:
+      label: "Neden yakalanmadı?"
+      description: "Hata hangi aşamada yakalanabilirdi ve neden yakalanmadı? Birim/entegrasyon/uçtan uca test, PR incelemesi, yerel deneme, kabul. Bilinmiyorsa \"incelenecek\" yazın; hata kapanmadan önce yanıtlanır."
+      placeholder: |
+        Aşama: uçtan uca test
+        Neden: senaryo yalnızca tek sicilli kişiyle kuruluydu; çok sicilli kişi sınanmadı.
+        Önlem: senaryoya çok sicilli kişi eklendi (PR #...).
+    validations:
+      required: true
+
   - type: input
     id: trace_id
     attributes:

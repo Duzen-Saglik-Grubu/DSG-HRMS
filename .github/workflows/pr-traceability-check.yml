@@ -250,43 +250,11 @@ jobs:
               problems.push('PR\'da "surec:" etiketi yok (orn. surec:TEC.7). Hangi 33061 surecinin kaniti oldugunu gosterir.');
             }
 
-            // BASLA: pr-disiplini
-            // Tamamlanma tanimindaki "atlanamaz" iki madde (CONTRIBUTING §6) PR govdesinde
-            // ya isaretlidir ya da ustu cizilip gerekcesi yazilmistir. Ornek PR'larin
-            // hicbirinde bu iki madde yoktu (T3 modul sonu denetimi, TEC.7-8).
-            const MANDATORY_DOD = [
-              { name: 'Yetki sizintisi testi', pattern: /yetki\s+s[ıi]z[ıi]nt[ıi]s[ıi]/i },
-              { name: 'Maskeleme testi', pattern: /maskeleme\s+testi/i },
-            ];
-            function missingMandatoryDod(prBody) {
-              const lines = (prBody || '').split('\n');
-              return MANDATORY_DOD.filter(({ pattern }) => !lines.some(line => {
-                if (!pattern.test(line)) return false;
-                if (/^\s*-\s*\[[xX]\]/.test(line)) return true;
-                // "- [ ] ~~Madde~~ — gerekce": ustu cizili ve gerekcesi var.
-                const struck = line.match(/^\s*-\s*\[ \]\s*~~[^~]+~~\s*[—–-]+\s*(.*)$/);
-                return Boolean(struck && struck[1].trim().length >= 5);
-              })).map(d => d.name);
-            }
-
-            // Uretilen dosyalar boyut sayimina girmez: degisikligi insan yazmadi.
-            const GENERATED = [
-              /(^|\/)src\/shared\/api\/generated\//,
-              /^docs\/api\/openapi-v1\.json$/,
-              /\/Migrations\/[^/]+\.Designer\.cs$/,
-              /ModelSnapshot\.cs$/,
-              /(^|\/)package-lock\.json$/,
-            ];
-            const SIZE_LIMIT = 1500;
-            function reviewableLines(files) {
-              return files
-                .filter(f => !GENERATED.some(p => p.test(f.filename)))
-                .reduce((sum, f) => sum + (f.additions || 0) + (f.deletions || 0), 0);
-            }
-            function needsSizeJustification(files, prBody) {
-              return reviewableLines(files) > SIZE_LIMIT && !/boyut\s+gerek[çc]esi/i.test(prBody || '');
-            }
-            // BITIR: pr-disiplini
+            // PR govdesi kurallari tek modulde (#390): bu adim ve pr-discipline-test.mjs
+            // ayni kodu calistirir. Sablon, bos haliyle de sinanir (test).
+            const rules = require(process.env.GITHUB_WORKSPACE + '/.github/scripts/pr-rules.cjs');
+            const { missingMandatoryDod, reviewableLines, needsSizeJustification, templateProblems } = rules;
+            const SIZE_LIMIT = rules.SIZE_LIMIT;
 
             // --- 8. Atlanamaz tamamlanma maddeleri (#216) ---
             for (const name of missingMandatoryDod(body)) {
@@ -297,11 +265,22 @@ jobs:
                 '\n    Ayrinti: CONTRIBUTING.md §6');
             }
 
-            // --- 9. PR boyutu (#216) ---
+            // --- 8b. Sablon yapisi (#390) ---
+            //
+            // T1'de 17 PR'da tamamlanma tanimi 8-16 maddeye indi (sablonda 26); 73 PR'in 45'inde
+            // "Neden?" veya "Notlar" yoktu. Govde sablonla karsilastirilir.
+            const template = require('fs').readFileSync(
+              process.env.GITHUB_WORKSPACE + '/.github/PULL_REQUEST_TEMPLATE.md', 'utf8');
+            for (const problem of templateProblems(body, template)) {
+              problems.push(problem + '\n    Ayrinti: .github/PULL_REQUEST_TEMPLATE.md, CONTRIBUTING.md §5-§6');
+            }
+
+            // --- 9. PR boyutu (#216, #390) ---
             //
             // #191 +5.319 satir ve iki ozellik tasiyordu; inceleme bu boyutta guvenilir
             // olmaz. Hedef 400 satirin altidir (CONTRIBUTING §5); 1.500'u asan PR,
-            // neden bolunmedigini govdede yazar.
+            // neden bolunmedigini govdede yazar. Gerekce kendi paragrafidir; sablonun DoD satiri
+            // sayilmaz (#390: eski kural o satirla her zaman geciyordu).
             const files = await github.paginate(github.rest.pulls.listFiles, {
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -311,7 +290,8 @@ jobs:
             if (needsSizeJustification(files, body)) {
               problems.push(
                 'PR ' + reviewableLines(files) + ' satir degistiriyor (uretilen dosyalar haric; sinir ' + SIZE_LIMIT + ').' +
-                '\n    Bolunemiyorsa govdeye "Boyut gerekcesi:" ile neden bolunmedigi yazilir.' +
+                '\n    Bolunemiyorsa govdeye kendi satirinda bir paragraf yazilir: "**Boyut gerekcesi:** <neden bolunmedi>".' +
+                '\n    Tamamlanma tanimindaki satir gerekce sayilmaz.' +
                 '\n    Ayrinti: CONTRIBUTING.md §5');
             }
 
