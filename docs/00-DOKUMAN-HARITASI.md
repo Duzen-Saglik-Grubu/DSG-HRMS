@@ -3,7 +3,7 @@
 **Proje:** DSG-HRMS — Düzen Sağlık Grubu İnsan Kaynakları Yönetim Sistemi
 **Amaç:** Bu doküman, TS ISO/IEC TS 33061 Seviye 2 kapsamında üretilen tüm kanıtların nerede tutulduğunu tek sayfadan gösterir. Bir denetçi ya da yeni katılan bir ekip üyesi aradığı kaydı buradan bulur.
 
-**Son güncelleme:** 2026-10-20
+**Son güncelleme:** 2026-11-12
 **Doküman sahibi:** Bilgi İşlem Birim Sorumlusu
 
 ---
@@ -229,7 +229,7 @@ Aşağıdaki tablolarda "33061 Süreç Çıktısı" sütunu, standardın Madde 5
 | Kalite güvence sistemi | CI/CD kalite kapıları (GitHub Actions) |
 | Düzeltici faaliyet | GitHub Issue (`[DÜZELTİCİ]`, etiket `tur:duzeltici-faaliyet`) |
 | Kalite güvence raporu | Ayrı rapor yazılmaz: K1–K6 değerleri MAN.2 durum raporu §3'te ve modül sonu denetiminde verilir (`KR-111`); T3 başlangıç değerleri `kayitlar/2026-10-15-kg-olcutleri-t3-baslangic.md` |
-| **Süreç değerlendirme raporu** (`MAN.8.BP3`) | `raporlar/YYYY-AA-GG-surec-gozden-gecirme-raporu.md` ve modül sonu denetimleri (`2026-10-02-t3-surec-denetimi*.md`, `2026-10-13-t3-modul-sonu-denetimi*.md`) — 33061 süreçlerinin standarda karşı değerlendirilmesi |
+| **Süreç değerlendirme raporu** (`MAN.8.BP3`) | `raporlar/YYYY-AA-GG-surec-gozden-gecirme-raporu.md` ve modül sonu denetimleri (`2026-10-02-t3-surec-denetimi*.md`, `2026-10-13-t3-modul-sonu-denetimi*.md`, `2026-11-12-t1-gelistirme-sonu-denetimi*.md`) — 33061 süreçlerinin standarda karşı değerlendirilmesi |
 | Kayıt | `kayitlar/` (ör. `2026-10-04-pr-onay-kaydi.md`, `2026-10-15-kg-olcutleri-t3-baslangic.md`) |
 | Olay ve problem kayıtları | GitHub Issue (etiket: `tur:hata`) |
 
@@ -284,3 +284,4 @@ Bazı kanıtlar birden fazla sürece hizmet eder. Tek kopya tutulur:
 | 2026-10-15 | 0.7 | MAN.8: DoD'nin tek kaynağı PR şablonu; kalite güvence ölçütleri K1–K6 ve T3 başlangıç kaydı; ayrı kalite raporu yok. TEC.5: diyagram notu YAKLASIM §8 ve #234'e bağlandı (`KR-111`, #217) | Bilgi İşlem |
 | 2026-10-20 | 0.8 | TEC.2: T1 toplantı kaydı ve `PG-PERS.md` (#239) | Bilgi İşlem |
 | 2026-10-20 | 0.9 | TEC.5: tasarım gözden geçirme raporu, kimlik tasarım diyagramları, SYG §2.5 tahsis (#234) | Bilgi İşlem |
+| 2026-11-12 | 0.10 | MAN.8: T1 geliştirme sonu süreç denetimi (#385) | Bilgi İşlem |

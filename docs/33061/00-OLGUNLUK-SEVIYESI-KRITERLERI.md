@@ -1,7 +1,7 @@
 # Olgunluk Seviyesi Kriterleri ve Öz Değerlendirme
 
 **Belge kimliği:** 33061-OSK
-**Son güncelleme:** 2026-10-13
+**Son güncelleme:** 2026-11-12
 **Hedef:** TS ISO/IEC TS 33061 kapsamındaki süreçlerde **Yetenek Seviyesi 2 (Yönetilen Süreç)**
 **Dayanak:** TS ISO/IEC TS 33061 (süreç boyutu) + TS ISO/IEC 33020 (ölçüm çerçevesi, Madde 5)
 
@@ -127,25 +127,34 @@ kanıtın fiilen mevcut olmasına göre yapılır — "yapılacak" olan sayılma
 
 | Süreç | PA 1.1 | PA 2.1 | PA 2.2 | Seviye | Not |
 |---|---|---|---|---|---|
-| MAN.1 Proje planlama | L+ | L+ | L | 1 | Plan, RACI ve iş kırılımı onaylandı (`KR-103`); bütçe ve tarihli kaynak taahhüdü yok |
-| MAN.2 Proje değerlendirme ve kontrol | L | L− | L− | 1 | İlk durum raporu Üst Yönetim'e sunuldu; yeterlilik değerlendirmesi ve ikinci döngü yok |
-| MAN.4 Risk yönetimi | L+ | L+ | L | 1 | Kabul yetkisi doğru uygulandı; yeni riskler kayda geç girdi, bazı puanlar bayattı |
-| MAN.5 Konfigürasyon yönetimi | L+ | L | L | 1 | Etiket, CHANGELOG ve dağıtım kaydı var; konfigürasyon denetimi her adayda yapılmadı |
-| MAN.6 Bilgi yönetimi | L− | L− | L− | 1 | Bilgi kayıt defteri var; kayıt dışı gizli kümeler (#215) |
-| MAN.8 Kalite güvence | L+ | L | L | 1 | 02.10 düzeltici işleri issue'ya çevrilip kapandı; önerilerin bir kısmı issue'suz, KG ölçütü ölçülmüyor |
-| TEC.2 Paydaş ihtiyaç ve gereksinimleri | L+ | L | L | 1 | Kritik performans ölçütü PG'de yok; değişiklik talebi yordamı yazılı değil (#210) |
-| TEC.3 Sistem/yazılım gereksinimleri | L+ | L | L | 1 | Uygulanan bir kural (#138) SYG'de yoktu; özet sayımlar ve kaynak metinler bayat (#211, #214) |
-| TEC.5 Tasarım tanımlama | L | L− | L− | 1 | SYG → tasarım tahsisi ve tasarım gözden geçirmesi yok; `KR-099` yeniden ihlal edildi (#212) |
-| TEC.7 Gerçekleştirme | L+ | L | L | 1 | Kapsam dışı öğe (#198) beş adayda fark edilmedi; DoD kayması ve PR boyutu (#216) |
-| TEC.8 Entegrasyon | L+ | L | L | 1 | Entegrasyon raporu `rc.2`'de kaldı; canlı arayüz denetimleri kayda girmiyor |
-| TEC.9 Doğrulama | L+ | L | L | 1 | Doğrulama raporu ve G2 kaydı kabul edilen sürümü kapsamıyor (#209) |
-| TEC.10 Geçiş | L+ | L+ | L | 1 | Geri dönüş yordamı yok; yaklaşım belgesi ve ADR-0011 §7 bayat |
-| TEC.11 Geçerleme | L+ | L | L− | 1 | T3 kabul edildi (`KR-105`); imzalı form bekleniyor, kanıt tek kopya (#213) |
-| TEC.13 Bakım | L− | P+ | L− | 1 | Arıza/eğilim verisi yok; 05.10 CI olayı kayda girmedi (#208) |
+| MAN.1 Proje planlama | L | L | L | 1 | Plan 13.10'dan beri güncellenmedi; T1 hedef tarihi ve sıradaki modül kararı yok (#388) |
+| MAN.2 Proje değerlendirme ve kontrol | L | L | L | 1 | Durum raporu 3 ve risk gözden geçirmesi denetimle yazıldı; dönem içinde ara gözden geçirme yok |
+| MAN.4 Risk yönetimi | L | L | L | 1 | R-29 olayları işlendi; R-09, R-24, R-30, R-31 denetime kadar bayat kaldı |
+| MAN.5 Konfigürasyon yönetimi | L | L | L− | 1 | Dağıtım kaydı sunucuyla 7/7; örnek ortam dosyaları ve öğe listesi eksik, sentetik birim kaldı (#391, #392) |
+| MAN.6 Bilgi yönetimi | L | L | L | 1 | Defter T1'de beş kez güncellendi; UAT'de yeniden kayıt dışı sır kopyası (#386) |
+| MAN.8 Kalite güvence | L+ | L+ | L | 1 | 13.10 işleri 13/13 kapandı; K1–K6 dönemde ölçülmedi; boyut denetimi şablonla geçiyor (#390) |
+| TEC.2 Paydaş ihtiyaç ve gereksinimleri | L+ | L | L+ | 1 | 9 değişiklik talebi kayıtlı; dördünde İK onayı yok veya birleştirmeden sonra (#387) |
+| TEC.3 Sistem/yazılım gereksinimleri | L+ | L+ | L+ | 1 | 79 SYG, 29 AN; izlenebilirlik CI'da; KPÖ sapması ve paydaşa geri bildirim yazılı değil (#392) |
+| TEC.5 Tasarım tanımlama | L+ | L | L− | 1 | Tasarım gözden geçirmesi yapıldı; ADR'ler üçüncü kez kararların gerisinde (#389) |
+| TEC.7 Gerçekleştirme | L+ | L | L | 1 | Etiket ve atlanamaz maddeler 89/89; DoD kırpılması, 5 kaçan hata (#390, #395) |
+| TEC.8 Entegrasyon | L+ | L | L | 1 | e2e T1'i kapsıyor (15 senaryo); entegrasyon raporu kabul adayında yazılacak (#388) |
+| TEC.9 Doğrulama | L+ | L+ | L | 1 | 77/79 SYG kanıtlı; UAT performans ölçümü; T1 doğrulama raporu kabul adayında (#388) |
+| TEC.10 Geçiş | L+ | L | L | 1 | T1 UAT'ye runbook ile kuruldu; dal commit'i çalıştı, geri dönüş yordamı yok (#391, #394) |
+| TEC.11 Geçerleme | L+ | L | L | 1 | T3 kanıtı korunuyor (#213); T1 kabul aşaması planlanmadı (#388) |
+| TEC.13 Bakım | L | L− | L− | 1 | 17 hata ve 6 kırmızı otomatik kayıtlı; eğilim raporu ve Dependabot kuralı yok (#393) |
 
-**Dayanak:** `MAN.8-kalite-guvence/raporlar/2026-10-13-t3-modul-sonu-denetimi.md` (T3 modül sonu). Önceki: `MAN.8-kalite-guvence/raporlar/2026-10-02-t3-surec-denetimi.md`
+**Dayanak:** `MAN.8-kalite-guvence/raporlar/2026-11-12-t1-gelistirme-sonu-denetimi.md` (T1 geliştirme sonu). Önceki: `…/2026-10-13-t3-modul-sonu-denetimi.md` (T3 modül sonu), `…/2026-10-02-t3-surec-denetimi.md`
 
-> **Seviye 2'nin önündeki engeller (13.10.2026):** 15 sürecin tamamı Seviye 1'de (02.10'da
+> **Seviye 2'nin önündeki engeller (12.11.2026):** 15 sürecin tamamı yine Seviye 1'de; hiçbirinde
+> PA 1.1 = F değil. Dokuz süreç ilerledi (MAN.2, MAN.6, MAN.8, TEC.2, TEC.3, TEC.5, TEC.9, TEC.11, TEC.13),
+> dördü geriledi (MAN.1, MAN.4, MAN.5, TEC.10), ikisi yerinde. Ortak engel aynı: **sürdürmek.**
+> (1) Denetimin yakaladığı her düzeltme kendi maddesinde kalıyor; kök neden ikinci modülde
+> yeniden çıkıyor (ADR'ler, sır kopyası, içerik bayatlığı).
+> (2) Otomatik denetimler biçimi sınıyor, anlamı sınamıyor (onaylayanın rolü, boyut gerekçesi).
+> (3) Yönetim çıktıları (plan, risk, durum raporu) dönem içinde değil, denetimde güncelleniyor.
+> Ayrıntı: T1 geliştirme sonu denetimi ve ekleri; düzeltici işler #386–#395.
+>
+> Önceki (13.10.2026): 15 sürecin tamamı Seviye 1'de (02.10'da
 > beşi Seviye 0'daydı). Hiçbir süreçte PA 1.1 = F değil. Ortak engel artık sürecin
 > işletilmemesi değil, **sürdürülmesi**:
 > (1) Kurallar yazılıyor, ama kopyaları birkaç gün içinde bayatlıyor (#214).
@@ -191,3 +200,4 @@ Seviye 2. PA 1.1 ≥ L ise Seviye 1. Aksi hâlde Seviye 0.
 | 2026-09-18 | 0.2 | §6 öz değerlendirme tablosu ilk kez gerçek kanıtla güncellendi; 15 süreç derecelendirildi (MAN.8 süreç gözden geçirmesi) | Bilgi İşlem |
 | 2026-10-02 | 0.3 | §6 T3 sonu süreç denetimiyle güncellendi (MAN.8-SGR-2026-10-02, #117) | Bilgi İşlem |
 | 2026-10-13 | 0.4 | §6 T3 modül sonu denetimiyle güncellendi (Ek A, B, C): 15 sürecin tamamı Seviye 1; Seviye 2 engelleri notu yeniden yazıldı | Bilgi İşlem |
+| 2026-11-12 | 0.5 | §6 T1 geliştirme sonu denetimiyle güncellendi (#385): 15 süreç Seviye 1; dokuz süreç ilerledi, dördü geriledi; engeller notu | Bilgi İşlem |
