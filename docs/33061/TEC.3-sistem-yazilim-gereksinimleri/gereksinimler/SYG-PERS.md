@@ -5,7 +5,7 @@
 **Modül:** T1 Personel Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-PERS.md` (19.10.2026'da İK onaylı, 45 gereksinim; değişiklik talebi #270)
 **Tasarım:** ADR-0019…ADR-0022 (`KR-121`…`KR-126`); T1 tasarım gözden geçirmesi (`TEC.5-tasarim-tanimlama/raporlar/2026-10-22-t1-tasarim-gozden-gecirme.md`)
-**Son güncelleme:** 2026-11-08
+**Son güncelleme:** 2026-11-13
 **Sahibi:** Bilgi İşlem
 **Onay durumu:** Bilgi İşlem (RACI TEC.3 A); değişiklikler PR onayıyla (`KR-096`). Baseline, T1'in kabul etiketiyle yazılır (`KR-097`, `KR-111`); o zamana kadar geliştirme sürüyor.
 
@@ -383,7 +383,7 @@ ayrıca gösterilir. Diğer bulgular paydaş gereksinimlerinin anlamını deği�
 | ClosedXML, PDFsharp / MigraDoc | Dışa aktarma | ✅ Projede mevcut (ADR-0014) |
 | SkiaSharp | Fotoğraf küçültme | ⏳ Fotoğraf PR'ıyla eklenir; MIT lisansı, paket envanterine yazılır |
 | Yük testi aracı | KPÖ-PERS-1, 2, 5 | ✅ T3 ölçümünde kullanılan yöntem (SYG-KMLK-077) |
-| Gizlilik taahhüdü kayıtları | SYG-PERS-065 | ⏳ İK tutar; UAT'de kan grubu açılmadan önce |
+| Gizlilik taahhüdü kayıtları | SYG-PERS-065 | ✅ Sistem Yöneticisi ve İK dâhil laboratuvarda çalışan tüm personelin taahhüdü var; İK biriminde saklanıyor (`KR-139` (8), 13.11.2026). Rol üyeleriyle karşılaştırma T1 kabulünde (AN-18) |
 
 ---
 
@@ -486,3 +486,4 @@ madde `İptal` notuyla kalır.
 | 2026-11-08 | 0.22 | §4: SYG-PERS-055 ve 062, `system.encryption.update` yalnızca Sistem Yöneticisinde (`KR-138`, #374); §6: AN-27, yeniden şifreleme işinin uç, kapsam, yazım ve anahtar yuvaları (#375) | Bilgi İşlem |
 | 2026-11-08 | 0.23 | §6: AN-28, telefon genişliği, dokunmatik ekranda 44 piksel kuralı, telefonda kart görünümü ve ölçüm (#377) | Bilgi İşlem |
 | 2026-11-08 | 0.24 | §6: AN-29, SYG-PERS-006 ile 021'in uzlaştırılması: senkronizasyonun görev kaydındaki tek yazımı (#379) | Bilgi İşlem |
+| 2026-11-13 | 0.25 | §7: gizlilik taahhüdü kayıtlarının varlığı (`KR-139`); SYG-PERS-056 negatif testle doğrulandı (#388) | Bilgi İşlem |

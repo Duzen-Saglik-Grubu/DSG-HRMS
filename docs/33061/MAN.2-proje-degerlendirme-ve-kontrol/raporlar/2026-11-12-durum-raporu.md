@@ -102,10 +102,11 @@ Risk defteri bu raporla gözden geçirildi (sürüm 1.16). Yeni risk: **R-32** (
 3. **Sıradaki modül kararı:** T2, T4 veya T5 için İK gereksinim toplantısı (`KR-068`).
 4. **Bu raporun dördüncüsü:** T1 kabulünde veya en geç 12.12.2026'da.
 
-**İletim kaydı:** _(Doğuş Uçanok doldurur: iletim tarihi, kime, cevap ve tarihi.)_
+**İletim kaydı:** §6'daki dört konu 13.11.2026'da Doğuş Uçanok (Bilgi İşlem Birim Sorumlusu) tarafından karara bağlandı (`KR-139`): (1) üretim altyapısı proje bittiğinde hazır sunuculara kurulur, hedef tarih verilmez; R-09 3/1/3'e düşürüldü ve Bilgi İşlem tarafından kabul edildi; (2) `KR-107` teyit edildi; (3) bütçe oluşturulmaz, iç kaynak; (4) T1 kabulü 16–20.11.2026 haftasında, düzeltici işler tamamlanırsa. Raporun Üst Yönetim'e iletimi ve bu kararlar durum raporu 4 ile Üst Yönetim'in bilgisine sunulur.
 
 ## Değişiklik Geçmişi
 
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-11-12 | 1.0 | Üçüncü durum raporu; T1 geliştirme sonu (#385) | Bilgi İşlem |
+| 2026-11-13 | 1.1 | İletim kaydı: §6 kararları (`KR-139`, #388) | Bilgi İşlem |

@@ -360,6 +360,23 @@ describe('PersonListPage', () => {
     // Uc acilir menuden secim yapar; CI kapsam olcumuyle yerelin birkac kati yavas (#376).
   }, 30_000);
 
+  it('T1 suzgec panelinde "Yoneticisi" suzgeci yoktur; butun izinler acik olsa da (SYG-PERS-056)', async () => {
+    const user = userEvent.setup();
+    // Yonetici iliskisi T2 Organizasyon Yonetimi ile gelir (AN-12); o zamana kadar suzgec sunulmaz.
+    vi.mocked(personsApi.filterOptions).mockResolvedValue(
+      options({ canFilterByNationalId: true, canFilterBySensitive: true }),
+    );
+    renderWithProviders(<PersonListPage />);
+    await screen.findByRole('article', { name: 'AYŞE DEMİR' });
+    await waitFor(() => expect(personsApi.filterOptions).toHaveBeenCalled());
+    await user.click(screen.getByRole('button', { name: /Süzgeçler/ }));
+    const panel = await screen.findByRole('dialog', { name: 'Süzgeçler' });
+
+    expect(within(panel).getByLabelText('Kan grubu')).toBeInTheDocument();
+    expect(within(panel).queryByLabelText(/yönetici/i)).not.toBeInTheDocument();
+    expect(within(panel).queryByText(/yönetici/i)).not.toBeInTheDocument();
+  });
+
   it('suzgec uygulandiktan hemen sonra Temizle kalici olur (#373)', async () => {
     const user = userEvent.setup();
     renderWithProviders(<PersonListPage />);
