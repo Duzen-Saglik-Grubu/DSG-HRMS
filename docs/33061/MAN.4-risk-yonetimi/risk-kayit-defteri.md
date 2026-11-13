@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-11-12
+**Son güncelleme:** 2026-11-13
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -67,7 +67,7 @@ raporunda ayrıca ele alınır.
 | **O / E / Puan** | 2 / 3 / **6** |
 | **Sahibi** | Bilgi İşlem + KVKK Sorumlusu |
 | **Önlem** | (1) Özel nitelikli alanlarda uygulama seviyesinde şifreleme. (2) Log ve denetim kayıtlarında TCKN/IBAN/iletişim bilgisi **maskeleme**. (3) Görüntüleme (erişim) logu tutulacak — sadece değişiklik logu yeterli değildir. (4) Satır bazlı yetkilendirme: kullanıcı yalnızca yetkili olduğu personeli görebilir. (5) Veri türü bazında yapılandırılabilir saklama süresi ve süre sonunda arşivleme/anonimleştirme yeteneği. (6) UAT ortamına gerçek veri kopyalanacaksa maskeleme uygulanacak. **Güncelleme (2026-10-04):** UAT, kabul testlerinin gerçek personelle yapılabilmesi için gerçek LOGO verisiyle çalışıyor; maskeleme uygulanmıyor. Bu durumun riski ve önlemleri **R-25**'te izlenir. T3'te uygulanan önlemler: günlükte maskeleme (gerçek günlük dosyasıyla test edilir, #119), erişim kaydı (hesap işlemleri listelemesi), hesap işlemleri ekranında yalnızca ad, sicil ve firma (SYG-KMLK-073). |
-| **Durum** | Açık |
+| **Durum** | Açık. **13.11.2026:** Kan grubunu görebilen roller (Sistem Yöneticisi, İK) dâhil laboratuvarda çalışan tüm personelin gizlilik taahhüdü var ve İK biriminde saklanıyor (`KR-139` (8)); SYG-PERS-065 incelemesi T1 kabulünde |
 
 ### R-04 — Kapsam kayması
 | | |
@@ -124,11 +124,11 @@ raporunda ayrıca ele alınır.
 |---|---|
 | **Kategori** | Altyapı |
 | **Açıklama** | Mevcut HRMS, PostgreSQL 14 üzerinde çalışmaktadır ve bu sürümün üretici desteği **Kasım 2026**'da sona ermektedir. Yeni sisteme geçiş bu tarihten sonraya sarkarsa mevcut sistem desteksiz kalır. |
-| **O / E / Puan** | **3** / 2 / **6** *(2026-10-13'te 2/2/4'ten yükseltildi)* |
-| **Puan gerekçesi** | **Olasılık 3:** PostgreSQL 14 desteği Kasım 2026'da bitiyor. Üretim altyapısı için kaynak ayrıldı ama hedef tarih belirlenmedi (`KR-103` karar 4); kesimin destek bitişinden sonraya kalması artık neredeyse kesindir. **Etki 2:** Eski sistem yalnızca veri kaynağı olarak kalır ve yeni geliştirme yapılmaz; desteksiz sürümde güvenlik yaması alınamaz. |
+| **O / E / Puan** | **3** / 1 / **3** *(2026-11-13'te 3/2/6'dan düşürüldü, `KR-139`; 2026-10-13'te 2/2/4'ten 6'ya yükseltilmişti)* |
+| **Puan gerekçesi** | **Olasılık 3:** PostgreSQL 14 desteği Kasım 2026'da bitiyor. Üretim altyapısı için kaynak ayrıldı ama hedef tarih belirlenmedi (`KR-103` karar 4); kesimin destek bitişinden sonraya kalması artık neredeyse kesindir. **Etki 2:** Eski sistem yalnızca veri kaynağı olarak kalır ve yeni geliştirme yapılmaz; desteksiz sürümde güvenlik yaması alınamaz. **Etki 2 → 1 (13.11.2026, `KR-139`):** Desteği biten sunucu yalnızca mevcut İK uygulamasının veritabanıdır. Yeni sistem bu sunucuyu hiçbir ortamda kullanmaz; üretim, hazır sunuculardan birine kurulacak güncel PostgreSQL üzerinde çalışır. Mevcut uygulamada geliştirme yapılmadığı için desteğe ihtiyaç duyulmuyor. Kalan etki, eski sistemin kesime kadar güvenlik yaması almamasıdır; sunucu kurum içindedir. |
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | (1) **Karar (2026-09-04):** Yeni sistem, **ayrı bir sunucuda kurulacak güncel PostgreSQL sürümü** üzerinde çalışacaktır; mevcut sunucu ve sürüm yükseltilmeyecektir. (2) Geçiş tamamlanana kadar mevcut sistem yerinde kalacağı için, kesim tarihi Kasım 2026 sonrasına sarkarsa eski sistem desteksiz sürümde çalışmaya devam eder. Bu süre boyunca eski sistem yalnızca veri kaynağı olarak kullanılacak, yeni geliştirme yapılmayacaktır. (3) Kesim sonrası eski veritabanı salt-okunur arşive alınacaktır. **Güncelleme (2026-10-13):** Puan 6'ya çıktığı için risk aktif takibe alındı ve durum raporlarında ayrıca ele alınır (§1). |
-| **Durum** | Açık — **gerçekleşti (12.11.2026):** PostgreSQL 14'ün üretici desteği bitti; mevcut sistem desteksiz sürümde çalışıyor. Üretim altyapısı için hedef tarih hâlâ yok; karar talebi durum raporu 3'te yinelendi |
+| **Durum** | **Kabul edildi** — Bilgi İşlem (Doğuş Uçanok), 13.11.2026 (`KR-139`). Puan 3 olduğu için kabul yetkisi RACI'ye göre Bilgi İşlem'dedir. Puanı düşüren değerlendirmeyi ve kabulü aynı kişi yaptı; Üst Yönetim'e durum raporu 4 ile bilgi verilir. **Gerçekleşti (12.11.2026):** PostgreSQL 14'ün üretici desteği bitti. Üretim altyapısı proje bittiğinde kurulur; hedef tarih verilmez (`KR-139` (1)) |
 
 ### R-10 — Değerlendirme (rating) çerçevesinin elde bulunmaması
 | | |
@@ -220,7 +220,7 @@ raporunda ayrıca ele alınır.
 | **O / E / Puan** | 3 / 3 / **9** |
 | **Sahibi** | Bilgi İşlem |
 | **Önlem** | (1) **Sistem içi uyarı** (asıl önlem): Y4 Sistem Yönetimi modülünde sertifikanın kalan geçerlilik günü izlenir; eşiğin (varsayılan 10 gün) altına düştüğünde sistem yöneticisine **e-posta ve SMS** gönderilir — bkz. gereksinim #42. Uyarı, **sunulan** sertifikadan okunur; böylece "dosya yenilendi ama nginx yeniden yüklenmedi" durumu da yakalanır. (2) Alıcı tek kişi değil, **sistem yöneticisi rolüdür**; tek kişinin izinli olması uyarıyı kör etmez. (3) **Ara dönem** (Y4 hazır olana kadar): sertifikanın bitiş tarihi UAT runbook'una yazılır ve Bilgi İşlem takvim hatırlatmasıyla takip eder. (4) **HSTS bilinçli olarak kapalı tutulur**: sertifika kaçırılırsa kullanıcı uyarıyı atlayarak sisteme erişebilir; HSTS bunu imkânsız kılardı. HSTS ancak yenileme otomatikleştiğinde açılacaktır. |
-| **Durum** | Açık — ara dönem önlemi yürürlükte; asıl önlem A3 aşamasında (#42). **12.11.2026:** sunulan sertifika 16.12.2026'da bitiyor (Let's Encrypt); yenileme 16.11'den sonra #386 ile |
+| **Durum** | Açık — ara dönem önlemi yürürlükte; asıl önlem A3 aşamasında (#42). **12.11.2026:** sunulan sertifika 16.12.2026'da bitiyor (Let's Encrypt); yenileme 16.11'den sonra #386 ile. **13.11.2026:** yenileme 01.12.2026'da yapılacak (`KR-139` (6)) |
 
 ### R-19 — Üyelikte bilgilerin eşleştiğinin dolaylı olarak anlaşılması (`KR-078`)
 | | |
@@ -345,7 +345,7 @@ raporunda ayrıca ele alınır.
 | **O / E / Puan** | 3 / 2 / **6** |
 | **Puan gerekçesi** | **Olasılık 3:** Gerçekleşti; dört küme kayıt dışıydı. **Etki 2:** Kümeler geliştirici makinesinde ve yalnızca kurum içinden erişilebilen UAT sunucusunda duruyor; ifşa için ayrıca erişim gerekir. Temizlik ve kayıt sonrasında yeniden puanlanır. |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) **Uygulandı (13.10.2026, #207):** UAT'deki eski sır kopyası karşılaştırıldı ve silindi; döndürme gerekmedi (R-25 önlem 7). (2) Kayıt dışı kümeler bilgi kayıt defterine eklenir; `src_old/` için imha ve parola kararı verilir (#215). (3) Her modül sonu denetiminde bilgi kayıt defteri depo dışı konumlarla karşılaştırılır (`KR-101`). **Yeniden gerçekleşti (12.11.2026, T1 denetimi A-01):** `/opt/dsg-hrms/secrets/.env.uat.bak-20261103` (03.11; 21.10 içeriği) kayıt dışı; önlem 3 bunu yakaladı. (4) Karşılaştırma ve silme #386; dağıtım betiği `secrets/` dizininde beklenmeyen dosyayı uyarır (#391) |
+| **Önlem** | (1) **Uygulandı (13.10.2026, #207):** UAT'deki eski sır kopyası karşılaştırıldı ve silindi; döndürme gerekmedi (R-25 önlem 7). (2) Kayıt dışı kümeler bilgi kayıt defterine eklenir; `src_old/` için imha ve parola kararı verilir (#215). (3) Her modül sonu denetiminde bilgi kayıt defteri depo dışı konumlarla karşılaştırılır (`KR-101`). **Yeniden gerçekleşti (12.11.2026, T1 denetimi A-01):** `/opt/dsg-hrms/secrets/.env.uat.bak-20261103` (03.11; 21.10 içeriği) kayıt dışı; önlem 3 bunu yakaladı. (4) **Silindi (13.11.2026, #386):** Kopya, silmeden önce güncel dosyayla karşılaştırılmadı (#386'daki adım atlandı). Kopya güncel dosyayla aynı dizinde ve aynı izinlerdeydi (yalnız `root`); yeni bir açığa çıkma yolu açmadığı için sır döndürülmedi. (5) Dağıtım betiği `secrets/` dizininde beklenmeyen dosyayı uyarır (#391) |
 | **Durum** | Açık |
 
 ### R-31 — Denetim kayıtlarının değiştirilemezliğinin veritabanı süper kullanıcısına karşı korunmaması
@@ -377,18 +377,20 @@ raporunda ayrıca ele alınır.
 | Puan | Risk sayısı | Riskler |
 |---|---:|---|
 | 9 | 1 | R-18 |
-| 6 | 9 | R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-25, R-30 |
+| 6 | 8 | R-01, R-03, R-04, R-05, R-06, R-15, R-25, R-30 |
 | 4 | 6 | R-08, R-14, R-16, R-23, R-24, R-28 |
-| 3 | 5 | R-02, R-20, R-29, R-31, R-32 |
+| 3 | 6 | R-02, R-09, R-20, R-29, R-31, R-32 |
 | 2 | 5 | R-19, R-21, R-22, R-26, R-27 |
 | Kapandı | 6 | R-07, R-10, R-11, R-12, R-13, R-17 |
-| **Toplam** | **32** | Açık 10 · İzleniyor 13 · Kabul edildi 3 · Kapandı 6 |
+| **Toplam** | **32** | Açık 9 · İzleniyor 13 · Kabul edildi 4 · Kapandı 6 |
 
-**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-09, R-15, R-18, R-25, R-30
+**Aktif takip gerektiren (puan ≥ 6):** R-01, R-03, R-04, R-05, R-06, R-15, R-18, R-25, R-30
 
-**Kabul edilen riskler:** R-25 (Üst Yönetim, 09.10.2026, puan 6; `KR-103`), R-16 (Bilgi İşlem, puan 4; `KR-055`), R-19 (Bilgi İşlem, puan 2; `KR-078`). İkisinin de puanı 6'nın altında olduğu için kabul yetkisi Bilgi İşlem'dedir. 04.10.2026'daki özet R-16 için yanlışlıkla "Üst Yönetim kararı" yazıyordu (#177).
+**Kabul edilen riskler:** R-25 (Üst Yönetim, 09.10.2026, puan 6; `KR-103`), R-16 (Bilgi İşlem, puan 4; `KR-055`), R-19 (Bilgi İşlem, puan 2; `KR-078`), R-09 (Bilgi İşlem, 13.11.2026, puan 3; `KR-139`). Son üçünün puanı 6'nın altında olduğu için kabul yetkisi Bilgi İşlem'dedir. 04.10.2026'daki özet R-16 için yanlışlıkla "Üst Yönetim kararı" yazıyordu (#177).
 
-**Son gözden geçirme:** 2026-11-12 — T1 geliştirme sonu (süreç denetimi `MAN.8-kalite-guvence/raporlar/2026-11-12-t1-gelistirme-sonu-denetimi.md`, #385). **R-09 gerçekleşti:** PostgreSQL 14 desteği 12.11.2026'da bitti; üretim için hedef tarih yok. **R-30 yeniden gerçekleşti:** UAT'de kayıt dışı sır kopyası (#386). **R-31** 6 → 3 (önlemler UAT'de etkin). **R-18:** sertifika 16.12.2026'da bitiyor (#386). R-24'e T1 ölçümü işlendi. Yeni risk: **R-32** (özel nitelikli veri anahtarı). T1 döneminde R-29 beş kez gerçekleşti (#223, #250, #255, #288, #305); Dependabot'un orta önemli uyarısı (#5) kayıtsız kaldı (#393).
+**Son gözden geçirme:** 2026-11-13 — Durum raporu 3'ün karar konuları (`KR-139`, #388). **R-09** 3/2/6 → 3/1/3 ve **kabul edildi** (Bilgi İşlem): eski sunucu yeni sistemde kullanılmıyor. R-18: yenileme 01.12.2026. R-30: kopya silindi (#386). R-03: gizlilik taahhüdü kayıtları İK'da.
+
+Önceki: 2026-11-12 — T1 geliştirme sonu (süreç denetimi `MAN.8-kalite-guvence/raporlar/2026-11-12-t1-gelistirme-sonu-denetimi.md`, #385). **R-09 gerçekleşti:** PostgreSQL 14 desteği 12.11.2026'da bitti; üretim için hedef tarih yok. **R-30 yeniden gerçekleşti:** UAT'de kayıt dışı sır kopyası (#386). **R-31** 6 → 3 (önlemler UAT'de etkin). **R-18:** sertifika 16.12.2026'da bitiyor (#386). R-24'e T1 ölçümü işlendi. Yeni risk: **R-32** (özel nitelikli veri anahtarı). T1 döneminde R-29 beş kez gerçekleşti (#223, #250, #255, #288, #305); Dependabot'un orta önemli uyarısı (#5) kayıtsız kaldı (#393).
 
 Önceki: 2026-10-13 — T3 modül kapanışı (T3 kabul edildi, `KR-105`; modül sonu denetimi MAN.8 Ek A §8.1). **R-09** 4 → 6'ya yükseldi ve aktif takibe girdi (PostgreSQL 14 desteği Kasım 2026'da bitiyor, üretim için hedef tarih yok). **R-20** 6 → 3'e düştü (sertifika 27.03.2027'ye kadar geçerli) ve aktif takipten çıktı. R-08, R-19, R-21, R-23, R-25, R-26, R-27 güncellendi. Yeni riskler: **R-28** (otomatik kontrollerin sessizce etkisiz kalması, #208), **R-29** (tekrarlayan bağımlılık açıkları), **R-30** (kayıt dışı gizli bilgi kopyaları, #207, #215). Bölüm sırası düzeltildi: R-11 yerine, R-17…R-30 §2'ye taşındı; içerik taşıma sırasında değişmedi.
 
@@ -434,3 +436,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-10-24 | 1.14 | R-29: yedinci olay (`zod`, `vitest`; #288, #286, #290) | Bilgi İşlem |
 | 2026-11-01 | 1.15 | R-29: sekizinci olay (`follow-redirects`; #305) | Bilgi İşlem |
 | 2026-11-12 | 1.16 | T1 geliştirme sonu gözden geçirmesi (#385): R-09 gerçekleşti; R-18 bitiş tarihi ve #386; R-24 T1 ölçümü; R-30 yeniden gerçekleşti, önlem 4; R-31 2/3/6 → 1/3/3, İzleniyor; R-32 eklendi; özet güncellendi | Bilgi İşlem |
+| 2026-11-13 | 1.17 | Durum raporu 3 kararları (`KR-139`, #388): R-09 3/2/6 → 3/1/3, Bilgi İşlem kabulü; R-18 yenileme tarihi; R-30 önlem 4 (kopya silindi); R-03 gizlilik taahhüdü; özet güncellendi | Bilgi İşlem |
