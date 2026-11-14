@@ -76,7 +76,7 @@ raporunda ayrıca ele alınır.
 | **Açıklama** | Modül gereksinim toplantılarında sürekli yeni talep gelmesi nedeniyle modüllerin kapanmaması ve projenin uzaması. |
 | **O / E / Puan** | 3 / 2 / **6** |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) Her modül için gereksinimler yazılı olarak kilitlenecek ve İK tarafından onaylanacak. (2) Sonradan gelen talepler `degisiklik-talebi` etiketli GitHub Issue olarak açılacak, mevcut modüle eklenmeyecek, sonraki sürüme alınacak. (3) Değişikliklerin etkisi durum raporlarında görünür kılınacak. |
+| **Önlem** | (1) Her modül için gereksinimler yazılı olarak kilitlenecek ve İK tarafından onaylanacak. (2) Sonradan gelen talepler `degisiklik-talebi` etiketli GitHub Issue olarak açılacak, mevcut modüle eklenmeyecek, sonraki sürüme alınacak. (3) Değişikliklerin etkisi durum raporlarında görünür kılınacak. (4) Değişiklik talebinin onaylayan rolü CI'da denetlenir: paydaş gereksinimi veya İK kararı değişiyorsa İK onayı birleştirmeden önce kayıtlı olmalı; birleştirme onaysız yapılırsa `main`'deki denetim düzeltici faaliyet açar. T1'de dört talep İK onayı olmadan birleşmişti (#387, `TEC.2-paydas-ihtiyac-ve-gereksinimleri/kayitlar/2026-11-14-t1-degisiklik-talebi-onay-kaydi.md`). |
 | **Durum** | Açık |
 
 ### R-05 — Bilgi tekelliği (tek kişiye bağımlılık)
@@ -440,3 +440,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-11-12 | 1.16 | T1 geliştirme sonu gözden geçirmesi (#385): R-09 gerçekleşti; R-18 bitiş tarihi ve #386; R-24 T1 ölçümü; R-30 yeniden gerçekleşti, önlem 4; R-31 2/3/6 → 1/3/3, İzleniyor; R-32 eklendi; özet güncellendi | Bilgi İşlem |
 | 2026-11-13 | 1.17 | Durum raporu 3 kararları (`KR-139`, #388): R-09 3/2/6 → 3/1/3, Bilgi İşlem kabulü; R-18 yenileme tarihi; R-30 önlem 4 (kopya silindi); R-03 gizlilik taahhüdü; özet güncellendi | Bilgi İşlem |
 | 2026-11-14 | 1.18 | R-23 önlem 5 (`KR-140`, #390) | Bilgi İşlem |
+| 2026-11-14 | 1.19 | R-04 önlem 4: değişiklik talebinde onaylayan rol denetimi (#387) | Bilgi İşlem |

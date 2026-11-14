@@ -15,6 +15,12 @@ body:
         issue'ya `Paydaş onayı: GG.AA.YYYY — <onaylayan rol> — <kanal>` biçiminde
         bir yorum yazılır.
 
+        **Onaylayan rol denetlenir (#387).** Paydaş gereksinimi (PG) veya İK kararı
+        değişiyorsa onay satırının rol alanında **İK** olmalıdır (RACI §3.1: TEC.2'yi
+        İK onaylar). Onay Bilgi İşlem aracılığıyla geldiyse rol yine İK yazılır ve
+        "(Doğuş Uçanok bildirdi)" eklenir. Yalnızca sistem gereksinimi (SYG), ADR
+        veya teknik parametre değişiyorsa Bilgi İşlem onayı yeterlidir.
+
   - type: textarea
     id: request
     attributes:
@@ -58,11 +64,25 @@ body:
     validations:
       required: true
 
+  # #387: T1'de dort PG degisikligi yalnizca Bilgi Islem onayiyla birlesti; onaylayacak rol
+  # talep acilirken belirlenir. CI, "IK" secildiyse onay satirinda IK rolunu arar.
+  - type: dropdown
+    id: approver_role
+    attributes:
+      label: "Onaylaması gereken rol"
+      description: "RACI §3.1. Paydaş gereksinimi veya İK kararı değişiyorsa İK. Yanlış seçim CI'ı geçirmez: PR paydaş gereksinimi belgesini değiştiriyorsa CI yine İK onayı arar."
+      options:
+        - "İK — paydaş gereksinimi (PG) veya İK kararı değişiyor"
+        - "Bilgi İşlem — yalnızca sistem gereksinimi (SYG), ADR veya teknik parametre"
+        - "Üst Yönetim — kapsam veya takvim değişikliği (büyük etki)"
+    validations:
+      required: true
+
   - type: input
     id: approval
     attributes:
       label: "Paydaş onayı"
-      description: "Tarih, onaylayan rol ve kanal. Onay henüz yoksa boş bırakılır; onay gelince yorumla eklenir."
+      description: "Biçim: GG.AA.YYYY — <onaylayan rol> — <kanal>. Rolü yazılmamış onay sayılmaz. Onay henüz yoksa boş bırakılır; onay gelince yorumla eklenir."
       placeholder: "10.10.2026 — İK birim yöneticisi — e-posta (BK-nn) / toplantı kaydı"
     validations:
       required: false
