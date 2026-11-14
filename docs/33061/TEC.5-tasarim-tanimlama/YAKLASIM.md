@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.5-YAK
 **Süreç:** TEC.5 — Tasarım Tanımlama
-**Son güncelleme:** 2026-10-22
+**Son güncelleme:** 2026-11-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir. Ayrıca `PA 2.1` için hedef, sorumluluk, kaynak ve arayüzler (§1, §3, §4).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -34,7 +34,7 @@ yorumunda kalır (`docs/adr/README.md`, "Ne zaman ADR yazılır?").
 | Kurumsal veya teknik karar ("ne") | `KR-084` denetleyici + FluentValidation, `KR-094` kimlik olayları tablosu | `docs/karar-kayit-defteri.md` |
 | Gereksinim yorumu | AN-01…AN-24 (ör. AN-05: kilit sayacı girilen e-postaya bağlı) | `SYG-<MODÜL>.md` §6 |
 | Öğeler ve gereksinim tahsisi | Öğe → konum ve SYG aralığı tablosu; madde madde SYG → öğe ve bileşen tahsisi | `SYG-<MODÜL>.md` §2.2 ve §2.5 |
-| Durum ve akış diyagramları | Hesap ve oturum durumları, üyelik akışı (Mermaid, koddan çıkarılmış ve kanıtlı) | `docs/mimari/<modül>-tasarim-diyagramlari.md` (T3: `kimlik-tasarim-diyagramlari.md`) |
+| Durum ve akış diyagramları | Hesap ve oturum durumları, üyelik akışı (Mermaid, koddan çıkarılmış ve kanıtlı) | `docs/mimari/<modül>-tasarim-diyagramlari.md` (T3: `kimlik-tasarim-diyagramlari.md`; T1: `personel-tasarim-diyagramlari.md`) |
 | Arayüz | HTTP API sözleşmesi; LOGO, NetGSM, SMTP, tarayıcı | `docs/api/openapi-v1.json`; `SYG-<MODÜL>.md` §2.3 |
 | Yardımcı mimari belgeler | Modül listesi, izin listesi, paket envanteri | `docs/mimari/` |
 
@@ -168,7 +168,7 @@ riskleri R-05 ve R-23 olarak izlenir.
 
 | 33061 çıktısı (TEC.5) | Karşılığı | Durum |
 |---|---|---|
-| a) Her öğenin tasarım özellikleri tanımlanır | ADR'ler, gerçekleştirme notları, `docs/mimari/` (T3 diyagramları dahil) | Var (diyagramlar #234) |
+| a) Her öğenin tasarım özellikleri tanımlanır | ADR'ler, gerçekleştirme notları, `docs/mimari/` (T3 ve T1 diyagramları dahil) | Var (diyagramlar #234; T1 #389) |
 | b) Gereksinimler öğelere dağıtılır | SYG §2.2 (öğe → SYG aralığı) ve §2.5 (SYG → öğe ve bileşen) | Var (#234) |
 | c) Tasarımı mümkün kılan araç ve kararlar | ADR-0001, `docs/mimari/paket-envanteri.md`, `KR-084` | Var |
 | d) Öğeler arası arayüzler tanımlanır | OpenAPI + sözleşme denetimi; SYG §2.3 | Var |
@@ -205,3 +205,4 @@ geçirilir.
 | 2026-10-15 | 1.2 | §7 ve §8: madde 2, 3 ve 4'ün diyagram kısmı #234'e bağlandı; madde 4'ün entegrasyon belgesi kısmı ve madde 5 kapandı (`KR-111`, #217) | Bilgi İşlem |
 | 2026-10-20 | 1.3 | §1.1, §5: SYG §2.5 tahsis ve diyagram belgesi; §2.5 tasarım gözden geçirmesi adımı; §7 a, b, h ve §8 madde 2, 3, 4 kapandı (#234) | Bilgi İşlem |
 | 2026-10-22 | 1.4 | §2.5: T1 tasarım gözden geçirmesi uygulandı (#267) | Bilgi İşlem |
+| 2026-11-14 | 1.5 | §1.1, §7 (a): T1 diyagram belgesi; SYG §2.2 ve §2.5 yollarının ve kapsamının CI denetimi (T1 geliştirme sonu denetimi TEC.5-11, #389) | Bilgi İşlem |

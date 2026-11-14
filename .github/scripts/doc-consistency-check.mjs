@@ -222,6 +222,57 @@ function checkAdrs(readme, adrs, register) {
   return errors;
 }
 
+// ------------------------------------------------------------------ 4. SYG tahsisi koda bagli (#389)
+//
+// SYG-PERS §2.2'deki konumlar planlandigi gibi kaldi, kod baska yerde kuruldu
+// (`Infrastructure/Security` hic olmadi); §2.5 dosya duzeyi tahsis bos kaldi (TEC.5-11). Iki kural:
+//   a. Bolum 4'teki her gereksinimin bolum 2.5'te bir satiri var.
+//   b. Bolum 2.2 ve 2.5'te ters tirnak icindeki her yol depoda var. Kisaltmalar (Api/, App/,
+//      Dom/, Inf/, T/, F/, FP/, FI/) acilir; yalniz dosya adi ("Person.cs") depoda bir yerde aranir.
+const PATH_PREFIXES = [
+  ['Api/', 'src/backend/Dsg.Hrms.Api/'], ['App/', 'src/backend/Dsg.Hrms.Application/'],
+  ['Dom/', 'src/backend/Dsg.Hrms.Domain/'], ['Inf/', 'src/backend/Dsg.Hrms.Infrastructure/'],
+  ['T/', 'src/backend/tests/'], ['FP/', 'src/frontend/dsg-hrms-web/src/features/personnel/'],
+  ['FI/', 'src/frontend/dsg-hrms-web/src/features/identity/'], ['F/', 'src/frontend/dsg-hrms-web/src/'],
+  ['Dsg.Hrms.', 'src/backend/Dsg.Hrms.'], ['features/', 'src/frontend/dsg-hrms-web/src/features/'],
+  // SYG-KMLK §2.2 frontend yollarini src/ kokune gore yazar ("shared/auth/", "app/").
+  ['shared/', 'src/frontend/dsg-hrms-web/src/shared/'], ['app/', 'src/frontend/dsg-hrms-web/src/app/'],
+];
+const FILE_EXT = /\.(cs|ts|tsx|sql|md|json|sh|yml)$/;
+
+function subsection(text, heading, next) {
+  const start = text.indexOf(heading);
+  if (start < 0) return '';
+  const end = text.indexOf(next, start + heading.length);
+  return text.slice(start, end < 0 ? undefined : end);
+}
+
+// index: { files: Set, dirs: Set, names: Set } — depodaki yollar.
+function checkAllocation(module, text, index) {
+  const errors = [];
+  const s22 = subsection(text, '### 2.2', '\n### ');
+  const s25 = subsection(text, '### 2.5', '\n## ');
+  if (!s25) return [`SYG-${module}: §2.5 bulunamadı`];
+  const allocated = new Set([...s25.matchAll(new RegExp(`^\\| SYG-${module}-(\\d{3}) \\|`, 'gm'))].map((m) => m[1]));
+  const required = [...text.matchAll(new RegExp(`^\\| \\*\\*SYG-${module}-(\\d{3})\\*\\* \\|`, 'gm'))].map((m) => m[1]);
+  const missing = required.filter((n) => !allocated.has(n));
+  if (missing.length) errors.push(`SYG-${module}: §4'teki ${missing.length} gereksinim §2.5'te yok: ${missing.map((n) => `SYG-${module}-${n}`).join(', ')}`);
+  // Yalnizca tablo satirlari; aciklama paragraflari ornek kisaltma tasir ("`Api/`").
+  const rows = (s22 + '\n' + s25).split('\n').filter((l) => l.startsWith('| ') && !/^\|\s*-/.test(l));
+  for (const token of new Set(rows.flatMap((l) => [...l.matchAll(/`([^`\s]+)`/g)].map((m) => m[1])))) {
+    const looksLikePath = (token.includes('/') && !token.startsWith('/')) || FILE_EXT.test(token);
+    if (!looksLikePath || /^(personnel|reference|notification|audit)\./.test(token)) continue;
+    // Onek, sondaki "/" silinmeden eslenir ("app/" -> F/app).
+    const prefix = PATH_PREFIXES.find(([p]) => token.startsWith(p));
+    const path = (prefix ? prefix[1] + token.slice(prefix[0].length) : token).replace(/\/$/, '');
+    const ok = path.includes('/')
+      ? index.files.has(path) || index.dirs.has(path)
+      : index.names.has(path);
+    if (!ok) errors.push(`SYG-${module}: §2.2/§2.5'teki yol depoda yok: ${token}`);
+  }
+  return errors;
+}
+
 // ------------------------------------------------------------------ calistir
 
 function markdownFiles() {
@@ -322,6 +373,38 @@ if (!adrFiles.length) {
       for (const e of errors) console.error(`    ${e}`);
     } else {
       console.log(`✓ ADR: ${adrs.length} ADR dizinle, başlık karar listeleriyle ve karar defteriyle tutarlı`);
+    }
+  }
+}
+
+// --- 4. SYG tahsisi koda bagli (#389)
+{
+  const listed = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], { cwd: ROOT, encoding: 'utf8' })
+    .split('\0').filter(Boolean);
+  const index = { files: new Set(listed), dirs: new Set(), names: new Set() };
+  for (const f of listed) {
+    index.names.add(f.split('/').pop());
+    const parts = f.split('/');
+    for (let i = 1; i < parts.length; i++) index.dirs.add(parts.slice(0, i).join('/'));
+  }
+  for (const module of modules) {
+    const systemDoc = read(join(systemDir, `SYG-${module}.md`));
+    if (!systemDoc.includes('### 2.5')) continue;
+    // Once denetimin kendisi: §2.5'ten ilk satir silinince ve bir yol bozulunca yakalamali.
+    const firstRow = systemDoc.match(new RegExp(`^\\| SYG-${module}-\\d{3} \\|.*\\n`, 'm'));
+    const firstPath = firstRow?.[0].match(/`([^`\s]*\/[^`\s]*)`/);
+    const dropped = firstRow ? checkAllocation(module, systemDoc.replace(firstRow[0], ''), index) : [];
+    const brokenPath = firstPath ? checkAllocation(module, systemDoc.replace(firstRow[0], firstRow[0].replace(firstPath[1], firstPath[1] + 'Yok')), index) : [];
+    if (!dropped.some((e) => e.includes('§2.5\'te yok')) || !brokenPath.some((e) => e.includes('depoda yok'))) {
+      fail(`SYG-${module}: tahsis denetimi kendi sınamasını geçemedi — silinen satır veya bozulan yol yakalanmadı`);
+      continue;
+    }
+    const errors = checkAllocation(module, systemDoc, index);
+    if (errors.length) {
+      fail(`SYG-${module}: tahsis ${errors.length} sorun (§2.2, §2.5; TEC.5 YAKLASIM §2.5)`);
+      for (const e of errors) console.error(`    ${e}`);
+    } else {
+      console.log(`✓ SYG-${module}: §2.5 her gereksinimi kapsıyor; §2.2 ve §2.5'teki yollar depoda var`);
     }
   }
 }

@@ -5,7 +5,7 @@
 **Modül:** T1 Personel Yönetimi
 **Kaynak:** `TEC.2/paydas-gereksinimleri/PG-PERS.md` (19.10.2026'da İK onaylı, 45 gereksinim; değişiklik talebi #270)
 **Tasarım:** ADR-0019…ADR-0022 (`KR-121`…`KR-126`); T1 tasarım gözden geçirmesi (`TEC.5-tasarim-tanimlama/raporlar/2026-10-22-t1-tasarim-gozden-gecirme.md`)
-**Son güncelleme:** 2026-11-13
+**Son güncelleme:** 2026-11-14
 **Sahibi:** Bilgi İşlem
 **Onay durumu:** Bilgi İşlem (RACI TEC.3 A); değişiklikler PR onayıyla (`KR-096`). Baseline, T1'in kabul etiketiyle yazılır (`KR-097`, `KR-111`); o zamana kadar geliştirme sürüyor.
 
@@ -56,24 +56,29 @@ kez burada tam olarak kurulur.
 
 ### 2.2 Öğeler
 
-Konumlar ADR-0002 ve ADR-0016'ya göre planlanmıştır; kod yazıldıkça kesinleşir ve tablo
-aynı PR'da güncellenir. Bir SYG birden çok öğeye dağılabilir.
+Konumlar 14.11.2026'da koddan çıkarıldı (#389; T1 geliştirme sonu denetimi TEC.5-11). İlk sürümdeki
+plan iki yerde koddan ayrılmıştı: şifreleme `Infrastructure/Security` yerine
+`Personnel/Protection` altında kuruldu; dışa aktarma, uygulama servisleri ve yetki sözlüğü
+tabloda yoktu. "Karşıladığı SYG-PERS" sütunu §2.5'teki dosya düzeyi tahsisten hesaplanır. Kodun
+yeri değiştiğinde iki tablo aynı PR'da güncellenir; yolların varlığını CI denetler
+(`doc-consistency-check.mjs` §4). Bir SYG birden çok öğeye dağılabilir.
 
-| Öğe | Ne yapar | Konum | Karşıladığı SYG-PERS | ADR |
-|---|---|---|---|---|
-| Personel ekranları | Liste (kart ızgarası ve tablo), kişi kartı, kendi profilim, senkronizasyon durumu, veri kalitesi raporu, düzeltme talepleri | `src/frontend/dsg-hrms-web/src/features/personnel/` | 008–010, 017, 020, 023–025, 027–032, 034, 036–040, 042–046, 048, 056, 070–071, 073 | 0015; 0019 |
-| Personel API'si | Liste, kart, fotoğraf, tarihçe, dışa aktarma, HRMS'te girilen alanlar, düzeltme talebi, senkronizasyon | `Dsg.Hrms.Api/Personnel` — `/api/v1/personnel/` | 008–010, 020, 024, 026, 029–033, 036, 041–045, 048, 051, 070, 074 | 0010; 0019 |
-| Kapsamlı sorgu ve görünürlük politikası | `ICurrentUserScope`, `IPersonnelQuery`, `PersonFieldVisibility` | `Dsg.Hrms.Application/Personnel`, `Dsg.Hrms.Infrastructure/Personnel` | 022, 024–028, 030–031, 050–054, 063 | 0019 §1–§2, §6 |
-| Personel alan modeli | Kişi genişlemesi, korumalı alanlar, fotoğraf, atama, görev, evlilik, acil durum, şube ve birim | `Dsg.Hrms.Domain/Personnel`; `personnel` şeması | 003, 006, 015–016, 018–019, 021, 035–036, 039, 042–043, 054, 067 | 0021 §1–§3, §6 |
-| LOGO senkronizasyon işi (genişler) | Yeni alanlar, fotoğraf özeti, tarih aralıklı atama, şema denetimi | `Dsg.Hrms.Application/Personnel/Sync`, `Dsg.Hrms.Infrastructure/Logo` | 001–005, 007, 011, 013–014, 018, 021 | 0003; 0021 §2, §4–§5 |
-| Şifreleme | Özel nitelikli veri anahtarı, AES-256-GCM, yeniden şifreleme işi | `Dsg.Hrms.Infrastructure/Security` | 005, 049, 060–062 | 0020 |
-| Referans veri çekirdeği | Ünvan ve görev tanımları, yönetim ekranı | `Reference` ad alanı; `reference.definition` | 038, 042, 072 | 0022 §1 |
-| Uygulama içi bildirim çekirdeği | Bildirim kutusu, okunmamış sayısı | `notification.inbox_item` | 012, 046 | 0022 §3 |
-| Düzeltme talebi | "İK'ya bildir" talebi, İK listesi ve kapatma | `personnel.correction_request` | 045–049 | 0022 §3 |
-| Denetim kayıtları ekranı | Dört kayıt türünü salt okunur listeleme | `Dsg.Hrms.Api/Audit`, `features/audit/` | 069 | 0022 §2 |
-| Denetim izi ve erişim kaydı (genişler) | Kişi bazlı liste ve dışa aktarma kaydı, korumalı süzgeç | `Dsg.Hrms.Infrastructure/Audit` | 033, 057–059, 064, 066 | 0009; 0019 §5 |
-| Parametre deposu (genişler) | T1 parametreleri | `system_parameter`; `Dsg.Hrms.Application/Settings` | 007, 012, 028–029, 047, 068, 075 | 0022 §5 |
-| İleti kuyruğu (mevcut) | "İK'ya bildir" e-postası | `Dsg.Hrms.Infrastructure/Notifications` | 047 | 0012 §4 |
+| Kod | Öğe | Ne yapar | Konum | Karşıladığı SYG-PERS | ADR |
+|---|---|---|---|---|---|
+| `E` | Personel ekranları | Liste (kart ızgarası ve tablo), kişi kartı, kendi profilim, senkronizasyon durumu, veri kalitesi raporu, düzeltme talepleri | `src/frontend/dsg-hrms-web/src/features/personnel/`; ortak bileşenler `src/frontend/dsg-hrms-web/src/shared/` | 008–010, 017, 020, 022–027, 029–030, 032–034, 036–045, 048, 052, 056–057, 070–071, 073 | 0015; 0019 |
+| `P` | Personel API'si | Liste, kart, fotoğraf, tarihçe, HRMS'te girilen alanlar, senkronizasyon, veri kalitesi | `src/backend/Dsg.Hrms.Api/Personnel/` — `/api/v1/personnel/` | 001, 008–010, 019–020, 022–024, 029, 032–033, 036, 038–040, 042–044, 051–052, 056–057, 066, 070–071, 074 | 0010; 0019 |
+| `U` | Personel uygulama servisleri | Kart, liste, tarihçe, görev, evlilik, acil durum kişisi, veri kalitesi; HRMS alanlarının depoları | `src/backend/Dsg.Hrms.Application/Personnel/` (`Cards`, `Listing`, `History`, `Duties`, `Marriage`, `EmergencyContacts`, `Quality`); `src/backend/Dsg.Hrms.Infrastructure/Personnel/` | 016–020, 022, 024–027, 029, 031, 033–036, 038–044, 051–053, 055, 057–059, 063, 066, 070–071 | 0019; 0021 |
+| `S` | Kapsamlı sorgu ve görünürlük politikası | `ICurrentUserScope`, `IPersonnelQuery`, `PersonFieldVisibility`, maske | `src/backend/Dsg.Hrms.Application/Personnel/Access/`; `src/backend/Dsg.Hrms.Infrastructure/Personnel/PersonnelQuery.cs`, `CurrentUserScope.cs` | 020, 022, 024, 028, 030–032, 034, 036, 038–043, 050–053, 063 | 0019 §1–§2, §6 |
+| `M` | Personel alan modeli | Kişi genişlemesi, korumalı alanlar, fotoğraf, atama, görev, evlilik, acil durum; tablo yapılandırmaları | `src/backend/Dsg.Hrms.Domain/Personnel/`; `src/backend/Dsg.Hrms.Infrastructure/Data/Configurations/`; `personnel` şeması | 003, 006, 013–015, 017–019, 021, 030, 034–036, 038–043, 045–046, 052, 054, 067, 069 | 0021 §1–§3, §6 |
+| `L` | LOGO senkronizasyon işi (genişler) | Yeni alanlar, fotoğraf özeti ve küçük hâli, tarih aralıklı atama, şema denetimi, uyarılar | `src/backend/Dsg.Hrms.Application/Personnel/Sync/`; `src/backend/Dsg.Hrms.Infrastructure/Logo/`; `src/backend/Dsg.Hrms.Infrastructure/Personnel/PersonnelSyncWorker.cs` | 001–008, 010–015, 018, 021, 070 | 0003; 0021 §2, §4–§5 |
+| `T` | Düzeltme talebi | "İK'ya bildir" talebi, İK listesi ve kapatma | `src/backend/Dsg.Hrms.Application/Personnel/Corrections/`; `src/backend/Dsg.Hrms.Infrastructure/Personnel/CorrectionStore.cs`; `personnel.correction_request` | 045–049 | 0022 §3 |
+| `A` | Dışa aktarma | Alan seçmeli Excel ve PDF, rapor yazıcıları | `src/backend/Dsg.Hrms.Application/Personnel/Export/`; `src/backend/Dsg.Hrms.Application/Common/Reports/`; `src/backend/Dsg.Hrms.Infrastructure/Reports/` | 032–033, 035, 039, 053, 059 | 0014; 0022 §4; 0023 |
+| `B` | Uygulama içi bildirim ve ileti | Bildirim kutusu, okunmamış sayısı; "İK'ya bildir" e-postası | `src/backend/Dsg.Hrms.Domain/Notifications/`, `src/backend/Dsg.Hrms.Application/Notifications/`, `src/backend/Dsg.Hrms.Api/Notifications/`, `src/backend/Dsg.Hrms.Infrastructure/Notifications/`; `notification.inbox_item` | 012, 046–047 | 0012 §4; 0022 §3 |
+| `V` | Referans veri çekirdeği | Ünvan, görev ve diğer tanımlar; yönetim ekranı | `src/backend/Dsg.Hrms.Domain/Reference/`, `src/backend/Dsg.Hrms.Application/Reference/`, `src/backend/Dsg.Hrms.Api/Reference/`; `src/frontend/dsg-hrms-web/src/features/reference/`; `reference.definition` | 072, 074 | 0022 §1 |
+| `X` | Şifreleme | Özel nitelikli veri anahtarı, AES-256-GCM, yeniden şifreleme işi | `src/backend/Dsg.Hrms.Infrastructure/Personnel/Protection/`; `src/backend/Dsg.Hrms.Application/Personnel/Protection/`; `src/frontend/dsg-hrms-web/src/features/system/` | 049, 060–062 | 0020 |
+| `D` | Denetim izi, erişim kaydı ve denetim kayıtları ekranı | Kişi bazlı liste ve dışa aktarma kaydı; dört kayıt türünü salt okunur listeleme | `src/backend/Dsg.Hrms.Application/Audit/`; `src/backend/Dsg.Hrms.Infrastructure/Audit/`; `src/backend/Dsg.Hrms.Api/Audit/`; `src/frontend/dsg-hrms-web/src/features/audit/` | 033, 058, 062, 064, 067, 069, 074 | 0009; 0019 §5; 0022 §2 |
+| `R` | Parametre deposu (genişler) | T1 parametreleri ve ekranı | `src/backend/Dsg.Hrms.Application/Settings/`; `src/backend/Dsg.Hrms.Infrastructure/Settings/`; `system_parameter` | 007, 012, 028–029, 047, 068, 075 | 0022 §5 |
+| `Y` | Yetki sözlüğü | T1 izinleri ve rollere dağılımı | `src/backend/Dsg.Hrms.Application/Identity/Authorization/Permissions.cs` | 008–009, 030, 032, 048, 050, 052, 055, 062, 069–070, 072 | 0007; 0019 §4 |
 
 ### 2.3 Dış arayüzler
 
@@ -105,9 +110,103 @@ aktarma (SYG-PERS-032).
 
 ### 2.5 SYG → tasarım tahsisi (TEC.5 çıktısı b)
 
-Her SYG'nin tasarım kararı izlenebilirlik matrisi §7'nin "Tasarım" sütunundadır ve §2.2'deki
-öğe tablosu ADR bölümünü gösterir. Dosya düzeyindeki tahsis (SYG-KMLK §2.5 gibi), kod
-yazıldıkça bu bölüme eklenir; T1 kabulünden önce tamamlanır.
+Her sistem gereksiniminin hangi öğe(ler)de ve hangi ana bileşende karşılandığı. Tablo
+14.11.2026'da koddan çıkarıldı: kod yorumlarındaki ve testlerdeki `SYG-PERS-nnn` atıfları
+(79 gereksinimin 74'ü), atıfsız olanlar için kodun ve kısıtı sınayan testin elle bulunması
+(#389; T1 geliştirme sonu denetimi TEC.5-11). Kodun yeri değiştiğinde tablo aynı PR'da
+güncellenir. Tablodaki her yolun var olduğunu ve §4'teki her gereksinimin burada bulunduğunu
+CI denetler (`doc-consistency-check.mjs` §4). ADR sütunu izlenebilirlik matrisi §7'nin
+"Tasarım" sütunundan gelir (paydaş gereksinimi düzeyinde; bölüm numarası matristedir).
+
+- **Ana bileşen** gereksinimi karşılayan en fazla dört üretim dosyasıdır. Üretimde karşılığı
+  olmayan bir kısıt ("istekte LOGO'ya bağlanılmaz", "süzgeç yoktur") için kısıtı sınayan test
+  yazılır. Kod dışı kontrol ve performans ölçütü için kayıt gösterilir.
+- **Öğe kodları** §2.2'dedir.
+- **Yol kısaltmaları:** `Api/`, `App/`, `Dom/`, `Inf/` =
+  `src/backend/Dsg.Hrms.{Api,Application,Domain,Infrastructure}/`; `T/` = `src/backend/tests/`;
+  `F/` = `src/frontend/dsg-hrms-web/src/`; `FP/` = `F/features/personnel/`.
+
+| SYG | Öğe | Ana bileşen | ADR |
+|---|---|---|---|
+| SYG-PERS-001 | `P` `L` | `T/Dsg.Hrms.Api.IntegrationTests/Personnel/PersonnelLogoIndependenceApiTests.cs`, `T/Dsg.Hrms.Architecture.Tests/LayerDependencyTests.cs` (kısıt: istek sırasında LOGO bağlantısı yok) | 0003; 0021 |
+| SYG-PERS-002 | `L` | `Inf/Logo/LogoDbContext.cs`; `T/Dsg.Hrms.Api.IntegrationTests/Logo/LogoReadOnlyAccessTests.cs`, `T/Dsg.Hrms.Architecture.Tests/LayerDependencyTests.cs` | 0003 |
+| SYG-PERS-003 | `M` `L` | `App/Personnel/Sync/ILogoPersonnelSource.cs`, `App/Personnel/Sync/PersonnelDetailsSynchronizer.cs`, `App/Personnel/Sync/PersonnelSyncService.cs`, `Dom/Personnel/Person.cs` | 0003; 0019; 0021; 0022 |
+| SYG-PERS-004 | `L` | `App/Personnel/Sync/ILogoPersonnelSource.cs`, `Inf/Logo/LogoSchema.cs` | 0019; 0020; 0021 |
+| SYG-PERS-005 | `L` | `App/Personnel/Sync/ILogoPersonnelSource.cs`, `App/Personnel/Sync/PersonnelDetailsSynchronizer.cs`, `Inf/Logo/LogoOptions.cs`, `Inf/Logo/LogoPersonnelSource.cs` | 0019; 0020; 0021 |
+| SYG-PERS-006 | `M` `L` | `T/Dsg.Hrms.Architecture.Tests/PersonnelWriteBoundaryTests.cs` (kısıt: LOGO alanına yazma ucu yok; HRMS alanları ayrı tablolarda) | 0021 |
+| SYG-PERS-007 | `L` `R` | `Inf/Personnel/PersonnelSyncWorker.cs`, `App/Personnel/Sync/PersonnelSyncOptions.cs`, `App/Settings/ParameterCatalog.cs` | 0003 |
+| SYG-PERS-008 | `E` `P` `L` `Y` | `App/Personnel/Sync/IPersonnelSyncStatus.cs`, `Api/Personnel/PersonnelSyncRunsController.cs`, `FP/api/syncApi.ts`, `FP/pages/SyncRunsPage.tsx` | 0003 |
+| SYG-PERS-009 | `E` `P` `Y` | `Api/Personnel/PersonnelSyncRunsController.cs` | 0003 |
+| SYG-PERS-010 | `E` `P` `L` | `App/Personnel/Sync/IPersonnelSyncStatus.cs`, `Api/Personnel/SyncFreshnessController.cs`, `FP/api/personsApi.ts`, `FP/components/SyncFreshness.tsx` | 0003 |
+| SYG-PERS-011 | `L` | `Inf/Logo/LogoSchema.cs` | 0003; 0021 |
+| SYG-PERS-012 | `L` `B` `R` | `App/Personnel/Sync/PersonnelSyncAlerts.cs`, `App/Personnel/Sync/PersonnelSyncService.cs`, `App/Settings/ParameterCatalog.cs`, `Dom/Notifications/InboxItem.cs` | 0003; 0021 |
+| SYG-PERS-013 | `M` `L` | `App/Personnel/Sync/IPersonnelSyncStore.cs`, `App/Personnel/Sync/PersonnelPhotoSynchronizer.cs`, `App/Personnel/Sync/PersonnelSyncService.cs`, `Dom/Personnel/PersonProfile.cs` | 0021 |
+| SYG-PERS-014 | `M` `L` | `App/Personnel/Sync/ILogoPersonnelSource.cs`, `App/Personnel/Sync/IPersonnelSyncStore.cs`, `App/Personnel/Sync/IPhotoThumbnailer.cs`, `App/Personnel/Sync/PersonnelPhotoSynchronizer.cs` | 0021 |
+| SYG-PERS-015 | `L` `M` | `App/Personnel/Sync/PersonnelSynchronizer.cs`, `Dom/Personnel/Person.cs`; `T/Dsg.Hrms.Api.IntegrationTests/Personnel/PersonListApiTests.cs` | 0005 |
+| SYG-PERS-016 | `U` | `App/Personnel/Quality/DataQualityService.cs`, `App/Personnel/Quality/IDataQualityQuery.cs` | 0003 |
+| SYG-PERS-017 | `E` `U` `M` | `App/Personnel/Cards/PersonCardService.cs`, `Dom/Personnel/Employment.cs`, `FP/components/PersonProfile.tsx`, `FP/display.ts` | 0005 |
+| SYG-PERS-018 | `U` `M` `L` | `App/Personnel/History/EmploymentHistoryService.cs`, `App/Personnel/Sync/ILogoPersonnelSource.cs`, `App/Personnel/Sync/PersonnelDetailsSynchronizer.cs`, `App/Personnel/Sync/PersonnelSyncService.cs` | 0021 |
+| SYG-PERS-019 | `P` `U` `M` | `App/Personnel/Duties/DutyService.cs`, `Dom/Personnel/EmploymentAssignment.cs`, `Dom/Personnel/EmploymentDuty.cs`, `Inf/Data/Configurations/EmploymentDutyConfiguration.cs` | 0021; 0022 |
+| SYG-PERS-020 | `E` `P` `U` `S` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/History/EmploymentHistoryService.cs`, `Api/Personnel/EmploymentHistoryController.cs`, `FP/api/historyApi.ts` | 0021 |
+| SYG-PERS-021 | `M` `L` | `App/Personnel/Sync/PersonnelDetailsSynchronizer.cs`, `Dom/Personnel/EmploymentDuty.cs` | 0021; 0022 |
+| SYG-PERS-022 | `E` `P` `U` `S` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Listing/PersonListService.cs`, `Inf/Personnel/PersonnelQuery.cs`, `Api/Personnel/PersonsController.cs` | 0005; 0015; 0021; 0022 |
+| SYG-PERS-023 | `E` `P` | `Api/Personnel/PersonsController.cs`, `FP/components/PersonCard.tsx`, `FP/listState.ts`, `FP/pages/PersonListPage.tsx` | 0015; 0021 |
+| SYG-PERS-024 | `E` `P` `U` `S` | `App/Personnel/Listing/PersonListFilters.cs`, `App/Personnel/Listing/PersonListService.cs`, `Inf/Data/HrmsDbFunctions.cs`, `Inf/Personnel/PersonFilterOptionsQuery.cs` | 0019; 0021 |
+| SYG-PERS-025 | `E` `U` | `App/Personnel/Listing/PersonListFilters.cs`, `FP/filterTags.ts`, `FP/listState.ts` | 0015; 0019; 0021 |
+| SYG-PERS-026 | `E` `U` | `App/Personnel/Listing/PersonListService.cs`, `FP/components/FilterPanel.tsx`, `FP/listState.ts` | 0019; 0021 |
+| SYG-PERS-027 | `E` `U` | `App/Personnel/Listing/PersonListService.cs`, `FP/listState.ts` | 0022 |
+| SYG-PERS-028 | `S` `R` | `App/Settings/ParameterCatalog.cs`, `Inf/Personnel/PersonnelQuery.cs` | 0022 |
+| SYG-PERS-029 | `E` `P` `U` `R` | `App/Personnel/Listing/PersonListService.cs`, `App/Settings/ParameterCatalog.cs`, `Api/Personnel/PersonsController.cs`, `FP/listState.ts` | 0010; 0022 |
+| SYG-PERS-030 | `E` `S` `M` `Y` | `App/Personnel/Access/PersonFieldVisibility.cs`, `Dom/Personnel/Person.cs`, `Dom/Personnel/SearchText.cs`, `Inf/Personnel/PersonnelQuery.cs` | 0021 |
+| SYG-PERS-031 | `U` `S` | `App/Personnel/Listing/PersonListService.cs`, `Inf/Personnel/PersonnelQuery.cs` | 0015; 0021 |
+| SYG-PERS-032 | `E` `P` `S` `A` `Y` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Export/PersonExportFields.cs`, `App/Personnel/Export/PersonExportService.cs`, `Api/Personnel/PersonExportController.cs` | 0014; 0019; 0022; 0023 |
+| SYG-PERS-033 | `E` `P` `U` `A` `D` | `App/Personnel/Export/PersonExportService.cs`, `App/Personnel/Quality/DataQualityService.cs`, `Dom/Audit/AccessLogEntry.cs`, `Api/Personnel/DataQualityController.cs` | 0014; 0022 |
+| SYG-PERS-034 | `E` `U` `S` `M` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Cards/PersonCardService.cs`, `Dom/Personnel/Person.cs`, `FP/api/personsApi.ts` | 0021 |
+| SYG-PERS-035 | `U` `M` `A` | `App/Personnel/Cards/PersonCardService.cs`, `App/Personnel/Export/PersonExportFields.cs`, `Dom/Personnel/Age.cs` | 0021 |
+| SYG-PERS-036 | `E` `P` `U` `S` `M` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Cards/PersonCardService.cs`, `App/Personnel/Marriage/MarriageService.cs`, `Dom/Personnel/PersonMarriage.cs` | 0021 |
+| SYG-PERS-037 | `E` | `FP/components/PersonProfile.tsx` | 0019 |
+| SYG-PERS-038 | `E` `P` `U` `S` `M` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Cards/PersonCardService.cs`, `Dom/Personnel/EmploymentAssignment.cs`, `Inf/Personnel/PersonnelQuery.cs` | 0021; 0022 |
+| SYG-PERS-039 | `E` `P` `U` `S` `M` `A` | `App/Personnel/Cards/PersonCardService.cs`, `App/Personnel/Export/PersonExportFields.cs`, `App/Personnel/Export/PersonExportService.cs`, `App/Personnel/Listing/PersonListFilters.cs` | 0021; 0022 |
+| SYG-PERS-040 | `E` `P` `U` `S` `M` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Cards/PersonCardService.cs`, `App/Personnel/Listing/PersonListService.cs`, `Dom/Personnel/PersonPhoto.cs` | 0021 |
+| SYG-PERS-041 | `E` `U` `S` `M` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Cards/PersonCardService.cs`, `Dom/Personnel/PersonPhoto.cs`, `Inf/Personnel/PersonnelQuery.cs` | 0007; 0019; 0021 |
+| SYG-PERS-042 | `E` `P` `U` `S` `M` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Cards/PersonCardService.cs`, `App/Personnel/Duties/DutyService.cs`, `App/Personnel/History/EmploymentHistoryService.cs` | 0021; 0022 |
+| SYG-PERS-043 | `E` `P` `U` `S` `M` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Cards/PersonCardService.cs`, `App/Personnel/EmergencyContacts/EmergencyContactService.cs`, `Dom/Personnel/EmergencyContact.cs` | 0019; 0021; 0022 |
+| SYG-PERS-044 | `E` `P` `U` | `App/Personnel/Cards/PersonCardService.cs`, `App/Personnel/History/EmploymentHistoryService.cs`, `Api/Personnel/PersonsController.cs`, `F/app/navigation.ts` | 0007; 0019 |
+| SYG-PERS-045 | `E` `M` `T` | `App/Personnel/Corrections/CorrectionService.cs`, `Dom/Personnel/CorrectionRequest.cs`, `Inf/Data/Configurations/CorrectionRequestConfiguration.cs`, `Inf/Personnel/CorrectionStore.cs` | 0022 |
+| SYG-PERS-046 | `M` `T` `B` | `App/Notifications/Inbox/InboxService.cs`, `App/Personnel/Corrections/CorrectionService.cs`, `Dom/Notifications/InboxItem.cs`, `Inf/Data/Configurations/InboxItemConfiguration.cs` | 0022 |
+| SYG-PERS-047 | `T` `B` `R` | `App/Personnel/Corrections/CorrectionService.cs`, `App/Settings/ParameterCatalog.cs`, `Dom/Notifications/NotificationDelivery.cs` | 0022 |
+| SYG-PERS-048 | `E` `T` `Y` | `App/Personnel/Corrections/CorrectionService.cs`, `Dom/Personnel/CorrectionRequest.cs`, `Api/Personnel/CorrectionsController.cs`, `FP/pages/CorrectionsPage.tsx` | 0022 |
+| SYG-PERS-049 | `T` `X` | `App/Personnel/Corrections/CorrectionService.cs`, `Inf/Personnel/Protection/PersonalDataProtector.cs` | 0019; 0020; 0021; 0022 |
+| SYG-PERS-050 | `S` `Y` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Access/PersonnelViewer.cs`, `Inf/Personnel/PersonnelQuery.cs` | 0007; 0019 |
+| SYG-PERS-051 | `P` `U` `S` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Duties/DutyService.cs`, `App/Personnel/EmergencyContacts/EmergencyContactService.cs`, `App/Personnel/History/EmploymentHistoryService.cs` | 0007; 0019 |
+| SYG-PERS-052 | `E` `P` `U` `S` `M` `Y` | `App/Personnel/Access/IPersonnelQuery.cs`, `App/Personnel/Access/PersonFieldVisibility.cs`, `App/Personnel/Cards/PersonCardService.cs`, `Dom/Personnel/EmergencyContact.cs` | 0019; 0020; 0021; 0022 |
+| SYG-PERS-053 | `U` `S` `A` | `App/Common/Security/Mask.cs`, `App/Personnel/Access/PersonFieldVisibility.cs`, `App/Personnel/Cards/PersonCardService.cs`, `App/Personnel/Export/PersonExportFields.cs` | 0019 |
+| SYG-PERS-054 | `M` | `Dom/Personnel/PersonSensitive.cs`, `Inf/Data/Configurations/PersonSensitiveConfiguration.cs` | 0019; 0020; 0021; 0022 |
+| SYG-PERS-055 | `U` `Y` | `App/Personnel/Quality/DataQualityService.cs` | 0003; 0014; 0019; 0022 |
+| SYG-PERS-056 | `E` `P` | `T/Dsg.Hrms.Architecture.Tests/ManagerFilterAbsenceTests.cs`, `FP/pages/__tests__/PersonListPage.test.tsx` (kısıt: süzgeç yok) | 0007 |
+| SYG-PERS-057 | `E` `P` `U` | `App/Personnel/Cards/PersonCardService.cs`, `App/Personnel/History/EmploymentHistoryService.cs`, `Api/Personnel/PersonsController.cs` | 0009; 0019; 0020; 0021 |
+| SYG-PERS-058 | `U` `D` | `App/Audit/AuditLogService.cs`, `App/Common/Abstractions/IAccessLogger.cs`, `App/Personnel/Listing/PersonListService.cs` | 0009; 0019 |
+| SYG-PERS-059 | `U` `A` | `App/Personnel/Export/PersonExportService.cs`, `App/Personnel/Listing/PersonListService.cs` | 0009; 0019; 0020; 0021 |
+| SYG-PERS-060 | `X` | `Inf/Personnel/Protection/PersonalDataProtectionOptions.cs`, `Inf/Personnel/Protection/PersonalDataProtector.cs` | 0019; 0020; 0021 |
+| SYG-PERS-061 | `X` | `Inf/InfrastructureRegistration.cs` (açılışta anahtar doğrulaması), `Inf/Personnel/Protection/PersonalDataProtectionOptions.cs` | 0019; 0020; 0021 |
+| SYG-PERS-062 | `X` `D` `Y` | `App/Personnel/Protection/PersonalDataKeyService.cs`, `Dom/Audit/SecurityEventEntry.cs`, `Inf/Personnel/PersonalDataKeyStore.cs`, `Inf/Personnel/Protection/PersonalDataProtectionOptions.cs` | 0019; 0020; 0021 |
+| SYG-PERS-063 | `U` `S` | `App/Personnel/Listing/PersonListFilters.cs`, `Inf/Personnel/PersonnelQuery.cs` | 0019; 0020; 0021 |
+| SYG-PERS-064 | `D` | `docker/postgres/app-role.sql`; `T/Dsg.Hrms.Api.IntegrationTests/Data/ApplicationRoleTests.cs` | 0009; 0019; 0020; 0021 |
+| SYG-PERS-065 | — | Kod dışı kurum kontrolü: gizlilik taahhütleri İK biriminde (`KR-139`); T1 kabulünde rol üyeleriyle karşılaştırılır | 0019; 0020; 0021 |
+| SYG-PERS-066 | `P` `U` | `App/Personnel/EmergencyContacts/EmergencyContactService.cs`, `App/Personnel/Marriage/MarriageService.cs`, `Api/Personnel/EmergencyContactsController.cs` | 0019; 0021; 0022 |
+| SYG-PERS-067 | `M` `D` | `T/Dsg.Hrms.Architecture.Tests/DataClassificationTests.cs` (her alanda sınıflandırma özniteliği) | 0009; 0019; 0020; 0021 |
+| SYG-PERS-068 | `R` | `App/Settings/ParameterCatalog.cs` | 0009; 0022 |
+| SYG-PERS-069 | `M` `D` `Y` | `App/Audit/AuditLogService.cs`, `Inf/Audit/AuditLogQuery.cs`, `Inf/Data/Configurations/AccessLogEntryConfiguration.cs`, `Inf/Data/Configurations/ChangeLogEntryConfiguration.cs` | 0009; 0014; 0019; 0022 |
+| SYG-PERS-070 | `E` `P` `U` `L` `Y` | `App/Personnel/Quality/IDataQualityQuery.cs`, `App/Personnel/Sync/PersonnelSynchronizer.cs`, `Dom/Personnel/Sync/PersonnelSyncWarning.cs`, `Inf/Personnel/DataQualityQuery.cs` | 0003; 0014 |
+| SYG-PERS-071 | `E` `P` `U` | `App/Personnel/Quality/DataQualityService.cs`, `App/Personnel/Quality/IDataQualityQuery.cs`, `Api/Personnel/DataQualityController.cs` | 0003 |
+| SYG-PERS-072 | `V` `Y` | `App/Reference/ReferenceDefinitionService.cs`, `Dom/Reference/ReferenceDefinition.cs`, `Api/Reference/ReferenceDefinitionsController.cs`, `F/features/reference/api/referenceApi.ts` | 0019; 0020; 0021; 0022 |
+| SYG-PERS-073 | `E` | `FP/pages/PersonListPage.tsx`, `F/shared/theme/theme.ts` | 0015 |
+| SYG-PERS-074 | `P` `V` `D` | `Api/Personnel/`, `Api/Reference/`, `Api/Audit/` (yol önekleri); `T/Dsg.Hrms.Architecture.Tests/ModuleRouteTests.cs` | 0007; 0010; 0015; 0019; 0021; 0022 |
+| SYG-PERS-075 | `R` | `App/Settings/ParameterCatalog.cs`, `Inf/Settings/SystemParameterEditor.cs`, `Api/Settings/SystemParametersController.cs`, `F/features/system/pages/ParametersPage.tsx` | 0009; 0010; 0022 |
+| SYG-PERS-076 | — | Ölçüm: `docs/33061/TEC.9-dogrulama/raporlar/2026-11-10-t1-performans-olcumu.md` (KPÖ-PERS-1) | 0021 |
+| SYG-PERS-077 | — | Ölçüm: `docs/33061/TEC.9-dogrulama/raporlar/2026-11-10-t1-performans-olcumu.md` (KPÖ-PERS-2) | 0021 |
+| SYG-PERS-078 | — | Ölçüm: `docs/33061/TEC.9-dogrulama/raporlar/2026-11-10-t1-performans-olcumu.md` (KPÖ-PERS-3, 4) | 0021 |
+| SYG-PERS-079 | — | Ölçüm: `docs/33061/TEC.9-dogrulama/raporlar/2026-11-10-t1-performans-olcumu.md` (KPÖ-PERS-5) | 0021 |
 
 ---
 
@@ -487,3 +586,4 @@ madde `İptal` notuyla kalır.
 | 2026-11-08 | 0.23 | §6: AN-28, telefon genişliği, dokunmatik ekranda 44 piksel kuralı, telefonda kart görünümü ve ölçüm (#377) | Bilgi İşlem |
 | 2026-11-08 | 0.24 | §6: AN-29, SYG-PERS-006 ile 021'in uzlaştırılması: senkronizasyonun görev kaydındaki tek yazımı (#379) | Bilgi İşlem |
 | 2026-11-13 | 0.25 | §7: gizlilik taahhüdü kayıtlarının varlığı (`KR-139`); SYG-PERS-056 negatif testle doğrulandı (#388) | Bilgi İşlem |
+| 2026-11-14 | 0.26 | §2.2 öğe konumları koddan (şifreleme `Personnel/Protection`; dışa aktarma, uygulama servisleri ve yetki sözlüğü öğe oldu; öğe kodları); §2.5 dosya düzeyi tahsis 79 gereksinim için; ikisi CI'da denetlenir (T1 geliştirme sonu denetimi TEC.5-11, #389) | Bilgi İşlem |
