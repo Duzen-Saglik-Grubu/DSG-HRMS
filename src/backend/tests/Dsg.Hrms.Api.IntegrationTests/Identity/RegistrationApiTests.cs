@@ -114,6 +114,7 @@ public sealed class RegistrationApiTests : IClassFixture<RegistrationApiFixture>
                     .Select(p => $"{p.Name}:{p.Value.GetRawText()}"));
             text.ShouldNotContain("ahmet");
             text.ShouldNotContain("5321234567");
+            // kisa-alt-dize: rastgele alanlar (registrationId, expiresAt) yukarida cikarildi (#295).
             text.ShouldNotContain("567");
         }
 

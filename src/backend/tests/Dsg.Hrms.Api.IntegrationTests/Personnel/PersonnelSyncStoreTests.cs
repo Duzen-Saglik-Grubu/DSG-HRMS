@@ -240,6 +240,7 @@ public sealed class PersonnelSyncStoreTests : IAsyncLifetime
                 .ToListAsync());
             changes.ShouldContain("BloodGroup");
             changes.ShouldNotContain(rows[0].BloodGroup!);
+            // kisa-alt-dize: degisiklik kaydi alan adi, maske, GUID ve zaman tasir; 'k1:' yalnizca sifreli degerin oneki olarak olusur.
             changes.ShouldNotContain("k1:");
         }
 

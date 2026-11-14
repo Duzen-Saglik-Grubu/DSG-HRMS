@@ -218,6 +218,7 @@ public sealed class SystemParameterStoreTests : IAsyncLifetime
         {
             var changes = entry.Changes.ToString();
             changes.ShouldNotContain(SmtpPassword);
+            // kisa-alt-dize: degisiklik kaydi alan adi, maske, GUID ve zaman tasir; 'v1:' yalnizca sifreli degerin oneki olarak olusur.
             changes.ShouldNotContain("v1:");
         }
     }
