@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.13-YAK
 **Süreç:** TEC.13 — Bakım
-**Son güncelleme:** 2026-10-05
+**Son güncelleme:** 2026-11-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -64,7 +64,7 @@ Hata olmayan ama sistemi etkileyen olaylar (denetimin çökmesi, klasör kaybı,
 | Konteyner imajında kritik ve yüksek açık | `ci.yml`, trivy (yaması olan açıklar) | Açık varsa CI düşer |
 | Taban imaj paketleri | Dockerfile'larda derlemede güncelleme (`KR-065`) | Yeni yamalar her derlemede alınır |
 
-CI zamanlanmış çalışmaz; yalnızca PR'da ve `main`'e gönderimde çalışır. Ortam koşulları elle izlenir: UAT sertifikası (runbook §7, R-18), SMTP sertifikası (runbook §10.5, R-20), sunucu saati (runbook §12, R-21).
+CI PR'da ve `main`'e gönderimde çalışır. Ayrıca `main` sağlık taraması 6 saatte bir zamanlanmış çalışır ve `main`'in son commit'inin doğrulandığını sonradan sınar (#208). Ortam koşulları elle izlenir: UAT sertifikası (runbook §7, R-18), SMTP sertifikası (runbook §10.5, R-20), sunucu saati (runbook §12, R-21).
 
 ---
 
@@ -123,7 +123,7 @@ Tek kişilik düzende hatayı kaydeden, düzelten ve kapatan aynı kişidir (R-0
 | **Eğilim ve maliyet verisi, bakım raporu** | Yok. `raporlar/` boş; hata sayısı, kaynağı, kapanma süresi ve kök neden sınıfları derlenmedi |
 | **Destek modeli** | Üretim için yok: kullanıcı sorunu nasıl bildirir, kim ilk yanıtı verir, mesai dışı ne olur |
 | **Sertifika ve sır süreleri izleme listesi** | Tek bir listede değil; bitiş tarihleri runbook §1 ve risk defterinde (R-18, R-20). Sistem içi uyarı Y4'te gelecek (#42) |
-| **Zamanlanmış güvenlik taraması** | Yok. Yeni yayımlanan bir açık, ancak bir sonraki PR'da veya `main` gönderiminde görülür |
+| **Zamanlanmış güvenlik taraması** | Kısmen. Bağımlılıklar için GitHub Dependabot uyarıları açık: yeni yayımlanan bir açık, PR beklemeden depoda uyarı olarak görünür (ör. Dependabot #5; #393). Konteyner imajı taraması (trivy) hâlâ yalnızca PR'da ve `main` gönderiminde çalışır |
 | **Müşteri memnuniyeti** | Ölçülmüyor; üretim kullanıcısı yok |
 
 ---
@@ -137,3 +137,4 @@ Bu belge her modül sonu süreç denetiminde (MAN.8) ve üretime geçişten önc
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
+| 2026-11-14 | 1.1 | §2 zamanlanmış `main` sağlık taraması (#208); §7 Dependabot uyarıları (T1 geliştirme sonu denetimi YB-06; #392) | Bilgi İşlem |

@@ -273,6 +273,30 @@ function checkAllocation(module, text, index) {
   return errors;
 }
 
+// ------------------------------------------------------------------ 5. PG §2 degisiklik talebi sayimi (#392)
+//
+// PG-PERS §2 "Onaydan sonraki degisiklik talebi: 2" diyordu; gecmiste dort talep vardi
+// (#333, #355 eklenmemisti; TEC.2-8). Ayni bayatlik 13.10'da PG-KMLK'de de gorulmustu.
+// Kural: degisiklik gecmisinde "Degisiklik talebi #N" olarak gecen her talep §2 satirinda
+// listelenir ve satirdaki sayi listedeki talep sayisina esittir.
+function checkChangeRequestSummary(name, text) {
+  const row = text.split('\n').find((l) => l.startsWith('| Onaydan sonraki değişiklik talebi |'));
+  if (!row) return [];
+  const cell = row.split('|')[2] || '';
+  // Bicim: "N (#a: ...; #b: ...) — not". Talepler yalnizca sayinin ardindaki parantezden okunur;
+  // nottaki baska issue numaralari ("#387") talep sayilmaz.
+  const head = cell.match(/^\s*(\d+)\s*\(([^)]*)\)/);
+  const count = Number(head?.[1]);
+  const listed = new Set([...(head?.[2] ?? '').matchAll(/#(\d+)/g)].map((m) => m[1]));
+  const history = text.split('\n').filter((l) => /^\| \d{4}-\d{2}-\d{2} \| [\d.]+ \|/.test(l)).join('\n');
+  const inHistory = new Set([...history.matchAll(/[Dd]eğişiklik talebi #(\d+)/g)].map((m) => m[1]));
+  const errors = [];
+  const missing = [...inHistory].filter((n) => !listed.has(n));
+  if (missing.length) errors.push(`${name}: değişiklik geçmişindeki talep §2'de yok: ${missing.map((n) => '#' + n).join(', ')}`);
+  if (count !== listed.size) errors.push(`${name}: §2 "${count}" diyor, listede ${listed.size} talep var`);
+  return errors;
+}
+
 // ------------------------------------------------------------------ calistir
 
 function markdownFiles() {
@@ -405,6 +429,31 @@ if (!adrFiles.length) {
       for (const e of errors) console.error(`    ${e}`);
     } else {
       console.log(`✓ SYG-${module}: §2.5 her gereksinimi kapsıyor; §2.2 ve §2.5'teki yollar depoda var`);
+    }
+  }
+}
+
+// --- 5. PG §2 degisiklik talebi sayimi (#392)
+{
+  const pgDir = join(ROOT, STAKEHOLDER_DIR);
+  const pgFiles = existsSync(pgDir) ? readdirSync(pgDir).filter((f) => /^PG-[A-Z]+\.md$/.test(f)) : [];
+  for (const file of pgFiles) {
+    const text = read(join(pgDir, file));
+    if (!text.includes('| Onaydan sonraki değişiklik talebi |')) continue;
+    // Once denetimin kendisi: §2 satirindan bir talep silinirse yakalanmali.
+    const probe = text.replace(/(\| Onaydan sonraki değişiklik talebi \|[^\n]*?)#(\d+)/, '$1');
+    const lastHistory = text.split('\n').filter((l) => /^\| \d{4}-\d{2}-\d{2} \|/.test(l)).at(-1) ?? '';
+    const withExtra = text.replace(lastHistory, `${lastHistory}\n| 2099-01-01 | 9.9 | Değişiklik talebi #99999 (sınama) | - |`);
+    if (!checkChangeRequestSummary(file, probe).length || !checkChangeRequestSummary(file, withExtra).length) {
+      fail(`${file}: §2 değişiklik talebi denetimi kendi sınamasını geçemedi`);
+      continue;
+    }
+    const errors = checkChangeRequestSummary(file, text);
+    if (errors.length) {
+      fail(`${file}: §2 özeti ${errors.length} sorun`);
+      for (const e of errors) console.error(`    ${e}`);
+    } else {
+      console.log(`✓ ${file}: §2 değişiklik talebi sayısı geçmişle tutarlı`);
     }
   }
 }

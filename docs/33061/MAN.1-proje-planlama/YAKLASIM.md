@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.1-YAK
 **Süreç:** MAN.1 — Proje Planlama
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-11-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.1`: hedefler, planlama, sorumluluklar, kaynaklar ve arayüzler. `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -168,7 +168,7 @@ Ek A §1) görülen konular. Durum sütunu 14.10.2026'da T3 modül sonu denetimi
 
 | # | Açık nokta | İzlendiği yer | Durum (14.10.2026) |
 |---|---|---|---|
-| 1 | Plan ve RACI 07.09.2026'dan beri onaysız; `A0 — Hazırlık ve Planlama` milestone'u açık | #127 | ⚠️ Kısmen: plan 0.3, RACI 0.2 ve WBS 0.4 Üst Yönetim tarafından onaylandı (09.10.2026, `KR-103`). `A0` milestone'u açık işi kalmadığı hâlde hâlâ açık |
+| 1 | Plan ve RACI 07.09.2026'dan beri onaysız; `A0 — Hazırlık ve Planlama` milestone'u açık | #127 | ⚠️ Kısmen: plan 0.3, RACI 0.2 ve WBS 0.4 Üst Yönetim tarafından onaylandı (09.10.2026, `KR-103`). `A0` milestone'u **14.11.2026'da kapatıldı** (açık işi yoktu; #392). Bütçe: Üst Yönetim kararıyla ayrı bütçe oluşturulmadı, iç kaynakla yürütülür (`KR-139`) |
 | 2 | Plan v0.2 revizyonu yapılmadı: `KR-077` sırası, `SYG-` kimliği (plan §3 hâlâ `REQ-` diyor), UAT'nin kurulmuş olması ve gerçek veriyle çalışması (`KR-083`, `R-25`), B3/B8 durumları. WBS §4 kritik yolu da T1 → T2 → T3 diyor | #127 | ✅ Kapandı: plan 0.3 ve WBS 0.4 (06.10.2026, PR #181) |
 | 3 | `proje-plani.md` başlığı "Sürüm 0.1, 2026-09-07" diyor; değişiklik geçmişinde 0.2 (2026-10-04) var | #127 | ✅ Kapandı: plan 0.3 ile eşitlendi |
 | 4 | `kayitlar/` boş: hiçbir plan revizyonu kayda geçmedi | — | ⚠️ Kısmen: onay kaydı var (`kayitlar/2026-10-06-plan-ve-raci-onay-talebi.md`, Üst Yönetim onay formu). §2.6'nın öngördüğü `…-plan-revizyonu.md` kaydı yazılmadı; revizyon özeti onay talebi §1'de |
@@ -188,3 +188,4 @@ Bu belge her modül sonu süreç denetiminde (MAN.8) ve plan revizyonu yapıldı
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
 | 2026-10-14 | 1.1 | T3 modül sonu gözden geçirmesi: §2.4 sürüm durumu (`v0.2.0`); §5 saklama kuralı MAN.6 ve `KR-107`; §7 durum sütunu (#214) | Bilgi İşlem |
+| 2026-11-14 | 1.2 | §7 #1: `A0` milestone'u kapatıldı; bütçe `KR-139` (T1 geliştirme sonu denetimi A-13, A-14; #392) | Bilgi İşlem |

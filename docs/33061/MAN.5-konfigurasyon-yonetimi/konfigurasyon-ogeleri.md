@@ -44,7 +44,7 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 | KÖ-10 | nginx yapılandırması | `src/frontend/dsg-hrms-web/nginx/` | TLS ve düz HTTP kipleri |
 | KÖ-11 | Compose yığınları | `docker/compose.yml` (geliştirme), `compose.uat.yml`, `compose.e2e.yml`; uçtan uca yığının betikleri ve tohum verisi `docker/e2e/` (`up.sh`, `down.sh`, `seed.sql`); TLS'siz kip için boş klasör `docker/tls-empty/` | |
 | KÖ-12 | Örnek ortam dosyaları | `docker/.env.example`, `docker/.env.uat.example` | Yığının kullandığı her değişkeni içermeli ve fazlasını içermemeli (§ denetim D-04). **CI denetler (#391):** `env-example-check.mjs`, compose ↔ örnek birebir; T1'de iki zorunlu sır örneğe eklenmemişti (D-07) |
-| KÖ-13 | Dağıtım, TLS ve veritabanı hesabı betikleri | `docker/deploy-uat.sh`, `renew-tls.sh`, `acme-dns-hook.sh`; LOGO salt-okunur hesabının betiği `docker/logo/read-only-login.sql` | Hesabın kendisi KÖ-40 |
+| KÖ-13 | Dağıtım, TLS ve veritabanı hesabı betikleri | `docker/deploy-uat.sh`, `renew-tls.sh`, `acme-dns-hook.sh`, `uat-ik-rolu-ata.sh` (İK rolü ataması, T4'e kadar; #383); LOGO salt-okunur hesabının betiği `docker/logo/read-only-login.sql`; uygulamanın çalışma rolü `docker/postgres/` (`app-role.sql`, `apply-app-role.sh`; #244) | Hesapların kendisi KÖ-37 ve KÖ-40 |
 | KÖ-14 | CI iş akışları ve betikleri | `.github/workflows/`, `.github/scripts/` | |
 | KÖ-14a | Depo ve araç ayarları | `.gitattributes`, `.gitignore`, `.gitleaks.toml` (CI sır taraması ayarı), `.config/dotnet-tools.json` (araç sürümleri; migration betiğini üreten `dotnet-ef` dahil) | `.gitignore` depo dışında kalan öğeleri (KÖ-30, KÖ-36, MAN.6 bilgi kayıt defteri) belirler |
 | KÖ-15 | Git kancaları | `.githooks/` (`commit-msg`, `pre-push`) | Her makinede `core.hooksPath` ile etkinleştirilir (CONTRIBUTING §0) |
@@ -65,8 +65,8 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 
 | KÖ | Öğe | Yer | Sahibi | Değişiklik yolu |
 |---|---|---|---|---|
-| KÖ-30 | UAT sır dosyası | `/opt/dsg-hrms/secrets/.env.uat` (izin `600`) | Bilgi İşlem | Elle, runbook §2.2 ve §9–§10'a göre. **İçerik depoya girmez.** Değişken listesi KÖ-12'deki `.env.uat.example`'ın alt kümesidir; varsayılanı olan isteğe bağlı değişkenler (ör. `IDENTITY_PUBLIC_BASE_URL`) yazılmayabilir (konfigürasyon denetimi 13.10.2026, D-08). `secrets/` dizininde yalnızca bu dosya bulunur; eski kopya bırakılmaz (#207). **Dağıtım betiği denetler (#391):** başka dosya varsa dağıtım durur (D-09) |
-| KÖ-31 | UAT TLS sertifikası | `/opt/dsg-hrms/tls/` | Bilgi İşlem | `renew-tls.sh` ile 90 günde bir, elle (`KR-067`, R-18). Bitiş: 16.12.2026 |
+| KÖ-30 | UAT sır dosyası | `/opt/dsg-hrms/secrets/.env.uat` (izin `600`) | Bilgi İşlem | Elle, runbook §2.2 ve §9–§10'a göre. **İçerik depoya girmez.** Değişken listesi KÖ-12'deki `.env.uat.example`'ın alt kümesidir (12.11.2026'da doğru değildi, D-08; #391 ile yeniden doğru ve CI'da denetleniyor). Özel nitelikli veri anahtarı üç yuvada tutulur (`PERSONAL_DATA_KEY_K1..K3`); döndürmede yeni anahtar bir sonraki boş yuvaya yazılır (runbook §5.1; ADR-0020 §3); varsayılanı olan isteğe bağlı değişkenler (ör. `IDENTITY_PUBLIC_BASE_URL`) yazılmayabilir (konfigürasyon denetimi 13.10.2026, D-08). `secrets/` dizininde yalnızca bu dosya bulunur; eski kopya bırakılmaz (#207). **Dağıtım betiği denetler (#391):** başka dosya varsa dağıtım durur (D-09) |
+| KÖ-31 | UAT TLS sertifikası | `/opt/dsg-hrms/tls/`; doğrulama dosyaları `/opt/acme/` (kanca, beklenen kayıt, günlük; BK-31) | Bilgi İşlem | `renew-tls.sh` ile 90 günde bir, elle (`KR-067`, R-18). Bitiş: 16.12.2026 |
 | KÖ-32 | NTP kaynakları | `/etc/chrony/sources.d/dsg-hrms-ntp.sources` | Bilgi İşlem | Elle, runbook NTP bölümü (#103, R-21) |
 | KÖ-33 | Docker Engine ve işletim sistemi | UAT sunucusu (Ubuntu 26.04) | Bilgi İşlem | **İşletim sistemi güvenlik güncellemeleri** `unattended-upgrades` ile kendiliğinden kurulur; iz `/var/log/apt/history.log`. **Docker Engine ve sürüm yükseltmeleri** elle, runbook §2.1. Yeniden başlatma gerektiğinde (`/var/run/reboot-required`) duyurulmuş bir zamanda yapılır; son yeniden başlatma 13.10.2026 (#207). Masaüstü kurulumundan kalan Avahi ve CUPS servisleri 13.10.2026'da kapatıldı ve maskelendi (#207, runbook §6). Her konfigürasyon denetiminde `apt` geçmişi ve bekleyen yeniden başlatma sınanır (§1) |
 | KÖ-34 | SSH erişimi | UAT sunucusu `/root/.ssh/authorized_keys`; geliştirici makinesinde `~/.ssh/dsg-hrms-uat` | Bilgi İşlem | Elle. Anahtarla erişim; parola girişi bilerek açık (`KR-102`, #174) |
@@ -77,6 +77,7 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 | KÖ | Öğe | Yer | Sahibi | Değişiklik yolu |
 |---|---|---|---|---|
 | KÖ-36 | Yerel geliştirme ortamı (Docker Desktop yığını ve sır dosyası) | Geliştirici makinesi: `docker/compose.yml` ile kurulan yığın; sır dosyası `docker/.env` (depo dışı, `.gitignore`'da) | Bilgi İşlem | Elle. Ortam gerçek LOGO verisiyle ve gerçek SMTP/NetGSM gönderimiyle çalışır (28.09.2026 kararı); `docker/.env` gerçek sırları tutar, **içeriği depoya girmez**, değişken listesi KÖ-12'deki `docker/.env.example` ile aynıdır. Ortam her güncellendiğinde hangi commit'ten derlendiği imaja yazılır: `HRMS_GIT_COMMIT=$(git rev-parse HEAD) docker compose -f docker/compose.yml up -d --build api web` ile `org.opencontainers.image.revision` etiketi (#391; etiket yoksa "bilinmiyor"); "yerelde denenir, sonra UAT'ye gider" kuralı bunu gerektirir. Baseline değildir, kabul kanıtı üretmez. Verisi MAN.6 bilgi kayıt defterinde (BK-15) |
+| KÖ-37 | Uygulamanın veritabanı çalışma rolü (`hrms_app`) | UAT ve yerel PostgreSQL; parola sır dosyasında (`HRMS_APP_DB_PASSWORD`, KÖ-30, KÖ-36) | Bilgi İşlem | `docker/postgres/apply-app-role.sh` ile her dağıtımda uygulanır (KÖ-13). Şemanın sahibi değildir, süper kullanıcı değildir; denetim tablolarında `UPDATE`/`DELETE` yetkisi yoktur (`KR-118`). Yetkileri `ApplicationRoleTests` sınar; dağıtım betiği API'nin bu rolle bağlandığını doğrular (#244, B-01; #392) |
 
 ### 3.3 Dış hizmetler ve kurum altyapısı
 
@@ -95,7 +96,7 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 |---|---|---|---|
 | KÖ-50 | Sistem parametreleri (PRM-*) | Veritabanı `settings.system_parameter`; varsayılanlar kodda (`ParameterCatalog`), bir kısmı yapılandırmadan | Parametre ekranı (Sistem Yöneticisi); her değişiklik denetim izinde (SYG-KMLK-075, 076) |
 | KÖ-51 | Kurumsal logo | Veritabanı | Parametre ekranı (SYG-KMLK-069) |
-| KÖ-52 | Rol ve izin atamaları | Veritabanı; izin kodları kodda sabit | T4'e kadar migration ve ilk yönetici yapılandırması (`KR-089`); atamalar denetim izinde |
+| KÖ-52 | Rol ve izin atamaları | Veritabanı; izin kodları kodda sabit | T4'e kadar: migration, ilk yönetici yapılandırması (`KR-089`) ve UAT'de İK rolü için `docker/uat-ik-rolu-ata.sh` (#383); atamalar denetim izinde |
 
 > **KÖ sayılmayanlar:** UAT veritabanındaki iş verisi (personel, hesaplar, denetim izi)
 > konfigürasyon değil **veridir**; yedekleme kuralı `KR-098`'dedir. CI yapıtları kanıttır;
@@ -111,3 +112,4 @@ Değişiklik yolu hepsinde aynıdır: dal → PR → CI → inceleme onayı (`KR
 | 2026-10-13 | 1.3 | §1: UAT denetiminde UDP dinleyiciler, `secrets/` dizininin tamamı ve yeniden başlatma da sınanır (#207) | Bilgi İşlem |
 | 2026-10-14 | 1.4 | T3 konfigürasyon denetimi (B-2, B-3, D-08): KÖ-06, KÖ-07, KÖ-08 yolları tam yazıldı; KÖ-08a (logo dosyası) ve KÖ-14a (depo ve araç ayarları) eklendi; KÖ-11 ve KÖ-13 sayılmayan dosyalarla tamamlandı; KÖ-22 `global.json`, `assets/`, `sema.sql`; KÖ-30 değişken listesi notu; KÖ-33 otomatik güvenlik güncellemeleri, yeniden başlatma ve Avahi/CUPS (#207); §3.2a KÖ-36 yerel geliştirme ortamı (#214) | Bilgi İşlem |
 | 2026-11-14 | 1.5 | KÖ-12 compose ↔ örnek CI denetimi; KÖ-30 sır dizini dağıtım betiğinde; KÖ-36 yerel imajda commit etiketi (T1 konfigürasyon denetimi D-07, D-09, KÖ-36; #391) | Bilgi İşlem |
+| 2026-11-14 | 1.6 | KÖ-13 `docker/postgres/` ve `uat-ik-rolu-ata.sh`; KÖ-30 anahtar yuvaları ve alt küme notu; KÖ-31 `/opt/acme/`; KÖ-37 çalışma rolü; KÖ-52 değişiklik yolu (T1 konfigürasyon denetimi Ö-7, A-08; #392) | Bilgi İşlem |

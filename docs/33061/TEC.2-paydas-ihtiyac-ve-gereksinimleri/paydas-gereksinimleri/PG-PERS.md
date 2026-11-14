@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.2-PG-PERS
 **Süreç:** TEC.2 — Paydaş İhtiyaç ve Gereksinimlerinin Tanımlanması
-**Son güncelleme:** 2026-11-06
+**Son güncelleme:** 2026-11-14
 **Kaynak toplantı:** `kayitlar/2026-10-19-personel-gereksinim-toplantisi.md`
 **Onay durumu:** **Onaylandı — 2026-10-19** (İK gereksinim toplantısı)
 
@@ -47,7 +47,7 @@ Ayrıntı için toplantı kaydı §4'e bakılabilir.
 | Toplantı sonucu eklenen | 3 (PG-PERS-42, 43 İK'nın eklediği; PG-PERS-44 S-08 cevabından) |
 | Toplantı sonrası teyitle eklenen | 1 (PG-PERS-45, KVKK Sorumlusu kararı, 20.10.2026) |
 | **Toplam onaylı gereksinim** | **45** |
-| Onaydan sonraki değişiklik talebi | 2 (#270: PG-PERS-12'den "çalışma şekli" çıkarıldı; #284: PG-PERS-12'ye firma eklendi) — gereksinim sayısı değişmedi |
+| Onaydan sonraki değişiklik talebi | 4 (#270: PG-PERS-12'den "çalışma şekli" çıkarıldı; #284: PG-PERS-12'ye firma eklendi; #333: PG-PERS-37 uygulama içi bildirimi Sistem Yöneticisine de gider; #355: PG-PERS-44 giriş izni olan kullanıcı kendi acil durum kişilerini girer) — gereksinim sayısı değişmedi. İK onayı: #270 birleştirmeden önce; #284, #333 ve #355 geriye dönük teyitle (14.11.2026, #387) |
 
 **Toplantı sonrası teyit (20.10.2026):** Toplantı kaydı §11'deki değerlendirmeler İK ve KVKK
 Sorumlusu tarafından cevaplandı (kayıt §12, #241). PG-PERS-14, 21, 36, 38, 42, 43 ve 44
@@ -176,3 +176,4 @@ Sistem gereksinimi, tasarım, kod ve test halkaları, işin yapıldığı PR'da 
 | 2026-10-24 | 1.6 | Değişiklik talebi #284: İK onayı da kayda geçti (24.10.2026, Doğuş Uçanok bildirdi) | Bilgi İşlem |
 | 2026-11-04 | 1.7 | **Değişiklik talebi #333** (Bilgi İşlem Birim Sorumlusu onayı 04.11.2026, Doğuş Uçanok): PG-PERS-37 uygulama içi bildirimi Sistem Yöneticisi rolüne de gider (`KR-132`) | Bilgi İşlem |
 | 2026-11-06 | 1.8 | **Değişiklik talebi #355** (Bilgi İşlem Birim Sorumlusu onayı 06.11.2026, Doğuş Uçanok): PG-PERS-44'te giriş yetkisi olan kullanıcı kendi acil durum kişilerini de girer; "değiştiremez" kuralı yetkisi olmayan kişi içindir (`KR-137`) | Bilgi İşlem |
+| 2026-11-14 | 1.9 | §2 özet: onaydan sonraki değişiklik talebi 2 → 4 (#333, #355 eklenmemişti; T1 geliştirme sonu denetimi TEC.2-8; #392) | Bilgi İşlem |
