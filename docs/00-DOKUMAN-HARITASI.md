@@ -3,7 +3,7 @@
 **Proje:** DSG-HRMS — Düzen Sağlık Grubu İnsan Kaynakları Yönetim Sistemi
 **Amaç:** Bu doküman, TS ISO/IEC TS 33061 Seviye 2 kapsamında üretilen tüm kanıtların nerede tutulduğunu tek sayfadan gösterir. Bir denetçi ya da yeni katılan bir ekip üyesi aradığı kaydı buradan bulur.
 
-**Son güncelleme:** 2026-11-12
+**Son güncelleme:** 2026-11-14
 **Doküman sahibi:** Bilgi İşlem Birim Sorumlusu
 
 ---
@@ -81,7 +81,7 @@ Aşağıdaki tablolarda "33061 Süreç Çıktısı" sütunu, standardın Madde 5
 | 33061 Süreç Çıktısı | Bizdeki karşılığı |
 |---|---|
 | Yaklaşım | `YAKLASIM.md` |
-| Tasarım modeli | ADR'ler (veri modeli ADR-0005) ve `docs/mimari/` (modül listesi, paket envanteri, izin listesi, `kimlik-tasarim-diyagramlari.md`); öğeler ve SYG → öğe tahsisi `SYG-<MODÜL>.md` §2.2 ve §2.5 |
+| Tasarım modeli | ADR'ler (veri modeli ADR-0005) ve `docs/mimari/` (modül listesi, paket envanteri, izin listesi, `kimlik-tasarim-diyagramlari.md`, `personel-tasarim-diyagramlari.md`); öğeler ve SYG → öğe tahsisi `SYG-<MODÜL>.md` §2.2 ve §2.5 |
 | Tasarım gerekçesi (Design rationale) | `docs/adr/` — Mimari Karar Kayıtları |
 | Arayüz tanımı (Interface definition) | `docs/api/openapi-v1.json` (OpenAPI sözleşmesi) + `SYG-<MODÜL>.md` §2.3 dış arayüzler |
 | Tasarım değerlendirme raporu | `raporlar/YYYY-AA-GG-tasarim-gozden-gecirme.md` (ilki `2026-10-20`; YAKLASIM §2.5) |
@@ -249,7 +249,7 @@ Bazı kanıtlar birden fazla sürece hizmet eder. Tek kopya tutulur:
 | GitHub Projects panosu | GitHub | MAN.1, MAN.2 |
 | Mevcut sistem ve süreç analizleri | `docs/analiz/` | TEC.2, TEC.10 |
 | Modül listesi ve bağımlılık haritası | `docs/mimari/modul-listesi-ve-bagimliliklar.md` | TEC.2, TEC.5, MAN.1 |
-| Tasarım diyagramları | `docs/mimari/kimlik-tasarim-diyagramlari.md` | TEC.5 |
+| Tasarım diyagramları | `docs/mimari/kimlik-tasarim-diyagramlari.md`, `docs/mimari/personel-tasarim-diyagramlari.md` | TEC.5 |
 | Vizyon ve kapsam belgesi | `docs/mimari/vizyon-ve-kapsam.md` | TEC.2 |
 | Paket envanteri ve izin listesi | `docs/mimari/paket-envanteri.md`, `docs/mimari/izin-listesi.md` | TEC.5, TEC.7, MAN.5 |
 | API sözleşmesi | `docs/api/openapi-v1.json` | TEC.5, TEC.8, TEC.9 |
@@ -285,3 +285,4 @@ Bazı kanıtlar birden fazla sürece hizmet eder. Tek kopya tutulur:
 | 2026-10-20 | 0.8 | TEC.2: T1 toplantı kaydı ve `PG-PERS.md` (#239) | Bilgi İşlem |
 | 2026-10-20 | 0.9 | TEC.5: tasarım gözden geçirme raporu, kimlik tasarım diyagramları, SYG §2.5 tahsis (#234) | Bilgi İşlem |
 | 2026-11-12 | 0.10 | MAN.8: T1 geliştirme sonu süreç denetimi (#385) | Bilgi İşlem |
+| 2026-11-14 | 0.11 | Tasarım diyagramları: `personel-tasarim-diyagramlari.md` (T1, #389) | Bilgi İşlem |
