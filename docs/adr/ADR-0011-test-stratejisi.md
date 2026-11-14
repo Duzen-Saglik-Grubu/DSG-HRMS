@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi; §7 Veri sütunu → ADR-0018
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-024`, `KR-111` (§6 tanımı)
+**Karar defteri karşılığı:** `KR-024`, `KR-111` (§6 tanımı), `KR-057`, `KR-096`, `KR-108`
 **İlgili süreç:** TEC.9 (Doğrulama), MAN.8 (Kalite Güvence)
 
 ---
@@ -226,3 +226,4 @@ dönmek ise kalite kaybı demektir.
 | 2026-10-14 | 0.4 | §7: ortamların Veri sütunu ADR-0018'e taşındı (`KR-108`, `KR-099`, #212) | Bilgi İşlem |
 | 2026-10-15 | 0.5 | §6: kalite kapısı tanımı ve iş akışlarındaki gerçek kapıların tek listesi; sunucu tarafı zorlamanın olmadığı yazıldı (`KR-111`, `KR-099`, BULGU-10, #217) | Bilgi İşlem |
 | 2026-10-15 | 0.6 | §6: A30 gereksinim belgesinde değişiklik geçmişi satırı (#235) | Bilgi İşlem |
+| 2026-11-14 | 0.7 | Başlık: değişiklik geçmişinde anılan `KR-057`, `KR-096`, `KR-108` "Karar defteri karşılığı" satırına eklendi (T1 geliştirme sonu denetimi TEC.5-9, #389) | Bilgi İşlem |

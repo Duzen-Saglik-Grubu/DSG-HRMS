@@ -2,7 +2,7 @@
 
 **Durum:** **Kabul Edildi**
 **Tarih:** 2026-10-22
-**Karar defteri karşılığı:** `KR-121`, `KR-125`, `KR-126`, `KR-130`
+**Karar defteri karşılığı:** `KR-121`, `KR-125`, `KR-126`, `KR-130`, `KR-128`, `KR-137`, `KR-141`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **Genişlettiği:** ADR-0007 §2–§3 (kapsam ve uygulama noktası), ADR-0009 §3 (erişim kaydı), ADR-0014 §4 (dışa aktarma)
 **İlgili gereksinimler:** PG-PERS-14, 20, 24–27, 31, 35, 36, 42, 44; `KR-116` madde 3
@@ -102,7 +102,7 @@ düzenlenirken değerlendirilir.
 | `personnel.person.view` | Tüm personeli görme (kapsam `All`) | ✔ | ✔ |
 | `personnel.person.view_national_id` | Tam TCKN | ✔ | ✔ |
 | `personnel.person.view_sensitive` | Adres, kan grubu, acil durum kişileri, evlilik bilgisi | ✔ | ✔ |
-| `personnel.person.update` | HRMS'te tutulan alanları girme (görev, evlilik bilgisi, acil durum kişisi; `KR-112`) | ✔ | ✔ |
+| `personnel.person.update` | HRMS'te tutulan alanları girme (görev, evlilik bilgisi, acil durum kişisi; `KR-112`). İzni olan kullanıcı görevini ve acil durum kişilerini kendi kaydı için de girer; izni olmayan kişi kendi kartında görür, değiştiremez (`KR-137`, değişiklik talebi #355) | ✔ | ✔ |
 | `personnel.person.export` | Dışa aktarma (ADR-0014 §4) | ✔ | ✔ |
 | `personnel.correction.view`, `personnel.correction.update` | "İK'ya bildir" taleplerini görme ve kapatma (PG-PERS-37) | ✔ | ✔ |
 | `personnel.quality.view`, `personnel.quality.export` | Veri kalitesi raporu ve dışa aktarımı (PG-PERS-32) | ✔ | ✔ |
@@ -212,3 +212,4 @@ ve testlerin bu bileşenlere dayanmasıdır.
 | 2026-10-22 | 1.2 | Revizyon (T1 tasarım gözden geçirmesi #267, #268): korumalı alanlar ayrı tablolarda ve tip düzeyinde test (B-11); sıralama ve küme işlemleri (B-07); TCKN araması (B-17); izin tablosu ve dağılım (B-14, B-16); erişim kaydında süzgeç değeri yazılmaz, dışa aktarmada kişi kimlikleri, küme işleminde `SpecialCategoryView` (B-01, B-08, B-09); §6 çok sicilli kişi (B-15) | Bilgi İşlem |
 | 2026-10-23 | 1.3 | §4: denetim kayıtları ve parametre izinleri İK'da da (`KR-128`, #278) | Bilgi İşlem |
 | 2026-11-03 | 1.4 | §6: esas sicil, aktif sicillerden işe giriş tarihi en eski olan (`KR-130`, değişiklik talebi #321) | Bilgi İşlem |
+| 2026-11-14 | 1.5 | §4 izin tablosu: izni olan kullanıcı kendi görevini ve acil durum kişilerini girer (`KR-137`, #355; T1 geliştirme sonu denetimi sonrası #389'daki tutarlılık denetimiyle bulundu). §6 sınıflandırması: `KR-130`, `KR-099` (1) kapsamında yerinde genişletmedir. Tersine dönen, bu ADR'nin kapsam ve alan görünürlüğü kararı değil, `KR-126` (4)'teki esas sicil seçimi alt kuralıdır (`KR-141`, #389) | Bilgi İşlem |

@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-093` (§5 gerçekleştirme notu)
+**Karar defteri karşılığı:** `KR-093` (§5 gerçekleştirme notu), `KR-111`, `KR-124`
 **İlgili süreç:** TEC.5 (Tasarım), TEC.8 (Entegrasyon)
 
 ---
@@ -198,3 +198,4 @@ tek noktadan yapılabilir.
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-10-15 | 0.2 | §5: HTTPS zorunluluğunun gerçekleştirme notu (`https-required`; `KR-093`, `KR-099`, `KR-111`, #217) | Bilgi İşlem |
 | 2026-10-22 | 0.3 | §4: sayfa boyutu parametresi ve kod tavanı (`KR-124`, ADR-0022) | Bilgi İşlem |
+| 2026-11-14 | 0.4 | Başlık: değişiklik geçmişinde anılan `KR-111`, `KR-124` "Karar defteri karşılığı" satırına eklendi (T1 geliştirme sonu denetimi TEC.5-9, #389) | Bilgi İşlem |

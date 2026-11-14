@@ -1,6 +1,6 @@
 # Mimari Karar Kayıtları (ADR)
 
-**Son güncelleme:** 2026-10-24
+**Son güncelleme:** 2026-11-14
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama) — *"Design rationale"* çıktısı
 
 ---
@@ -31,6 +31,18 @@ Bu proje için iki nedenle kritiktir:
      yazılır. Eski ADR silinmez; durumu `Yerini aldı: ADR-NNNN` yapılır. Böylece kararın
      geçmişi korunur.
    - Hangisi olduğu belirsizse yeni ADR yazılır.
+   - ADR'yi revize eden karar, karar defterindeki metninde bunu açıkça yazar:
+     `ADR-NNNN §x bu kararla revize edildi`. Sınıflandırma ya yeni ADR'nin
+     **Değiştirdiği:** satırıyla ya da revize edilen ADR'nin değişiklik geçmişinde
+     `KR-099` gerekçesiyle kayda geçer.
+   - **CI denetler (#389):** `doc-consistency-check.mjs`; T3'te iki kez, T1'de üçüncü kez
+     ADR'ler kararların gerisinde kaldığı için (T1 geliştirme sonu denetimi TEC.5-9).
+     Denetim dört şeye bakar:
+     - Bu dizindeki "Son değişiklik", ADR'nin değişiklik geçmişinin son satırıyla aynı.
+     - Geçmişte anılan her `KR`, ADR başlığındaki "Karar defteri karşılığı" satırında var.
+     - ADR'yi "bu kararla" revize eden karar sınıflandırılmış.
+     - Revize edilen bir paydaş gereksinimine "İlgili gereksinimler" başlığında dayanan ADR,
+       kararı anıyor.
 3. Her ADR, `docs/karar-kayit-defteri.md` içindeki ilgili `KR-NNN` kayıtlarına atıf
    yapar. Karar defteri **ne** karar verildiğini, ADR **neden** karar verildiğini tutar.
 4. Yeni ADR `docs/sablonlar/ADR-sablonu.md` şablonuyla oluşturulur.
@@ -53,28 +65,29 @@ değildir.
 
 | No | Başlık | Durum | Son değişiklik | Konu |
 |---|---|---|---|---|
-| [ADR-0001](ADR-0001-teknoloji-yigini.md) | Teknoloji Yığını | Kabul Edildi | 2026-09-09 (0.2) | .NET 10 LTS, React 19, PostgreSQL; AutoMapper/MediatR/QuestPDF reddi |
+| [ADR-0001](ADR-0001-teknoloji-yigini.md) | Teknoloji Yığını | Kabul Edildi; PDF kütüphanesi → ADR-0023 | 2026-11-14 (0.3) | .NET 10 LTS, React 19, PostgreSQL; AutoMapper/MediatR/QuestPDF reddi |
 | [ADR-0002](ADR-0002-cozum-yapisi-ve-katmanli-mimari.md) | Çözüm Yapısı ve Katmanlı Mimari | Kabul Edildi; modül düzeni → ADR-0016 | 2026-10-22 (0.3) | Modüler monolit, 4 katman, bağımlılık kuralları, mimari testi |
 | [ADR-0003](ADR-0003-logo-entegrasyon-stratejisi.md) | LOGO Entegrasyon Stratejisi | Kabul Edildi | 2026-10-22 (0.3) | Salt okuma, yalıtım katmanı, 15 dk snapshot senkronizasyon, şema sapma denetimi |
 | [ADR-0004](ADR-0004-veritabani-tasarim-standartlari.md) | Veritabanı Tasarım Standartları | Kabul Edildi | 2026-10-22 (0.3) | Adlandırma, tipler, soft delete, tarih aralıklı tablolar, migration kuralları |
-| [ADR-0005](ADR-0005-cekirdek-veri-modeli.md) | Çekirdek Veri Modeli | Kabul Edildi | 2026-10-22 (0.5) | Kişi/İstihdam ayrımı, tarih farkındalığı, yönetici grafı |
-| [ADR-0006](ADR-0006-kimlik-dogrulama-ve-oturum.md) | Kimlik Doğrulama, Üyelik ve Oturum | Kabul Edildi; §7'nin iki kuralı → ADR-0017 | 2026-10-22 (1.3) | Üyelik akışı, doğrulama kodu, parola politikası, JWT + yenileme jetonu |
-| [ADR-0007](ADR-0007-yetkilendirme-modeli.md) | Yetkilendirme Modeli | Kabul Edildi | 2026-10-22 (0.5) | Rol (eylem) × Kapsam (satır); `404` tercihi; yetki sızıntısı testi; varsayılan politika oturum ister |
-| [ADR-0008](ADR-0008-sir-ve-yapilandirma-yonetimi.md) | Sır ve Yapılandırma Yönetimi | Kabul Edildi | 2026-09-26 (0.2) | User Secrets / ortam değişkeni, `gitleaks`, açılışta doğrulama |
-| [ADR-0009](ADR-0009-loglama-denetim-izi-ve-kvkk.md) | Loglama, Denetim İzi ve KVKK | Kabul Edildi; §7 → ADR-0018 | 2026-10-22 (0.10) | Üç kayıt türü, maskeleme, erişim kaydı, saklama ve imha |
-| [ADR-0010](ADR-0010-api-sozlesmesi-ve-hata-yonetimi.md) | API Sözleşmesi ve Hata Yönetimi | Kabul Edildi | 2026-10-22 (0.3) | OpenAPI, Problem Details, sayfalama, eşzamanlılık; API'de HTTPS zorunluluğu (`KR-093`) |
-| [ADR-0011](ADR-0011-test-stratejisi.md) | Test Stratejisi ve Kalite Kapıları | Kabul Edildi; §7 Veri sütunu → ADR-0018 | 2026-10-15 (0.6) | Test piramidi, kapsam eşikleri, Testcontainers, kalite kapısı tanımı ve tek kapı listesi |
-| [ADR-0012](ADR-0012-bildirim-altyapisi.md) | Bildirim Altyapısı | Kabul Edildi | 2026-10-22 (0.5) | E-posta/SMS/uygulama içi, NetGSM standart servisi, dayanıklılık |
-| [ADR-0013](ADR-0013-dosya-saklama.md) | Dosya Saklama ve Güvenlik Taraması | Kabul Edildi | 2026-10-22 (0.2) | NAS + `IFileStorage`, ClamAV, yükleme/indirme denetimleri |
-| [ADR-0014](ADR-0014-raporlama-ve-disa-aktarma.md) | Raporlama ve Dışa Aktarma | Kabul Edildi | 2026-10-22 (0.2) | ClosedXML + PDFsharp, `export` izni, dışa aktarma kaydı |
-| [ADR-0015](ADR-0015-frontend-mimarisi.md) | Frontend Mimarisi ve Arayüz İlkeleri | Kabul Edildi | 2026-09-06 (0.1) | Modül bazlı yapı, TanStack Query, ortak bileşenler, kullanılabilirlik |
+| [ADR-0005](ADR-0005-cekirdek-veri-modeli.md) | Çekirdek Veri Modeli | Kabul Edildi | 2026-11-14 (0.6) | Kişi/İstihdam ayrımı, tarih farkındalığı, yönetici grafı |
+| [ADR-0006](ADR-0006-kimlik-dogrulama-ve-oturum.md) | Kimlik Doğrulama, Üyelik ve Oturum | Kabul Edildi; §7'nin iki kuralı → ADR-0017 | 2026-11-14 (1.4) | Üyelik akışı, doğrulama kodu, parola politikası, JWT + yenileme jetonu |
+| [ADR-0007](ADR-0007-yetkilendirme-modeli.md) | Yetkilendirme Modeli | Kabul Edildi | 2026-11-14 (0.6) | Rol (eylem) × Kapsam (satır); `404` tercihi; yetki sızıntısı testi; varsayılan politika oturum ister |
+| [ADR-0008](ADR-0008-sir-ve-yapilandirma-yonetimi.md) | Sır ve Yapılandırma Yönetimi | Kabul Edildi | 2026-11-14 (0.3) | User Secrets / ortam değişkeni, `gitleaks`, açılışta doğrulama |
+| [ADR-0009](ADR-0009-loglama-denetim-izi-ve-kvkk.md) | Loglama, Denetim İzi ve KVKK | Kabul Edildi; §7 → ADR-0018 | 2026-11-14 (0.11) | Üç kayıt türü, maskeleme, erişim kaydı, saklama ve imha |
+| [ADR-0010](ADR-0010-api-sozlesmesi-ve-hata-yonetimi.md) | API Sözleşmesi ve Hata Yönetimi | Kabul Edildi | 2026-11-14 (0.4) | OpenAPI, Problem Details, sayfalama, eşzamanlılık; API'de HTTPS zorunluluğu (`KR-093`) |
+| [ADR-0011](ADR-0011-test-stratejisi.md) | Test Stratejisi ve Kalite Kapıları | Kabul Edildi; §7 Veri sütunu → ADR-0018 | 2026-11-14 (0.7) | Test piramidi, kapsam eşikleri, Testcontainers, kalite kapısı tanımı ve tek kapı listesi |
+| [ADR-0012](ADR-0012-bildirim-altyapisi.md) | Bildirim Altyapısı | Kabul Edildi | 2026-11-14 (0.6) | E-posta/SMS/uygulama içi, NetGSM standart servisi, dayanıklılık |
+| [ADR-0013](ADR-0013-dosya-saklama.md) | Dosya Saklama ve Güvenlik Taraması | Kabul Edildi | 2026-11-14 (0.3) | NAS + `IFileStorage`, ClamAV, yükleme/indirme denetimleri |
+| [ADR-0014](ADR-0014-raporlama-ve-disa-aktarma.md) | Raporlama ve Dışa Aktarma | Kabul Edildi; §1 PDF kütüphanesi → ADR-0023 | 2026-11-14 (0.4) | ClosedXML + SkiaSharp (ADR-0023), `export` izni, dışa aktarma kaydı |
+| [ADR-0015](ADR-0015-frontend-mimarisi.md) | Frontend Mimarisi ve Arayüz İlkeleri | Kabul Edildi | 2026-11-08 (0.2) | Modül bazlı yapı, TanStack Query, ortak bileşenler, kullanılabilirlik |
 | [ADR-0016](ADR-0016-modul-siniri-denetimi.md) | Modül Sınırının Denetimi | Kabul Edildi | 2026-10-22 (0.2) | Bildirilen bağımlılık tablosu; ölçülen ve bildirilen bağımlılıkların birebir karşılaştırılması |
 | [ADR-0017](ADR-0017-iki-adimli-dogrulama-kullanici-tercihi.md) | İki Adımlı Doğrulamanın Kullanıcı Tercihine Bağlanması | Kabul Edildi | 2026-10-14 (1.0) | Parametre yalnızca kullanıma açar; kullanıcı kodla açar, parolayla kapatır; İK kurtarması (`KR-104`) |
 | [ADR-0018](ADR-0018-ortamlarin-verisi.md) | Ortamların Verisi | Kabul Edildi | 2026-10-14 (1.0) | Yerel geliştirme ve UAT gerçek personel verisiyle; CI sentetik (`KR-108`) |
-| [ADR-0019](ADR-0019-personel-verisine-erisim-kapsam-ve-alan-gorunurlugu.md) | Personel Verisine Erişim: Kapsam ve Alan Görünürlüğü | Kabul Edildi | 2026-10-23 (1.3) | `All`/`Self` kapsam, kapsamlı sorgu, tek görünürlük politikası (yanıt, filtre, dışa aktarma); liste erişim kaydında kişi kimlikleri (`KR-121`) |
-| [ADR-0020](ADR-0020-ozel-nitelikli-verinin-sifrelenmesi.md) | Özel Nitelikli Verinin Şifrelenmesi | Kabul Edildi | 2026-10-23 (1.3) | Kan grubu AES-256-GCM, ayrı anahtar, AAD, blind index yok; yerelde senkronize edilmez (`KR-122`) |
-| [ADR-0021](ADR-0021-t1-veri-modeli-genislemesi.md) | T1 Veri Modeli Genişlemesi | Kabul Edildi | 2026-10-24 (1.3) | Kaynağa göre tablo ayrımı, tarih aralıklı atama ve görev, fotoğraf özeti ve küçük hâli, Türkçe karaktersiz arama (`KR-123`) |
-| [ADR-0022](ADR-0022-t1-yatay-cekirdekler.md) | T1'de Kurulan Yatay Çekirdekler | Kabul Edildi | 2026-10-23 (1.4) | Referans veri, denetim kaydı görüntüleme, İK'ya bildir ve uygulama içi bildirim, dışa aktarma, parametreler (`KR-124`) |
+| [ADR-0019](ADR-0019-personel-verisine-erisim-kapsam-ve-alan-gorunurlugu.md) | Personel Verisine Erişim: Kapsam ve Alan Görünürlüğü | Kabul Edildi | 2026-11-14 (1.5) | `All`/`Self` kapsam, kapsamlı sorgu, tek görünürlük politikası (yanıt, filtre, dışa aktarma); liste erişim kaydında kişi kimlikleri (`KR-121`) |
+| [ADR-0020](ADR-0020-ozel-nitelikli-verinin-sifrelenmesi.md) | Özel Nitelikli Verinin Şifrelenmesi | Kabul Edildi | 2026-11-14 (1.6) | Kan grubu AES-256-GCM, ayrı anahtar, AAD, blind index yok; yerelde senkronize edilmez (`KR-122`) |
+| [ADR-0021](ADR-0021-t1-veri-modeli-genislemesi.md) | T1 Veri Modeli Genişlemesi | Kabul Edildi | 2026-11-14 (1.7) | Kaynağa göre tablo ayrımı, tarih aralıklı atama ve görev, fotoğraf özeti ve küçük hâli, Türkçe karaktersiz arama (`KR-123`) |
+| [ADR-0022](ADR-0022-t1-yatay-cekirdekler.md) | T1'de Kurulan Yatay Çekirdekler | Kabul Edildi | 2026-11-14 (1.8) | Referans veri, denetim kaydı görüntüleme, İK'ya bildir ve uygulama içi bildirim, dışa aktarma, parametreler (`KR-124`) |
+| [ADR-0023](ADR-0023-pdf-raporlarinin-skiasharp-ile-uretilmesi.md) | PDF Raporlarının SkiaSharp ile Üretilmesi | Kabul Edildi | 2026-11-14 (1.0) | PDFsharp/MigraDoc AGPL-3.0'a geçti; PDF SkiaSharp ile, Noto Sans gömülü; SixLabors.Fonts 1.x'e sabit (`KR-131`) |
 
 ---
 
@@ -124,3 +137,4 @@ değerlendirilmelidir:
 | 2026-10-23 | 0.12 | ADR-0019 1.3 ve ADR-0022 1.3: İK izinleri (`KR-128`, #278) | Bilgi İşlem |
 | 2026-10-23 | 0.13 | ADR-0020 1.3, ADR-0022 1.4: kan grubu kodları referans veride (`KR-129`, #280) | Bilgi İşlem |
 | 2026-10-24 | 0.14 | ADR-0021 1.3: atamada firma ve tarih aralığı kuralları (#284, #285) | Bilgi İşlem |
+| 2026-11-14 | 0.15 | ADR-0023 eklendi (`KR-131`, `KR-141`); ADR-0001 ve 0014 durumları; dizin 17 ADR'de geçmişle eşitlendi; kural 2'ye sınıflandırma kalıbı ve CI denetimi (T1 geliştirme sonu denetimi TEC.5-9, TEC.5-10; #389) | Bilgi İşlem |

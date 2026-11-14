@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-009`, `KR-010`, `KR-014`, `KR-043`
+**Karar defteri karşılığı:** `KR-009`, `KR-010`, `KR-014`, `KR-043`, `KR-123`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 
 ---
@@ -210,3 +210,4 @@ anlamına gelir. Bu nedenle ölçüme dayandırılmış ve İK ile doğrulanmı�
 | 2026-10-22 | 0.3 | §3: görev ayrı tabloda (`KR-123`, ADR-0021) | Bilgi İşlem |
 | 2026-10-22 | 0.4 | §5: LOGO'da birim firmaya bağlı (`KR-123`, ADR-0021) | Bilgi İşlem |
 | 2026-10-22 | 0.5 | §3: çalışma şekli T1'de kapsam dışı (değişiklik talebi #270) | Bilgi İşlem |
+| 2026-11-14 | 0.6 | Başlık: değişiklik geçmişinde anılan `KR-123` "Karar defteri karşılığı" satırına eklendi (T1 geliştirme sonu denetimi TEC.5-9, #389) | Bilgi İşlem |

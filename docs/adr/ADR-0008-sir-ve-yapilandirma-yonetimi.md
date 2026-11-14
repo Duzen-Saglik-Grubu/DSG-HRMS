@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-030`, `KR-031`, `KR-038`, `KR-041`, `KR-044`
+**Karar defteri karşılığı:** `KR-030`, `KR-031`, `KR-038`, `KR-041`, `KR-044`, `KR-081`
 **İlgili süreç:** TEC.5 (Tasarım), MAN.5 (Konfigürasyon Yönetimi)
 
 ---
@@ -152,3 +152,4 @@ geçilmesi yapılandırma sağlayıcısı eklemekten ibarettir.
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-26 | 0.2 | §7 parametre ekranından değiştirilebilen sırlar (`KR-081`, #83) | Bilgi İşlem |
+| 2026-11-14 | 0.3 | Başlık: değişiklik geçmişinde anılan `KR-081` "Karar defteri karşılığı" satırına eklendi (T1 geliştirme sonu denetimi TEC.5-9, #389) | Bilgi İşlem |

@@ -2,7 +2,7 @@
 
 **Durum:** **Kabul Edildi**
 **Tarih:** 2026-10-22
-**Karar defteri karşılığı:** `KR-123`, `KR-126`
+**Karar defteri karşılığı:** `KR-123`, `KR-126`, `KR-137`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **Genişlettiği:** ADR-0003 (LOGO entegrasyonu), ADR-0004 §3, §5, §7, §10; ADR-0005 §3, §5
 **Ayrıldığı yer:** ADR-0013 §2 (fotoğraflar veritabanında; gerekçe §5)
@@ -79,7 +79,9 @@ karar T2 tasarımına aittir. T1 `organization_unit` tablosunu kurmaz.
 - **LOGO yalnızca bugünkü değeri verir.** Senkronizasyon, değer değiştiğinde açık kaydı
   değişikliği gördüğü günle kapatır ve yeni kaydı açar. Geçmiş, T1'in devreye girdiği günden
   başlar. Önceki dönemler için geçmiş yoktur ve uydurulmaz.
-- Görev değişikliğini İK girer. Önceki görev yeni görevin başlangıç tarihiyle kapanır.
+- Görev değişikliğini `personnel.person.update` izni olan kullanıcı girer; izni olan kullanıcı
+  kendi görevini de girer (`KR-137`, değişiklik talebi #355; ilk hâlinde "İK girer").
+  Önceki görev yeni görevin başlangıç tarihiyle kapanır.
 
 **Tarih aralığı kuralları** (revizyon 1.2, B-06). Her biri bir entegrasyon testiyle sınanır.
 
@@ -285,3 +287,4 @@ yeniden üretilebilir.
 | 2026-11-02 | 1.4 | §5 gerçekleştirme notu: fotoğrafın kaynağı esas istihdam, parçalı okuma, EXIF, önbellek ve ilk yerel ölçüm (#313) | Bilgi İşlem |
 | 2026-11-02 | 1.5 | §5 gerçekleştirme notu: EXIF yönü uygulanmaz, küçültme sürümü, ETag'de küçültme sürümü (#315) | Bilgi İşlem |
 | 2026-11-10 | 1.6 | §5: fotoğraf özeti sorgusunun UAT ölçümü (KPÖ-PERS-4, B-13) ve UAT'deki ilk aktarım (#381) | Bilgi İşlem |
+| 2026-11-14 | 1.7 | §2: görev değişikliğini izni olan kullanıcı girer, kendi görevi dâhil (`KR-137`, #355; #389'daki tutarlılık denetimiyle bulundu) | Bilgi İşlem |

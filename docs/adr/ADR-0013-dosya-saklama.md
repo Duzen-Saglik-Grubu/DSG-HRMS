@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-027`, `KR-023`
+**Karar defteri karşılığı:** `KR-027`, `KR-023`, `KR-123`
 **İlgili süreç:** TEC.5 (Tasarım), TEC.8 (Entegrasyon)
 **İlgili riskler:** `R-03`
 
@@ -166,3 +166,4 @@ mevcut dosyaların taşınması ayrı bir göç işidir.
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-10-22 | 0.2 | §2: personel fotoğrafı istisnası (`KR-123`, ADR-0021) | Bilgi İşlem |
+| 2026-11-14 | 0.3 | Başlık: değişiklik geçmişinde anılan `KR-123` "Karar defteri karşılığı" satırına eklendi (T1 geliştirme sonu denetimi TEC.5-9, #389) | Bilgi İşlem |

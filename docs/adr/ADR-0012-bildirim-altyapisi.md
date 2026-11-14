@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-036`, `KR-042`, `KR-044`
+**Karar defteri karşılığı:** `KR-036`, `KR-042`, `KR-044`, `KR-082`, `KR-083`, `KR-124`
 **İlgili süreç:** TEC.5 (Tasarım), TEC.8 (Entegrasyon)
 **İlgili riskler:** `R-14`
 **Ayrıntı:** `docs/analiz/02-netgsm-sms-entegrasyonu.md`
@@ -192,3 +192,4 @@ ibarettir.
 | 2026-09-27 | 0.3 | §3: gönderen adresi ve görünen ad (Düzen İK Sistemi) yazıldı (#85) | Bilgi İşlem |
 | 2026-10-22 | 0.4 | §4: uygulama içi bildirim ve kalıcı kuyruk henüz yok; bellek içi kuyruğun sınırları (#246) | Bilgi İşlem |
 | 2026-10-22 | 0.5 | §4: uygulama içi bildirim çekirdeği T1'de (`KR-124`, ADR-0022) | Bilgi İşlem |
+| 2026-11-14 | 0.6 | Başlık: değişiklik geçmişinde anılan `KR-082`, `KR-083`, `KR-124` "Karar defteri karşılığı" satırına eklendi (T1 geliştirme sonu denetimi TEC.5-9, #389) | Bilgi İşlem |

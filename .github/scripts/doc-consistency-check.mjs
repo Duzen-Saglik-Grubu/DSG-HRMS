@@ -1,6 +1,6 @@
 // Belge tutarliligi denetimi (MAN.6 / TEC.3; #214, denetim A-06 ve TEC.3-7)
 //
-// Iki kural denetlenir:
+// Uc kural denetlenir (3. kural #389'da eklendi; ayrintisi kendi bolumunde):
 //   1. "Son guncelleme" basligi, degisiklik gecmisinin en yeni satirindan eski olamaz
 //      (harita bolum 4.4, MAN.6 YAKLASIM bolum 2.1). docs/ altindaki her .md dosyasinda, hem
 //      basinda "**Son guncelleme:** YYYY-AA-GG" hem sonunda "Degisiklik Gecmisi"
@@ -8,6 +8,8 @@
 //   2. SYG-*.md bolum 1 ozet sayimlari bolum 4 tablosundan (ve bolum 5 KPO tablosundan) yeniden
 //      hesaplananla ayni. bolum 1'de taninmayan bir satir varsa denetim duser: sayilmayan
 //      bir satir, denetleniyormus gibi gorunmemelidir; betik genisletilir.
+//   3. ADR'ler: dizin <-> degisiklik gecmisi, gecmis <-> baslik karar listesi, KR-099
+//      siniflandirmasi ve revize edilen paydas gereksinimine dayanan ADR'nin karari anmasi.
 //
 // Neden otomatik? 13.10.2026 modul sonu denetiminde 13 belgenin basligi gecmisin
 // gerisindeydi ve SYG bolum 1 sayimlari iki degisiklik talebi sonrasinda bayatti. Yazili
@@ -132,6 +134,94 @@ export function checkSummary(module, systemDoc, stakeholderDoc) {
   return errors;
 }
 
+// ------------------------------------------------------------------ 3. ADR'ler ve kararlar (#389)
+//
+// ADR'ler T3'te iki kez, T1'de ucuncu kez kararlarin gerisinde kaldi (TEC.5-9): dizin bes ADR'de
+// bayatti, ADR-0022 KR-132'yi ve KR-131'i yansitmiyordu, KR-099 siniflandirmasi yapilmamisti.
+// #212 maddeleri tek tek kapatti; kopyalar arasinda otomatik bag yoktu. Dort kural:
+//   a. Dizin (docs/adr/README.md): her ADR'nin satiri var; "Son degisiklik" = gecmisin son satiri.
+//   b. ADR gecmisinde anilan her KR, ADR basligindaki "Karar defteri karsiligi" satirinda da var
+//      (KR-099 yordam kuralidir, karar degildir; sayilmaz).
+//   c. KR-099 siniflandirmasi: "ADR-NNNN ... bu kararla revize edildi" diyen karar ya yeni bir
+//      ADR'yle ("Degistirdigi: ADR-NNNN" basligi ve karar basligin listesinde) ya da ADR-NNNN
+//      gecmisinde karari anan satirda "KR-099" gerekcesiyle kayitlidir.
+//   d. "bu kararla revize edildi" diyen kararin revize ettigi PG kimligi bir ADR'nin "Ilgili
+//      gereksinimler" basliginda varsa, o ADR karari anar (KR-132 -> ADR-0022 §3 boyle kaydi).
+const ADR_HISTORY = /^\| (\d{4}-\d{2}-\d{2}) \| ([\d.]+) \|/;
+const KR_SINCE_099 = (id) => Number(id.slice(3)) > 99; // siniflandirma kurali KR-099'la basladi
+
+function headerLine(text, label) {
+  return (text.match(new RegExp(`^\\*\\*${label}:\\*\\*.*$`, 'm')) || [''])[0];
+}
+
+// "PG-PERS-17, 21, 24–27" -> PG-PERS-17, PG-PERS-21, PG-PERS-24 ... PG-PERS-27
+function pgIds(text) {
+  const out = new Set();
+  for (const m of text.matchAll(/PG-([A-Z]+)-([\d\s,–-]+)/g)) {
+    for (const part of m[2].split(',')) {
+      const r = part.trim().match(/^(\d+)(?:\s*[–-]\s*(\d+))?$/);
+      if (!r) break;
+      const last = r[2] ? Number(r[2]) : Number(r[1]);
+      for (let i = Number(r[1]); i <= last; i++) out.add(`PG-${m[1]}-${String(i).padStart(2, '0')}`);
+    }
+  }
+  return out;
+}
+
+// adrs: [{ id, file, text }]; register: karar defteri metni. Hata iletileri dondurur.
+function checkAdrs(readme, adrs, register) {
+  const errors = [];
+  const readmeLines = readme.split('\n');
+  for (const adr of adrs) {
+    const history = adr.text.split('\n').filter((l) => ADR_HISTORY.test(l));
+    const last = history.at(-1)?.match(ADR_HISTORY);
+    // a. dizin
+    const row = readmeLines.find((l) => l.includes(`](${adr.file})`));
+    if (!row) {
+      errors.push(`${adr.id}: dizinde (docs/adr/README.md) satırı yok`);
+    } else if (last) {
+      const cell = row.split('|')[4]?.trim();
+      const expected = `${last[1]} (${last[2]})`;
+      if (cell !== expected) errors.push(`${adr.id}: dizinde "Son değişiklik" ${cell}, değişiklik geçmişinin son satırı ${expected}`);
+    }
+    // b. baslik
+    const header = headerLine(adr.text, 'Karar defteri karşılığı');
+    const cited = new Set(history.join('\n').match(/KR-\d{3}/g) || []);
+    cited.delete('KR-099');
+    const missing = [...cited].filter((kr) => !header.includes(kr));
+    if (missing.length) errors.push(`${adr.id}: değişiklik geçmişinde anılan ${missing.join(', ')} başlıktaki "Karar defteri karşılığı" satırında yok`);
+  }
+  const byId = new Map(adrs.map((a) => [a.id, a]));
+  for (const line of register.split('\n').filter((l) => /^\| KR-\d{3} \|/.test(l))) {
+    const kr = line.slice(2, 8);
+    const decision = line.split('|')[4] || '';
+    if (!/bu kararla revize/.test(decision)) continue;
+    // c. KR-099 siniflandirmasi
+    if (KR_SINCE_099(kr)) {
+      for (const target of new Set(decision.match(/ADR-\d{4}/g) || [])) {
+        const asNewAdr = adrs.some((a) => a.id !== target
+          && headerLine(a.text, 'Değiştirdiği').includes(target)
+          && headerLine(a.text, 'Karar defteri karşılığı').includes(kr));
+        const inPlace = byId.get(target)?.text.split('\n')
+          .some((l) => ADR_HISTORY.test(l) && l.includes(kr) && l.includes('KR-099'));
+        if (!asNewAdr && !inPlace) {
+          errors.push(`${kr}: ${target}'ü revize ediyor ama KR-099 sınıflandırması yok — yeni ADR ("Değiştirdiği: ${target}") ya da ${target} geçmişinde "KR-099" gerekçeli satır`);
+        }
+      }
+    }
+    // d. PG -> ADR bagi
+    const revised = pgIds(decision);
+    for (const adr of adrs) {
+      const related = pgIds(headerLine(adr.text, 'İlgili gereksinimler'));
+      const hit = [...revised].filter((pg) => related.has(pg));
+      if (hit.length && !adr.text.includes(kr)) {
+        errors.push(`${kr}: ${hit.join(', ')} revize edildi; ${adr.id} bu gereksinime dayanıyor ama kararı anmıyor (metin bayat olabilir)`);
+      }
+    }
+  }
+  return errors;
+}
+
 // ------------------------------------------------------------------ calistir
 
 function markdownFiles() {
@@ -193,6 +283,46 @@ for (const module of modules) {
     for (const e of errors) console.error(`    ${e}`);
   } else {
     console.log(`✓ SYG-${module}: §1 özet sayımları §4 ve §5 ile tutarlı`);
+  }
+}
+
+// --- 3. ADR'ler ve kararlar (#389)
+const ADR_DIR = 'docs/adr';
+const adrFiles = existsSync(join(ROOT, ADR_DIR))
+  ? readdirSync(join(ROOT, ADR_DIR)).filter((f) => /^ADR-\d{4}-.*\.md$/.test(f))
+  : [];
+if (!adrFiles.length) {
+  fail('ADR kuralı: docs/adr altında ADR bulunamadı — yol veya ad kalıbı bozulmuş olabilir');
+} else {
+  const adrs = adrFiles.map((file) => ({ id: file.slice(0, 8), file, text: read(join(ROOT, ADR_DIR, file)) }));
+  const readme = read(join(ROOT, ADR_DIR, 'README.md'));
+  const register = read(join(ROOT, 'docs/karar-kayit-defteri.md'));
+
+  // Once denetimin kendisi: dort kuralin her biri bozulmus bir ornegi yakalamali.
+  const first = adrs.find((a) => headerLine(a.text, 'İlgili gereksinimler').includes('PG-')) ?? adrs[0];
+  const firstPg = [...pgIds(headerLine(first.text, 'İlgili gereksinimler'))][0] ?? 'PG-XXXX-01';
+  const fakeKr = (text) => `| KR-999 | 2099-01-01 | sınama | ${text} | - | - | - |`;
+  const probes = [
+    ['dizin', checkAdrs(readme.replace(`](${first.file})`, '](yok.md)'), adrs, register)],
+    ['başlık', checkAdrs(readme, adrs.map((a) => (a === first
+      ? { ...a, text: a.text + '\n| 2099-01-01 | 9.9 | sınama (`KR-998`) | - |' } : a)), register)],
+    ['sınıflandırma', checkAdrs(readme, adrs, `${register}\n${fakeKr(`${first.id} §1 bu kararla revize edildi`)}`)],
+    ['PG bağı', checkAdrs(readme, adrs, `${register}\n${fakeKr(`${firstPg} bu kararla revize edildi`)}`)],
+  ];
+  // Sayi degil ileti karsilastirilir: ornek ADR'de zaten bir bulgu varsa bozma onun yerine
+  // yenisini koyar ve sayi degismez.
+  const baseline = new Set(checkAdrs(readme, adrs, register));
+  const blind = probes.filter(([, errs]) => !errs.some((e) => !baseline.has(e))).map(([name]) => name);
+  if (blind.length) {
+    fail(`ADR kuralı kendi sınamasını geçemedi — bozulan örnek yakalanmadı: ${blind.join(', ')}`);
+  } else {
+    const errors = checkAdrs(readme, adrs, register);
+    if (errors.length) {
+      fail(`ADR kuralı: ${errors.length} sorun (docs/adr/README.md kural 2-3, KR-099)`);
+      for (const e of errors) console.error(`    ${e}`);
+    } else {
+      console.log(`✓ ADR: ${adrs.length} ADR dizinle, başlık karar listeleriyle ve karar defteriyle tutarlı`);
+    }
   }
 }
 

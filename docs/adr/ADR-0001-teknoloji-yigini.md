@@ -1,8 +1,8 @@
 # ADR-0001 — Teknoloji Yığını
 
-**Durum:** Kabul Edildi
+**Durum:** Kabul Edildi — PDF kütüphanesi **ADR-0023 ile değiştirildi** (04.11.2026; ADR olarak 14.11.2026)
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-001`, `KR-005`, `KR-006`, `KR-025`, `KR-026`, `KR-057`
+**Karar defteri karşılığı:** `KR-001`, `KR-005`, `KR-006`, `KR-025`, `KR-026`, `KR-057`, `KR-131` (→ ADR-0023), `KR-141`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 
 ---
@@ -39,7 +39,7 @@ Aşağıdaki yığın kullanılacaktır.
 | Zamanlanmış işler | **Hosted Service** (LOGO senkronizasyonu vb.) | Harici zamanlayıcı bağımlılığı yok |
 | Dayanıklılık | **Microsoft.Extensions.Http.Resilience** | Yeniden deneme, zaman aşımı, devre kesici |
 | Excel | **ClosedXML** (MIT) | |
-| PDF | **PDFsharp / MigraDoc 6.x** (MIT) | QuestPDF **kullanılmayacak** |
+| PDF | **SkiaSharp** (MIT) — ADR-0023 (`KR-131`) | QuestPDF **kullanılmayacak**. İlk hâlinde PDFsharp / MigraDoc 6.x'ti; 6.5.0'dan itibaren AGPL-3.0 |
 | Birim test | **xUnit** + **Shouldly** + **NSubstitute** | FluentAssertions **kullanılmayacak** (`KR-057`) |
 | Mimari denetimi | **NetArchTest.Rules** | Katman ve modül kurallarını otomatik denetler (ADR-0002) |
 | Entegrasyon test | **Testcontainers** (gerçek PostgreSQL) | In-memory sağlayıcı kullanılmayacak |
@@ -132,9 +132,9 @@ Bu ADR yalnızca ana sürümleri ve seçimleri belirler; sürüm envanteri
 - Linux ve konteyner uyumu baştan sağlanmış.
 
 **Olumsuz / kabul edilen ödünler:**
-- PDFsharp/MigraDoc, QuestPDF'e göre daha düşük seviyeli bir API sunar; karmaşık tablo
-  düzenleri için daha fazla kod yazılacaktır. Türkçe karakterler için font açıkça
-  gömülecek ve Linux'ta font çözücü tanımlanacaktır.
+- PDF kütüphanesi (SkiaSharp, ADR-0023) bir belge düzeni kütüphanesi değildir; tablo ve
+  sayfalama ortak yazıcıda elle çizilir. Türkçe karakterler için yazı tipi (Noto Sans)
+  gömülüdür. *(İlk hâlinde bu madde PDFsharp/MigraDoc içindi.)*
 - Mapperly ekipte AutoMapper kadar bilinmiyor; kısa bir alışma dönemi olacaktır.
 
 **Yükümlülükler:**
@@ -157,3 +157,4 @@ Bu ADR yalnızca ana sürümleri ve seçimleri belirler; sürüm envanteri
 |---|---|---|---|
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-09-09 | 0.2 | FluentAssertions lisans değişikliği nedeniyle Shouldly ile değiştirildi (`KR-057`) | Bilgi İşlem |
+| 2026-11-14 | 0.3 | PDF satırı ve ödünler: PDFsharp/MigraDoc yerine SkiaSharp, ADR-0023'e bağlandı (`KR-131`, `KR-141`, #389) | Bilgi İşlem |

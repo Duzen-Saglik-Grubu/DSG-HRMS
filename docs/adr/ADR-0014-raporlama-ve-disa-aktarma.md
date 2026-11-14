@@ -1,9 +1,9 @@
 # ADR-0014 — Raporlama ve Dışa Aktarma
 
-**Durum:** Kabul Edildi
+**Durum:** Kabul Edildi — §1'in PDF kütüphanesi **ADR-0023 ile değiştirildi** (04.11.2026; ADR olarak 14.11.2026)
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-025`, `KR-026`, `KR-131`
-**Son güncelleme:** 2026-11-04
+**Karar defteri karşılığı:** `KR-025`, `KR-026`, `KR-121`, `KR-124`, `KR-131` (→ ADR-0023), `KR-141`
+**Son güncelleme:** 2026-11-14
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **İlgili riskler:** `R-03`
 
@@ -25,7 +25,7 @@ kurum dışına çıkarabilecek bir dosyaya dönüştürmek aynı şey değildir
 | Biçim | Kütüphane | Lisans |
 |---|---|---|
 | Excel (`.xlsx`) | **ClosedXML** | MIT |
-| PDF | **SkiaSharp** (`KR-131`) | MIT |
+| PDF | **SkiaSharp** (ADR-0023, `KR-131`) | MIT |
 
 **QuestPDF kullanılmayacaktır** (`KR-025`): Community lisansı ciro eşiğine bağlıdır;
 kurum koşullu lisanslı paket istemiyor.
@@ -36,11 +36,14 @@ kurum koşullu lisanslı paket istemiyor.
 > `PdfReportWriter`). ClosedXML'in yazı tipi bağımlılığı SixLabors.Fonts 1.0.1'e (Apache-2.0)
 > sabittir; 2.x ciroya bağlı lisanslıdır. Yazı tipi Noto Sans (OFL) gömülüdür; SkiaSharp'ın
 > bağımlılıksız yerel paketi alt kümeleme yapmadığı için her PDF'e yaklaşık 0,65 MB sabit ek gelir.
+>
+> **ADR-0023 (14.11.2026, `KR-141`, #389).** Bu revizyon yerinde yapılmıştı; `KR-099` (2),
+> yerine başka bir çözüm koyan değişikliği yeni ADR ile ister. Kararın bağlamı, alternatifleri
+> ve sonuçları ADR-0023'tedir; bu bölümün PDF satırı oraya bağlıdır.
 
-**Türkçe karakter:** PDF üretiminde font **açıkça gömülecek** (örn. DejaVu Sans veya
-Noto Sans) ve Linux için font çözücü tanımlanacaktır. Bu, PDFsharp'ta atlanırsa Türkçe
-karakterlerin bozulmasına yol açan bilinen bir noktadır; iskelette bir kez çözülüp
-ortak bir yardımcı sınıfa alınacaktır.
+**Türkçe karakter:** PDF üretiminde yazı tipi **açıkça gömülür** (Noto Sans; ADR-0023);
+Linux'ta sistem yazı tipine bağlı kalınmaz. Bu, ortak yazıcıda (`PdfReportWriter`) bir kez
+çözüldü.
 
 ### 2. Raporlama mimarisi
 
@@ -168,3 +171,4 @@ etkiler.
 | 2026-09-06 | 0.1 | İlk oluşturma | Bilgi İşlem |
 | 2026-10-22 | 0.2 | §4: alan seçmeli dışa aktarma (`KR-121`, `KR-124`) | Bilgi İşlem |
 | 2026-11-04 | 0.3 | §1: PDF kütüphanesi SkiaSharp; PDFsharp/MigraDoc AGPL-3.0'a geçti; SixLabors.Fonts 1.x'e sabit (`KR-131`, #330) | Bilgi İşlem |
+| 2026-11-14 | 0.4 | Durum ve §1: PDF kütüphanesi değişikliği ADR-0023'e bağlandı (`KR-099` (2) sınıflandırması, `KR-141`); §1 Türkçe karakter notu güncellendi; başlıkta `KR-121`, `KR-124` (#389) | Bilgi İşlem |
