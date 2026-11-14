@@ -10,6 +10,7 @@ doğrulama geçtikten sonra ekler; satır PR ile commit edilir. Aynı bilgi sunu
 
 - **Sürüm:** `git describe --tags --always` çıktısı. Etiketli commit'te etiketin kendisidir (örn. `v0.2.0-rc.1`). Etiketsiz commit'te en yakın etiket, uzaklık ve kısa SHA'dır (örn. `v0.1.0-74-g89a027c`).
 - **Zaman:** UTC.
+- **A6:** Kurulum sonrası kısa kontrolün sonucu; betik 14.11.2026'dan (#391) itibaren her kurulumda yazar. Önceki satırlarda "—": A6 elle ve yalnızca adaylarda yapılıyordu (`KR-110`). Sürüme eklenen "(dal)", `main`'in atası olmayan bir commit'in bilerek kurulduğunu gösterir (`ALLOW_NON_MAIN=1`).
 
 > **Kayıt öncesi:** Bu kayıt 04.10.2026'da başladı (#125). Bilinen son dağıtım `2d79f01`'dir
 > (#141, 04.10.2026). O tarihe kadarki dağıtımlar etiketsizdi ve commit kaydı tutulmadı.
@@ -26,12 +27,12 @@ doğrulama geçtikten sonra ekler; satır PR ile commit edilir. Aynı bilgi sunu
 > **Notlar tablonun üstündedir:** betik satırı dosyanın sonuna ekler; tablonun altına yazılan not
 > tabloyu böler (T1 denetimi A-16, YB-05).
 
-| Zaman (UTC) | Sürüm | Commit | Dağıtan |
-|---|---|---|---|
-| 2026-10-04T18:47:00Z | v0.2.0-rc.1 | `6cfeef0` | Doğuş Uçanok |
-| 2026-10-04T20:04:34Z | v0.2.0-rc.2 | `69bafad` | Doğuş Uçanok |
-| 2026-10-10T13:02:28Z | v0.2.0-rc.3 | `fa3e194` | Doğuş Uçanok |
-| 2026-10-10T21:56:02Z | v0.2.0-rc.4 | `353eae7` | Doğuş Uçanok |
-| 2026-10-12T19:51:46Z | v0.2.0-rc.5 | `149f6ee` | Doğuş Uçanok |
-| 2026-10-21T11:33:58Z | v0.2.0-27-ge488898 | `e488898` | Doğuş Uçanok |
-| 2026-11-09T21:26:10Z | v0.2.0-89-g6dbe9d5 | `6dbe9d5` | Claude (Doğuş Uçanok onayıyla) |
+| Zaman (UTC) | Sürüm | Commit | Dağıtan | A6 |
+|---|---|---|---|---|
+| 2026-10-04T18:47:00Z | v0.2.0-rc.1 | `6cfeef0` | Doğuş Uçanok | — |
+| 2026-10-04T20:04:34Z | v0.2.0-rc.2 | `69bafad` | Doğuş Uçanok | — |
+| 2026-10-10T13:02:28Z | v0.2.0-rc.3 | `fa3e194` | Doğuş Uçanok | — |
+| 2026-10-10T21:56:02Z | v0.2.0-rc.4 | `353eae7` | Doğuş Uçanok | — |
+| 2026-10-12T19:51:46Z | v0.2.0-rc.5 | `149f6ee` | Doğuş Uçanok | — |
+| 2026-10-21T11:33:58Z | v0.2.0-27-ge488898 | `e488898` | Doğuş Uçanok | — |
+| 2026-11-09T21:26:10Z | v0.2.0-89-g6dbe9d5 | `6dbe9d5` | Claude (Doğuş Uçanok onayıyla) | — |

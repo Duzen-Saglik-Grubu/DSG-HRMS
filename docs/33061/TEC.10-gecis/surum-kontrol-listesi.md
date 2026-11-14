@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.10-KL-SURUM
 **Süreç:** TEC.10 — Geçiş, MAN.5 — Konfigürasyon Yönetimi, TEC.9 — Doğrulama, TEC.11 — Geçerleme
-**Son güncelleme:** 2026-10-15 · **Sahibi:** Bilgi İşlem
+**Son güncelleme:** 2026-11-14 · **Sahibi:** Bilgi İşlem
 **Dayanak:** `KR-097` (sürümleme), `KR-110` (konfigürasyon denetimi sıklığı), CONTRIBUTING §9
 
 > **Neden var?** T3'te sürüm adımları beş ayrı belgede yazılıydı ve kontrol listesi yoktu.
@@ -28,7 +28,7 @@ dener ve Bilgi İşlem kabul planının senaryolarını prova eder.
 | A3 | PR birleşince **`main` CI'ı yeşil** (CI, API sözleşme denetimi, Dal Koruma Denetimi) | Çalışma numarası |
 | A4 | Açıklamalı etiket `main`'deki commit'e konur ve gönderilir: `git tag -a vX.Y.0-rc.N -m "<CHANGELOG başlığı>" <commit>` | `git tag -n2` |
 | A5 | UAT'ye etiketten kurulum: `git checkout vX.Y.0-rc.N && bash docker/deploy-uat.sh`. Betik kendi doğrulamasını yapar ve dağıtım kaydına satır ekler | Betik çıktısı |
-| A6 | **Kurulum sonrası kısa kontrol** (her adayda): konteynerler `healthy`; sağlık uçlarının üçü `Healthy`; çalışan imajın commit'i etiketle aynı; son migration depodakiyle aynı; dışarıya açık portlar (`ss -ltnup`) yalnız 22/80/443; `secrets/` dizininde yalnız `.env.uat`; API günlüğünde hata yok | Kayıt PR'ında satır |
+| A6 | **Kurulum sonrası kısa kontrol** — her kurulumda, etiketsiz kurulum dahil; `deploy-uat.sh` yapar ve tutmazsa dağıtım başarısız sayılır (#391): konteynerler `healthy`; sağlık uçlarının üçü `Healthy`; çalışan imajın commit'i etiketle aynı; son migration depodakiyle aynı; dışarıya açık portlar (`ss -ltnup`) yalnız 22/80/443; `secrets/` dizininde yalnız `.env.uat`; API günlüğünde hata yok | Dağıtım kaydının A6 sütunu (betik yazar); kayıt PR'ında satır |
 | A7 | **CI kanıt özeti** etiketin commit'inin CI çalışmasından **hemen** üretilir: `node .github/scripts/ci-evidence-summary.mjs <çalışma> docs/33061/TEC.9-dogrulama/kayitlar/<tarih>-vX.Y.0-rc.N-ci-kanit-ozeti.md "<başlık>"` | Özet dosyası |
 | A8 | **Tam konfigürasyon denetimi** — yalnız **İK kabul oturumuna sunulacak son adayda** (`KR-110`). Ara adaylarda A6 yeterlidir | `MAN.5-…/raporlar/` |
 | A9 | **Kayıt PR'ı:** dağıtım kaydı satırı, CI kanıt özeti, A6 sonucu, kabul planı §4 "etiketlendi ve UAT'ye kuruldu" maddesi işaretlenir | PR |
@@ -60,3 +60,4 @@ dener ve Bilgi İşlem kabul planının senaryolarını prova eder.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-15 | 1.0 | İlk oluşturma: T3 deneyiminden (#218, `KR-110`) | Bilgi İşlem |
+| 2026-11-14 | 1.1 | A6 her kurulumda ve betikle; sonuç dağıtım kaydının A6 sütununda (#391) | Bilgi İşlem |

@@ -53,6 +53,17 @@ git diff --quiet HEAD -- src docker global.json assets \
 COMMIT=$(git rev-parse HEAD)
 [[ -n "$(git branch -r --contains "$COMMIT" 2>/dev/null)" ]] \
   || fail "$COMMIT GitHub'da yok. Once gonderin (push); dagitilan her surum depoda izlenebilir olmalidir."
+# Dagitilan commit main'in atasi olmali (#391, YB-04): 21.10-09.11.2026 arasinda UAT'de PR #258'in
+# dal commit'i (e488898) calisti; kodu birlesen commit'le ayniydi ama kayit main'de olmayan bir
+# commit'i gosteriyordu. Dal commit'i yalnizca bilerek kurulur ve kayda "(dal)" olarak gecer.
+git fetch -q origin main || fail "origin/main alinamadi; main atasi denetimi yapilamaz."
+BRANCH_NOTE=''
+if ! git merge-base --is-ancestor "$COMMIT" origin/main; then
+  [[ "${ALLOW_NON_MAIN:-}" == '1' ]] \
+    || fail "$COMMIT main'in atasi degil. Once PR'i birlestirip main'den kurun. Dal commit'i bilerek kurulacaksa: ALLOW_NON_MAIN=1 ./docker/deploy-uat.sh"
+  BRANCH_NOTE=' (dal)'
+  echo '  Uyari: main disi commit kuruluyor (ALLOW_NON_MAIN=1); kayda "(dal)" olarak yazilacak.'
+fi
 # Etiketli commit'te etiketin kendisi (v0.2.0-rc.1), degilse en yakin etiket + uzaklik + kisa SHA.
 VERSION=$(git describe --tags --always)
 DEPLOYER=$(git config user.name || echo bilinmiyor)
@@ -67,6 +78,12 @@ ssh "$SERVER" "test -f $SECRETS_FILE" \
 # Calisma rolunun parolasi (#244, B-01). Yoksa yigin baslamaz; once runbook §2.2.1.
 ssh "$SERVER" "grep -q '^HRMS_APP_DB_PASSWORD=' $SECRETS_FILE" \
   || fail "$SECRETS_FILE icinde HRMS_APP_DB_PASSWORD yok. Runbook §2.2.1'i uygulayin."
+# Sir dizininde .env.uat'tan baska dosya olmamali (A6; #391, D-09). 13.10'da (#207) ve 03.11'de
+# (A-01) kayit disi bir sir kopyasi bulundu; ikisi de elle denetimde, gunler sonra goruldu.
+# Yalnizca dosya ADLARI yazilir, icerik okunmaz.
+extra_secrets=$(ssh "$SERVER" "ls -A $(dirname "$SECRETS_FILE") | grep -vx '.env.uat' || true")
+[[ -z "$extra_secrets" ]] \
+  || fail "Sir dizininde .env.uat disinda dosya var: $(tr '\n' ' ' <<<"$extra_secrets"). Kayit disi sir kopyasidir; silin ya da gerekcesini bilgi kayit defterine yazin (runbook §2.2)."
 
 info 'Kaynak aktariliyor'
 # git archive: yalnizca commit'teki dosyalar gider. Calisma kopyasindaki yerel
@@ -109,6 +126,8 @@ ssh "$SERVER" "cd $APP_DIR/docker && set -a && . $SECRETS_FILE && set +a \
   && bash postgres/apply-app-role.sh dsg-hrms-uat-postgres"
 
 info 'Yigin baslatiliyor'
+# A6'daki gunluk denetimi bu andan sonraki kayitlara bakar.
+STACK_STARTED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 ssh "$SERVER" "cd $APP_DIR/docker && docker compose -f compose.uat.yml --env-file $SECRETS_FILE up -d"
 
 info 'Dogrulaniyor'
@@ -171,14 +190,57 @@ for c in dsg-hrms-uat-api dsg-hrms-uat-web; do
   [[ "$running" == "$COMMIT" ]] || fail "$c dagitilan commit'i calistirmiyor (calisan: ${running:-etiketsiz})"
 done
 
+info 'Kurulum sonrasi kisa kontrol (A6)'
+# Surum kontrol listesi A6 (KR-110) her kurulumda calisir; etiketsiz kurulum da dahil (#391).
+# Onceden elle yapiliyordu ve yalnizca adaylarda zorunluydu; 21.10-09.11 arasindaki etiketsiz
+# kurulumlarda kayit disi sir kopyasi ve main disi commit fark edilmedi. Calisan commit ve
+# sir dizini yukarida denetlendi.
+
+# Konteynerler saglikli.
+unhealthy=$(ssh "$SERVER" "docker ps --filter name=dsg-hrms-uat --format '{{.Names}} {{.Status}}' | grep -v '(healthy)' || true")
+[[ -z "$unhealthy" ]] || fail "Saglikli olmayan konteyner: $unhealthy"
+
+# Saglik uclari: hazirlik, senkronizasyon ve bildirim. Yalnizca durum alani okunur.
+for ep in ready sync notifications; do
+  for i in $(seq 1 12); do
+    ep_status=$(curl -s --max-time 10 "$BASE_URL/health/$ep" | grep -o '"status":"[A-Za-z]*"' | head -1 | cut -d'"' -f4 || true)
+    [[ "$ep_status" == 'Healthy' ]] && break
+    sleep 5
+  done
+  [[ "$ep_status" == 'Healthy' ]] || fail "/health/$ep saglikli degil (durum: ${ep_status:-yok})"
+done
+
+# Son migration depodakiyle ayni.
+repo_migration=$(git ls-tree --name-only "$COMMIT" src/backend/Dsg.Hrms.Infrastructure/Data/Migrations/ \
+  | xargs -n1 basename | grep -E '^[0-9]{14}_.*\.cs$' | grep -v '\.Designer\.cs$' | sort | tail -1 | sed 's/\.cs$//')
+db_migration=$(ssh "$SERVER" "cd $APP_DIR/docker && set -a && . $SECRETS_FILE && set +a \
+  && docker exec dsg-hrms-uat-postgres psql -U \"\$POSTGRES_USER\" -d \"\$POSTGRES_DB\" -tAc \
+     'SELECT max(migration_id) FROM public.__ef_migrations_history'")
+[[ -n "$repo_migration" && "$db_migration" == "$repo_migration" ]] \
+  || fail "Son migration farkli (depo: ${repo_migration:-yok}, veritabani: ${db_migration:-yok})"
+
+# Disariya acik portlar yalnizca 22, 80, 443 (TCP ve UDP; runbook §6).
+open_ports=$(ssh "$SERVER" "ss -ltnupH" | awk '{print $5}' \
+  | grep -vE '^(127\.|\[::1\]|[^ ]*%lo:)' | sed -E 's/.*:([0-9]+)$/\1/' | sort -un | tr '\n' ' ')
+for port in $open_ports; do
+  [[ "$port" =~ ^(22|80|443)$ ]] || fail "Disariya acik beklenmeyen port: $port (acik: $open_ports)"
+done
+
+# API gunlugunde yigin basladiktan sonra hata yok. Ileti icerigi yazdirilmaz, yalnizca sayilir.
+log_errors=$(ssh "$SERVER" "docker logs --since $STACK_STARTED dsg-hrms-uat-api 2>&1 | grep -cE '\"Level\":\"(Error|Fatal)\"' || true")
+[[ "${log_errors:-0}" -eq 0 ]] || fail "API gunlugunde $log_errors hata kaydi var (docker logs --since $STACK_STARTED dsg-hrms-uat-api)"
+
+A6_RESULT="A6 ✓ sağlık 3/3, migration \`${repo_migration%%_*}\`, port $(tr ' ' '/' <<<"${open_ports% }"), sır dizini, günlük 0 hata"
+echo "  $A6_RESULT"
+
 info 'Dagitim kaydediliyor'
 DEPLOYED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 # Sunucudaki kayit: sunucuya bakan herkes ne zaman neyin kuruldugunu gorur.
-ssh "$SERVER" "printf '%s\t%s\t%s\t%s\n' '$DEPLOYED_AT' '$VERSION' '$COMMIT' '$DEPLOYER' >> $APP_DIR/deployments.log \
+ssh "$SERVER" "printf '%s\t%s\t%s\t%s\t%s\n' '$DEPLOYED_AT' '$VERSION$BRANCH_NOTE' '$COMMIT' '$DEPLOYER' 'A6 ok' >> $APP_DIR/deployments.log \
   && printf '%s %s\n' '$VERSION' '$COMMIT' > $APP_DIR/VERSION"
 # Depodaki kayit: PR ile commit edilir; boylece dagitim gecmisi kalici kanittir.
 RECORD=docs/33061/TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md
-printf '| %s | %s | `%s` | %s |\n' "$DEPLOYED_AT" "$VERSION" "${COMMIT:0:7}" "$DEPLOYER" >> "$RECORD"
+printf '| %s | %s | `%s` | %s | %s |\n' "$DEPLOYED_AT" "$VERSION$BRANCH_NOTE" "${COMMIT:0:7}" "$DEPLOYER" "$A6_RESULT" >> "$RECORD"
 echo "  $RECORD dosyasina satir eklendi; PR ile commit edin."
 
 printf '\n\033[1;32mDagitim tamam.\033[0m %s (%s)\n' "$BASE_URL" "$VERSION"
