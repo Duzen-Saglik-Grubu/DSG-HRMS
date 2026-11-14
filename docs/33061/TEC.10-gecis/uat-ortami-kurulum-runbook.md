@@ -1,7 +1,7 @@
 # UAT Ortamı — Kurulum ve Dağıtım Runbook'u
 
 **Belge kimliği:** TEC.10-RB-001
-**Son güncelleme:** 2026-11-10
+**Son güncelleme:** 2026-11-14
 **İlgili süreçler:** TEC.10 (Geçiş), MAN.5 (Konfigürasyon Yönetimi)
 **İlgili kararlar:** `KR-024`, `KR-038`, `KR-065`, `KR-097`
 
@@ -125,9 +125,11 @@ git checkout v0.2.0-rc.1
 git checkout main && git pull
 ```
 
-Betik iki koşul arar:
+Betik dört koşul arar:
 - **Kod commit edilmiş olmalı.** `src`, `docker`, `global.json` ve `assets` altında commit edilmemiş değişiklik varsa dağıtım durur.
 - **Commit GitHub'a gönderilmiş olmalı.** Böylece UAT'de çalışan her sürüm depoda bulunur.
+- **Commit `main`'in atası olmalı (#391).** 21.10–09.11.2026 arasında UAT'de bir PR'ın dal commit'i (`e488898`) çalıştı ve kayıt `main`'de olmayan bir commit'i gösterdi. Dal commit'i yalnızca bilerek kurulur: `ALLOW_NON_MAIN=1 ./docker/deploy-uat.sh`. Kayda sürümün yanına "(dal)" yazılır.
+- **Sır dizininde yalnızca `.env.uat` olmalı (#391).** Başka bir dosya varsa, örneğin kayıt dışı bir sır kopyası, dağıtım durur ve dosyanın adı yazılır. 13.10 ve 03.11.2026'da böyle kopyalar elle denetimde, günler sonra bulunmuştu.
 
 Etiketsiz bir commit de dağıtılabilir; betik bu durumda uyarı verir. Kabul oturumu yalnızca
 etiketli sürümle yapılır.
@@ -229,8 +231,8 @@ Doğrulama (§4) geçince betik dağıtımı iki yere yazar:
 
 | Kayıt | Yer | İçerik |
 |---|---|---|
-| Sunucu | `/opt/dsg-hrms/deployments.log`; son sürüm `/opt/dsg-hrms/VERSION` | Zaman (UTC), sürüm, commit, dağıtan |
-| Depo | `docs/33061/TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md` | Aynı bilgi; betik satırı ekler, PR ile commit edilir |
+| Sunucu | `/opt/dsg-hrms/deployments.log`; son sürüm `/opt/dsg-hrms/VERSION` | Zaman (UTC), sürüm, commit, dağıtan, A6 sonucu |
+| Depo | `docs/33061/TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md` | Aynı bilgi ve A6 özeti (sağlık uçları, son migration, açık portlar, sır dizini, günlük); betik satırı ekler, PR ile commit edilir |
 
 Betik, çalışan konteynerlerin etiketindeki commit'i dağıtılan commit'le karşılaştırır.
 Eşleşmezse, yani eski imaj ayakta kalmışsa, dağıtım başarısız sayılır ve kayıt yazılmaz.
@@ -263,6 +265,21 @@ curl -s -o /dev/null -w "%{http_code}\n" --max-time 5 http://192.168.3.202:5299/
 | Eşleşmeyen yol (SPA geri dönüşü) | `200` |
 | Güvenlik başlıkları | `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` |
 | Dışarıdan `5299` ve `5434` | Erişilemez |
+
+**Kurulum sonrası kısa kontrol (A6) betikle, her kurulumda (#391).** Sürüm kontrol listesinin
+A6 adımı önceden elle ve yalnızca adaylarda yapılıyordu (`KR-110`). Betik artık bunu her
+kurulumda, etiketsiz kurulumlarda da yapar; herhangi biri tutmazsa dağıtım başarısız sayılır ve
+kayıt yazılmaz:
+
+| A6 kontrolü | Betiğin yaptığı |
+|---|---|
+| Konteynerler `healthy` | `docker ps` çıktısında `(healthy)` olmayan konteyner yok |
+| Sağlık uçları | `/health/ready`, `/health/sync`, `/health/notifications` → `Healthy` (yalnızca durum alanı okunur) |
+| Çalışan commit | İmaj etiketindeki commit dağıtılanla aynı (§3.5) |
+| Son migration | `public.__ef_migrations_history` son satırı, dağıtılan commit'teki son migration'la aynı |
+| Açık portlar | `ss -ltnup`; dışarıya açık yalnızca 22, 80, 443 (TCP ve UDP) |
+| Sır dizini | Yalnızca `.env.uat` (§3.0) |
+| API günlüğü | Yığın başladıktan sonra `Error` veya `Fatal` düzeyinde kayıt yok; yalnızca sayılır, içerik yazdırılmaz |
 
 ---
 
@@ -723,3 +740,4 @@ curl -sI https://insankaynaklaritest.duzen.com.tr/health/live | grep -i "^date";
 | 2026-10-21 | 1.12 | §2.2.1 ve §3.3a: uygulamanın çalışma rolü `hrms_app`; şemadan önce yalnızca veritabanı başlatılır (`KR-118`, #244) | Bilgi İşlem |
 | 2026-11-08 | 1.13 | §5.1: özel nitelikli veri anahtarının döndürülmesi ve yeniden şifreleme işi (#375) | Bilgi İşlem |
 | 2026-11-10 | 1.14 | §11.2: İK rolünün betikle atanması (T4'e kadar), gizlilik taahhüdü onayı ve denetim izi (#383) | Bilgi İşlem |
+| 2026-11-14 | 1.15 | §3.0: `main` atası ve sır dizini koşulları; §3.5: kayıtta A6 sonucu; §4: A6 her kurulumda betikle (#391) | Bilgi İşlem |

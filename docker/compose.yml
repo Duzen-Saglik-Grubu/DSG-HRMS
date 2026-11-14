@@ -43,6 +43,10 @@ services:
     build:
       context: ../src/backend
       dockerfile: Dsg.Hrms.Api/Dockerfile
+      # Calisan imajin hangi commit'ten derlendigi (#391, KO-36). UAT'de dagitim betigi yazar;
+      # yerelde derleme komutu verir: HRMS_GIT_COMMIT=$(git rev-parse HEAD) docker compose ... build
+      labels:
+        org.opencontainers.image.revision: ${HRMS_GIT_COMMIT:-bilinmiyor}
     image: dsg-hrms-api:dev
     container_name: dsg-hrms-api
     environment:
@@ -126,6 +130,8 @@ services:
   web:
     build:
       context: ../src/frontend/dsg-hrms-web
+      labels:
+        org.opencontainers.image.revision: ${HRMS_GIT_COMMIT:-bilinmiyor}
     image: dsg-hrms-web:dev
     container_name: dsg-hrms-web
     ports:
