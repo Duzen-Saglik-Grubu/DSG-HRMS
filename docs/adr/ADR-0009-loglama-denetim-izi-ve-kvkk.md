@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi; §7 → ADR-0018
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-023`, `KR-118`, `KR-120`
+**Karar defteri karşılığı:** `KR-023`, `KR-118`, `KR-120`, `KR-059`, `KR-094`, `KR-108`, `KR-109`, `KR-122`
 **İlgili süreç:** TEC.5 (Tasarım), MAN.6 (Bilgi Yönetimi)
 **İlgili riskler:** `R-03`
 
@@ -263,3 +263,4 @@ veri sızıntısı incelemesi mümkün olur.
 | 2026-10-22 | 0.8 | §3 erişim kaydının ayrı işlemi; §8 yönetici bildirimi Y1'e ertelendi (#246) | Bilgi İşlem |
 | 2026-10-22 | 0.9 | §5: kolon şifrelemesi (`KR-122`, ADR-0020) | Bilgi İşlem |
 | 2026-10-22 | 0.10 | Sonuçlar: şifreli alanda bellek içi filtre (ADR-0020 §4; #268, B-16) | Bilgi İşlem |
+| 2026-11-14 | 0.11 | Başlık: değişiklik geçmişinde anılan `KR-059`, `KR-094`, `KR-108`, `KR-109`, `KR-122` "Karar defteri karşılığı" satırına eklendi (T1 geliştirme sonu denetimi TEC.5-9, #389) | Bilgi İşlem |

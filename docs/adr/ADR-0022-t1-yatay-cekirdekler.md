@@ -2,7 +2,7 @@
 
 **Durum:** **Kabul Edildi**
 **Tarih:** 2026-10-22
-**Karar defteri karşılığı:** `KR-124`, `KR-126`, `KR-136`; kapsam kararları `KR-115` (Y3), `KR-119` (Y2)
+**Karar defteri karşılığı:** `KR-124`, `KR-126`, `KR-128`, `KR-129`, `KR-131` (→ ADR-0023), `KR-132`, `KR-133`, `KR-134`, `KR-135`, `KR-136`; kapsam kararları `KR-115` (Y3), `KR-119` (Y2)
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **Genişlettiği:** ADR-0010 §4 (sayfalama), ADR-0012 §4 (uygulama içi bildirim), ADR-0014 (dışa aktarma), ADR-0016 (modül tablosu)
 **İlgili gereksinimler:** PG-PERS-17, 21, 28, 30, 37, 38, 42, 43, 45
@@ -80,8 +80,9 @@ Onaylanmamış gereksinime dayanan hiçbir şey yazılmaz (`KR-068`).
     izinleriyle yapılır; ikisi de İK'da ve Sistem Yöneticisindedir (ADR-0019 §4, B-14).
     Önerilen kan grubunu görmek `SpecialCategoryView` kaydı üretir (ADR-0019 §5).
 - **Uygulama içi bildirim** (`notification.inbox_item`): alıcı kullanıcı, tür, ilişkili kayıt
-  bağlantısı, okundu/okunmadı. Talep oluşunca **İK rolündeki her kullanıcıya** bir bildirim
-  yazılır (S-12). Menüde okunmamış sayısı görünür. Bu, ADR-0012 §4'ün en küçük hâlidir;
+  bağlantısı, okundu/okunmadı. Talep oluşunca **İK ve Sistem Yöneticisi rolündeki her etkin
+  kullanıcıya** bir bildirim yazılır; iki role sahip kullanıcı tek bildirim alır (S-12;
+  `KR-132`, değişiklik talebi #333 — ilk hâlinde yalnızca İK rolüydü). Menüde okunmamış sayısı görünür. Bu, ADR-0012 §4'ün en küçük hâlidir;
   Y1 tercihleri, kanalları ve diğer bildirim türlerini sonra ekler.
 - **E-posta:** Sistem Yönetimi parametresindeki İK adresine gider (S-12; yeni parametre).
   E-postada **önerilen değer yazmaz**, yalnızca HRMS'teki talebe bağlantı verir. Böylece
@@ -103,8 +104,9 @@ Onaylanmamış gereksinime dayanan hiçbir şey yazılmaz (`KR-068`).
 - Excel düz listedir. PDF'e fotoğraf alanı seçilirse küçük fotoğraf (ADR-0021 §5) eklenir.
 - Erişim kaydına süzgeç, kayıt sayısı, **aktarılan alanların listesi** ve **aktarılan
   kişilerin kimlikleri** yazılır (ADR-0019 §5; revizyon 1.2, B-09).
-- Kütüphaneler ADR-0014 §1'deki gibidir: ClosedXML ve PDFsharp/MigraDoc, Türkçe karakter
-  için gömülü yazı tipiyle.
+- Kütüphaneler ADR-0014 §1'deki gibidir: Excel için ClosedXML, PDF için SkiaSharp
+  (ADR-0023, `KR-131`; ilk hâlinde PDFsharp/MigraDoc), Türkçe karakter için gömülü yazı
+  tipiyle.
 
 ### 5. Sistem Yönetimi parametreleri
 
@@ -176,3 +178,4 @@ Düşük–orta. Çekirdekler küçüktür ve kendi ad alanlarındadır.
 | 2026-11-05 | 1.5 | §3: senkronizasyon uyarısı e-postayla da gider (`KR-134`); alıcı roller `PRM-BLD-01` (`KR-133`) (#344) | Bilgi İşlem |
 | 2026-11-05 | 1.6 | §1: "Yakınlık" tanım türü (`KR-135`, #348) | Bilgi İşlem |
 | 2026-11-06 | 1.7 | §1: pasif tanım yeniden aktif edilir (`KR-136`, #352) | Bilgi İşlem |
+| 2026-11-14 | 1.8 | §3: uygulama içi bildirim İK ve Sistem Yöneticisine (`KR-132`, #333); §4: PDF kütüphanesi SkiaSharp (ADR-0023, `KR-131`); başlıktaki karar listesi tamamlandı (T1 geliştirme sonu denetimi TEC.5-9, #389) | Bilgi İşlem |

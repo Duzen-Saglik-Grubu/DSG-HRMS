@@ -2,7 +2,7 @@
 
 **Durum:** Kabul Edildi; §7'nin iki uygulama kuralı → ADR-0017
 **Tarih:** 2026-09-06
-**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`, `KR-078`, `KR-086`, `KR-087`, `KR-088`, `KR-090`, `KR-092`, `KR-104` (→ ADR-0017)
+**Karar defteri karşılığı:** `KR-013`, `KR-014`, `KR-015`, `KR-016`, `KR-017` (yürürlükten kalktı), `KR-018`, `KR-019`, `KR-020`, `KR-042`, `KR-069`, `KR-070`, `KR-073`, `KR-074`, `KR-075`, `KR-076`, `KR-078`, `KR-086`, `KR-087`, `KR-088`, `KR-090`, `KR-092`, `KR-104` (→ ADR-0017), `KR-085`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **İlgili riskler:** `R-08`, `R-12`, `R-13`, `R-14`
 
@@ -305,3 +305,4 @@ kimlik kaynağı (LOGO) değişirse ADR-0003'teki yalıtım katmanı sayesinde e
 | 2026-10-10 | 1.1 | §7: kullanıcı tercihine bağlı 2FA gerçekleştirme notu (`KR-104`, #190) | Bilgi İşlem |
 | 2026-10-14 | 1.2 | §5: sınır değerleri #185'e göre ve parametre kimlikleriyle; §7: kullanıcı tercihine bağlı 2FA ADR-0017'ye taşındı (`KR-099`); başlıkta `KR-092`, `KR-104` (#212) | Bilgi İşlem |
 | 2026-10-22 | 1.3 | §5 notu: kilidin tek doğru kaynağı `LoginThrottle` (#246) | Bilgi İşlem |
+| 2026-11-14 | 1.4 | Başlık: değişiklik geçmişinde anılan `KR-085` "Karar defteri karşılığı" satırına eklendi (T1 geliştirme sonu denetimi TEC.5-9, #389) | Bilgi İşlem |

@@ -2,7 +2,7 @@
 
 **Durum:** **Kabul Edildi**
 **Tarih:** 2026-10-22
-**Karar defteri karşılığı:** `KR-122`, `KR-125`, `KR-126`
+**Karar defteri karşılığı:** `KR-122`, `KR-125`, `KR-126`, `KR-129`, `KR-138`
 **İlgili süreç:** TEC.5 (Tasarım Tanımlama)
 **Uyguladığı:** ADR-0009 §5 (özel nitelikli verinin saklanması)
 **İlgili gereksinimler:** PG-PERS-36; `KR-113`, `KR-116` (kan grubu işleme koşulları), `KR-120`
@@ -202,3 +202,4 @@ yeniden senkronizasyonla uygulanabilir.
 | 2026-10-23 | 1.3 | §1: şifrelenen değer kan grubu kodudur; ad referans veriden (`KR-129`, #280) | Bilgi İşlem |
 | 2026-11-03 | 1.4 | §6 sonuna gerçekleştirme notu: kaynak kolon, anahtar yapılandırması, biçim ve AAD, çözülemeyen değer, ortamlar (#317) | Bilgi İşlem |
 | 2026-11-08 | 1.5 | §3 sonuna gerçekleştirme notu: yeniden şifreleme işi, yetki (`KR-138`), anahtar yuvaları (#375) | Bilgi İşlem |
+| 2026-11-14 | 1.6 | Başlık: değişiklik geçmişinde anılan `KR-129`, `KR-138` "Karar defteri karşılığı" satırına eklendi (T1 geliştirme sonu denetimi TEC.5-9, #389) | Bilgi İşlem |
