@@ -20,9 +20,14 @@ public sealed class PersonalDataProtectorTests
 
         var value = protector.Protect("3", ProtectedField.BloodGroup(Owner));
 
-        value.ShouldStartWith("k1:");
-        value.Split(':').Length.ShouldBe(3);
-        value.ShouldNotContain("3:");
+        var parts = value.Split(':');
+        parts.Length.ShouldBe(3);
+        parts[0].ShouldBe("k1");
+        // Duz metin hicbir parcada ne acik ne base64 olarak durur. Alt dize aramasi ("3:") rastgele
+        // nonce'ta tesadufen olusuyordu ve test ~1/64 olasilikla dusuyordu (#404).
+        // kisa-alt-dize: dizi elemaninda esitlik aranir, alt dize degil.
+        parts.ShouldNotContain("3");
+        parts.ShouldNotContain(Convert.ToBase64String("3"u8));
         protector.TryUnprotect(value, ProtectedField.BloodGroup(Owner)).ShouldBe("3");
     }
 

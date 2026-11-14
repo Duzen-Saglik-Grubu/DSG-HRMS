@@ -201,6 +201,7 @@ public sealed class AuditTrailTests : IAsyncLifetime
         foreach (var entry in entries)
         {
             entry.Changes.ShouldContain(nameof(SampleRecord.BloodType));
+            // kisa-alt-dize: degisiklik kaydi alan adi ve maske tasir; GUID onaltilik oldugu icin 'Rh' olusamaz.
             entry.Changes.ShouldNotContain("Rh");
         }
     }

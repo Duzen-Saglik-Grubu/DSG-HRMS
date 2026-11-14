@@ -164,6 +164,7 @@ public sealed class PersonnelSynchronizerTests
         foreach (var warning in outcome.Warnings)
         {
             warning.Detail.ShouldNotContain(nationalId);
+            // kisa-alt-dize: uyari ayrintisi sabit metinden uretilir; rastgele parca icermez.
             warning.Detail.ShouldNotContain("@");
             warning.Detail.ShouldNotContain("312");
             warning.Detail.ShouldNotContain("1985");
