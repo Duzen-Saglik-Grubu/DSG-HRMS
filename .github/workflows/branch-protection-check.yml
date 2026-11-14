@@ -88,35 +88,97 @@ jobs:
                   pull_number: pr.number,
                   per_page: 100,
                 });
-                if (!rules.needsReviewNote(files)) return;
-                const note = comments.find(c =>
+                const failures = [];
+                const note = !rules.needsReviewNote(files) || comments.find(c =>
                   c.user.login === approval.user.login && rules.hasReviewNote(c.body) &&
                   new Date(c.created_at) <= mergedAt);
                 if (note) {
-                  core.info(`UYGUN: #${pr.number} buyuk PR; inceleme notu ${note.created_at}.`);
-                  return;
+                  if (note !== true) core.info(`UYGUN: #${pr.number} buyuk PR; inceleme notu ${note.created_at}.`);
+                } else {
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: `[DÜZELTİCİ] #${pr.number} büyük PR inceleme notu olmadan birleştirildi`,
+                    body: [
+                      '## Tespit edilen uygunsuzluk',
+                      '',
+                      `#${pr.number} ${rules.reviewableLines(files)} satır değiştiriyor (üretilen dosyalar hariç; sınır ${rules.SIZE_LIMIT}). ` +
+                        'Onay yorumunda neyin incelendiği yazılmamış (`KR-140`, CONTRIBUTING §5).',
+                      '',
+                      'Beklenen: onay yorumunda ayrı bir satır — `İncelenen: <ne satır satır, ne örneklemeyle incelendi>`',
+                      '',
+                      '## Yapılması gerekenler',
+                      '',
+                      '- [ ] İnceleyen, neyin incelendiğini bu issue\'ya yazdı',
+                      '- [ ] Neden atlandığı yazıldı',
+                    ].join('\n'),
+                    labels: ['tur:duzeltici-faaliyet', 'surec:MAN.8', 'oncelik:orta'],
+                  });
+                  failures.push(`#${pr.number} büyük PR inceleme notu olmadan birleştirildi.`);
                 }
-                await github.rest.issues.create({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  title: `[DÜZELTİCİ] #${pr.number} büyük PR inceleme notu olmadan birleştirildi`,
-                  body: [
-                    '## Tespit edilen uygunsuzluk',
-                    '',
-                    `#${pr.number} ${rules.reviewableLines(files)} satır değiştiriyor (üretilen dosyalar hariç; sınır ${rules.SIZE_LIMIT}). ` +
-                      'Onay yorumunda neyin incelendiği yazılmamış (`KR-140`, CONTRIBUTING §5).',
-                    '',
-                    'Beklenen: onay yorumunda ayrı bir satır — `İncelenen: <ne satır satır, ne örneklemeyle incelendi>`',
-                    '',
-                    '## Yapılması gerekenler',
-                    '',
-                    '- [ ] İnceleyen, neyin incelendiğini bu issue\'ya yazdı',
-                    '- [ ] Neden atlandığı yazıldı',
-                  ].join('\n'),
-                  labels: ['tur:duzeltici-faaliyet', 'surec:MAN.8', 'oncelik:orta'],
-                });
-                core.setOutput('issue_opened', 'true');
-                core.setFailed(`#${pr.number} büyük PR inceleme notu olmadan birleştirildi. Düzeltici faaliyet issue'su açıldı.`);
+
+                // Degisiklik talebinde rol onayi BIRLESTIRMEDEN ONCE (#387). PR denetimi kirmiziyken
+                // de birlestirme yapilabilir (GitHub Free, R-16) ve issue yorumu PR denetimini yeniden
+                // tetiklemez. #284'te IK onayi birlestirmeden 6 dakika sonra yazildi. Denetim
+                // birlestirmeden saniyeler sonra calistigi icin issue govdesi birlestirme anindaki
+                // haliyle okunur; yorumlar ayrica zamanina gore suzulur.
+                const cr = require(process.env.GITHUB_WORKSPACE + '/.github/scripts/change-request-rules.cjs');
+                const register = require('fs').readFileSync(
+                  process.env.GITHUB_WORKSPACE + '/docs/karar-kayit-defteri.md', 'utf8');
+                for (const number of cr.closingIssueNumbers(pr.body)) {
+                  const { data: issue } = await github.rest.issues.get({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: number,
+                  });
+                  if (!issue.labels.some(l => (l.name || l) === 'tur:degisiklik-talebi')) continue;
+                  const issueComments = await github.paginate(github.rest.issues.listComments, {
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: number,
+                    per_page: 100,
+                  });
+                  const required = cr.requiredRoles({
+                    title: issue.title, body: issue.body,
+                    changedFiles: files.map(f => f.filename), register,
+                  });
+                  const before = issueComments.filter(c => new Date(c.created_at) <= mergedAt).map(c => c.body);
+                  const missing = cr.missingApprovals([issue.body, ...before], required);
+                  if (missing.length === 0) {
+                    core.info(`UYGUN: #${pr.number} degisiklik talebi #${number} onayi birlestirmeden once kayitli.`);
+                    continue;
+                  }
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: `[DÜZELTİCİ] #${pr.number} değişiklik talebi #${number} için ${missing.join(', ')} onayı olmadan birleştirildi`,
+                    body: [
+                      '## Tespit edilen uygunsuzluk',
+                      '',
+                      `#${pr.number}, değişiklik talebi #${number}'i kapatıyor. Birleştirmeden önce talepte gereken rolün tarihli onay satırı yok (TEC.2 YAKLASIM §4.1, RACI §3.1).`,
+                      '',
+                      '| Alan | Değer |',
+                      '|---|---|',
+                      `| Eksik onay | ${missing.join(', ')} |`,
+                      ...required.map(r => `| ${r.role} gerekçesi | ${r.reasons.join('; ')} |`),
+                      `| Birleştirme | ${pr.merged_at} |`,
+                      '',
+                      '## Yapılması gerekenler',
+                      '',
+                      '- [ ] Onay, onaylaması gereken rolden alındı ve talebe `Paydaş onayı: GG.AA.YYYY — <rol> — <kanal>` biçiminde yazıldı',
+                      '- [ ] Onay alınamıyorsa değişikliğin geri alınması değerlendirildi',
+                      '- [ ] Değişiklik kabul planına `T-xx` teyit maddesi olarak eklendi',
+                      '- [ ] Neden atlandığı yazıldı',
+                    ].join('\n'),
+                    labels: ['tur:duzeltici-faaliyet', 'surec:TEC.2', 'oncelik:yuksek'],
+                  });
+                  failures.push(`#${pr.number} değişiklik talebi #${number} için ${missing.join(', ')} onayı olmadan birleştirildi.`);
+                }
+
+                if (failures.length > 0) {
+                  core.setOutput('issue_opened', 'true');
+                  core.setFailed(failures.join(' ') + ' Düzeltici faaliyet issue\'su açıldı.');
+                }
                 return;
               }
 

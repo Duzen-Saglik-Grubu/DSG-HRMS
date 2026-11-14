@@ -177,36 +177,25 @@ jobs:
               }
             }
 
-            // --- 6. Degisiklik talebinde paydas onayi (#210) ---
+            // --- 6. Degisiklik talebinde paydas onayi (#210, #387) ---
             //
             // Onayli bir gereksinimi degistiren is, paydasin onayi KAYDA GECMEDEN
             // birlestirilmez (TEC.2 YAKLASIM §4.1). #185'te uygulama PR'i, IK onayi
             // kayda gecmeden 49 dakika once birlesti ve UAT'ye kuruldu.
             // Onay, kapatilan issue'nun govdesinde (sablondaki "Paydas onayi" alani)
-            // veya bir yorumunda tarihli bir satirdir.
-            // BASLA: onay-denetimi
-            function hasStakeholderApproval(texts) {
-              const DATE = /\b(\d{2}\.\d{2}\.\d{4}|\d{4}-\d{2}-\d{2})\b/;
-              for (const text of texts) {
-                const lines = (text || '').split('\n');
-                for (let i = 0; i < lines.length; i++) {
-                  if (!/payda[şs]\s+onay/i.test(lines[i])) continue;
-                  // Sablonun urettigi baslik ("### Paydas onayi") ise deger bir sonraki
-                  // dolu satirdadir; bos alan "_No response_" olarak gelir.
-                  let value = lines[i];
-                  if (/^\s*#{1,6}\s/.test(lines[i])) {
-                    value = lines.slice(i + 1).find((l) => l.trim() !== '') || '';
-                  }
-                  if (!/_No response_/.test(value) && DATE.test(value)) return true;
-                }
-              }
-              return false;
-            }
-            // BITIR: onay-denetimi
+            // veya bir yorumunda tarihli ve rollu bir satirdir. #387: PG veya IK karari
+            // degisiyorsa rol IK olmalidir (RACI §3.1); T1'de dort talep Bilgi Islem onayiyla gecti.
+            const cr = require(process.env.GITHUB_WORKSPACE + '/.github/scripts/change-request-rules.cjs');
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100,
+            });
+            const register = require('fs').readFileSync(
+              process.env.GITHUB_WORKSPACE + '/docs/karar-kayit-defteri.md', 'utf8');
 
-            const closingIssues = [...body.matchAll(
-              /\b(?:clos(?:e[sd]?)|fix(?:e[sd]?)?|resolv(?:e[sd]?))\s+#(\d+)/gi)]
-              .map(m => Number(m[1]));
+            const closingIssues = cr.closingIssueNumbers(body);
             for (const number of closingIssues) {
               const { data: issue } = await github.rest.issues.get({
                 owner: context.repo.owner,
@@ -227,11 +216,19 @@ jobs:
                 issue_number: number,
                 per_page: 100,
               });
-              if (!hasStakeholderApproval([issue.body, ...comments.map(c => c.body)])) {
+              const required = cr.requiredRoles({
+                title: issue.title, body: issue.body,
+                changedFiles: files.map(f => f.filename), register,
+              });
+              const missing = cr.missingApprovals([issue.body, ...comments.map(c => c.body)], required);
+              if (missing.length > 0) {
+                const why = required.map(r => '\n    ' + r.role + ' onayi gerekli: ' + r.reasons.join('; ')).join('');
                 problems.push(
-                  '#' + number + ' bir degisiklik talebi, ama paydas onayi kayitli degil.' +
+                  '#' + number + ' bir degisiklik talebi, ama paydas onayi kayitli degil (eksik: ' + missing.join(', ') + ').' +
+                  why +
                   '\n    Onay geldiginde issue\'ya su bicimde bir yorum yazilir:' +
                   '\n    Paydas onayi: GG.AA.YYYY — <onaylayan rol> — <kanal>' +
+                  '\n    Yorumdan sonra bu denetim yeniden calistirilir (issue yorumu PR denetimini tetiklemez).' +
                   '\n    Ayrinti: TEC.2 YAKLASIM §4.1');
               }
             }
@@ -281,12 +278,6 @@ jobs:
             // olmaz. Hedef 400 satirin altidir (CONTRIBUTING §5); 1.500'u asan PR,
             // neden bolunmedigini govdede yazar. Gerekce kendi paragrafidir; sablonun DoD satiri
             // sayilmaz (#390: eski kural o satirla her zaman geciyordu).
-            const files = await github.paginate(github.rest.pulls.listFiles, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr.number,
-              per_page: 100,
-            });
             if (needsSizeJustification(files, body)) {
               problems.push(
                 'PR ' + reviewableLines(files) + ' satir degistiriyor (uretilen dosyalar haric; sinir ' + SIZE_LIMIT + ').' +

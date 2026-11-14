@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.2-YAK
 **Süreç:** TEC.2 — Paydaş İhtiyaç ve Gereksinimlerinin Tanımlanması
-**Son güncelleme:** 2026-10-15
+**Son güncelleme:** 2026-11-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)` sürecin dokümante edilmiş bilgi
 gereksinimleri belirlenir · `PA 2.2 (b)` bu bilginin kontrol gereksinimleri belirlenir
 
@@ -118,7 +118,7 @@ gelmeli".
 | Onay | En az bir gözden geçiren onayı (CONTRIBUTING §5) |
 | Kimlik | `PG-<MODÜL>-<no>`; numara yeniden kullanılmaz |
 | Tarih ve sahip | Her belgede "Son güncelleme" ve değişiklik geçmişi |
-| Değişiklik | Kesinleşmiş gereksinimin değişimi `tur:degisiklik-talebi` issue'su açar (`R-04`) ve §4.1'deki yordamla işlenir. **Otomatik:** değişiklik talebini kapatan PR, issue'da tarihli paydaş onayı yoksa birleştirilemez |
+| Değişiklik | Kesinleşmiş gereksinimin değişimi `tur:degisiklik-talebi` issue'su açar (`R-04`) ve §4.1'deki yordamla işlenir. **Otomatik:** değişiklik talebini kapatan PR, issue'da gereken rolün tarihli paydaş onayı yoksa birleştirilemez; birleştirme onaysız yapılırsa `main`'deki denetim düzeltici faaliyet açar (#387) |
 | Kişisel veri | Kayıtlar karar ve gerekçe taşır; kişisel veri içeren ekler depoya girmez |
 | Erişim | Depo kurum içi; gereksinim özetleri İK ile paylaşılır |
 
@@ -138,9 +138,9 @@ elden kaydedildi; #190'ın kapsamı PR sırasında genişledi (T3 modül sonu de
 |---|---|---|
 | 1 | Değişiklik talebi şablonuyla issue açılır (`tur:degisiklik-talebi`, `surec:TEC.2`): ne değişsin, neden, etkilenen gereksinimler (PG, SYG, ADR, parametre), tahmini etki | Issue |
 | 2 | Etki analizi issue'ya yazılır: hangi PG ve SYG maddeleri değişir, hangi testler, kabul planı etkileniyor mu | Issue yorumu |
-| 3 | **Paydaş onayı** issue'ya yazılır: `Paydaş onayı: GG.AA.YYYY — <onaylayan rol> — <kanal>`. Kanal toplantı kaydı, e-posta veya yazılı form olabilir; yazılı bir kanıt varsa bilgi kayıt defterinde numarası verilir. Onayı Bilgi İşlem iletiyorsa "(Doğuş Uçanok bildirdi)" eklenir | Issue gövdesi veya yorumu |
+| 3 | **Paydaş onayı** issue'ya yazılır: `Paydaş onayı: GG.AA.YYYY — <onaylayan rol> — <kanal>`. Kanal toplantı kaydı, e-posta veya yazılı form olabilir; yazılı bir kanıt varsa bilgi kayıt defterinde numarası verilir. Onayı Bilgi İşlem iletiyorsa "(Doğuş Uçanok bildirdi)" eklenir. **Onaylayan rol RACI §3.1'e göredir (#387):** paydaş gereksinimi (PG) veya kaynağında İK bulunan bir karar değişiyorsa rol **İK**'dır (TEC.2'nin onaylayanı); yalnızca sistem gereksinimi (SYG), ADR veya teknik parametre değişiyorsa Bilgi İşlem (TEC.3'ün onaylayanı). Onaylaması gereken rol talep açılırken şablonda seçilir. Rolü yazılmamış satır onay sayılmaz | Issue gövdesi veya yorumu |
 | 4 | PG, SYG, izlenebilirlik matrisi ve gerekiyorsa ADR **aynı PR'da** güncellenir. PG değişiklik geçmişine talep numarası ve onay tarihi yazılır | PR |
-| 5 | Uygulama PR'ı **3. adımdan sonra** birleşir. **Otomatik:** PR izlenebilirlik denetimi, kapatılan issue değişiklik talebiyse tarihli onay satırını arar; yoksa PR birleştirilemez | CI |
+| 5 | Uygulama PR'ı **3. adımdan sonra** birleşir. **Otomatik:** PR izlenebilirlik denetimi, kapatılan issue değişiklik talebiyse gereken rolün tarihli onay satırını arar; yoksa PR birleştirilemez. İK gerektiren talep: PG kimliği başlıkta veya "Etkilenen kayıt" satırının başında, PR bir PG belgesini değiştiriyor, etkilenen kararın kaynağında İK var ya da şablonda İK seçilmiş. Issue yorumu PR denetimini yeniden tetiklemez; onay yorumlandıktan sonra denetim yeniden çalıştırılır. **Birleştirmeden sonra:** Dal Koruma Denetimi, yalnızca birleştirmeden önce yazılmış onayları sayar; eksikse `[DÜZELTİCİ]` issue'su açar. Kurallar `.github/scripts/change-request-rules.cjs`'tedir | CI |
 | 6 | Kapsam PR sırasında genişlerse issue'ya **"Kapsam değişikliği"** başlıklı bir yorum yazılır ve yeni kapsam için 3. adım yinelenir | Issue yorumu |
 | 7 | Değişiklik, kabul planında İK'nın teyit edeceği yorumlar arasına (`T-xx`) eklenir ve kabulde gösterilir | Kabul planı §6.1, kabul formu |
 
@@ -180,3 +180,4 @@ uyulmayan bir şablon, olmayan bir şablondan kötüdür: uyum varmış gibi gö
 | 2026-09-18 | 0.1 | İlk oluşturma — ilk İK gereksinim toplantısı öncesi (BULGU-02, BULGU-09) | Bilgi İşlem |
 | 2026-10-14 | 0.2 | §4: değişiklik talebi otomatik denetimi; §4.1 değişiklik talebi yordamı (#210) | Bilgi İşlem |
 | 2026-10-15 | 0.3 | §2.2: KPÖ taslakları toplantıda bilgi olarak sunulur; §3.1: T3'ün `REQ-KMLK` kimlik istisnası; §5 (f): KPÖ'ler SYG §5'te, PG şablonundaki "Ölçüt" alanı kaldırıldı (`KR-111`, #217) | Bilgi İşlem |
+| 2026-11-14 | 0.4 | §4 ve §4.1 adım 3, 5: onaylayan rol denetimi; birleştirmeden sonra `main`'de zaman denetimi (#387) | Bilgi İşlem |
