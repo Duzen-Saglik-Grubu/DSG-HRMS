@@ -1,7 +1,7 @@
 # Risk Kayıt Defteri
 
 **Belge kimliği:** MAN.4-RKD
-**Son güncelleme:** 2026-11-13
+**Son güncelleme:** 2026-11-14
 **Gözden geçirme sıklığı:** Her modül kapanışında ve en geç ayda bir
 **Risk sahibi (genel):** Bilgi İşlem Birim Sorumlusu
 
@@ -271,7 +271,7 @@ raporunda ayrıca ele alınır.
 | **Açıklama** | Geliştirmeyi ve incelemeyi aynı kişi yürütüyor; PR'ı açan ve birleştiren aynı hesap. İnceleme, geliştirme yardımcısının (Claude) ürettiği kodun ve belgenin tek bir kişi tarafından gözden geçirilmesine dayanıyor. Gözden kaçan bir hatayı ikinci bir göz yakalamaz. |
 | **O / E / Puan** | 2 / 2 / **4** |
 | **Sahibi** | Bilgi İşlem |
-| **Önlem** | (1) İnceleme onayı birleştirmeden önce PR'a yazılır; CI denetler (`KR-096`, #128). Denetimin kendisi de çalışmayabilir: 05.10.2026'da Dal Koruma Denetimi iki PR'da (#169, #172) hiç koşmadı; `main-failure-check` adım çalıştırmadan iptal oldu ve issue açılmadı (#208, R-28). (2) Otomatik kapılar: derleme, birim, entegrasyon ve uçtan uca testler, kapsam eşiği, mimari testi, gereksinim izlenebilirliği, statik analiz, güvenlik taramaları (ADR-0011 §6). (3) Modül sonunda süreç denetimi yapılır. (4) İK kabulü ürünü geliştiriciden bağımsız bir gözle sınar (TEC.11). |
+| **Önlem** | (1) İnceleme onayı birleştirmeden önce PR'a yazılır; CI denetler (`KR-096`, #128). Denetimin kendisi de çalışmayabilir: 05.10.2026'da Dal Koruma Denetimi iki PR'da (#169, #172) hiç koşmadı; `main-failure-check` adım çalıştırmadan iptal oldu ve issue açılmadı (#208, R-28). (2) Otomatik kapılar: derleme, birim, entegrasyon ve uçtan uca testler, kapsam eşiği, mimari testi, gereksinim izlenebilirliği, statik analiz, güvenlik taramaları (ADR-0011 §6). (3) Modül sonunda süreç denetimi yapılır. (4) İK kabulü ürünü geliştiriciden bağımsız bir gözle sınar (TEC.11). (5) **14.11.2026 (`KR-140`, #390):** 1.500 satırı aşan PR'ın onay yorumu neyin incelendiğini `İncelenen:` satırıyla yazar; `main`'deki denetim arar. PR gövdesinin şablona uygunluğu da CI'da denetlenir; T1'de 91 PR'ın 86'sı uymuyordu. |
 | **Durum** | İzleniyor |
 
 ### R-24 — UAT sunucusunun işlemci kapasitesi
@@ -388,7 +388,9 @@ raporunda ayrıca ele alınır.
 
 **Kabul edilen riskler:** R-25 (Üst Yönetim, 09.10.2026, puan 6; `KR-103`), R-16 (Bilgi İşlem, puan 4; `KR-055`), R-19 (Bilgi İşlem, puan 2; `KR-078`), R-09 (Bilgi İşlem, 13.11.2026, puan 3; `KR-139`). Son üçünün puanı 6'nın altında olduğu için kabul yetkisi Bilgi İşlem'dedir. 04.10.2026'daki özet R-16 için yanlışlıkla "Üst Yönetim kararı" yazıyordu (#177).
 
-**Son gözden geçirme:** 2026-11-13 — Durum raporu 3'ün karar konuları (`KR-139`, #388). **R-09** 3/2/6 → 3/1/3 ve **kabul edildi** (Bilgi İşlem): eski sunucu yeni sistemde kullanılmıyor. R-18: yenileme 01.12.2026. R-30: kopya silindi (#386). R-03: gizlilik taahhüdü kayıtları İK'da.
+**Son gözden geçirme:** 2026-11-14 — R-23 önlem 5: büyük PR inceleme notu ve şablon denetimi (`KR-140`, #390).
+
+Önceki: 2026-11-13 — Durum raporu 3'ün karar konuları (`KR-139`, #388). **R-09** 3/2/6 → 3/1/3 ve **kabul edildi** (Bilgi İşlem): eski sunucu yeni sistemde kullanılmıyor. R-18: yenileme 01.12.2026. R-30: kopya silindi (#386). R-03: gizlilik taahhüdü kayıtları İK'da.
 
 Önceki: 2026-11-12 — T1 geliştirme sonu (süreç denetimi `MAN.8-kalite-guvence/raporlar/2026-11-12-t1-gelistirme-sonu-denetimi.md`, #385). **R-09 gerçekleşti:** PostgreSQL 14 desteği 12.11.2026'da bitti; üretim için hedef tarih yok. **R-30 yeniden gerçekleşti:** UAT'de kayıt dışı sır kopyası (#386). **R-31** 6 → 3 (önlemler UAT'de etkin). **R-18:** sertifika 16.12.2026'da bitiyor (#386). R-24'e T1 ölçümü işlendi. Yeni risk: **R-32** (özel nitelikli veri anahtarı). T1 döneminde R-29 beş kez gerçekleşti (#223, #250, #255, #288, #305); Dependabot'un orta önemli uyarısı (#5) kayıtsız kaldı (#393).
 
@@ -437,3 +439,4 @@ yükseltmelerde majör şema değişikliği olmadığı bilgisiyle **6'dan 3'e d
 | 2026-11-01 | 1.15 | R-29: sekizinci olay (`follow-redirects`; #305) | Bilgi İşlem |
 | 2026-11-12 | 1.16 | T1 geliştirme sonu gözden geçirmesi (#385): R-09 gerçekleşti; R-18 bitiş tarihi ve #386; R-24 T1 ölçümü; R-30 yeniden gerçekleşti, önlem 4; R-31 2/3/6 → 1/3/3, İzleniyor; R-32 eklendi; özet güncellendi | Bilgi İşlem |
 | 2026-11-13 | 1.17 | Durum raporu 3 kararları (`KR-139`, #388): R-09 3/2/6 → 3/1/3, Bilgi İşlem kabulü; R-18 yenileme tarihi; R-30 önlem 4 (kopya silindi); R-03 gizlilik taahhüdü; özet güncellendi | Bilgi İşlem |
+| 2026-11-14 | 1.18 | R-23 önlem 5 (`KR-140`, #390) | Bilgi İşlem |
