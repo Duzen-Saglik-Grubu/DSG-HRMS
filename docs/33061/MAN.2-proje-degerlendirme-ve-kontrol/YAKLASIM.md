@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.2-YAK
 **Süreç:** MAN.2 — Proje Değerlendirme ve Kontrol
-**Son güncelleme:** 2026-10-15
+**Son güncelleme:** 2026-11-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.1`: hedefler, izleme sıklığı, sorumluluklar, kaynaklar ve arayüzler. `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -27,7 +27,7 @@ denetimi (MAN.8). MAN.8 denetimleri bu sürece girdi verir.
 
 ## 2. Süreç bugün nasıl işletiliyor?
 
-Bugün proje kontrolü dört araçla yapılıyor. Dönemsel durum raporu henüz yok (§2.5).
+Bugün proje kontrolü dört araçla ve dönemsel durum raporuyla yapılıyor (§2.5).
 
 ### 2.1 Sürekli izleme: GitHub
 
@@ -84,7 +84,7 @@ Raporun içeriği:
 5. Rol ve kaynak yeterliliği (tek geliştirme kanalı, `R-05`; bekleyen altyapı B2, B4, B5, B9).
 6. Üst Yönetimden beklenen onaylar.
 
-Rapor Üst Yönetime iletilir; iletim tarihi ve alıcı rapora yazılır. **İlk rapor #127'dir.**
+Rapor Üst Yönetime iletilir; iletim tarihi ve alıcı rapora yazılır. Raporlar `raporlar/` altındadır: 1 (06.10.2026, #127), 2 (13.10.2026, #206), 3 (12.11.2026, #385).
 
 ---
 
@@ -191,3 +191,4 @@ gözden geçirilir. Rapor dönemi pratikte işlemiyorsa burada değiştirilir.
 | 2026-10-13 | 1.2 | §2.2 G4 durumu ve §8 açık nokta 3: T3 kapanışı (#206) | Bilgi İşlem |
 | 2026-10-14 | 1.3 | T3 modül sonu gözden geçirmesi: §2.2 G2 yeniden kaydı ve G3 kabulü; §8 açık nokta 1, 4, 5 kapandı, 2 kısmen (#214) | Bilgi İşlem |
 | 2026-10-15 | 1.4 | §2.5 ve §3: durum raporunun §3'ü kalite güvence ölçütlerini (K1–K6, MAN.8 YAKLAŞIM §2.5) de içerir; ayrı kalite raporu yazılmaz (`KR-111`, #217) | Bilgi İşlem |
+| 2026-11-14 | 1.5 | §2, §2.5: durum raporları 1–3 var; "henüz yok" ve "ilk rapor" ifadeleri bayattı (T1 geliştirme sonu denetimi A-13; #392) | Bilgi İşlem |

@@ -84,9 +84,9 @@ alınmıştır.
 | #108 | feat(kimlik): İK davet bağlantısı | 2026-10-01 | 2026-10-01 | 94 | Açık onay |
 | #110 | feat(kimlik): parametre ekranı ve kurumsal logo | 2026-10-01 | 2026-10-01 | 95 | Açık onay |
 | #112 | feat(kimlik): 2FA açılmadan önce etki uyarısı | 2026-10-01 | 2026-10-01 | 96 | Açık onay |
-| #114 | feat(kimlik): periyodik ve ilk girişte parola değişimi (#113) | 2026-10-01 | 2026-10-02 | 97 | Açık onay |
+| #114 | feat(kimlik): periyodik ve ilk girişte parola değişimi (#113) | 2026-10-01 | 2026-10-02 | 97 | Açık onay; **birleştirmeden sonra olabilir** (birleştirme 01.10 21:47 UTC = 02.10 00:47 TR; onay 02.10, saat arşivde yok). Not 14.11.2026 (#392; T3 denetimi MAN.8-9, T1 denetimi MAN.8-17) |
 | #116 | feat(kimlik): API'de HTTPS zorunluluğu (#115) | 2026-10-02 | 2026-10-02 | 99 | Açık onay |
-| #118 | docs(33061): T3 sonu süreç denetimi ve performans ölçümü (#117) | 2026-10-02 | 2026-10-03 | 101 | Açık onay |
+| #118 | docs(33061): T3 sonu süreç denetimi ve performans ölçümü (#117) | 2026-10-02 | 2026-10-03 | 101 | Açık onay; **birleştirmeden sonra** (birleştirme 02.10 14:40 UTC, onay 03.10). Not 14.11.2026 (#392; T3 denetimi MAN.8-9, T1 denetimi MAN.8-17) |
 | #139 | fix(kimlik): davet bağlantısının jetonu açılışta kayboluyordu (#137) | 2026-10-03 | 2026-10-03 | 103 | Açık onay |
 | #140 | feat(kimlik): kimlik olayları, günlük maskeleme ve istisna (#119) | 2026-10-03 | 2026-10-03 | 103 | Açık onay |
 | #141 | fix(kimlik): girişte en kısa yanıt süresi kaldırıldı (#120) | 2026-10-04 | 2026-10-04 | 104 | Açık onay |
@@ -101,3 +101,4 @@ alınmıştır.
 | Tarih | Sürüm | Değişiklik | Yapan |
 |---|---|---|---|
 | 2026-10-04 | 1.0 | İlk oluşturma (#128) | Bilgi İşlem |
+| 2026-11-14 | 1.1 | #114 ve #118: onayın birleştirmeden sonra yazıldığı notu (T3 denetimi MAN.8-9 (3), T1 denetimi MAN.8-17; #392) | Bilgi İşlem |

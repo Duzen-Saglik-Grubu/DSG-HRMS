@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.5-YAK
 **Süreç:** MAN.5 — Konfigürasyon Yönetimi
-**Son güncelleme:** 2026-10-15
+**Son güncelleme:** 2026-11-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.1`: amaç, planlama, sorumluluk, kaynak ve arayüzler (§1–§4). `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir (§5). `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir (§6).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -154,7 +154,7 @@ Durum sütunu 14.10.2026'da T3 modül sonu denetimlerine göre güncellendi (#21
 | 5 | CHANGELOG yalnızca sürüm hazırlık PR'ında güncellenir; unutulursa onu yalnızca konfigürasyon denetimi yakalar (D-01) | İzleniyor. 13.10 denetiminde 7 etiketin 7'sinin bölümü var |
 | 6 | Örnek ortam dosyası ile compose değişkenlerinin uyumu (D-04/D-08) elle denetleniyor | Açık: 13.10 denetiminde de elle yapıldı (G-2, Ö-9) |
 | 7 | 04.10.2026'dan önceki UAT dağıtımlarının commit kaydı yok | Geriye dönük kapatılamaz; kayıtta yazılı |
-| 8 | Kabul adayları `rc.3`, `rc.4`, `rc.5` için konfigürasyon denetimi yapılmadı (§2.4 kuralı) | Açık: kural ya da uygulaması #218'de |
+| 8 | Kabul adayları `rc.3`, `rc.4`, `rc.5` için konfigürasyon denetimi yapılmadı (§2.4 kuralı) | ✅ Kapandı (#218): tam denetim yalnızca İK kabul oturumuna sunulan son adayda ve modül kapanışında, ara adaylarda A6 (`KR-110`); A6 14.11.2026'dan beri her kurulumda betikle (`KR-142`, #391) |
 
 ---
 
@@ -169,3 +169,4 @@ Bu belge her konfigürasyon denetiminde ve her modül sonu süreç denetiminde (
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
 | 2026-10-14 | 1.1 | T3 modül sonu gözden geçirmesi: §2.3 etiket listesi (`rc.3`…`rc.5`, `v0.2.0`) ve kabul etiketinde CHANGELOG bölümünün sonraki commit'te yazılması; §2.4 yapılan denetimler; §5 etiket açıklaması kuralı uygulamaya göre; §8 durumları güncellendi, madde 8 eklendi (#214) | Bilgi İşlem |
 | 2026-10-15 | 1.2 | §2.4: denetim sıklığı `KR-110`; sürüm kontrol listesi (#218) | Bilgi İşlem |
+| 2026-11-14 | 1.3 | §8 #8 kapandı (`KR-110`, #218; A6 her kurulumda `KR-142`) (T1 geliştirme sonu denetimi A-13; #392) | Bilgi İşlem |

@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.4-YAK
 **Süreç:** MAN.4 — Risk Yönetimi
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-11-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.1`: hedefler, gözden geçirme sıklığı, sorumluluklar ve yetkiler, arayüzler. `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -29,7 +29,7 @@ olay kaydıyla yönetilir (TEC.13). Risk niteliğindeki olay ayrıca risk defter
 ### 2.1 Tek kaynak
 
 Riskin tek kaydı `risk-kayit-defteri.md`'dir. Başka belgede anılan risk (ADR, karar,
-denetim raporu) defterdeki `R-NN` numarasına atıf yapar. 14.10.2026'da defterde 30 kayıt
+denetim raporu) defterdeki `R-NN` numarasına atıf yapar. 14.11.2026'da defterde 32 kayıt
 vardır (R-01…R-30): 10 açık, 11 izlenen, 3 kabul edilmiş, 6 kapalı (defter §3).
 
 ### 2.2 Belirleme: riskler nereden gelir?
@@ -151,7 +151,7 @@ Durum sütunu 14.10.2026'da T3 modül sonu denetimine (MAN.8 Ek A §3) göre gü
 | 2 | Risk profili hiçbir zaman Üst Yönetime iletilmedi; durum raporu yok | #127 | ✅ Kapandı: durum raporu 1 (06.10.2026) §4 ve durum raporu 2 (13.10.2026) |
 | 3 | Defterin bölüm sırası bozuk: R-17…R-26 §3 özetinin arkasında, R-11 R-13'ten sonra | — | ✅ Kapandı: defter 1.5 (13.10.2026), yalnızca taşıma |
 | 4 | T3 boyunca (24.09–02.10.2026) deftere hiç risk eklenmedi; olay tetikleyicisi 04.10.2026'da yazıldı. Yeni kuralın işlediği henüz görülmedi | Sonraki modül sonu denetimi | ⚠️ Kısmen: olaylardan R-27 (#190), R-28 (#208), R-29 (#223), R-30 (#207) açıldı. #171, #175 ve 05.10 çalıştırıcı arızası tetikleyici sayılmadı (MAN.8 Ek A §3.4) |
-| 5 | PR şablonunda "risk etkisi" sorusu yok; risk adayı yakalamak gözden geçirene bağlı | #216 | Açık |
+| 5 | PR şablonunda "risk etkisi" sorusu yok; risk adayı yakalamak gözden geçirene bağlı | #216 | ✅ Kapandı (#216): PR şablonunun tamamlanma tanımında "Risk defteri gözden geçirildi" maddesi var; CI maddenin silinmesini engeller (#390) |
 
 ---
 
@@ -166,3 +166,4 @@ Bu belge her modül sonu süreç denetiminde (MAN.8) gözden geçirilir.
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
 | 2026-10-06 | 1.1 | §4 örnek: R-20 yeni bitiş tarihi (#179) | Bilgi İşlem |
 | 2026-10-14 | 1.2 | T3 modül sonu gözden geçirmesi: §2.1 kayıt sayısı (30), §2.2 olay kaynaklı yeni riskler, §2.4 R-25 kabulü (`KR-103`), §2.5 son gözden geçirme 13.10.2026, §7 durum sütunu (#214) | Bilgi İşlem |
+| 2026-11-14 | 1.3 | §2.1: kayıt sayısı 32; §7 #5 kapandı (#216) (T1 geliştirme sonu denetimi A-13; #392) | Bilgi İşlem |

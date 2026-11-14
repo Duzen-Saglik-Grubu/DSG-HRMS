@@ -3,7 +3,7 @@
 **Belge kimliği:** TEC.3-SYG-PERS
 **Süreç:** TEC.3 — Sistem/Yazılım Gereksinimlerinin Tanımlanması
 **Modül:** T1 Personel Yönetimi
-**Kaynak:** `TEC.2/paydas-gereksinimleri/PG-PERS.md` (19.10.2026'da İK onaylı, 45 gereksinim; değişiklik talebi #270)
+**Kaynak:** `TEC.2/paydas-gereksinimleri/PG-PERS.md` (19.10.2026'da İK onaylı, 45 gereksinim; değişiklik talepleri #270, #284, #333, #355)
 **Tasarım:** ADR-0019…ADR-0022 (`KR-121`…`KR-126`); T1 tasarım gözden geçirmesi (`TEC.5-tasarim-tanimlama/raporlar/2026-10-22-t1-tasarim-gozden-gecirme.md`)
 **Son güncelleme:** 2026-11-14
 **Sahibi:** Bilgi İşlem
@@ -408,6 +408,11 @@ güvencesini bozmadığını gösterir. KPÖ-4, LOGO'nun kurumun kaynak sistemi 
 yorulmadığının tek kanıtıdır; ölçüm kötüyse ADR-0021 §5'teki iki yedek yöntem uygulanır.
 KPÖ-5, şifrelemenin bedelini (bellek içi süzgeç) ölçer.
 
+> **Kimlikler toplantı taslağıyla aynı değildir (AN-30).** 19.10.2026 toplantı kaydındaki
+> taslakta KPÖ-PERS-4 "telefon ekranında kullanılabilirlik", KPÖ-PERS-5 "'İK'ya bildir'
+> e-postasının ulaşma süresi" idi. Buradaki KPÖ-PERS-4 ve 5 başka ölçütlerdir; toplantı
+> kaydındaki kimliklerle karıştırılmaz.
+
 ---
 
 ## 6. Gereksinim analizi (TEC.3 çıktısı d, BP3)
@@ -446,6 +451,7 @@ geçirmesinin bulgularıyla birlikte karşılaştırıldı. Kapanmamış olanlar
 | AN-27 | **Türetilmiş davranış (08.11.2026, #375).** SYG-PERS-062 işin nerede başlatılacağını, işten önce neyin görüleceğini, çözülemeyen değerin ve silinmiş kaydın nasıl ele alınacağını, işin tekrar çalıştırılmasını ve yeni anahtarın ortama nasıl verileceğini tanımlamaz. | **Uç ve ekran:** `GET /api/v1/personnel/encryption` güncel anahtarı ve şifreli değerlerin anahtara göre sayılarını (tanımlı olmayan anahtarlar dahil) döner; değer, anahtar ve kişi dönmez. `POST /api/v1/personnel/encryption/re-encryption` işi çalıştırır. Ekran Sistem → Parametreler'de "Özel nitelikli veri şifrelemesi" bölümüdür; yalnızca bu izni olana görünür, iş onay penceresiyle başlar. **Kapsam:** kişilerin kan grubu ve önerilen kan grubu taşıyan düzeltme talepleri; silinmiş satırlar dahil, çünkü şifreli metin orada da durur. **Yazım:** değerler değişiklik izleyicisi dışında, eski şifreli metin koşuluyla yazılır; iş sırasında aynı satır başka bir yazımla değiştiyse atlanır. Bütün yazımlar ve güvenlik olayı tek veritabanı işlemindedir. **Çözülemeyen değer** (bozuk, tanımsız anahtar, başka yere ait) yeniden yazılmaz ve ayrıca sayılır. **Tekrar:** güncel anahtarla şifreli değer yeniden yazılmaz; işi tekrar çalıştırmak güvenlidir ve her çalıştırma bir olay yazar. **Olay ayrıntısı:** `<kaynaklar>><hedef> n=<yeniden yazılan> kalan=<eski anahtarla kalan> cozulemeyen=<sayı>`. **Anahtar yuvaları:** ortam `k1`–`k3` yuvalarını aktarır; boş yuva tanımsız sayılır, en az bir anahtar zorunludur; yeni yazımlar en büyük numaralı anahtarla yapılır. | ✅ |
 | AN-28 | **Türetilmiş davranış (08.11.2026, #377).** SYG-PERS-073 "telefon"un hangi genişlik olduğunu, 44 piksel kuralının hangi cihazda uygulanacağını, sığmayan tablo görünümünün ne olacağını ve ölçümün nasıl yapılacağını tanımlamaz. | **Telefon:** 600 pikselin altı. Personel listesi orada kart görünümüyle açılır, görünüm seçimi sunulmaz; adresteki tablo seçimi korunur ve geniş ekranda geri gelir. Süzgeç paneli tam genişliktir. Kullanıcı bölümü (Profilim, çıkış) açılır menüdedir. **Dokunma hedefi:** kural dokunmatik ekranda (`pointer: coarse`) uygulanır ve temada tek yerdedir: düğme, simge düğmesi, geçiş düğmesi, metin ve seçim alanı, kaldırılabilen veya tıklanabilen etiket, sayfa boyutu seçicisi. Fareyle kullanılan ekranda boyutlar değişmez. Yalnızca bilgi veren etiket (durum, anahtar türü) dokunma hedefi değildir. **Sayfalama:** satır dar ekranda kırılır; düğmeler ekranın içinde kalır. **Ölçüm:** uçtan uca senaryo 360 × 740 dokunmatik ekranda her ekranı ekran durulana kadar ölçer: sayfa yatay kaymaz, hiçbir görünür öğe sağ kenarı aşmaz, görünür her dokunma hedefi en az 44 × 44 pikseldir. Metin alanında parmağın dokunduğu çerçeve ölçülür; tarih alanının ekran okuyucudan da gizli değeri ve onay kutusunun saydam girdisi dokunma hedefi sayılmaz. | ✅ |
 | AN-29 | **İki gereksinimin uzlaştırılması (08.11.2026, #379).** SYG-PERS-006 "senkronizasyon HRMS'te girilen tablolara yazmaz" der; SYG-PERS-021 ise istihdam bitince açık görevin senkronizasyonla kapanmasını ister. İkisi birlikte uygulanmıştır (PR #298). | **Görev kaydında senkronizasyonun tek yazımı**, istihdam bitince açık görevin bitiş tarihini kapatmaktır (SYG-PERS-021). Görevin adı ve başlangıcı değişmez, kapalı görev yeniden açılmaz; SYG-PERS-006'nın amacı ("senkronizasyon İK'nın girdiğini ezemez") korunur. Evlilik bilgisi ve acil durum kişisine senkronizasyon hiç dokunmaz. Mimari testi bunu sınar: senkronizasyon sınıfları evlilik bilgisi ve acil durum kişisi tiplerine bağımlı değildir; görev tipine yalnızca T1 adımı (`PersonnelDetailsSynchronizer`), onun anlık görüntüsü ve veri deposu bağımlıdır. Personel modülünün yazma uçları gerekçeleriyle bir listededir; LOGO kaynaklı alana yazan uç yoktur. Yeniden şifreleme ucu (SYG-PERS-062) değeri değiştirmeden şifreli metni yeniler; senkronizasyonu tetikleme ucu LOGO kaynaklı tablolara yalnızca senkronizasyon üzerinden yazar. | ✅ |
+| AN-30 | **KPÖ seti toplantı taslağından ayrıldı (T1 geliştirme sonu denetimi TEC.3-9, #392).** İK'ya 19.10.2026'da bilgi olarak sunulan taslakta KPÖ-PERS-4 "telefon ekranında kullanılabilirlik: 360 px'te yan kaydırma yok" ve KPÖ-PERS-5 "'İK'ya bildir' e-postasının ulaşma süresi: p95 < 60 sn" idi. §5'te aynı kimlikler "fotoğraf özeti maliyeti" ve "kan grubu süzgeçli liste" oldu. Ayrılmanın gerekçesi o gün kayda geçmedi. | **Telefon ölçütü** KPÖ olmaktan çıktı ama karşılanıyor: SYG-PERS-073 ve AN-28 (telefon 600 pikselin altı; kart görünümü; dokunma hedefi). 360 px'te yan kaydırma uçtan uca testte sınanır. **E-posta ulaşma süresi** düştü: e-postanın kullanıcıya ulaşması kurum SMTP sunucusuna ve alıcının posta kutusuna bağlıdır, HRMS'in ölçebileceği bir süre değildir. HRMS tarafında sınanan, talep kaydedildiği anda iletinin kuyruğa alınmasıdır (SYG-PERS-047). İki yeni ölçüt (fotoğraf özeti maliyeti, kan grubu süzgeçli liste) T1 tasarımının getirdiği iki riski ölçer (ADR-0021 §5, ADR-0020). Bu değerlendirme Bilgi İşlem'indir; T1 kabulünde İK'ya gösterilir (#398). | ⏳ İK teyidi |
 
 **T1 tasarım gözden geçirmesinin test tanımı olmayan kuralları** (rapor §4) şu maddelerde,
 doğrulama yöntemiyle yer alır:
@@ -466,7 +472,19 @@ doğrulama yöntemiyle yer alır:
 **Paydaşa geri bildirim (BP3):** AN-04 onaylı bir kabul kriterinin (PG-PERS-21) uç
 durumunu tek anlama indirir; İK 22.10.2026'da teyit etti (`KR-127`). AN-03 ve AN-11, kabul
 kriterlerinin T1 içinde tam gösterilemeyecek kısmını söyler; bu ikisi T1 kabulünde İK'ya
-ayrıca gösterilir. Diğer bulgular paydaş gereksinimlerinin anlamını değiştirmez.
+ayrıca gösterilir.
+
+AN-19…AN-30 geliştirme sırasında eklendi (14.11.2026'da değerlendirildi, #392; TEC.3-10):
+
+- **T1 kabulünde İK'ya gösterilir** (kullanıcının gördüğü davranışı belirler): AN-19 (ayrılan
+  istihdamın son nitelikleri), AN-21 (dışa aktarmada satır, esas istihdam, maskeli TCKN), AN-22
+  (veri kalitesi raporundaki uyarıların kaynağı), AN-24 (evlilik bilgisi giriş kuralları), AN-25
+  (denetim kayıtları ekranı), AN-26 (korumalı süzgeçler, kaydı olmayan kişinin eşleşmesi), AN-28
+  (telefonda görünüm) ve AN-30 (KPÖ setinin taslaktan ayrılması).
+- **Anlam değişmez** (teknik ayrıntı veya iki gereksinimin uzlaştırılması): AN-20, AN-23,
+  AN-27, AN-29.
+
+Diğer bulgular paydaş gereksinimlerinin anlamını değiştirmez.
 
 ---
 
@@ -587,3 +605,5 @@ madde `İptal` notuyla kalır.
 | 2026-11-08 | 0.24 | §6: AN-29, SYG-PERS-006 ile 021'in uzlaştırılması: senkronizasyonun görev kaydındaki tek yazımı (#379) | Bilgi İşlem |
 | 2026-11-13 | 0.25 | §7: gizlilik taahhüdü kayıtlarının varlığı (`KR-139`); SYG-PERS-056 negatif testle doğrulandı (#388) | Bilgi İşlem |
 | 2026-11-14 | 0.26 | §2.2 öğe konumları koddan (şifreleme `Personnel/Protection`; dışa aktarma, uygulama servisleri ve yetki sözlüğü öğe oldu; öğe kodları); §2.5 dosya düzeyi tahsis 79 gereksinim için; ikisi CI'da denetlenir (T1 geliştirme sonu denetimi TEC.5-11, #389) | Bilgi İşlem |
+| 2026-11-14 | 0.27 | Başlıktaki "Kaynak" satırı: PG değişiklik talepleri #270, #284, #333, #355 (T1 geliştirme sonu denetimi TEC.2-8; #392) | Bilgi İşlem |
+| 2026-11-14 | 0.28 | §5: KPÖ kimliklerinin toplantı taslağından farklı olduğu notu; §6: AN-30 (KPÖ seti taslaktan ayrıldı) ve AN-19…AN-30 için paydaşa geri bildirim kararı (T1 geliştirme sonu denetimi TEC.3-9, TEC.3-10; #392) | Bilgi İşlem |

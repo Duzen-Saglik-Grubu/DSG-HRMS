@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.11-YAK
 **Süreç:** TEC.11 — Geçerleme
-**Son güncelleme:** 2026-10-15
+**Son güncelleme:** 2026-11-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir.
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -113,7 +113,7 @@ gösterimine bırakılan her gereksinimin neden ekrandan denenemediğini yazar.
 |---|---|
 | UAT ortamı (gerçek LOGO verisiyle) | Var (TEC.10 runbook) |
 | UAT izin listesi: yalnızca listedeki adreslere e-posta ve SMS gider (`KR-083`) | Var. Yeni katılımcılar eklenir; önceki kabullerin katılımcıları listede kalır (`KR-106`). Saklama koşulu KVKK Sorumlusu tarafından onaylandı (BK-22, `KR-109`) |
-| Etiketli sürüm ve dağıtım kaydı | Var (#125): UAT'ye yalnızca etiketten `deploy-uat.sh` ile kurulur; kayıt `TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`. T3 kabulü `v0.2.0-rc.5` kurulumunda yapıldı |
+| Etiketli sürüm ve dağıtım kaydı | Var (#125): UAT'ye `deploy-uat.sh` ile kurulur. **Kabul adayı** etiketten kurulur; ara kurulumlar etiketsiz olabilir, ama `main`'in atası olmalıdır ve her kurulumda A6 yapılır (`KR-142`, #391); kayıt `TEC.10-gecis/kayitlar/uat-dagitim-kaydi.md`. T3 kabulü `v0.2.0-rc.5` kurulumunda yapıldı |
 | Kabul formu şablonu | `docs/sablonlar/kabul-formu.md` |
 
 ---
@@ -155,3 +155,4 @@ gösterimine bırakılan her gereksinimin neden ekrandan denenemediğini yazar.
 | 2026-10-14 | 1.2 | §6: kabul formu kopyası depoda; imzalı nüsha proje sonunda (`KR-107`, #213) | Bilgi İşlem |
 | 2026-10-14 | 1.3 | T3 modül sonu gözden geçirmesi: §2 adım 5 imza zamanı (`KR-107`); §5 etiketli sürüm ve dağıtım kaydı kuruldu (#125); §7 (g) (#214) | Bilgi İşlem |
 | 2026-10-15 | 1.4 | §2: senaryoların ekranda denenmesi, ön deneme (1a), giriş ölçütleri; §2.1 katılımcı seçimi İK'nın (oran kuralı yok); §3 kanıt gösterimi kuralı; §5 izin listesi (#219) | Bilgi İşlem |
+| 2026-11-14 | 1.5 | §5: "yalnızca etiketten" ifadesi düzeltildi; ara kurulumlar `main` atası ve A6 ile (`KR-142`; T1 geliştirme sonu denetimi YB-06; #392) | Bilgi İşlem |

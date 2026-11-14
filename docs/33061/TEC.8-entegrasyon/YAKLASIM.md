@@ -2,7 +2,7 @@
 
 **Belge kimliği:** TEC.8-YAK
 **Süreç:** TEC.8 — Entegrasyon
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-11-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir. `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir. Ayrıca `PA 2.1` için hedef, sorumluluk, kaynak ve taraflar arası arayüzler (§1, §4, §5).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -37,7 +37,7 @@ sunucusunun kurulumu ve dağıtım yordamı (TEC.10, runbook), İK kabulü (TEC.
 
 | Arayüz | Yön / protokol | Kısıt | Kaynak |
 |---|---|---|---|
-| **LOGO** (MSSQL) | Okuma, TDS | Yazma, güncelleme, silme yapılmaz; ayrı `LogoDbContext`, şema yönetilmez (`--context HrmsDbContext`) | `KR-003`, `KR-004`, ADR-0003 |
+| **LOGO** (MSSQL) | Okuma, TDS | Yazma, güncelleme, silme yapılmaz; ayrı `LogoDbContext`, şema yönetilmez (`--context HrmsDbContext`). T1 beş tablo daha okur ve her çalışmadan önce şemayı denetler (SYG-PERS-011); fotoğraf önce özetle karşılaştırılır, yalnızca değişen fotoğraf okunur (SYG-PERS-013, 014); kan grubu yerelde okunmaz (SYG-PERS-005) | `KR-003`, `KR-004`, ADR-0003, ADR-0021 §4–§5; SYG-KMLK §2.3, SYG-PERS §2.3 |
 | **NetGSM** | Giden, HTTPS | Standart SMS servisi; gönderim kipi | ADR-0012, `KR-083` |
 | **Kurum SMTP** (`mail.duzen.com.tr:587`) | Giden, SMTP + STARTTLS | Sunucu sertifikası doğrulanır, doğrulama kapatılmaz | Runbook §10.5, R-20 |
 | **Tarayıcı ↔ nginx ↔ API** | Gelen, HTTPS | Kurum içi erişim; API yalnızca HTTPS isteğe hizmet verir; `X-Forwarded-*` yalnızca güvenilen vekil ağından okunur | `KR-067`, `KR-093`, runbook §10.4, R-22 |
@@ -204,3 +204,4 @@ gözden geçirilir.
 |---|---|---|---|
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
 | 2026-10-14 | 1.1 | T3 modül sonu gözden geçirmesi: §3.5 raporun kabul edilen sürümü kapsaması, T3 raporu 1.2; §9 madde 4 notu ve madde 5 (#214) | Bilgi İşlem |
+| 2026-11-14 | 1.2 | §2 LOGO satırı: T1 tabloları, şema denetimi, fotoğraf özeti; kaynakta SYG-PERS §2.3 (T1 geliştirme sonu denetimi YB-06; #392) | Bilgi İşlem |

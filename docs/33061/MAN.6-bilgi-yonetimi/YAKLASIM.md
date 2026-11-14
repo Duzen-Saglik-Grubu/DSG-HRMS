@@ -2,7 +2,7 @@
 
 **Belge kimliği:** MAN.6-YAK
 **Süreç:** MAN.6 — Bilgi Yönetimi
-**Son güncelleme:** 2026-10-14
+**Son güncelleme:** 2026-11-14
 **Karşıladığı öznitelik maddeleri:** `PA 2.1`: amaç, planlama, sorumluluk, kaynak ve arayüzler (§1–§4). `PA 2.2 (a)`: sürecin dokümante edilmiş bilgi gereksinimleri belirlenir (§5). `PA 2.2 (b)`: bu bilginin kontrol gereksinimleri belirlenir (§6).
 
 > **Yaklaşım belgesi nedir?** Sürecin **nasıl işletildiğini** tanımlar: hangi bilgi
@@ -127,12 +127,12 @@ Durum sütunu 14.10.2026'da T3 modül sonu denetimine (MAN.8 Ek A §5) göre gü
 | # | Konu | Durum |
 |---|---|---|
 | 1 | **Ö-1:** Yazışma arşivinde (`claude/`, BK-25) düz metin sunucu parolası var. Parolanın değiştirilmesi ve SSH'nin anahtarla yapılması gerekiyor | ✅ Kapandı (06.10.2026): arşiv temizlendi, SSH anahtarla, `root` parolası değiştirildi (`KR-102`, #174; defter Ö-1) |
-| 2 | **Ö-2:** "Öneri" saklama ve imha süreleri KVKK Sorumlusu onayını bekliyor. KVKK Sorumlusunun projedeki rolü de resmen bildirilmedi (RACI §7 iş 3) | Açık |
+| 2 | **Ö-2:** "Öneri" saklama ve imha süreleri KVKK Sorumlusu onayını bekliyor. KVKK Sorumlusunun projedeki rolü de resmen bildirilmedi (RACI §7 iş 3) | ✅ Kapandı (14.10.2026, `KR-109`, #215): KVKK Sorumlusu (Doğuş Uçanok) denetim kayıtları için 10 yılı belirledi, defterdeki diğer önerilen süreleri onayladı |
 | 3 | **Ö-3:** İmzalı kabul formlarının saklanacağı yer belirlenmedi | ✅ Kapandı (14.10.2026, `KR-107`, #213): konum depodur; doldurulmuş formlar `kayitlar/` altında, taranmış imzalı nüshalar proje sonunda |
 | 4 | Doküman haritası 24.09.2026'dan beri güncellenmedi. Bilgi kayıt defteri ve yaklaşım belgeleri haritada yok. Harita var olmayan `tamamlanma-tanimi.md` ve `kod-gozden-gecirme-kontrol-listesi.md` dosyalarını gösteriyor | ✅ Kapandı: harita 0.5 (14.10.2026, #214). "Son güncelleme" alanının değişiklik geçmişiyle tutarlılığı artık CI'da denetlenir (`doc-consistency-check.mjs`) |
 | 5 | Paydaşlara hangi bilginin hangi kanalla sunulduğu kayda geçmiyor (örn. İK inceleme seti) | Dağıtım kaydı tanımlanmadı |
 | 6 | Deponun ve geliştirici makinesindeki kümelerin planlı yedeği tanımlı değil (plan B5, B9 "bekliyor") | Açık |
-| 7 | Depo dışı konumlarla ilk karşılaştırma (`KR-101`, 13.10.2026) defterde olmayan kümeler buldu (MAN.8 Ek A §5.3) | Açık; #215 |
+| 7 | Depo dışı konumlarla ilk karşılaştırma (`KR-101`, 13.10.2026) defterde olmayan kümeler buldu (MAN.8 Ek A §5.3) | ✅ Kapandı (#215). 12.11.2026'daki ikinci karşılaştırmanın bulguları (T1 Ek A §5.3) deftere 14.11.2026'da işlendi: BK-30, BK-31 (#392) |
 
 ---
 
@@ -147,3 +147,4 @@ Bu belge ve bilgi kayıt defteri her modül sonu süreç denetiminde (MAN.8) gö
 | 2026-10-05 | 1.0 | İlk oluşturma (#130) | Bilgi İşlem |
 | 2026-10-06 | 1.1 | Defterin modül sonu denetiminde sınanması onaylandı (`KR-101`, #177) | Bilgi İşlem |
 | 2026-10-14 | 1.2 | §8 durum sütunu: Ö-1, Ö-3 ve madde 4 kapandı; madde 7 eklendi (#214) | Bilgi İşlem |
+| 2026-11-14 | 1.3 | §8 #2 ve #7 kapandı (`KR-109`, #215; T1 Ek A §5.3 bulguları #392) | Bilgi İşlem |
